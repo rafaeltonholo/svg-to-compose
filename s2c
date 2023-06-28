@@ -1,0 +1,887 @@
+#!/bin/bash
+# set -x
+
+# region [ constants ]
+readonly VERSION=0.1
+readonly ERROR_CODE_FILE_NOT_FOUND=2
+readonly ERROR_CODE_SVGO_OPTIMIZATION=3
+readonly ERROR_CODE_SV2_OPTIMIZATION=4
+readonly ERROR_CODE_AVOCADO_OPTIMIZATION=5
+readonly ERROR_CODE_MISSING_PACKAGE=6
+readonly ERROR_CODE_MISSING_THEME=7
+readonly ERROR_CODE_MISSING_OUTPUT=8
+readonly FALLBACK_COLOR="<fallback-color>"
+readonly SHELL_COLOR_WARNING="\033[43m"
+readonly SHELL_NO_COLOR="\033[0m"
+
+# endregion [ constants ]
+
+# region [ functions ]
+fn_prerequisits () {
+  enable_opt=$1
+  filename=$2
+  package=$3
+  theme=$4
+  output=$5
+
+  if [[ "$package" == "" ]]; then
+    echo "ERROR: the parameter --package or -p should be specified"
+    echo
+    fn_help
+    exit $ERROR_CODE_MISSING_PACKAGE
+  fi
+  if [[ "$theme" == "" ]]; then
+    echo "ERROR: the parameter --theme or -t should be specified"
+    echo
+    fn_help
+    exit $ERROR_CODE_MISSING_THEME
+  fi
+  if [[ "$output" == "" ]]; then
+    echo "ERROR: the parameter --output or -o should be specified"
+    echo
+    fn_help
+    exit $ERROR_CODE_MISSING_OUTPUT
+  fi
+
+  if [[ $filename == "" ]]; then
+    echo "ERROR: the file MUST be specified."
+    echo
+    fn_help
+    exit $ERROR_CODE_FILE_NOT_FOUND
+  fi
+
+  if ! command -v xpath > /dev/null; then
+    echo "xpath is required."
+    exit
+  fi
+
+  if [ "$enable_opt" == "TRUE" ]; then
+    if ! command -v svgo > /dev/null; then
+      echo "svgo is required. Use npm -g install svgo to install."
+      exit
+    fi
+
+    if ! command -v s2v > /dev/null; then
+      echo "svg2vectordrawable is required. Use npm install -g svg2vectordrawable to install."
+      exit
+    fi
+
+    if ! command -v avocado > /dev/null; then
+      echo "avocado is required. Use npm install -g avocado to install."
+      exit
+    fi
+  fi
+}
+
+fn_help () {
+  echo "SVG to Compose (s2c) v$VERSION"
+  echo "Usage: stc [arguments] [file *.svg]      convert specific .svg file to Jetpack Compose icon file"
+  echo
+  echo "Required arguments:"
+  echo "   --package or -p                       Specify icons's package. This will replace package at the top of the icon file"
+  echo "   --theme or -t                         Specify project's theme name. This will take place in the Icon Preview composable function"
+  echo "                                         and in the ImageVector Builder's names."
+  echo
+  echo "   --output or -o                        The output filename; if no .kt extension specified, it will be automatically added"
+  echo
+  echo "Arguments:"
+  echo "   --optimize or -opt                    Enable svg optimization before parsing to Jetpack Compose icon. The optimization"
+  echo "                                         process uses the following programs: svgo, svg2vectordrawable, avocado from NPM Registry"
+  echo
+  echo "   --help or -h                          Shows this menu"
+  echo "   --version or -v                       Show this script version"
+}
+
+fn_show_versions () {
+  echo "StC version: $VERSION"
+}
+
+fn_write_svgo_config_file () {
+  echo "writing svgo config file"
+
+  cat >svgo-config.js <<'EOL'
+
+  module.exports = {
+    plugins: [
+        {
+            name: "convertPathData",
+            params: {
+                leadingZero: false,
+                floatPrecision: 2,
+            }
+        }
+    ]
+  }
+
+EOL
+}
+
+fn_run_optimization () {
+  echo
+  echo "🏎️  Optimizing SVG"
+  fn_write_svgo_config_file
+
+  echo
+  echo "⏳ Running svgo"
+  svgo target.svg --config=svgo-config.js -o target.optimized.svg
+  if [ $? != 0 ]; then
+    echo "Error running svgo optimization"
+    exit $ERROR_CODE_SVGO_OPTIMIZATION
+  fi
+  
+  echo
+  echo "✅ Finished svgo"
+  echo
+  echo "⏳ Running s2v"
+
+  s2v -p 2 -i target.optimized.svg -o target.xml
+  if [ $? != 0 ]; then
+    echo "Error running s2v optimization"
+    exit $ERROR_CODE_SV2_OPTIMIZATION
+  fi
+  
+  echo
+  echo "✅ Finished s2v"
+  echo
+  echo "⏳ Running avocado"
+  
+  avocado target.xml
+  if [ $? != 0 ]; then
+    echo "Error running avocado optimization"
+    exit $ERROR_CODE_AVOCADO_OPTIMIZATION
+  fi 
+  echo
+  echo "✅ Finished avocado"
+
+}
+
+fn_parse_svg () {
+  echo "👓 Parsing the svg file"
+  enable_opt=$1
+  filename=$2
+  package=$3
+  theme=$4
+  cp $filename target.svg
+  if [[ $enable_opt == TRUE ]]; then
+
+    fn_run_optimization
+    xpath_result=$(xpath -q -e '/vector/path/@android:pathData' target.xml)
+
+    paths=$(echo $xpath_result | sed 's/android:pathData="//g' | sed 's/"/,/g' | sed 's/ /\$/g')
+    IFS="," read -a joined_paths <<< $paths
+
+    i=0
+    path_colors=""
+    array=($joined_paths)
+    while [[ i -le ${#array[@]} ]] 
+    do
+      i=$((i+1))
+      xpath_result=$(xpath -q -e "/vector/path[position()=$i]/@android:fillColor" target.xml | sed 's/android:fillColor="#//g; s/"//g; s/ //g')
+      if [[ "$xpath_result" == "" ]]; then
+        xpath_result=$FALLBACK_COLOR
+      fi
+      path_colors="${path_colors},$xpath_result"
+    done
+    unset i
+
+    xpath_result=$(xpath -q -e '/vector/@android:width' target.xml)
+    width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    xpath_result=$(xpath -q -e '/vector/@android:height' target.xml)
+    height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+
+    xpath_result=$(xpath -q -e '/vector/@android:viewportWidth' target.xml)
+    viewport_width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    xpath_result=$(xpath -q -e '/vector/@android:viewportHeight' target.xml)
+    viewport_height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+
+  else
+
+    echo
+    echo -e "${SHELL_COLOR_WARNING} WARNING ⚠️ ${SHELL_NO_COLOR}: Generating Vector paths without optimization."
+    echo "             The image may be incomplete due to non-optimized svg issues."
+    echo "             It is strongly adviced to run this script with optimization instead."
+
+    xpath_result=$(xpath -q -e '/svg/path/@d' target.svg)
+    if [[ $xpath_result == "" ]]; then
+      xpath_result=$(xpath -q -e '/svg/g/path/@d' target.svg)
+    fi
+
+    paths=$(echo $xpath_result | sed 's/d="//g' | sed 's/"/,/g' | sed 's/ /\$/g')
+    
+    IFS="," read -a joined_paths <<< $paths
+    i=0
+    path_colors=""
+    array=($joined_paths)
+
+    while [[ i -le ${#array[@]} ]] 
+    do
+
+      i=$((i+1))
+      xpath_result=$(xpath -q -e "/svg/path[position()=$i]/@fill" target.svg | sed 's/fill="#/FF/g; s/"//g')
+      if [[ "$xpath_result" == "" ]]; then
+        xpath_result=$FALLBACK_COLOR
+      fi
+      path_colors="${path_colors},$xpath_result"
+
+    done
+    unset i
+
+    xpath_result=$(xpath -q -e '/svg/@width' target.svg)
+    width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    xpath_result=$(xpath -q -e '/svg/@height' target.svg)
+    height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+
+    xpath_result=$(xpath -q -e '/svg/@viewBox' target.svg)
+    viewbox=($(echo $xpath_result | sed 's/.*"\([^"]*\)".*/\1/'))
+    viewport_width=${viewbox[${#viewbox[@]} - 2]}
+    viewport_height=${viewbox[${#viewbox[@]} - 1]}
+
+  fi
+  
+  path_colors=$(echo $path_colors | sed 's/,//')
+  kotlin_filename="$(echo $filename | awk -F"/" '{print $NF}' | sed 's/.svg//')"
+  fn_write_icon_file $kotlin_filename "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
+}
+
+fn_write_icon_file () {
+  icon_name=$1
+  prearray=$2
+  package=$3
+  theme=$4
+  path_colors=($(echo $5 | sed 's/,/ /g'))
+  width=$6
+  height=$7
+  viewport_width=$8
+  viewport_height=$9
+  IFS="," read -a paths <<< $prearray
+
+  echo
+  echo "📝 Writing icon file"
+
+  # region [ icon file ]
+  file="""package $package
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+
+val $icon_name = ImageVector.Builder(
+    name = \"${theme}.$icon_name\",
+    defaultWidth = $width.dp,
+    defaultHeight = $height.dp,
+    viewportWidth = ${viewport_width}f,
+    viewportHeight = ${viewport_height}f,
+).apply {
+$(
+  index=0
+  for path in ${paths[@]}
+  do
+    path_color=${path_colors[$index]}
+    parsedPath=$(
+      echo $path | 
+      sed 's/\$/ /g' | 
+      sed 's/\([0-9]\)-/\1 -/g' | 
+      sed 's/z/z /g' |
+      sed -E 's/([a-yA-Y*])/ &/g'
+    )
+    echo "    // $parsedPath"
+    commands=($parsedPath)
+    if [[ "$path_color" == $FALLBACK_COLOR ]]; then
+      fill_color="SolidColor(Color.Black), // No color defined. Using fallback color."
+    elif [[ "$path_color" =~ ^[0-9A-F]{8}$ ]]; then
+      fill_color="SolidColor(Color(0x$path_color)),"
+    else
+      fill_color="SolidColor(Color.Black), // Can't parse $path_color to Jetpack Color."
+    fi
+
+    echo "    path(
+      fill = $fill_color
+    ) {
+    "
+    i=0
+    last_command=NULL
+    should_close=false
+    while [[ ${#commands[@]} -gt i ]] 
+    do
+      current=${commands[i]}
+
+      i=$((i+1))
+      if [[ "$current" =~ "M" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "M" ]]); then
+        y=${commands[i]}
+        printf "        // $current $y"
+
+        current=$(echo $current | sed 's/M//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+        if [[ "$y" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          y=$(echo $y | sed 's/[zZ]//g')
+          if [[ "$y" == "" ]]; then
+            y=0
+          fi
+        fi
+
+        echo
+        echo "        moveTo(x = ${current}f, y = ${y}f)"
+        i=$((i+1))
+        last_command="M"
+
+      elif [[ "$current" =~ "m" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "m" ]]); then
+      
+        dy=${commands[i]}
+        printf "        // $current $dy"
+        current=$(echo $current | sed 's/m//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy=$(echo $dy | sed 's/[zZ]//g')
+          if [[ "$dy" == "" ]]; then
+            dy=0
+          fi
+        fi
+
+        echo
+        echo "        moveToRelative(dx = ${current}f, dy = ${dy}f)"
+        i=$((i+1))
+        last_command="m"
+
+      elif [[ "$current" =~ "a" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "a" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/a//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        a=$current
+        b=${commands[i]}
+        display="${display} ${b}"
+        i=$((i+1))
+        theta=${commands[i]}
+        display="${display} ${theta}"
+        i=$((i+1))
+        is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+        display="${display} ${commands[i]}"
+        i=$((i+1))
+        is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+        display="${display} ${commands[i]}"
+        i=$((i+1))
+        dx1=${commands[i]}
+        display="${display} ${dx1}"
+        i=$((i+1))
+        dy1=${commands[i]}
+        display="${display} ${commands[i]}"
+
+        printf "\n        // ${display}"
+
+        if [[ "$dy1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy1=$(echo $dy1 | sed 's/[zZ]//g')
+          if [[ "$dy1" == "" ]]; then
+            dy1=0
+          fi
+        fi
+
+        echo "
+        arcToRelative(
+            a = ${a}f,
+            b = ${b}f,
+            theta = ${theta}f,
+            isMoreThanHalf = $is_more_than_half,
+            isPositiveArc = $is_positive_arc,
+            dx1 = ${dx1}f,
+            dy1 = ${dy1}f
+        )
+        "
+        i=$((i+1))
+        last_command="a"
+
+      elif [[ "$current" =~ "A" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "A" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/A//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        horizontal_ellipse_radius=$current
+        vertical_ellipse_radius=${commands[i]}
+        display="${display} ${vertical_ellipse_radius}"
+        i=$((i+1))
+        theta=${commands[i]}
+        display="${display} ${theta}"
+        i=$((i+1))
+        is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+        display="${display} ${commands[i]}"
+        i=$((i+1))
+        is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+        display="${display} ${commands[i]}"
+        i=$((i+1))
+        x1=${commands[i]}
+        display="${display} ${x1}"
+        i=$((i+1))
+        y1=${commands[i]}
+        display="${display} ${commands[i]}"
+
+        printf "\n        // ${display}"
+
+        if [[ "$y1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          y1=$(echo $y1 | sed 's/[zZ]//g')
+          if [[ "$y1" == "" ]]; then
+            y1=0
+          fi
+        fi
+
+        echo "
+        arcTo(
+            horizontalEllipseRadius = ${horizontal_ellipse_radius}f,
+            verticalEllipseRadius = ${vertical_ellipse_radius}f,
+            theta = ${theta}f,
+            isMoreThanHalf = $is_more_than_half,
+            isPositiveArc = $is_positive_arc,
+            x1 = ${x1}f,
+            y1 = ${y1}f
+        )
+        "
+        i=$((i+1))
+        last_command="A"
+
+      elif [[ "$current" =~ "v" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "v" ]]); then
+        
+        echo "        // $current"
+        current=$(echo $current | sed 's/v//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+        fi
+
+        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          current=$(echo $current | sed 's/[zZ]//g')
+        fi
+
+        echo "        verticalLineToRelative(dy = ${current}f)"
+        last_command="v"
+
+      elif [[ "$current" =~ "V" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "V" ]]); then
+      
+        echo "        // $current"
+        current=$(echo $current | sed 's/V//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+        fi
+
+        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          current=$(echo $current | sed 's/[zZ]//g')
+        fi
+
+        echo "        verticalLineTo(y = ${current}f)"
+        last_command="V"
+
+      elif [[ "$current" =~ "h" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "h" ]]); then
+        
+        echo "        // $current"
+        current=$(echo $current | sed 's/h//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+        fi
+
+        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+        fi
+
+        current=$(echo $current | sed 's/[zZ]//g')
+        echo "        horizontalLineToRelative(dx = ${current}f)"
+        last_command="h"
+
+      elif [[ "$current" =~ "H" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "H" ]]); then
+
+        echo "        // $current"
+        current=$(echo $current | sed 's/H//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+        fi
+
+        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          current=$(echo $current | sed 's/[zZ]//g')
+        fi
+
+        echo "        horizontalLineTo(x = ${current}f)"
+        last_command="H"
+
+      elif [[ "$current" =~ "L" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "L" ]]); then
+        
+        dy=${commands[i]}
+        echo "        // $current $dy"
+        current=$(echo $current | sed 's/L//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy=$(echo $dy | sed 's/[zZ]//g')
+          if [[ "$dy" == "" ]]; then
+            dy=0
+          fi
+        fi
+
+        echo "        lineTo(x = ${current}f, y = ${dy}f)"
+        i=$((i+1))
+        last_command="L"
+
+      elif [[ "$current" =~ "l" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "l" ]]); then
+
+        dy=${commands[i]}
+        echo "        // $current $dy"
+        current=$(echo $current | sed 's/l//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        dy=${commands[i]}
+        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy=$(echo $dy | sed 's/[zZ]//g')
+          if [[ "$dy" == "" ]]; then
+            dy=0
+          fi
+        fi
+        
+        echo "        lineToRelative(dx = ${current}f, dy = ${dy}f)"
+        i=$((i+1))
+        last_command="l"
+
+      elif [[ "$current" =~ "C" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "C" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/C//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        x1=$current
+        y1=${commands[i]}
+        display="${display} ${y1}"
+        i=$((i+1))
+        x2=${commands[i]}
+        display="${display} ${x2}"
+        i=$((i+1))
+        y2=${commands[i]}
+        display="${display} ${y2}"
+        i=$((i+1))
+        x3=${commands[i]}
+        display="${display} ${x3}"
+        i=$((i+1))
+        y3=${commands[i]}
+        display="${display} ${y3}"
+        i=$((i+1))
+
+        printf "\n        // ${display}"
+
+        if [[ "$y3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          y3=$(echo $y3 | sed 's/[zZ]//g')
+          if [[ "$y3" == "" ]]; then
+            y3=0
+          fi
+        fi
+
+        echo "
+        curveTo(
+            x1 = ${x1}f,
+            y1 = ${y1}f,
+            x2 = ${x2}f,
+            y2 = ${y2}f,
+            x3 = ${x3}f,
+            y3 = ${y3}f,
+        )
+        "
+        last_command="C"
+        
+
+      elif [[ "$current" =~ "c" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "c" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/c//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        dx1=$current
+        dy1=${commands[i]}
+        display="${display} ${dy1}"
+        i=$((i+1))
+        dx2=${commands[i]}
+        display="${display} ${dx2}"
+        i=$((i+1))
+        dy2=${commands[i]}
+        display="${display} ${dy2}"
+        i=$((i+1))
+        dx3=${commands[i]}
+        display="${display} ${dx3}"
+        i=$((i+1))
+        dy3=${commands[i]}
+        display="${display} ${dy3}"
+        i=$((i+1))
+
+        printf "\n        // ${display}"
+
+        if [[ "$dy3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy3=$(echo $dy3 | sed 's/[zZ]//g')
+          if [[ "$dy3" == "" ]]; then
+            dy3=0
+          fi
+        fi
+
+        echo "
+        curveToRelative(
+            dx1 = ${dx1}f,
+            dy1 = ${dy1}f,
+            dx2 = ${dx2}f,
+            dy2 = ${dy2}f,
+            dx3 = ${dx3}f,
+            dy3 = ${dy3}f,
+        )
+        "
+        last_command="c"
+
+      elif [[ "$current" =~ "s" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "s" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/s//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        dx1=$current
+        dy1=${commands[i]}
+        display="${display} ${dy1}"
+        i=$((i+1))
+        dx2=${commands[i]}
+        display="${display} ${dx2}"
+        i=$((i+1))
+        dy2=${commands[i]}
+        display="${display} ${dy2}"
+        i=$((i+1))
+
+        printf "\n        // ${display}"
+
+        if [[ "$dy2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          dy2=$(echo $dy2 | sed 's/[zZ]//g')
+          if [[ "$dy2" == "" ]]; then
+            dy2=0
+          fi
+        fi
+
+        echo "
+        reflectiveCurveToRelative(
+            dx1 = ${dx1}f,
+            dy1 = ${dy1}f,
+            dx2 = ${dx2}f,
+            dy2 = ${dy2}f,
+        )
+        "
+        last_command="s"
+
+      elif [[ "$current" =~ "S" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "S" ]]); then
+
+        display="${current}"
+        current=$(echo $current | sed 's/S//g')
+        if [[ "$current" == "" ]]; then
+          current=${commands[i]}
+          i=$((i+1))
+        fi
+        current=$(echo $current | sed 's/[zZ]//g')
+
+        x1=$current
+        y1=${commands[i]}
+        display="${display} ${y1}"
+        i=$((i+1))
+        x2=${commands[i]}
+        display="${display} ${x2}"
+        i=$((i+1))
+        y2=${commands[i]}
+        display="${display} ${y2}"
+        i=$((i+1))
+
+        printf "\n        // ${display}"
+
+        if [[ "$y2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+          should_close=true
+          y2=$(echo $y2 | sed 's/[zZ]//g')
+          if [[ "$y2" == "" ]]; then
+            y2=0
+          fi
+        fi
+
+        echo "
+        reflectiveCurveTo(
+            x1 = ${x1}f,
+            y1 = ${y1}f,
+            x2 = ${x2}f,
+            y2 = ${y2}f,
+        )
+        "
+        last_command="S"
+        
+      fi
+
+      if [[ $should_close == true ]]; then
+        echo "        close()"
+        should_close=false
+      fi
+    done
+    echo "    }"
+    echo
+    index=$((index+1))
+  done
+)
+}.build()
+
+@Preview
+@Composable
+private fun IconPreview() {
+    $theme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                imageVector = $icon_name,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+            )
+        }
+    }
+}"""
+  # endregion [ icon file ]
+
+  echo "$file" > "temp.kt"
+
+  echo
+  echo "✅ Done writing the file"
+}
+
+fn_move_output () {
+  output=$1
+
+  if [[ $output != *".kt" ]]; then
+    echo
+    echo "📢 Output path is missing kotlin extension. Adding it automatically."
+    output="${output}.kt"
+  fi
+
+  echo
+  echo "📲 Moving generated icon to output destination"
+
+  cp temp.kt $output
+
+  echo
+  echo "✅ File moved successfully."
+}
+
+fn_cleanup () {
+  echo
+  echo "🧹 Cleaning up temp files"
+  rm svgo-config.js 2> /dev/null
+  rm target.svg 2> /dev/null
+  rm target.optimized.svg 2> /dev/null
+  rm target.xml 2> /dev/null
+  rm temp.kt 2> /dev/null
+  echo
+  echo "✅ Finished cleanup."
+}
+
+# endregion [ functions ]
+
+
+# Run
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    -o|--output) 
+      output="$2"; shift ;;
+    -opt|--optimize)
+      if [ "$2" == "true" ] 
+      then
+        enable_opt=TRUE
+      elif [ "$2" == "false" ] 
+      then
+        enable_opt=FALSE
+      else
+        enable_opt=TRUE
+      fi
+      shift ;;
+    -h|--help) 
+      fn_help
+      exit;;
+    -v|--version) 
+      fn_show_versions
+      exit;;
+    -p|--package)
+      package="$2"; shift ;;
+    -t|--theme)
+      theme="$2"; shift ;;
+    *)
+      if [[ $1 == ${*: -1:1} ]] && [[ $1 != "--"* ]];
+      then
+        filename=$1
+      else # Invalid option
+        echo "Unknown parameter passed: $1."
+        fn_help
+        exit 1
+      fi
+      ;;
+  esac
+  shift
+done
+
+if [ -z ${enable_opt+x} ];
+then
+  enable_opt=TRUE
+fi
+
+fn_prerequisits $enable_opt $filename $package $theme $output
+fn_parse_svg $enable_opt $filename $package $theme
+fn_move_output $output
+fn_cleanup
+
+echo
+echo "🎉 SVG parsed to Jetpack Compose icon with success 🎉"
+
