@@ -61,4 +61,4 @@ s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme --optmi
 ```
 
 # License
-MIT
+This software is released under the terms of the [MIT license](https://github.com/rafaeltonholo/svg-to-compose/blob/main/LICENSE).
