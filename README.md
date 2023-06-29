@@ -8,13 +8,13 @@ With the addition of Jetpack Compose, we don't use XML to write views and we can
 
 With that in mind, what if we could also avoid using our old approach to import icons to our project, and now rely on `ImageVector`s and creating the icons using Kotlin, following the same approach that is made for all Material Icons, from Google.
 
-There are a few plugins available to make that so, but usually they doesn't optmize the svg first before converting it to Jetpack Compose Icons.
+There are existing plugins available, but they usually don't optimize the svg before converting it to Jetpack Compose Icons.
 
 This library adds that functionallity.
 
 ## Installation
 As this is just a shell script, the installation is very simple:
-1. Download the s2c script in this repository and save it in any place of your computer
+1. Download the s2c script from this repository and save it in your preferred folder
 2. Give execution permission to the script:
 ```sh
 chmod +x s2c
@@ -26,12 +26,12 @@ export PATH=<s2c path>:$PATH
 Replacing `<s2c path>` to the folder's path where you stored the script
 
 ### Dependencies
-This script relies in three others to perform the optimization:
+This script relies on three others to perform the optimization:
 - [SVGO](https://github.com/svg/svgo): Optmizes the SVG reducing the paths.
 ```sh
 npm -g install svgo
 ```
-- [SVG2VectorDrawable](https://github.com/Ashung/svg2vectordrawable): Converts the SVG to a Android Vector.
+- [SVG2VectorDrawable](https://github.com/Ashung/svg2vectordrawable): Converts the SVG to an Android Vector.
 ```sh
 npm install -g svg2vectordrawable
 ```
