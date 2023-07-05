@@ -161,6 +161,7 @@ fn_parse_svg () {
   filename=$2
   package=$3
   theme=$4
+  output=$5
   cp $filename target.svg
   if [[ $enable_opt == TRUE ]]; then
 
@@ -236,11 +237,19 @@ fn_parse_svg () {
     viewport_width=${viewbox[${#viewbox[@]} - 2]}
     viewport_height=${viewbox[${#viewbox[@]} - 1]}
 
+    if [[ "$width" == "" ]]; then
+      width=$viewport_width
+    fi
+    if [[ "$height" == "" ]]; then
+      height=$viewport_height
+    fi
+
   fi
   
   path_colors=$(echo $path_colors | sed 's/,//')
-  kotlin_filename="$(echo $filename | awk -F"/" '{print $NF}' | sed 's/.svg//')"
-  fn_write_icon_file $kotlin_filename "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
+  # TODO: make sure the icon_name follows PascalCase.
+  icon_name="$(echo $output | awk -F"/" '{print $NF}' | sed 's/.kt//')"
+  fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
 }
 
 fn_write_icon_file () {
@@ -317,6 +326,7 @@ $(
 
       i=$((i+1))
       if [[ "$current" =~ "M" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "M" ]]); then
+
         y=${commands[i]}
         printf "        // $current $y"
 
@@ -410,7 +420,7 @@ $(
             isMoreThanHalf = $is_more_than_half,
             isPositiveArc = $is_positive_arc,
             dx1 = ${dx1}f,
-            dy1 = ${dy1}f
+            dy1 = ${dy1}f,
         )
         "
         i=$((i+1))
@@ -463,7 +473,7 @@ $(
             isMoreThanHalf = $is_more_than_half,
             isPositiveArc = $is_positive_arc,
             x1 = ${x1}f,
-            y1 = ${y1}f
+            y1 = ${y1}f,
         )
         "
         i=$((i+1))
@@ -878,7 +888,7 @@ then
 fi
 
 fn_prerequisits $enable_opt $filename $package $theme $output
-fn_parse_svg $enable_opt $filename $package $theme
+fn_parse_svg $enable_opt $filename $package $theme $output
 fn_move_output $output
 fn_cleanup
 
