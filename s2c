@@ -10,6 +10,7 @@ readonly ERROR_CODE_AVOCADO_OPTIMIZATION=5
 readonly ERROR_CODE_MISSING_PACKAGE=6
 readonly ERROR_CODE_MISSING_THEME=7
 readonly ERROR_CODE_MISSING_OUTPUT=8
+readonly ERROR_CODE_MISSING_CORE_DEPENDENCY=1000
 readonly FALLBACK_COLOR="<fallback-color>"
 readonly SHELL_COLOR_WARNING="\033[43m"
 readonly SHELL_NO_COLOR="\033[0m"
@@ -52,7 +53,17 @@ fn_prerequisits () {
 
   if ! command -v xpath > /dev/null; then
     echo "xpath is required."
-    exit
+    exit $ERROR_CODE_MISSING_CORE_DEPENDENCY
+  fi
+
+  if ! command -v perl > /dev/null; then
+    echo "perl is required."
+    exit $ERROR_CODE_MISSING_CORE_DEPENDENCY
+  fi
+
+  if ! command -v sed > /dev/null; then
+    echo "sed is required."
+    exit $ERROR_CODE_MISSING_CORE_DEPENDENCY
   fi
 
   if [ "$enable_opt" == "TRUE" ]; then
