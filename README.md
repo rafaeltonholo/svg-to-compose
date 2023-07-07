@@ -1,5 +1,5 @@
 # SVG to Compose
-A command-line tool for convert SVG to Android Jetpack Compose Icons.
+A command-line tool for convert SVG or an Android Vector Drawable to Android Jetpack Compose Icons.
 
 ## Why?
 We usually use Android Vector drawables to display icons on Android apps.
@@ -47,6 +47,16 @@ If you don't want to optimizes the SVG before converting it, you can just disabl
 Convert a SVG to a Compose Icon:
 ```sh
 s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme input.svg
+```
+
+Convert an Android Drawable Vector to a Compose Icon:
+```sh
+s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme input.xml
+```
+
+Convert all SVGs and Android Drawable Vectors to Compose Icons:
+```sh
+s2c -o /my/desired/directory -p your.app.package.icon -t YourAppComposeTheme /my/svg/or/xml/directory
 ```
 
 Help for advance usage:
