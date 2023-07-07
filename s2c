@@ -11,6 +11,7 @@ readonly ERROR_CODE_MISSING_PACKAGE=6
 readonly ERROR_CODE_MISSING_THEME=7
 readonly ERROR_CODE_MISSING_OUTPUT=8
 readonly ERROR_CODE_NOT_SUPPORTED_FILE=9
+readonly ERROR_CODE_OUTPUT_NOT_DIRECTORY=10
 readonly ERROR_CODE_MISSING_CORE_DEPENDENCY=1000
 readonly FALLBACK_COLOR="<fallback-color>"
 readonly SHELL_COLOR_WARNING="\033[43m"
@@ -181,6 +182,7 @@ fn_parse_svg () {
   package=$3
   theme=$4
   output=$5
+  is_directory=$6
 
   if [[ "$filename" == *.svg ]]; then
     cp $filename target.svg
@@ -274,8 +276,13 @@ fn_parse_svg () {
   fi
   
   path_colors=$(echo $path_colors | sed 's/,//')
-  # TODO: make sure the icon_name follows PascalCase.
-  icon_name="$(echo $output | awk -F"/" '{print $NF}' | sed 's/.kt//')"
+
+  if [[ $is_directory == TRUE ]]; then
+    icon_name=$(echo $filename | awk -F"/" '{print $NF}' | sed 's/.svg//' | sed 's/.xml//')
+  else
+    icon_name="$(echo $output | awk -F"/" '{print $NF}' | sed 's/.kt//')"
+  fi
+  
   fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
 }
 
@@ -857,18 +864,36 @@ private var _$icon_name_camel_case: ImageVector? = null"""
 }
 
 fn_move_output () {
-  output=$1
+  cp_output=$1
+  filename=$2
+  is_directory=$3
 
-  if [[ $output != *".kt" ]]; then
-    echo
-    echo "📢 Output path is missing kotlin extension. Adding it automatically."
-    output="${output}.kt"
+  if [[ $is_directory == TRUE ]]; then
+    icon_name=$(echo $filename | awk -F"/" '{print $NF}' | sed 's/.svg//' | sed 's/.xml//')
+    directory=$cp_output
+    cp_output="$cp_output$(fn_to_pascal_case $icon_name).kt"
+  else
+    if [[ $cp_output != *".kt" ]]; then
+      echo
+      echo "📢 Output path is missing kotlin extension. Adding it automatically."
+      cp_output="${cp_output}.kt"
+    fi
   fi
 
   echo
   echo "📲 Moving generated icon to output destination"
 
-  cp temp.kt $output
+  cp temp.kt $cp_output 2> /dev/null
+
+  if [[ $is_directory == TRUE ]] && [ $? != 1 ]; then
+    mkdir -p $directory
+    cp temp.kt $cp_output
+
+    if [ $? != 0 ]; then
+      echo "🛑 Error trying to move to output folder"
+      exit
+    fi
+  fi
 
   echo
   echo "✅ File moved successfully."
@@ -918,7 +943,7 @@ while [[ "$#" -gt 0 ]]; do
     *)
       if [[ $1 == ${*: -1:1} ]] && [[ $1 != "--"* ]];
       then
-        filename=$1
+        input=$1
       else # Invalid option
         echo "Unknown parameter passed: $1."
         fn_help
@@ -934,10 +959,38 @@ then
   enable_opt=TRUE
 fi
 
-fn_prerequisits $enable_opt $filename $package $theme $output
-fn_parse_svg $enable_opt $filename $package $theme $output
-fn_move_output $output
-fn_cleanup
+if [ -f $input ]; then
+  files=($input)
+else
+  echo "🔍 Directory detected"
+  files=($(ls $input | grep -E '\.svg$|\.xml$'))
+
+  if [ -d $output ]; then
+    is_directory=TRUE
+  else
+    echo
+    echo "ERROR: when the input is a directory, the output MUST be directory too."
+    echo
+    exit $ERROR_CODE_OUTPUT_NOT_DIRECTORY
+  fi
+fi
+
+for file in ${files[@]}
+do
+  if [[ $is_directory == TRUE ]]; then
+    filename="$input/$file"
+  else
+    filename=$file
+  fi
+  
+  echo "⏳ Processing $filename"
+  echo
+
+  fn_prerequisits $enable_opt $filename $package $theme $output
+  fn_parse_svg $enable_opt $filename $package $theme $output $is_directory
+  fn_move_output $output $filename $is_directory
+  fn_cleanup
+done
 
 echo
 echo "🎉 SVG parsed to Jetpack Compose icon with success 🎉"
