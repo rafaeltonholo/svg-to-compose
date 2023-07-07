@@ -10,6 +10,7 @@ readonly ERROR_CODE_AVOCADO_OPTIMIZATION=5
 readonly ERROR_CODE_MISSING_PACKAGE=6
 readonly ERROR_CODE_MISSING_THEME=7
 readonly ERROR_CODE_MISSING_OUTPUT=8
+readonly ERROR_CODE_NOT_SUPPORTED_FILE=9
 readonly ERROR_CODE_MISSING_CORE_DEPENDENCY=1000
 readonly FALLBACK_COLOR="<fallback-color>"
 readonly SHELL_COLOR_WARNING="\033[43m"
@@ -128,31 +129,38 @@ EOL
 }
 
 fn_run_optimization () {
-  echo
-  echo "🏎️  Optimizing SVG"
-  fn_write_svgo_config_file
+  if [[ "$filename" == *.svg ]]; then
+    echo
+    echo "🏎️  Optimizing SVG"
+    fn_write_svgo_config_file
+    echo
+    echo "⏳ Running svgo"
+    svgo target.svg --config=svgo-config.js -o target.optimized.svg
+    if [ $? != 0 ]; then
+      echo "Error running svgo optimization"
+      exit $ERROR_CODE_SVGO_OPTIMIZATION
+    fi
+    
+    echo
+    echo "✅ Finished svgo"
+    echo
+    echo "⏳ Running s2v"
 
-  echo
-  echo "⏳ Running svgo"
-  svgo target.svg --config=svgo-config.js -o target.optimized.svg
-  if [ $? != 0 ]; then
-    echo "Error running svgo optimization"
-    exit $ERROR_CODE_SVGO_OPTIMIZATION
+    s2v -p 2 -i target.optimized.svg -o target.xml
+    if [ $? != 0 ]; then
+      echo "Error running s2v optimization"
+      exit $ERROR_CODE_SV2_OPTIMIZATION
+    fi
+    
+    echo
+    echo "✅ Finished s2v"
+  else
+    echo
+    echo -e "⚠️ XML deteced, skipping SVG optimization"
+    echo
+    echo "🏎️  Optimizing XML"
   fi
-  
-  echo
-  echo "✅ Finished svgo"
-  echo
-  echo "⏳ Running s2v"
 
-  s2v -p 2 -i target.optimized.svg -o target.xml
-  if [ $? != 0 ]; then
-    echo "Error running s2v optimization"
-    exit $ERROR_CODE_SV2_OPTIMIZATION
-  fi
-  
-  echo
-  echo "✅ Finished s2v"
   echo
   echo "⏳ Running avocado"
   
@@ -173,7 +181,15 @@ fn_parse_svg () {
   package=$3
   theme=$4
   output=$5
-  cp $filename target.svg
+
+  if [[ "$filename" == *.svg ]]; then
+    cp $filename target.svg
+  elif [[ "$filename" == *.xml ]]; then
+    cp $filename target.xml
+  else
+    exit $ERROR_CODE_NOT_SUPPORTED_FILE
+  fi
+
   if [[ $enable_opt == TRUE ]]; then
 
     fn_run_optimization
