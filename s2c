@@ -2,7 +2,7 @@
 # set -x
 
 # region [ constants ]
-readonly VERSION=0.1
+readonly VERSION=0.2
 readonly ERROR_CODE_FILE_NOT_FOUND=2
 readonly ERROR_CODE_SVGO_OPTIMIZATION=3
 readonly ERROR_CODE_SV2_OPTIMIZATION=4
@@ -88,7 +88,8 @@ fn_prerequisits () {
 
 fn_help () {
   echo "SVG to Compose (s2c) v$VERSION"
-  echo "Usage: stc [arguments] [file *.svg]      convert specific .svg file to Jetpack Compose icon file"
+  echo "Usage: stc [arguments] [file *.svg | *.xml | directory]      convert specific .svg or an Android Vector Drawable (.xml)"
+  echo "                                                             file to Jetpack Compose icon file"
   echo
   echo "Required arguments:"
   echo "   --package or -p                       Specify icons's package. This will replace package at the top of the icon file"
@@ -96,6 +97,7 @@ fn_help () {
   echo "                                         and in the ImageVector Builder's names."
   echo
   echo "   --output or -o                        The output filename; if no .kt extension specified, it will be automatically added"
+  echo "                                         In case of the input is a directory, output MUST also be a directory."
   echo
   echo "Arguments:"
   echo "   --optimize or -opt                    Enable svg optimization before parsing to Jetpack Compose icon. The optimization"
