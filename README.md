@@ -46,17 +46,17 @@ If you don't want to optimizes the SVG before converting it, you can just disabl
 ## Use in command-line
 Convert a SVG to a Compose Icon:
 ```sh
-s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme input.svg
+s2c -o OutputIconFile.kt -p your.app.package.icon -t your.app.package.theme.YourAppComposeTheme input.svg
 ```
 
 Convert an Android Drawable Vector to a Compose Icon:
 ```sh
-s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme input.xml
+s2c -o OutputIconFile.kt -p your.app.package.icon -t your.app.package.theme.YourAppComposeTheme input.xml
 ```
 
 Convert all SVGs and Android Drawable Vectors to Compose Icons:
 ```sh
-s2c -o /my/desired/directory -p your.app.package.icon -t YourAppComposeTheme /my/svg/or/xml/directory
+s2c -o /my/desired/directory -p your.app.package.icon -t your.app.package.theme.YourAppComposeTheme /my/svg/or/xml/directory
 ```
 
 Help for advance usage:
@@ -67,8 +67,10 @@ s2c --help
 Disabling SVG optimization:
 
 ```sh
-s2c -o OutputIconFile.kt -p your.app.package.icon -t YourAppComposeTheme --optmize false input.svg
+s2c -o OutputIconFile.kt -p your.app.package.icon -t your.app.package.theme.YourAppComposeTheme --optmize false input.svg
 ```
+
+> **Important**: If you don't specify the full qualifier of the Theme, you'll need to add the import it later.
 
 # License
 This software is released under the terms of the [MIT license](https://github.com/rafaeltonholo/svg-to-compose/blob/main/LICENSE).
