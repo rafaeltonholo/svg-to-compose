@@ -252,6 +252,16 @@ fn_parse_svg () {
   fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
 }
 
+fn_to_camel_case() {
+  string=$1
+  echo "$string" | perl -pe 's/(?:[_-]|^)(\w)/\L\u$1/g; s/[_-]//g; s/^(.)/\l$1/'
+}
+
+fn_to_pascal_case() {
+  string=$1
+  echo "$string" | perl -pe 's/(^|[-_.])([a-zA-Z0-9])/\U$2/g; s/[-_]+//g'
+}
+
 fn_write_icon_file () {
   icon_name=$1
   prearray=$2
@@ -263,6 +273,8 @@ fn_write_icon_file () {
   viewport_width=$8
   viewport_height=$9
   IFS="," read -a paths <<< $prearray
+  icon_name_camel_case=$(fn_to_camel_case $icon_name)
+  icon_name_pascal_case=$(fn_to_pascal_case $icon_name)
 
   echo
   echo "📝 Writing icon file"
@@ -284,506 +296,512 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val $icon_name = ImageVector.Builder(
-    name = \"${theme}.$icon_name\",
-    defaultWidth = $width.dp,
-    defaultHeight = $height.dp,
-    viewportWidth = ${viewport_width}f,
-    viewportHeight = ${viewport_height}f,
-).apply {
-$(
-  index=0
-  for path in ${paths[@]}
-  do
-    path_color=${path_colors[$index]}
-    parsedPath=$(
-      echo $path | 
-      sed 's/\$/ /g' | 
-      sed 's/\([0-9]\)-/\1 -/g' | 
-      sed 's/z/z /g' |
-      sed -E 's/([a-yA-Y*])/ &/g'
-    )
-    echo "    // $parsedPath"
-    commands=($parsedPath)
-    if [[ "$path_color" == $FALLBACK_COLOR ]]; then
-      fill_color="SolidColor(Color.Black), // No color defined. Using fallback color."
-    elif [[ "$path_color" =~ ^[0-9A-F]{8}$ ]]; then
-      fill_color="SolidColor(Color(0x$path_color)),"
-    else
-      fill_color="SolidColor(Color.Black), // Can't parse $path_color to Jetpack Color."
-    fi
+val $icon_name_pascal_case: ImageVector
+  get() {
+    val current = _$icon_name_camel_case
+    if (current != null) return current
 
-    echo "    path(
-      fill = $fill_color
-    ) {
-    "
-    i=0
-    last_command=NULL
-    should_close=false
-    while [[ ${#commands[@]} -gt i ]] 
-    do
-      current=${commands[i]}
-
-      i=$((i+1))
-      if [[ "$current" =~ "M" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "M" ]]); then
-
-        y=${commands[i]}
-        printf "        // $current $y"
-
-        current=$(echo $current | sed 's/M//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-        if [[ "$y" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          y=$(echo $y | sed 's/[zZ]//g')
-          if [[ "$y" == "" ]]; then
-            y=0
-          fi
-        fi
-
-        echo
-        echo "        moveTo(x = ${current}f, y = ${y}f)"
-        i=$((i+1))
-        last_command="M"
-
-      elif [[ "$current" =~ "m" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "m" ]]); then
-      
-        dy=${commands[i]}
-        printf "        // $current $dy"
-        current=$(echo $current | sed 's/m//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy=$(echo $dy | sed 's/[zZ]//g')
-          if [[ "$dy" == "" ]]; then
-            dy=0
-          fi
-        fi
-
-        echo
-        echo "        moveToRelative(dx = ${current}f, dy = ${dy}f)"
-        i=$((i+1))
-        last_command="m"
-
-      elif [[ "$current" =~ "a" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "a" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/a//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        a=$current
-        b=${commands[i]}
-        display="${display} ${b}"
-        i=$((i+1))
-        theta=${commands[i]}
-        display="${display} ${theta}"
-        i=$((i+1))
-        is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
-        display="${display} ${commands[i]}"
-        i=$((i+1))
-        is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
-        display="${display} ${commands[i]}"
-        i=$((i+1))
-        dx1=${commands[i]}
-        display="${display} ${dx1}"
-        i=$((i+1))
-        dy1=${commands[i]}
-        display="${display} ${commands[i]}"
-
-        printf "\n        // ${display}"
-
-        if [[ "$dy1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy1=$(echo $dy1 | sed 's/[zZ]//g')
-          if [[ "$dy1" == "" ]]; then
-            dy1=0
-          fi
-        fi
-
-        echo "
-        arcToRelative(
-            a = ${a}f,
-            b = ${b}f,
-            theta = ${theta}f,
-            isMoreThanHalf = $is_more_than_half,
-            isPositiveArc = $is_positive_arc,
-            dx1 = ${dx1}f,
-            dy1 = ${dy1}f,
+    return ImageVector.Builder(
+      name = \"${theme}.$icon_name_pascal_case\",
+      defaultWidth = $width.dp,
+      defaultHeight = $height.dp,
+      viewportWidth = ${viewport_width}f,
+      viewportHeight = ${viewport_height}f,
+    ).apply {
+    $(
+      index=0
+      for path in ${paths[@]}
+      do
+        path_color=${path_colors[$index]}
+        parsedPath=$(
+          echo $path | 
+          sed 's/\$/ /g' | 
+          sed 's/\([0-9]\)-/\1 -/g' | 
+          sed 's/z/z /g' |
+          sed -E 's/([a-yA-Y*])/ &/g'
         )
+        echo "    // $parsedPath"
+        commands=($parsedPath)
+        if [[ "$path_color" == $FALLBACK_COLOR ]]; then
+          fill_color="SolidColor(Color.Black), // No color defined. Using fallback color."
+        elif [[ "$path_color" =~ ^[0-9A-F]{8}$ ]]; then
+          fill_color="SolidColor(Color(0x$path_color)),"
+        else
+          fill_color="SolidColor(Color.Black), // Can't parse $path_color to Jetpack Color."
+        fi
+
+        echo "    path(
+          fill = $fill_color
+        ) {
         "
-        i=$((i+1))
-        last_command="a"
-
-      elif [[ "$current" =~ "A" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "A" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/A//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        horizontal_ellipse_radius=$current
-        vertical_ellipse_radius=${commands[i]}
-        display="${display} ${vertical_ellipse_radius}"
-        i=$((i+1))
-        theta=${commands[i]}
-        display="${display} ${theta}"
-        i=$((i+1))
-        is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
-        display="${display} ${commands[i]}"
-        i=$((i+1))
-        is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
-        display="${display} ${commands[i]}"
-        i=$((i+1))
-        x1=${commands[i]}
-        display="${display} ${x1}"
-        i=$((i+1))
-        y1=${commands[i]}
-        display="${display} ${commands[i]}"
-
-        printf "\n        // ${display}"
-
-        if [[ "$y1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          y1=$(echo $y1 | sed 's/[zZ]//g')
-          if [[ "$y1" == "" ]]; then
-            y1=0
-          fi
-        fi
-
-        echo "
-        arcTo(
-            horizontalEllipseRadius = ${horizontal_ellipse_radius}f,
-            verticalEllipseRadius = ${vertical_ellipse_radius}f,
-            theta = ${theta}f,
-            isMoreThanHalf = $is_more_than_half,
-            isPositiveArc = $is_positive_arc,
-            x1 = ${x1}f,
-            y1 = ${y1}f,
-        )
-        "
-        i=$((i+1))
-        last_command="A"
-
-      elif [[ "$current" =~ "v" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "v" ]]); then
-        
-        echo "        // $current"
-        current=$(echo $current | sed 's/v//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-        fi
-
-        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          current=$(echo $current | sed 's/[zZ]//g')
-        fi
-
-        echo "        verticalLineToRelative(dy = ${current}f)"
-        last_command="v"
-
-      elif [[ "$current" =~ "V" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "V" ]]); then
-      
-        echo "        // $current"
-        current=$(echo $current | sed 's/V//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-        fi
-
-        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          current=$(echo $current | sed 's/[zZ]//g')
-        fi
-
-        echo "        verticalLineTo(y = ${current}f)"
-        last_command="V"
-
-      elif [[ "$current" =~ "h" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "h" ]]); then
-        
-        echo "        // $current"
-        current=$(echo $current | sed 's/h//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-        fi
-
-        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-        fi
-
-        current=$(echo $current | sed 's/[zZ]//g')
-        echo "        horizontalLineToRelative(dx = ${current}f)"
-        last_command="h"
-
-      elif [[ "$current" =~ "H" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "H" ]]); then
-
-        echo "        // $current"
-        current=$(echo $current | sed 's/H//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-        fi
-
-        if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          current=$(echo $current | sed 's/[zZ]//g')
-        fi
-
-        echo "        horizontalLineTo(x = ${current}f)"
-        last_command="H"
-
-      elif [[ "$current" =~ "L" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "L" ]]); then
-        
-        dy=${commands[i]}
-        echo "        // $current $dy"
-        current=$(echo $current | sed 's/L//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy=$(echo $dy | sed 's/[zZ]//g')
-          if [[ "$dy" == "" ]]; then
-            dy=0
-          fi
-        fi
-
-        echo "        lineTo(x = ${current}f, y = ${dy}f)"
-        i=$((i+1))
-        last_command="L"
-
-      elif [[ "$current" =~ "l" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "l" ]]); then
-
-        dy=${commands[i]}
-        echo "        // $current $dy"
-        current=$(echo $current | sed 's/l//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        dy=${commands[i]}
-        if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy=$(echo $dy | sed 's/[zZ]//g')
-          if [[ "$dy" == "" ]]; then
-            dy=0
-          fi
-        fi
-        
-        echo "        lineToRelative(dx = ${current}f, dy = ${dy}f)"
-        i=$((i+1))
-        last_command="l"
-
-      elif [[ "$current" =~ "C" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "C" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/C//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        x1=$current
-        y1=${commands[i]}
-        display="${display} ${y1}"
-        i=$((i+1))
-        x2=${commands[i]}
-        display="${display} ${x2}"
-        i=$((i+1))
-        y2=${commands[i]}
-        display="${display} ${y2}"
-        i=$((i+1))
-        x3=${commands[i]}
-        display="${display} ${x3}"
-        i=$((i+1))
-        y3=${commands[i]}
-        display="${display} ${y3}"
-        i=$((i+1))
-
-        printf "\n        // ${display}"
-
-        if [[ "$y3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          y3=$(echo $y3 | sed 's/[zZ]//g')
-          if [[ "$y3" == "" ]]; then
-            y3=0
-          fi
-        fi
-
-        echo "
-        curveTo(
-            x1 = ${x1}f,
-            y1 = ${y1}f,
-            x2 = ${x2}f,
-            y2 = ${y2}f,
-            x3 = ${x3}f,
-            y3 = ${y3}f,
-        )
-        "
-        last_command="C"
-        
-
-      elif [[ "$current" =~ "c" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "c" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/c//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        dx1=$current
-        dy1=${commands[i]}
-        display="${display} ${dy1}"
-        i=$((i+1))
-        dx2=${commands[i]}
-        display="${display} ${dx2}"
-        i=$((i+1))
-        dy2=${commands[i]}
-        display="${display} ${dy2}"
-        i=$((i+1))
-        dx3=${commands[i]}
-        display="${display} ${dx3}"
-        i=$((i+1))
-        dy3=${commands[i]}
-        display="${display} ${dy3}"
-        i=$((i+1))
-
-        printf "\n        // ${display}"
-
-        if [[ "$dy3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy3=$(echo $dy3 | sed 's/[zZ]//g')
-          if [[ "$dy3" == "" ]]; then
-            dy3=0
-          fi
-        fi
-
-        echo "
-        curveToRelative(
-            dx1 = ${dx1}f,
-            dy1 = ${dy1}f,
-            dx2 = ${dx2}f,
-            dy2 = ${dy2}f,
-            dx3 = ${dx3}f,
-            dy3 = ${dy3}f,
-        )
-        "
-        last_command="c"
-
-      elif [[ "$current" =~ "s" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "s" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/s//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        dx1=$current
-        dy1=${commands[i]}
-        display="${display} ${dy1}"
-        i=$((i+1))
-        dx2=${commands[i]}
-        display="${display} ${dx2}"
-        i=$((i+1))
-        dy2=${commands[i]}
-        display="${display} ${dy2}"
-        i=$((i+1))
-
-        printf "\n        // ${display}"
-
-        if [[ "$dy2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          dy2=$(echo $dy2 | sed 's/[zZ]//g')
-          if [[ "$dy2" == "" ]]; then
-            dy2=0
-          fi
-        fi
-
-        echo "
-        reflectiveCurveToRelative(
-            dx1 = ${dx1}f,
-            dy1 = ${dy1}f,
-            dx2 = ${dx2}f,
-            dy2 = ${dy2}f,
-        )
-        "
-        last_command="s"
-
-      elif [[ "$current" =~ "S" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "S" ]]); then
-
-        display="${current}"
-        current=$(echo $current | sed 's/S//g')
-        if [[ "$current" == "" ]]; then
-          current=${commands[i]}
-          i=$((i+1))
-        fi
-        current=$(echo $current | sed 's/[zZ]//g')
-
-        x1=$current
-        y1=${commands[i]}
-        display="${display} ${y1}"
-        i=$((i+1))
-        x2=${commands[i]}
-        display="${display} ${x2}"
-        i=$((i+1))
-        y2=${commands[i]}
-        display="${display} ${y2}"
-        i=$((i+1))
-
-        printf "\n        // ${display}"
-
-        if [[ "$y2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
-          should_close=true
-          y2=$(echo $y2 | sed 's/[zZ]//g')
-          if [[ "$y2" == "" ]]; then
-            y2=0
-          fi
-        fi
-
-        echo "
-        reflectiveCurveTo(
-            x1 = ${x1}f,
-            y1 = ${y1}f,
-            x2 = ${x2}f,
-            y2 = ${y2}f,
-        )
-        "
-        last_command="S"
-        
-      fi
-
-      if [[ $should_close == true ]]; then
-        echo "        close()"
+        i=0
+        last_command=NULL
         should_close=false
-      fi
-    done
-    echo "    }"
-    echo
-    index=$((index+1))
-  done
-)
-}.build()
+        while [[ ${#commands[@]} -gt i ]] 
+        do
+          current=${commands[i]}
+
+          i=$((i+1))
+          if [[ "$current" =~ "M" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "M" ]]); then
+
+            y=${commands[i]}
+            printf "        // $current $y"
+
+            current=$(echo $current | sed 's/M//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+            if [[ "$y" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              y=$(echo $y | sed 's/[zZ]//g')
+              if [[ "$y" == "" ]]; then
+                y=0
+              fi
+            fi
+
+            echo
+            echo "        moveTo(x = ${current}f, y = ${y}f)"
+            i=$((i+1))
+            last_command="M"
+
+          elif [[ "$current" =~ "m" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "m" ]]); then
+          
+            dy=${commands[i]}
+            printf "        // $current $dy"
+            current=$(echo $current | sed 's/m//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy=$(echo $dy | sed 's/[zZ]//g')
+              if [[ "$dy" == "" ]]; then
+                dy=0
+              fi
+            fi
+
+            echo
+            echo "        moveToRelative(dx = ${current}f, dy = ${dy}f)"
+            i=$((i+1))
+            last_command="m"
+
+          elif [[ "$current" =~ "a" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "a" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/a//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            a=$current
+            b=${commands[i]}
+            display="${display} ${b}"
+            i=$((i+1))
+            theta=${commands[i]}
+            display="${display} ${theta}"
+            i=$((i+1))
+            is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+            display="${display} ${commands[i]}"
+            i=$((i+1))
+            is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+            display="${display} ${commands[i]}"
+            i=$((i+1))
+            dx1=${commands[i]}
+            display="${display} ${dx1}"
+            i=$((i+1))
+            dy1=${commands[i]}
+            display="${display} ${commands[i]}"
+
+            printf "\n        // ${display}"
+
+            if [[ "$dy1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy1=$(echo $dy1 | sed 's/[zZ]//g')
+              if [[ "$dy1" == "" ]]; then
+                dy1=0
+              fi
+            fi
+
+            echo "
+            arcToRelative(
+                a = ${a}f,
+                b = ${b}f,
+                theta = ${theta}f,
+                isMoreThanHalf = $is_more_than_half,
+                isPositiveArc = $is_positive_arc,
+                dx1 = ${dx1}f,
+                dy1 = ${dy1}f,
+            )
+            "
+            i=$((i+1))
+            last_command="a"
+
+          elif [[ "$current" =~ "A" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "A" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/A//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            horizontal_ellipse_radius=$current
+            vertical_ellipse_radius=${commands[i]}
+            display="${display} ${vertical_ellipse_radius}"
+            i=$((i+1))
+            theta=${commands[i]}
+            display="${display} ${theta}"
+            i=$((i+1))
+            is_more_than_half=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+            display="${display} ${commands[i]}"
+            i=$((i+1))
+            is_positive_arc=$([[ "${commands[i]}" == "1" ]] && echo "true" || echo "false" )
+            display="${display} ${commands[i]}"
+            i=$((i+1))
+            x1=${commands[i]}
+            display="${display} ${x1}"
+            i=$((i+1))
+            y1=${commands[i]}
+            display="${display} ${commands[i]}"
+
+            printf "\n        // ${display}"
+
+            if [[ "$y1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              y1=$(echo $y1 | sed 's/[zZ]//g')
+              if [[ "$y1" == "" ]]; then
+                y1=0
+              fi
+            fi
+
+            echo "
+            arcTo(
+                horizontalEllipseRadius = ${horizontal_ellipse_radius}f,
+                verticalEllipseRadius = ${vertical_ellipse_radius}f,
+                theta = ${theta}f,
+                isMoreThanHalf = $is_more_than_half,
+                isPositiveArc = $is_positive_arc,
+                x1 = ${x1}f,
+                y1 = ${y1}f,
+            )
+            "
+            i=$((i+1))
+            last_command="A"
+
+          elif [[ "$current" =~ "v" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "v" ]]); then
+            
+            echo "        // $current"
+            current=$(echo $current | sed 's/v//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+            fi
+
+            if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              current=$(echo $current | sed 's/[zZ]//g')
+            fi
+
+            echo "        verticalLineToRelative(dy = ${current}f)"
+            last_command="v"
+
+          elif [[ "$current" =~ "V" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "V" ]]); then
+          
+            echo "        // $current"
+            current=$(echo $current | sed 's/V//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+            fi
+
+            if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              current=$(echo $current | sed 's/[zZ]//g')
+            fi
+
+            echo "        verticalLineTo(y = ${current}f)"
+            last_command="V"
+
+          elif [[ "$current" =~ "h" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "h" ]]); then
+            
+            echo "        // $current"
+            current=$(echo $current | sed 's/h//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+            fi
+
+            if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+            fi
+
+            current=$(echo $current | sed 's/[zZ]//g')
+            echo "        horizontalLineToRelative(dx = ${current}f)"
+            last_command="h"
+
+          elif [[ "$current" =~ "H" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "H" ]]); then
+
+            echo "        // $current"
+            current=$(echo $current | sed 's/H//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+            fi
+
+            if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              current=$(echo $current | sed 's/[zZ]//g')
+            fi
+
+            echo "        horizontalLineTo(x = ${current}f)"
+            last_command="H"
+
+          elif [[ "$current" =~ "L" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "L" ]]); then
+            
+            dy=${commands[i]}
+            echo "        // $current $dy"
+            current=$(echo $current | sed 's/L//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy=$(echo $dy | sed 's/[zZ]//g')
+              if [[ "$dy" == "" ]]; then
+                dy=0
+              fi
+            fi
+
+            echo "        lineTo(x = ${current}f, y = ${dy}f)"
+            i=$((i+1))
+            last_command="L"
+
+          elif [[ "$current" =~ "l" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "l" ]]); then
+
+            dy=${commands[i]}
+            echo "        // $current $dy"
+            current=$(echo $current | sed 's/l//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            dy=${commands[i]}
+            if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy=$(echo $dy | sed 's/[zZ]//g')
+              if [[ "$dy" == "" ]]; then
+                dy=0
+              fi
+            fi
+            
+            echo "        lineToRelative(dx = ${current}f, dy = ${dy}f)"
+            i=$((i+1))
+            last_command="l"
+
+          elif [[ "$current" =~ "C" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "C" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/C//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            x1=$current
+            y1=${commands[i]}
+            display="${display} ${y1}"
+            i=$((i+1))
+            x2=${commands[i]}
+            display="${display} ${x2}"
+            i=$((i+1))
+            y2=${commands[i]}
+            display="${display} ${y2}"
+            i=$((i+1))
+            x3=${commands[i]}
+            display="${display} ${x3}"
+            i=$((i+1))
+            y3=${commands[i]}
+            display="${display} ${y3}"
+            i=$((i+1))
+
+            printf "\n        // ${display}"
+
+            if [[ "$y3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              y3=$(echo $y3 | sed 's/[zZ]//g')
+              if [[ "$y3" == "" ]]; then
+                y3=0
+              fi
+            fi
+
+            echo "
+            curveTo(
+                x1 = ${x1}f,
+                y1 = ${y1}f,
+                x2 = ${x2}f,
+                y2 = ${y2}f,
+                x3 = ${x3}f,
+                y3 = ${y3}f,
+            )
+            "
+            last_command="C"
+            
+
+          elif [[ "$current" =~ "c" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "c" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/c//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            dx1=$current
+            dy1=${commands[i]}
+            display="${display} ${dy1}"
+            i=$((i+1))
+            dx2=${commands[i]}
+            display="${display} ${dx2}"
+            i=$((i+1))
+            dy2=${commands[i]}
+            display="${display} ${dy2}"
+            i=$((i+1))
+            dx3=${commands[i]}
+            display="${display} ${dx3}"
+            i=$((i+1))
+            dy3=${commands[i]}
+            display="${display} ${dy3}"
+            i=$((i+1))
+
+            printf "\n        // ${display}"
+
+            if [[ "$dy3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy3=$(echo $dy3 | sed 's/[zZ]//g')
+              if [[ "$dy3" == "" ]]; then
+                dy3=0
+              fi
+            fi
+
+            echo "
+            curveToRelative(
+                dx1 = ${dx1}f,
+                dy1 = ${dy1}f,
+                dx2 = ${dx2}f,
+                dy2 = ${dy2}f,
+                dx3 = ${dx3}f,
+                dy3 = ${dy3}f,
+            )
+            "
+            last_command="c"
+
+          elif [[ "$current" =~ "s" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "s" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/s//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            dx1=$current
+            dy1=${commands[i]}
+            display="${display} ${dy1}"
+            i=$((i+1))
+            dx2=${commands[i]}
+            display="${display} ${dx2}"
+            i=$((i+1))
+            dy2=${commands[i]}
+            display="${display} ${dy2}"
+            i=$((i+1))
+
+            printf "\n        // ${display}"
+
+            if [[ "$dy2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              dy2=$(echo $dy2 | sed 's/[zZ]//g')
+              if [[ "$dy2" == "" ]]; then
+                dy2=0
+              fi
+            fi
+
+            echo "
+            reflectiveCurveToRelative(
+                dx1 = ${dx1}f,
+                dy1 = ${dy1}f,
+                dx2 = ${dx2}f,
+                dy2 = ${dy2}f,
+            )
+            "
+            last_command="s"
+
+          elif [[ "$current" =~ "S" ]] || ([[ $current =~ ^[+-]?[0-9]+([.][0-9]+)?$ ]] && [[ $last_command == "S" ]]); then
+
+            display="${current}"
+            current=$(echo $current | sed 's/S//g')
+            if [[ "$current" == "" ]]; then
+              current=${commands[i]}
+              i=$((i+1))
+            fi
+            current=$(echo $current | sed 's/[zZ]//g')
+
+            x1=$current
+            y1=${commands[i]}
+            display="${display} ${y1}"
+            i=$((i+1))
+            x2=${commands[i]}
+            display="${display} ${x2}"
+            i=$((i+1))
+            y2=${commands[i]}
+            display="${display} ${y2}"
+            i=$((i+1))
+
+            printf "\n        // ${display}"
+
+            if [[ "$y2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+              should_close=true
+              y2=$(echo $y2 | sed 's/[zZ]//g')
+              if [[ "$y2" == "" ]]; then
+                y2=0
+              fi
+            fi
+
+            echo "
+            reflectiveCurveTo(
+                x1 = ${x1}f,
+                y1 = ${y1}f,
+                x2 = ${x2}f,
+                y2 = ${y2}f,
+            )
+            "
+            last_command="S"
+            
+          fi
+
+          if [[ $should_close == true ]]; then
+            echo "        close()"
+            should_close=false
+          fi
+        done
+        echo "    }"
+        echo
+        index=$((index+1))
+      done
+    )
+    }.build().also { _$icon_name_camel_case = it }
+  }
 
 @Preview
 @Composable
@@ -794,13 +812,15 @@ private fun IconPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = $icon_name,
+                imageVector = $icon_name_pascal_case,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
             )
         }
     }
-}"""
+}
+
+private var _$icon_name_camel_case: ImageVector? = null"""
   # endregion [ icon file ]
 
   echo "$file" > "temp.kt"
