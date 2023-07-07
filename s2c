@@ -364,7 +364,7 @@ val $icon_name_pascal_case: ImageVector
                   i=$((i+1))
                 fi
                 current=$(echo $current | sed 's/[zZ]//g')
-                if [[ "$y" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$y" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   y=$(echo $y | sed 's/[zZ]//g')
                   if [[ "$y" == "" ]]; then
@@ -388,7 +388,7 @@ val $icon_name_pascal_case: ImageVector
                 fi
                 current=$(echo $current | sed 's/[zZ]//g')
 
-                if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy=$(echo $dy | sed 's/[zZ]//g')
                   if [[ "$dy" == "" ]]; then
@@ -432,7 +432,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$dy1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy1" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy1=$(echo $dy1 | sed 's/[zZ]//g')
                   if [[ "$dy1" == "" ]]; then
@@ -485,7 +485,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$y1" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$y1" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   y1=$(echo $y1 | sed 's/[zZ]//g')
                   if [[ "$y1" == "" ]]; then
@@ -515,7 +515,7 @@ val $icon_name_pascal_case: ImageVector
                   current=${commands[i]}
                 fi
 
-                if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$current" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   current=$(echo $current | sed 's/[zZ]//g')
                 fi
@@ -531,7 +531,7 @@ val $icon_name_pascal_case: ImageVector
                   current=${commands[i]}
                 fi
 
-                if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$current" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   current=$(echo $current | sed 's/[zZ]//g')
                 fi
@@ -547,7 +547,7 @@ val $icon_name_pascal_case: ImageVector
                   current=${commands[i]}
                 fi
 
-                if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$current" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                 fi
 
@@ -563,7 +563,7 @@ val $icon_name_pascal_case: ImageVector
                   current=${commands[i]}
                 fi
 
-                if [[ "$current" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$current" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   current=$(echo $current | sed 's/[zZ]//g')
                 fi
@@ -582,7 +582,7 @@ val $icon_name_pascal_case: ImageVector
                 fi
                 current=$(echo $current | sed 's/[zZ]//g')
 
-                if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy=$(echo $dy | sed 's/[zZ]//g')
                   if [[ "$dy" == "" ]]; then
@@ -606,7 +606,7 @@ val $icon_name_pascal_case: ImageVector
                 current=$(echo $current | sed 's/[zZ]//g')
 
                 dy=${commands[i]}
-                if [[ "$dy" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy=$(echo $dy | sed 's/[zZ]//g')
                   if [[ "$dy" == "" ]]; then
@@ -647,7 +647,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$y3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$y3" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   y3=$(echo $y3 | sed 's/[zZ]//g')
                   if [[ "$y3" == "" ]]; then
@@ -697,7 +697,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$dy3" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy3" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy3=$(echo $dy3 | sed 's/[zZ]//g')
                   if [[ "$dy3" == "" ]]; then
@@ -740,7 +740,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$dy2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$dy2" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   dy2=$(echo $dy2 | sed 's/[zZ]//g')
                   if [[ "$dy2" == "" ]]; then
@@ -781,7 +781,7 @@ val $icon_name_pascal_case: ImageVector
 
                 printf "\n                // ${display}"
 
-                if [[ "$y2" =~ ^[+-]?[0-9]+([.][0-9]+)?[zZ]$ ]]; then
+                if [[ "$y2" =~ ^[+-]?[0-9]*([.][0-9]+)?[zZ]$ ]]; then
                   should_close=true
                   y2=$(echo $y2 | sed 's/[zZ]//g')
                   if [[ "$y2" == "" ]]; then
