@@ -2,7 +2,7 @@
 # set -x
 
 # region [ constants ]
-readonly VERSION=0.2
+readonly VERSION=0.3
 readonly ERROR_CODE_FILE_NOT_FOUND=2
 readonly ERROR_CODE_SVGO_OPTIMIZATION=3
 readonly ERROR_CODE_SV2_OPTIMIZATION=4
@@ -105,6 +105,11 @@ fn_help () {
   echo
   echo "   --help or -h                          Shows this menu"
   echo "   --version or -v                       Show this script version"
+  echo "   --context-provider or -cp             Adds a custom context provider to the Icon definition"
+  echo "                                         E.g.: s2c <args> -o MyIcon.kt -cp Icons.Filled my-icon.svg will creates the Compose Icon:"
+  echo "                                         val Icons.Filled.MyIcon: ImageVector."
+  echo
+  echo "   --add-to-material                     Add the icon to the Material Icons context provider."
 }
 
 fn_show_versions () {
@@ -185,6 +190,8 @@ fn_parse_svg () {
   theme=$4
   output=$5
   is_directory=$6
+  context_provider=$7
+  add_to_material=$8
 
   if [[ "$filename" == *.svg ]]; then
     cp $filename target.svg
@@ -217,14 +224,14 @@ fn_parse_svg () {
     unset i
 
     xpath_result=$(xpath -q -e '/vector/@android:width' target.xml)
-    width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    width=$(echo $xpath_result | sed 's/[^0-9.]*//g')
     xpath_result=$(xpath -q -e '/vector/@android:height' target.xml)
-    height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    height=$(echo $xpath_result | sed 's/[^0-9.]*//g')
 
     xpath_result=$(xpath -q -e '/vector/@android:viewportWidth' target.xml)
-    viewport_width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    viewport_width=$(echo $xpath_result | sed 's/[^0-9.]*//g')
     xpath_result=$(xpath -q -e '/vector/@android:viewportHeight' target.xml)
-    viewport_height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    viewport_height=$(echo $xpath_result | sed 's/[^0-9.]*//g')
 
   else
 
@@ -259,9 +266,9 @@ fn_parse_svg () {
     unset i
 
     xpath_result=$(xpath -q -e '/svg/@width' target.svg)
-    width=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    width=$(echo $xpath_result | sed 's/[^0-9.]*//g')
     xpath_result=$(xpath -q -e '/svg/@height' target.svg)
-    height=$(echo $xpath_result | sed 's/[^0-9]*//g')
+    height=$(echo $xpath_result | sed 's/[^0-9.]*//g')
 
     xpath_result=$(xpath -q -e '/svg/@viewBox' target.svg)
     viewbox=($(echo $xpath_result | sed 's/.*"\([^"]*\)".*/\1/'))
@@ -285,7 +292,10 @@ fn_parse_svg () {
     icon_name="$(echo $output | awk -F"/" '{print $NF}' | sed 's/.kt//')"
   fi
   
-  fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" $width $height $viewport_width $viewport_height
+  echo "context_provider=$context_provider, add_to_material=$add_to_material"
+  fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" \
+                     $width $height $viewport_width $viewport_height \
+                     "$context_provider" "$add_to_material"
 }
 
 fn_to_camel_case() {
@@ -299,6 +309,7 @@ fn_to_pascal_case() {
 }
 
 fn_write_icon_file () {
+  echo "args: $@"
   icon_name=$1
   prearray=$2
   package=$3
@@ -308,9 +319,17 @@ fn_write_icon_file () {
   height=$7
   viewport_width=$8
   viewport_height=$9
+  context_provider=${10}
+  add_to_material=${11}
   IFS="," read -a paths <<< $prearray
   icon_name_camel_case=$(fn_to_camel_case $icon_name)
   icon_name_pascal_case=$(fn_to_pascal_case $icon_name)
+
+  if [[ $add_to_material == TRUE ]]; then
+    material_import="
+import androidx.compose.material.icons.Icons"
+    icon_name_pascal_case="Icons.Filled.$icon_name_pascal_case"
+  fi
 
   echo
   echo "📝 Writing icon file"
@@ -321,7 +340,7 @@ fn_write_icon_file () {
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.size$material_import
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -942,6 +961,10 @@ while [[ "$#" -gt 0 ]]; do
       package="$2"; shift ;;
     -t|--theme)
       theme="$2"; shift ;;
+    -cp|--context-provider)
+      context_provider="$2"; shift ;;
+    --add-to-material)
+      add_to_material=TRUE ;;
     *)
       if [[ $1 == ${*: -1:1} ]] && [[ $1 != "--"* ]];
       then
@@ -960,9 +983,16 @@ if [ -z ${enable_opt+x} ];
 then
   enable_opt=TRUE
 fi
+if [ -z ${context_provider+x} ]; then
+  context_provider=NULL
+fi
+if [ -z ${add_to_material+x} ]; then
+  add_to_material=FALSE
+fi
 
 if [ -f $input ]; then
   files=($input)
+  is_directory=FALSE
 else
   echo "🔍 Directory detected"
   files=($(ls $input | grep -E '\.svg$|\.xml$'))
@@ -989,7 +1019,7 @@ do
   echo
 
   fn_prerequisits $enable_opt $filename $package $theme $output
-  fn_parse_svg $enable_opt $filename $package $theme $output $is_directory
+  fn_parse_svg $enable_opt $filename $package $theme $output $is_directory $context_provider $add_to_material
   fn_move_output $output $filename $is_directory
   fn_cleanup
 done
