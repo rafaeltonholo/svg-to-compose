@@ -92,24 +92,24 @@ fn_help () {
   echo "                                                             file to Jetpack Compose icon file"
   echo
   echo "Required arguments:"
-  echo "   --package or -p                       Specify icons's package. This will replace package at the top of the icon file"
-  echo "   --theme or -t                         Specify project's theme name. This will take place in the Icon Preview composable function"
-  echo "                                         and in the ImageVector Builder's names."
+  echo "   --package or -p [package]                         Specify icons's package. This will replace package at the top of the icon file"
+  echo "   --theme or -t [theme full qualifier]              Specify project's theme name. This will take place in the Icon Preview composable function"
+  echo "                                                     and in the ImageVector Builder's names."
   echo
-  echo "   --output or -o                        The output filename; if no .kt extension specified, it will be automatically added"
-  echo "                                         In case of the input is a directory, output MUST also be a directory."
+  echo "   --output or -o [output filename.kt | directory]   output filename; if no .kt extension specified, it will be automatically added"
+  echo "                                                     In case of the input is a directory, output MUST also be a directory."
   echo
   echo "Arguments:"
-  echo "   --optimize or -opt                    Enable svg optimization before parsing to Jetpack Compose icon. The optimization"
-  echo "                                         process uses the following programs: svgo, svg2vectordrawable, avocado from NPM Registry"
+  echo "   --optimize or -opt [true|false; default=true]     Enable svg optimization before parsing to Jetpack Compose icon. The optimization"
+  echo "                                                     process uses the following programs: svgo, svg2vectordrawable, avocado from NPM Registry"
   echo
-  echo "   --help or -h                          Shows this menu"
-  echo "   --version or -v                       Show this script version"
-  echo "   --context-provider or -cp             Adds a custom context provider to the Icon definition"
-  echo "                                         E.g.: s2c <args> -o MyIcon.kt -cp Icons.Filled my-icon.svg will creates the Compose Icon:"
-  echo "                                         val Icons.Filled.MyIcon: ImageVector."
+  echo "   --help or -h                                      Shows this menu"
+  echo "   --version or -v                                   Show this script version"
+  echo "   --context-provider or -cp [context provider]      Adds a custom context provider to the Icon definition"
+  echo "                                                     E.g.: s2c <args> -o MyIcon.kt -cp Icons.Filled my-icon.svg will creates the Compose Icon:"
+  echo "                                                     val Icons.Filled.MyIcon: ImageVector."
   echo
-  echo "   --add-to-material                     Add the icon to the Material Icons context provider."
+  echo "   --add-to-material                                 Add the icon to the Material Icons context provider."
 }
 
 fn_show_versions () {
@@ -326,9 +326,14 @@ fn_write_icon_file () {
   icon_name_pascal_case=$(fn_to_pascal_case $icon_name)
 
   if [[ $add_to_material == TRUE ]]; then
-    material_import="
+    context_provider_import="
 import androidx.compose.material.icons.Icons"
     icon_name_pascal_case="Icons.Filled.$icon_name_pascal_case"
+  fi
+
+  if [[ $context_provider != NULL ]]; then
+    context_provider=$(echo $context_provider | sed 's/\.$//')
+    icon_name_pascal_case="$context_provider.$icon_name_pascal_case"
   fi
 
   echo
@@ -340,7 +345,7 @@ import androidx.compose.material.icons.Icons"
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size$material_import
+import androidx.compose.foundation.layout.size$context_provider_import
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
