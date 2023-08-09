@@ -2,7 +2,7 @@
 # set -x
 
 # region [ constants ]
-readonly VERSION=0.3
+readonly VERSION=0.4
 readonly ERROR_CODE_FILE_NOT_FOUND=2
 readonly ERROR_CODE_SVGO_OPTIMIZATION=3
 readonly ERROR_CODE_SV2_OPTIMIZATION=4
@@ -194,9 +194,9 @@ fn_parse_svg () {
   add_to_material=$8
 
   if [[ "$filename" == *.svg ]]; then
-    cp $filename target.svg
+    cp "$(fn_decrypt_whitespaces $filename)" target.svg
   elif [[ "$filename" == *.xml ]]; then
-    cp $filename target.xml
+    cp "$(fn_decrypt_whitespaces $filename)" target.xml
   else
     exit $ERROR_CODE_NOT_SUPPORTED_FILE
   fi
@@ -292,7 +292,7 @@ fn_parse_svg () {
     icon_name="$(echo $output | awk -F"/" '{print $NF}' | sed 's/.kt//')"
   fi
   
-  echo "context_provider=$context_provider, add_to_material=$add_to_material"
+  # echo "context_provider=$context_provider, add_to_material=$add_to_material"
   fn_write_icon_file $icon_name "$paths" $package $theme "$path_colors" \
                      $width $height $viewport_width $viewport_height \
                      "$context_provider" "$add_to_material"
@@ -300,16 +300,16 @@ fn_parse_svg () {
 
 fn_to_camel_case() {
   string=$1
-  echo "$string" | perl -pe 's/(?:[_-]|^)(\w)/\L\u$1/g; s/[_-]//g; s/^(.)/\l$1/'
+  echo "$string" | perl -pe 's/(^|[_ -])(\w)/\L\u$2/g; s/^(.)/\l$1/'
 }
 
 fn_to_pascal_case() {
   string=$1
-  echo "$string" | perl -pe 's/(^|[-_.])([a-zA-Z0-9])/\U$2/g; s/[-_]+//g'
+  echo "$string" | perl -pe 's/(^|[-_.\ ])([a-zA-Z0-9])/\U$2/g; s/[-_]+//g'
 }
 
 fn_write_icon_file () {
-  echo "args: $@"
+  # echo "args: $@"
   icon_name=$1
   prearray=$2
   package=$3
@@ -322,8 +322,9 @@ fn_write_icon_file () {
   context_provider=${10}
   add_to_material=${11}
   IFS="," read -a paths <<< $prearray
-  icon_name_camel_case=$(fn_to_camel_case $icon_name)
-  icon_name_pascal_case=$(fn_to_pascal_case $icon_name)
+  decrypted_icon_name=$(fn_decrypt_whitespaces $icon_name)
+  icon_name_camel_case=$(fn_to_camel_case "$decrypted_icon_name")
+  icon_name_pascal_case=$(fn_to_pascal_case "$decrypted_icon_name")
 
   if [[ $add_to_material == TRUE ]]; then
     context_provider_import="
@@ -891,13 +892,16 @@ private var _$icon_name_camel_case: ImageVector? = null"""
 
 fn_move_output () {
   cp_output=$1
-  filename=$2
+  filename=$(fn_decrypt_whitespaces "$2")
   is_directory=$3
 
   if [[ $is_directory == TRUE ]]; then
     icon_name=$(echo $filename | awk -F"/" '{print $NF}' | sed 's/.svg//' | sed 's/.xml//')
     directory=$cp_output
-    cp_output="$cp_output$(fn_to_pascal_case $icon_name).kt"
+    if [ $cp_output != *"/" ]; then
+      cp_output="$cp_output/"
+    fi
+    cp_output="$cp_output$(fn_to_pascal_case "$icon_name").kt"
   else
     if [[ $cp_output != *".kt" ]]; then
       echo
@@ -910,15 +914,11 @@ fn_move_output () {
   echo "📲 Moving generated icon to output destination"
 
   cp temp.kt $cp_output 2> /dev/null
+  result=$?
 
-  if [[ $is_directory == TRUE ]] && [ $? != 1 ]; then
-    mkdir -p $directory
-    cp temp.kt $cp_output
-
-    if [ $? != 0 ]; then
-      echo "🛑 Error trying to move to output folder"
-      exit
-    fi
+  if [ $result != 0 ]; then
+    echo "🛑 Error trying to move to output folder. Please make sure the output directory exists."
+    return 1;
   fi
 
   echo
@@ -935,6 +935,16 @@ fn_cleanup () {
   rm temp.kt 2> /dev/null
   echo
   echo "✅ Finished cleanup."
+}
+
+fn_encrypt_whitespaces () {
+  string=$1
+  echo "$string" | sed 's/ /\&nbsp;/g'
+}
+
+fn_decrypt_whitespaces () {
+  string=$1
+  echo "$string" | sed 's/\&nbsp;/ /g'
 }
 
 # endregion [ functions ]
@@ -995,18 +1005,20 @@ if [ -z ${add_to_material+x} ]; then
   add_to_material=FALSE
 fi
 
-if [ -f $input ]; then
-  files=($input)
+if [ -f "$input" ]; then
+  files=($(fn_encrypt_whitespaces "$input"))
   is_directory=FALSE
 else
   echo "🔍 Directory detected"
-  files=($(ls $input | grep -E '\.svg$|\.xml$'))
+  files=($(ls $input | grep -E '\.svg$|\.xml$' | sed 's/ /\&nbsp;/g'))
 
   if [ -d $output ]; then
     is_directory=TRUE
   else
     echo
-    echo "ERROR: when the input is a directory, the output MUST be directory too."
+    echo "❌ ERROR: when the input is a directory, the output MUST be directory too."
+    echo "          If you pointed to a directory path, make sure the output directory"
+    echo "          already exists."
     echo
     exit $ERROR_CODE_OUTPUT_NOT_DIRECTORY
   fi
@@ -1020,15 +1032,33 @@ do
     filename=$file
   fi
   
-  echo "⏳ Processing $filename"
+  echo "⏳ Processing $(fn_decrypt_whitespaces $filename)"
   echo
+
+  failures_on_parse=0
+  failures_on_move=0
+  failures_on_cleanup=0
 
   fn_prerequisits $enable_opt $filename $package $theme $output
   fn_parse_svg $enable_opt $filename $package $theme $output $is_directory $context_provider $add_to_material
+  if [ $? != 0 ]; then
+    failures_on_parse=$((failures_on_parse+1))
+  fi
   fn_move_output $output $filename $is_directory
+  if [ $? != 0 ]; then
+    failures_on_move=$((failures_on_parse+1))
+  fi
   fn_cleanup
+  if [ $? != 0 ]; then
+    failures_on_cleanup=$((failures_on_parse+1))
+  fi
 done
 
 echo
-echo "🎉 SVG parsed to Jetpack Compose icon with success 🎉"
+if [ $failures_on_parse -eq 0 ] && [ $failures_on_move -eq 0 ] && [ $failures_on_cleanup -eq 0 ]; then
+  echo "🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉"
+else
+  echo "❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose." 
+  echo "Please see the logs for more information."
+fi
 
