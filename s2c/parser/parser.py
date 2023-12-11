@@ -9,6 +9,48 @@ from s2c.parser.nodes.draw_node import ArcToDrawNode, CurveToDrawNode, DrawNode,
 
 SHELL_COLOR_WARNING="\033[43m"
 SHELL_NO_COLOR = "\033[0m"
+ANDROID_NS = "{http://schemas.android.com/apk/res/android}"
+
+def _get_width(
+    root: ElementTree.Element,
+    is_xml: bool,
+) -> str:
+    return root.attrib[f"{ANDROID_NS}width" if is_xml else "width"].removesuffix("dp")
+
+def _get_height(
+    root: ElementTree.Element,
+    is_xml: bool,
+) -> str:
+    return root.attrib[f"{ANDROID_NS}height" if is_xml else "height"].removesuffix("dp")
+
+def _get_viewport(
+    root: ElementTree.Element,
+    is_xml: bool,
+) -> tuple[str, str]:
+    if (is_xml):
+        return root.attrib[f"{ANDROID_NS}viewportWidth"], root.attrib[f"{ANDROID_NS}viewportHeight"]
+    else:
+        viewbox = root.attrib["viewBox"].split()
+        return viewbox[-2], viewbox[-1]
+
+def _get_fill(
+    pathElement: ElementTree.Element,
+    is_xml: bool,
+) -> str:
+    return pathElement.get(f"{ANDROID_NS}fillColor" if is_xml else "fill")
+
+def _get_opacity(
+    pathElement: ElementTree.Element,
+    is_xml: bool,
+) -> str:
+    return pathElement.get(f"{ANDROID_NS}opacity" if is_xml else "opacity")
+
+def _get_path(
+    pathElement: ElementTree.Element,
+    is_xml: bool,
+) -> str:
+    return pathElement.get(f"{ANDROID_NS}pathData" if is_xml else "d")
+
 
 def parse(
     file: Path,
@@ -40,20 +82,32 @@ def parse(
 
     tree = ElementTree.parse(target_file)
     root = tree.getroot()
+    is_xml = target_file.name.endswith(".xml")
+
+    width = _get_width(root, is_xml)
+    height = _get_height(root, is_xml)
     
-    width = root.attrib["width"]
-    height = root.attrib["height"]
-    
-    viewbox = root.attrib["viewBox"].split()
-    viewport_width=viewbox[-2]
-    viewport_height=viewbox[-1]
+    viewport_width, viewport_height=_get_viewport(root, is_xml)
+
+    if isdebug():
+        print()
+        print("======================== Retrieving base data =======================")
+        print(f"is_xml = {is_xml}")
+        print(f"width = {width}")
+        print(f"height = {height}")
+        print(f"viewport_width = {viewport_width}")
+        print(f"viewport_width = {viewport_width}")
+        print()
+        print("====================================================================")
 
     paths = []
     for child in root:
+        if (isdebug()):
+            print(f"child tag={child.tag}")
         if child.tag.endswith("path"):
-            fill_color = child.get("fill")
-            path = child.get("d")
-            opacity = child.get("opacity")
+            fill_color = _get_fill(child, is_xml)
+            path = _get_path(child, is_xml)
+            opacity = _get_opacity(child, is_xml)
 
             normalized_path = __normalize_path(path)
 
@@ -68,30 +122,31 @@ def parse(
             while len(commands) > 0:
                 current = commands[0]
                 current_command = current[0]
-                if (current_command.isdigit() and last_command != ""):
+
+                if ((current_command.isdigit() or current_command == "-") and last_command != ""):
                     current_command = last_command
                     current = last_command + current
                 
                 if current.lower().startswith("m"):
-                    nodes.append(MoveToDrawNode(commands))
+                    nodes.append(MoveToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("a"):
-                    nodes.append(ArcToDrawNode(commands))
+                    nodes.append(ArcToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("v"):
-                    nodes.append(VerticalLineToDrawNode(commands))
+                    nodes.append(VerticalLineToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("h"):
-                    nodes.append(HorizontalLineToDrawNode(commands))
+                    nodes.append(HorizontalLineToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("l"):
-                    nodes.append(LineToDrawNode(commands))
+                    nodes.append(LineToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("c"):
-                    nodes.append(CurveToDrawNode(commands))
+                    nodes.append(CurveToDrawNode(commands, current_command.islower()))
                     last_command = current_command
                 elif current.lower().startswith("s"):
-                    nodes.append(ReflectiveCurveToDrawNode(commands))
+                    nodes.append(ReflectiveCurveToDrawNode(commands, current_command.islower()))
                     last_command = current_command
 
 
@@ -150,7 +205,7 @@ def __normalize_path(path: str) -> str:
     parsed_path = ""
     last_char = ''
     for char in path:
-        if char.isalpha() and char.lower() != "z" or (last_char.isdigit() and char == "-"):
+        if (char.isalpha() and char.lower() != "z") or (last_char.isdigit() and char == "-"):
             parsed_path += f" {char}"
         else:
             parsed_path += char
@@ -160,7 +215,7 @@ def __normalize_path(path: str) -> str:
     if isdebug():
         print()
         print("======================= Finished Normalizing =======================")
-        print(f"Normalized path value = {path}")
+        print(f"Normalized path value = {parsed_path}")
         print("====================================================================")
         print()
 

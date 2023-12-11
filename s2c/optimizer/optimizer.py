@@ -1,7 +1,7 @@
 import subprocess
 
 from pathlib import Path
-from s2c import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR
+from s2c import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
 
 def __write_svgo_config_file():
     svgo_config = Path("svgo-config.js")
@@ -56,6 +56,11 @@ def __optmize_svg():
     )
 
 def optimize(file: Path):
+    if isdebug():
+        print()
+        print("========================= Start optimization =========================")
+        print()
+
     if file.name.endswith(".svg"):
         __optmize_svg()
     else:

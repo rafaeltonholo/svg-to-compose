@@ -32,12 +32,9 @@ class DrawNode(ABC):
         pass
 
 class MoveToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
         values = [first, commands.pop(0)]
 
@@ -74,12 +71,9 @@ class MoveToDrawNode(DrawNode):
 """.lstrip()
 
 class ArcToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         values = [first]
@@ -121,24 +115,21 @@ class ArcToDrawNode(DrawNode):
         return f"""
                 // {command}{" ".join(self.values)}
                 arcTo{relative}(
-                    {"a" if self.is_relative else "horizontalEllipseRadius"} = ${a}f,
-                    {"b" if self.is_relative else "verticalEllipseRadius"} = ${b}f,
-                    theta = ${theta}f,
+                    {"a" if self.is_relative else "horizontalEllipseRadius"} = {a}f,
+                    {"b" if self.is_relative else "verticalEllipseRadius"} = {b}f,
+                    theta = {theta}f,
                     isMoreThanHalf = {is_more_than_half},
                     isPositiveArc = {is_positive_arc},
-                    {relative_prefix}x = {x}f, 
-                    {relative_prefix}y = {y}f,
+                    {relative_prefix}x1 = {x}f, 
+                    {relative_prefix}y1 = {y}f,
                 )
                 {close_command}
 """.lstrip("\n")
 
 class VerticalLineToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         first, should_close = DrawNode._check_should_close(value=first)
@@ -171,12 +162,9 @@ class VerticalLineToDrawNode(DrawNode):
 """.lstrip("\n")
 
 class HorizontalLineToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         first, should_close = DrawNode._check_should_close(value=first)
@@ -209,12 +197,9 @@ class HorizontalLineToDrawNode(DrawNode):
 """.lstrip("\n")
 
 class LineToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         values = [first, commands.pop(0)]
@@ -251,12 +236,9 @@ class LineToDrawNode(DrawNode):
 """.lstrip("\n")
 
 class CurveToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         values = [first]
@@ -308,12 +290,9 @@ class CurveToDrawNode(DrawNode):
 """.lstrip("\n")
 
 class ReflectiveCurveToDrawNode(DrawNode):
-    def __init__(self, commands: list[str]):
+    def __init__(self, commands: list[str], is_relative: bool):
         first = commands.pop(0)
-        if (not first.lower().startswith(self.command_name)):
-            raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
-        
-        is_relative = first.startswith(self.command_name)
+
         first = first.lower().removeprefix(self.command_name)
 
         values = [first]
