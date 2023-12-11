@@ -11,6 +11,7 @@ def template(
     height: float,
     viewport_width: float,
     viewport_height: float,
+    has_group: bool,
     paths: str,
 ) -> str:
     if isdebug():
@@ -31,8 +32,11 @@ def template(
     icon_name_pascal_case = (f"{context_provider}." if context_provider and context_provider != "" else "") + pascal_case(icon_name)
     icon_name_camel_case = camel_case(icon_name)
     add_to_material_import = """
-import androidx.compose.material.icons.Icons
-""" if add_to_material else ""
+import androidx.compose.material.icons.Icons""" if add_to_material else ""
+
+    group_import = """
+import androidx.compose.ui.graphics.vector.PathData
+import androidx.compose.ui.graphics.vector.group""" if has_group else ""
     
     return f"""
 package {package}
@@ -46,7 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.ImageVector{group_import}
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
