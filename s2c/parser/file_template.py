@@ -81,5 +81,6 @@ private fun IconPreview() {{
     }}
 }}
 
+@Suppress("ObjectPropertyName")
 private var _{icon_name_camel_case}: ImageVector? = null
 """
