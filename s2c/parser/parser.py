@@ -105,7 +105,7 @@ def parse(
                 f"fill = {color}",
             ]
             if opacity:
-                path_params_list.append(f"fillApha = {float(opacity)}f,")
+                path_params_list.append(f"fillAlpha = {float(opacity)}f,")
 
             path_params = "\n                ".join(path_params_list)
             paths.append(f"""
