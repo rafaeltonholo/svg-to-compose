@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from s2c import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR
 from s2c.parser import parser
+from s2c.writer import write_file
 
 def build_args():
     parser = argparse.ArgumentParser(
@@ -94,14 +95,19 @@ def process_file(
     add_to_material: bool,
 ):
     print(f"⏳ Processing {file.name}")
-    parser.parse(
+    file_contents = parser.parse(
         file=file,
         optimize=optimize,
         package=package,
         theme=theme,
-        output=output,
         context_provider=context_provider,
         add_to_material=add_to_material,
+    )
+    icon_name = file.name.removesuffix(".svg").removesuffix(".xml")
+    write_file.write(
+        icon_name=icon_name,
+        file_contents=file_contents,
+        output=output,
     )
 
 def app():
