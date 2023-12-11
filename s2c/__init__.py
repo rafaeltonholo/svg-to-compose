@@ -36,3 +36,10 @@ ERRORS = {
 }
 
 __DEBUG__ = False
+
+def isdebug():
+    return __DEBUG__
+
+def set_debug(isDebug: bool):
+    global __DEBUG__
+    __DEBUG__ = isDebug

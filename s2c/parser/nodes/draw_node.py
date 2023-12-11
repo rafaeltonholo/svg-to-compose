@@ -1,10 +1,15 @@
 from abc import ABC, abstractmethod
-from s2c import __DEBUG__
+from s2c import isdebug
 
 class DrawNode(ABC):
     should_close = False
     values = []
     is_relative = False
+
+    @property
+    @abstractmethod
+    def command_name(self) -> str:
+        pass
 
     def __init__(self, values: list[str], should_close = False, is_relative = False):
         self.values = values
@@ -29,19 +34,19 @@ class DrawNode(ABC):
 class MoveToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("m")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("m")
-        first = first.lower().removeprefix("m")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
         values = [first, commands.pop(0)]
 
         last = values[-1]
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -49,9 +54,13 @@ class MoveToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "m"
     
     def materialize(self) -> str:
-        command = "m" if self.is_relative else "M"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -67,11 +76,11 @@ class MoveToDrawNode(DrawNode):
 class ArcToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("a")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("a")
-        first = first.lower().removeprefix("a")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         values = [first]
         for _ in range(1, 7):
@@ -81,8 +90,8 @@ class ArcToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
         
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -90,9 +99,13 @@ class ArcToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "a"
     
     def materialize(self) -> str:
-        command = "a" if self.is_relative else "A"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -122,18 +135,18 @@ class ArcToDrawNode(DrawNode):
 class VerticalLineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("v")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("v")
-        first = first.lower().removeprefix("v")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         first, should_close = DrawNode._check_should_close(value=first)
 
         values = [first]
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -142,8 +155,12 @@ class VerticalLineToDrawNode(DrawNode):
             is_relative = is_relative,
         )
     
+    @property
+    def command_name(self) -> str:
+        return "v"
+
     def materialize(self) -> str:
-        command = "v" if self.is_relative else "V"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -156,18 +173,18 @@ class VerticalLineToDrawNode(DrawNode):
 class HorizontalLineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("h")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("h")
-        first = first.lower().removeprefix("h")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         first, should_close = DrawNode._check_should_close(value=first)
 
         values = [first]
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -175,9 +192,13 @@ class HorizontalLineToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "h"
     
     def materialize(self) -> str:
-        command = "h" if self.is_relative else "H"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -190,11 +211,11 @@ class HorizontalLineToDrawNode(DrawNode):
 class LineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("l")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("l")
-        first = first.lower().removeprefix("l")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         values = [first, commands.pop(0)]
 
@@ -202,8 +223,8 @@ class LineToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -211,9 +232,13 @@ class LineToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "l"
     
     def materialize(self) -> str:
-        command = "l" if self.is_relative else "L"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -228,11 +253,11 @@ class LineToDrawNode(DrawNode):
 class CurveToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("c")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("c")
-        first = first.lower().removeprefix("c")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         values = [first]
         for _ in range(1, 6):
@@ -242,8 +267,8 @@ class CurveToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -251,9 +276,13 @@ class CurveToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "c"
     
     def materialize(self) -> str:
-        command = "c" if self.is_relative else "C"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""
@@ -281,11 +310,11 @@ class CurveToDrawNode(DrawNode):
 class ReflectiveCurveToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
         first = commands.pop(0)
-        if (not first.lower().startswith("s")):
+        if (not first.lower().startswith(self.command_name)):
             raise Exception("TODO: Wrong start path. Expecting to start with M or m. Current path={path}")
         
-        is_relative = first.startswith("s")
-        first = first.lower().removeprefix("s")
+        is_relative = first.startswith(self.command_name)
+        first = first.lower().removeprefix(self.command_name)
 
         values = [first]
         for _ in range(1, 4):
@@ -295,8 +324,8 @@ class ReflectiveCurveToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        if __DEBUG__:
-            print(f"// {values}")
+        if isdebug():
+            print(f"Processing {self.command_name if is_relative else self.command_name.upper()}; values = {values}")
 
         DrawNode.__init__(
             self=self,
@@ -304,9 +333,13 @@ class ReflectiveCurveToDrawNode(DrawNode):
             should_close=should_close,
             is_relative = is_relative,
         )
+
+    @property
+    def command_name(self) -> str:
+        return "s"
     
     def materialize(self) -> str:
-        command = "a" if self.is_relative else "A"
+        command = self.command_name if self.is_relative else self.command_name.upper()
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
         close_command = "close()" if self.should_close else ""

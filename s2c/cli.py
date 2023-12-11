@@ -2,7 +2,7 @@ import argparse
 import subprocess
 
 from pathlib import Path
-from s2c import __DEBUG__, __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR
+from s2c import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR, isdebug, set_debug
 from s2c.parser import parser
 from s2c.writer import write_file
 
@@ -117,7 +117,7 @@ def process_file(
 
 def app():
     args = build_args()
-    DEBUG=args.debug
+    set_debug(args.debug)
 
     # TODO: figure out how to trigger that without specifying all required paramters.
     if (args.version):
@@ -157,4 +157,5 @@ def app():
             context_provider=args.context_provider,
             add_to_material=args.add_to_material,
         )
+        print()
     

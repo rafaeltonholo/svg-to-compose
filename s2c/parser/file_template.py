@@ -1,5 +1,5 @@
+from s2c import isdebug
 from s2c.utils.string_utils import camel_case, pascal_case
-
 
 def template(
     package: str,
@@ -13,17 +13,20 @@ def template(
     viewport_height: float,
     paths: str,
 ) -> str:
-    print(f"""
-        package={package}
-        icon_name={icon_name}
-        context_provider={context_provider}
-        add_to_material={add_to_material}
-        theme={theme}
-        width={width}
-        height={height}
-        viewport_width={viewport_width}
-        viewport_height={viewport_height}
-    """)
+    if isdebug():
+        print()
+        print("========================= Generating file =========================")
+        print(f"""Parameters:
+            package={package}
+            icon_name={icon_name}
+            context_provider={context_provider}
+            add_to_material={add_to_material}
+            theme={theme}
+            width={width}
+            height={height}
+            viewport_width={viewport_width}
+            viewport_height={viewport_height}
+        """)
 
     icon_name_pascal_case = (f"{context_provider}." if context_provider and context_provider != "" else "") + pascal_case(icon_name)
     icon_name_camel_case = camel_case(icon_name)

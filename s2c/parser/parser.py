@@ -2,7 +2,7 @@ from pathlib import Path
 from shutil import copy
 import xml.etree.ElementTree as ElementTree
 
-from s2c import ERRORS, NOT_SUPPORTED_FILE_ERROR
+from s2c import ERRORS, NOT_SUPPORTED_FILE_ERROR, isdebug
 from s2c.optimizer import optimizer
 from s2c.parser.file_template import template
 from s2c.parser.nodes.draw_node import ArcToDrawNode, CurveToDrawNode, DrawNode, HorizontalLineToDrawNode, LineToDrawNode, MoveToDrawNode, ReflectiveCurveToDrawNode, VerticalLineToDrawNode
@@ -57,6 +57,10 @@ def parse(
 
             normalized_path = __normalize_path(path)
 
+            if isdebug():
+                print()
+                print("========================== Starting path ==========================")
+                print()
 
             commands = normalized_path.split()
             last_command = ''
@@ -115,6 +119,11 @@ def parse(
                 {plain_nodes}
             }}""")
 
+            if isdebug():
+                print()
+                print("========================== Finished path ==========================")
+                print()
+
     file_contents = template(
         package=package,
         icon_name=file.name.removesuffix(".svg").removesuffix(".xml"),
@@ -131,6 +140,13 @@ def parse(
     return file_contents
 
 def __normalize_path(path: str) -> str:
+    if isdebug():
+        print()
+        print("========================= Normalizing path =========================")
+        print(f"Original path value = {path}")
+        print("====================================================================")
+        print()
+
     parsed_path = ""
     last_char = ''
     for char in path:
@@ -140,5 +156,12 @@ def __normalize_path(path: str) -> str:
             parsed_path += char
 
         last_char = char
+
+    if isdebug():
+        print()
+        print("======================= Finished Normalizing =======================")
+        print(f"Normalized path value = {path}")
+        print("====================================================================")
+        print()
 
     return parsed_path
