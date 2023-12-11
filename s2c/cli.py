@@ -2,7 +2,7 @@ import argparse
 import subprocess
 
 from pathlib import Path
-from s2c import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR
+from s2c import __DEBUG__, __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR
 from s2c.parser import parser
 from s2c.writer import write_file
 
@@ -60,6 +60,11 @@ def build_args():
         action="store_true",
         help="Add the icon to the Material Icons context provider.",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="enable debug log",
+    )
 
     args = parser.parse_args()
 
@@ -112,6 +117,7 @@ def process_file(
 
 def app():
     args = build_args()
+    DEBUG=args.debug
 
     # TODO: figure out how to trigger that without specifying all required paramters.
     if (args.version):

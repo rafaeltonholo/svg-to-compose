@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from s2c import __DEBUG__
 
 class DrawNode(ABC):
     should_close = False
@@ -39,7 +40,8 @@ class MoveToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
 
         DrawNode.__init__(
             self=self,
@@ -52,7 +54,7 @@ class MoveToDrawNode(DrawNode):
         command = "m" if self.is_relative else "M"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
         x = float(self.values[0])
         y = float(self.values[1])
 
@@ -60,7 +62,7 @@ class MoveToDrawNode(DrawNode):
                 // {command}{" ".join(self.values)}
                 moveTo{relative}({relative_prefix}x = {x}f, {relative_prefix}y = {y}f)
                 {close_command}
-"""
+""".lstrip()
 
 class ArcToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -79,7 +81,9 @@ class ArcToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
         
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -91,7 +95,7 @@ class ArcToDrawNode(DrawNode):
         command = "a" if self.is_relative else "A"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
 
         a = float(self.values[0])
         b = float(self.values[1])
@@ -113,7 +117,7 @@ class ArcToDrawNode(DrawNode):
                     {relative_prefix}y = {y}f,
                 )
                 {close_command}
-"""
+""".lstrip("\n")
 
 class VerticalLineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -128,7 +132,9 @@ class VerticalLineToDrawNode(DrawNode):
 
         values = [first]
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -140,12 +146,12 @@ class VerticalLineToDrawNode(DrawNode):
         command = "v" if self.is_relative else "V"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
         return f"""
                 // {command}{" ".join(self.values)}
                 verticalLineTo{relative}({relative_prefix}y = {float(self.values[0])}f)
                 {close_command}
-"""
+""".lstrip("\n")
 
 class HorizontalLineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -160,7 +166,9 @@ class HorizontalLineToDrawNode(DrawNode):
 
         values = [first]
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -172,12 +180,12 @@ class HorizontalLineToDrawNode(DrawNode):
         command = "h" if self.is_relative else "H"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
         return f"""
                 // {command}{" ".join(self.values)}
                 horizontalLineTo{relative}({relative_prefix}x = {float(self.values[0])}f)
                 {close_command}
-"""
+""".lstrip("\n")
 
 class LineToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -194,7 +202,9 @@ class LineToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -206,14 +216,14 @@ class LineToDrawNode(DrawNode):
         command = "l" if self.is_relative else "L"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
         x = float(self.values[0])
         y = float(self.values[1])
         return f"""
                 // {command}{" ".join(self.values)}
                 lineTo{relative}({relative_prefix}x = {x}f, {relative_prefix}y = {y}f)
                 {close_command}
-"""
+""".lstrip("\n")
 
 class CurveToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -232,7 +242,9 @@ class CurveToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -244,7 +256,7 @@ class CurveToDrawNode(DrawNode):
         command = "c" if self.is_relative else "C"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
 
         x1 = float(self.values[0])
         y1 = float(self.values[1])
@@ -264,7 +276,7 @@ class CurveToDrawNode(DrawNode):
                     {relative_prefix}y3 = {y3}f,
                 )
                 {close_command}
-"""
+""".lstrip("\n")
 
 class ReflectiveCurveToDrawNode(DrawNode):
     def __init__(self, commands: list[str]):
@@ -283,7 +295,9 @@ class ReflectiveCurveToDrawNode(DrawNode):
         last, should_close = DrawNode._check_should_close(value=last)
         values[-1] = last
 
-        print(f"// {values}")
+        if __DEBUG__:
+            print(f"// {values}")
+
         DrawNode.__init__(
             self=self,
             values = values,
@@ -295,7 +309,7 @@ class ReflectiveCurveToDrawNode(DrawNode):
         command = "a" if self.is_relative else "A"
         relative = "Relative" if self.is_relative else ""
         relative_prefix = "d" if self.is_relative else ""
-        close_command = "close()\n" if self.should_close else ""
+        close_command = "close()" if self.should_close else ""
 
         x1 = float(self.values[0])
         y1 = float(self.values[1])
@@ -311,4 +325,4 @@ class ReflectiveCurveToDrawNode(DrawNode):
                     {relative_prefix}y2 = {y2}f,
                 )
                 {close_command}
-"""
+""".lstrip("\n")

@@ -34,3 +34,5 @@ ERRORS = {
     """,
     # MISSING_CORE_DEPENDENCY_ERROR: "xpath is required.",
 }
+
+__DEBUG__ = False

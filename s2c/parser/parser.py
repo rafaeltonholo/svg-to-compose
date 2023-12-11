@@ -57,7 +57,6 @@ def parse(
 
             normalized_path = __normalize_path(path)
 
-            print(f"// {normalized_path}")
 
             commands = normalized_path.split()
             last_command = ''
@@ -109,6 +108,7 @@ def parse(
 
             path_params = "\n                ".join(path_params_list)
             paths.append(f"""
+            // {normalized_path}
             path(
                 {path_params}
             ) {{
