@@ -3,6 +3,8 @@ import subprocess
 from pathlib import Path
 from s2c import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
 
+# TODO: future improvement, consider: https://github.com/mathandy/svgpathtools
+
 def __write_svgo_config_file():
     svgo_config = Path("svgo-config.js")
     if not svgo_config.exists():
