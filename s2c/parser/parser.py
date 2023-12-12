@@ -176,15 +176,15 @@ def _process_group(
             clip_nodes, _ = _get_path_nodes(mask_child, is_xml)
             clip_paths.append(clip_nodes)
 
-    group_paths = "\n                ".join(group_paths)
-    clip_paths = "\n                ".join(clip_paths)
+    # replace to fix the indentation.
+    group_paths = "\n".join(group_paths).replace("            ", "                ")
+    clip_paths = "\n".join(clip_paths).replace("                ", "                    ")
     group =  f"""
             group(
                 clipPathData = PathData {{
                     {clip_paths}
                 }},
-            ) {{
-                {group_paths}
+            ) {{{group_paths}
             }}
     """.rstrip()
 
