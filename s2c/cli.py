@@ -45,8 +45,9 @@ def build_args():
     parser.add_argument(
         "-v", 
         "--version",
-        action="store_true",
+        action="version",
         help="Show this script version",
+        version=f"SVG to Compose version: {__version__}",
     )
     parser.add_argument(
         "-cp", 
@@ -118,11 +119,6 @@ def process_file(
 def app():
     args = build_args()
     set_debug(args.debug)
-
-    # TODO: figure out how to trigger that without specifying all required paramters.
-    if (args.version):
-        print(__version__)
-        exit
 
     optimize = True if args.optimize == "true" else False
 
