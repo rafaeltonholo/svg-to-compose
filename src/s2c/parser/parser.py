@@ -3,10 +3,10 @@ import urllib.parse
 
 from pathlib import Path
 from shutil import copy
-from s2c import ERRORS, NOT_SUPPORTED_FILE_ERROR, isdebug
-from s2c.optimizer import optimizer
-from s2c.parser.file_template import template
-from s2c.parser.nodes.draw_node import ArcToDrawNode, CurveToDrawNode, DrawNode, HorizontalLineToDrawNode, LineToDrawNode, MoveToDrawNode, ReflectiveCurveToDrawNode, VerticalLineToDrawNode
+from config import ERRORS, NOT_SUPPORTED_FILE_ERROR, isdebug
+from optimizer import optimizer
+from parser.file_template import template
+from parser.nodes.draw_node import ArcToDrawNode, CurveToDrawNode, DrawNode, HorizontalLineToDrawNode, LineToDrawNode, MoveToDrawNode, ReflectiveCurveToDrawNode, VerticalLineToDrawNode
 
 SHELL_COLOR_WARNING="\033[43m"
 SHELL_NO_COLOR = "\033[0m"

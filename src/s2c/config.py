@@ -1,5 +1,5 @@
 """Top-level package for Svg to Compose."""
-#src/__init__.py
+# src/__init__.py
 
 __app_name__ = "s2c"
 __version__ = "1.0.0-alpha01"

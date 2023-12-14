@@ -1,4 +1,4 @@
-from s2c import cli, __app_name__
+import cli
 
 def main():
     cli.app()

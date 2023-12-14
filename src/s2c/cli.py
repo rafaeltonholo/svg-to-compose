@@ -2,9 +2,10 @@ import argparse
 import subprocess
 
 from pathlib import Path
-from s2c import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR, isdebug, set_debug
-from s2c.parser import parser
-from s2c.writer import write_file
+
+from config import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR, set_debug
+from parser import parser
+from writer import write_file
 
 def build_args():
     parser = argparse.ArgumentParser(

@@ -1,9 +1,9 @@
 import os
 
 from pathlib import Path
-from s2c import isdebug
+from config import isdebug
 
-from s2c.utils.string_utils import pascal_case
+from utils.string_utils import pascal_case
 
 def write(
     icon_name: str,

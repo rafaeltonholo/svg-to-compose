@@ -1,5 +1,5 @@
-from s2c import isdebug
-from s2c.utils.string_utils import camel_case, pascal_case
+from config import isdebug
+from utils.string_utils import camel_case, pascal_case
 
 def template(
     package: str,

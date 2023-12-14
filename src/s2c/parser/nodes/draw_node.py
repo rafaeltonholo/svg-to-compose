@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from s2c import isdebug
+from config import isdebug
 
 class DrawNode(ABC):
     should_close = False

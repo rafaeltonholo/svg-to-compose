@@ -1,7 +1,8 @@
 import subprocess
 
 from pathlib import Path
-from s2c import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
+from svgpathtools import svg2paths
+from config import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
 
 # TODO: future improvement, consider: https://github.com/mathandy/svgpathtools
 
@@ -46,6 +47,10 @@ def __run_optimization(command: str, error_code: int):
 def __optmize_svg():
     print("🏎️  Optimizing SVG")
     __write_svgo_config_file()
+
+    path, attributes = svg2paths("target.svg")
+    print(f"d = {path[0].d()}")
+    print(path, attributes)
 
     __run_optimization(
         command="svgo target.svg --config=svgo-config.js -o target.optimized.svg",
