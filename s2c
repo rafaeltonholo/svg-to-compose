@@ -1,0 +1,18 @@
+#!/bin/bash
+
+PYTHON=python
+
+if ! command -v $PYTHON > /dev/null; then
+    PYTHON=python3
+fi
+
+if ! command -v $PYTHON > /dev/null; then
+    echo "ERROR: the current script requires python to execute."
+    exit 2
+fi
+
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+echo "Script directory: $SCRIPT_DIR"
+
+$PYTHON $SCRIPT_DIR/src/s2c $@
