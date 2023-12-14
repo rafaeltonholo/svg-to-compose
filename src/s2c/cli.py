@@ -143,16 +143,28 @@ def app():
     else:
         print("🔍 File detected")
         files.append(path)
-
-    for file in files:
-        process_file(
-            file, 
-            optimize,
-            package=args.package,
-            theme=args.theme,
-            output=output,
-            context_provider=args.context_provider,
-            add_to_material=args.add_to_material,
-        )
-        print()
     
+    errors = []
+    for file in files:
+        try:
+            process_file(
+                file, 
+                optimize,
+                package=args.package,
+                theme=args.theme,
+                output=output,
+                context_provider=args.context_provider,
+                add_to_material=args.add_to_material,
+            )
+            print()
+        except Exception as e:
+            errors.append(f"Failed to parse {file} to Jetpack Compose Icon. Error message: {str(e)}")
+    
+    if len(errors) == 0:
+        print("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
+    else:
+        print("❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.")
+        print("Please see the logs for more information.")
+        print()
+        for error in errors:
+            print(error)    
