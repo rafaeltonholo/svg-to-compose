@@ -4,6 +4,7 @@ from pathlib import Path
 from config import ERRORS, ROOT_PATH, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
 
 # TODO: future improvement, consider: https://github.com/mathandy/svgpathtools
+# TODO: verify if we can optimize the svg without using external cli tools.
 
 SVGO_CONFIG_FILE = f"{ROOT_PATH}/svgo-config.js"
 
