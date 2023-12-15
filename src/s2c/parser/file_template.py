@@ -29,10 +29,20 @@ def template(
             viewport_height={viewport_height}
         """)
 
+    # if user specifies both context_provider and add_to_material, the context_provide will
+    # override the material option.
+    if context_provider == None and add_to_material:
+        context_provider = "Icons.Filled"
+
+    if context_provider != None:
+        # as we add the dot in the next line, remove it in case the user adds a left over dot 
+        # to avoid compile issues.
+        context_provider = context_provider.removesuffix(".")
+
     icon_name_pascal_case = (f"{context_provider}." if context_provider and context_provider != "" else "") + pascal_case(icon_name)
     icon_name_camel_case = camel_case(icon_name)
     add_to_material_import = """
-import androidx.compose.material.icons.Icons""" if add_to_material else ""
+import androidx.compose.material.icons.Icons""" if add_to_material and context_provider == None else ""
 
     group_import = """
 import androidx.compose.ui.graphics.vector.PathData
