@@ -13,20 +13,33 @@ There are existing plugins available, but they usually don't optimize the svg be
 This library adds that functionallity.
 
 ## Installation
-As this is just a shell script, the installation is very simple:
-1. Download the s2c script from this repository and save it in your preferred folder
+The installation is very simple:
+1. Clone this repository and save it in your preferred folder
+```sh
+git clone https://github.com/rafaeltonholo/svg-to-compose.git
+```
 2. Give execution permission to the script:
 ```sh
 chmod +x s2c
 ```
 3. If you want to run the script from anywhere, you might need to add it to your path, in your `~/.bashrc`, `~/.zshrc`, `~/.zshenv`, or `~/.profile`:
 ```sh
-export PATH=<s2c path>:$PATH
+export PATH=<s2c folder path>:$PATH
 ```
-Replacing `<s2c path>` to the folder's path where you stored the script
+Replacing `<s2c folder path>` to the folder's path where you stored the script
 
 ### Dependencies
-This script relies on three others to perform the optimization:
+This script relies on Python `3.9.6` to have a better support on reading the `svg` and `xml` files. Make sure you have the following
+version or above prior to use it. Run the following script to make sure you have the right Python version:
+```sh
+python3 --version
+```
+or 
+```sh
+python --version
+```
+
+This script also relies on three others to perform the optimization, which is optional:
 - [SVGO](https://github.com/svg/svgo): Optmizes the SVG reducing the paths.
 ```sh
 npm -g install svgo
