@@ -1,15 +1,17 @@
 import subprocess
 
 from pathlib import Path
-from config import ERRORS, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
+from config import ERRORS, ROOT_PATH, SVGO_OPTIMIZATION_ERROR, SV2_OPTIMIZATION_ERROR, AVOCADO_OPTIMIZATION_ERROR, isdebug
 
 # TODO: future improvement, consider: https://github.com/mathandy/svgpathtools
 
+SVGO_CONFIG_FILE = f"{ROOT_PATH}/svgo-config.js"
+
 def __write_svgo_config_file():
-    svgo_config = Path("svgo-config.js")
+    svgo_config = Path(SVGO_CONFIG_FILE)
     if not svgo_config.exists():
         print("⚙️ writing svgo config file")
-        with open(svgo_config.name, "w") as file:
+        with open(svgo_config, "w") as file:
             file.write(
                 """
 module.exports = {
@@ -37,7 +39,10 @@ def __run_optimization(command: str, error_code: int):
             capture_output=True, 
             check=True,
         )
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as error:
+        if isdebug():
+            print(str(error))
+
         raise Exception(ERRORS[error_code])
 
     print()
@@ -48,12 +53,12 @@ def __optmize_svg():
     __write_svgo_config_file()
 
     __run_optimization(
-        command="svgo target.svg --config=svgo-config.js -o target.optimized.svg",
+        command=f"svgo {ROOT_PATH}/target.svg --config={SVGO_CONFIG_FILE} -o {ROOT_PATH}/target.optimized.svg",
         error_code=SVGO_OPTIMIZATION_ERROR,
     )
     
     __run_optimization(
-        command="s2v -p 2 -i target.optimized.svg -o target.xml",
+        command=f"s2v -p 2 -i {ROOT_PATH}/target.optimized.svg -o {ROOT_PATH}/target.xml",
         error_code=SV2_OPTIMIZATION_ERROR,
     )
 
@@ -71,6 +76,18 @@ def optimize(file: Path):
         print("🏎️  Optimizing XML")
     
     __run_optimization(
-        command="avocado target.xml",
+        command=f"avocado {ROOT_PATH}/target.xml",
         error_code=AVOCADO_OPTIMIZATION_ERROR,
     )
+
+def delete_svgo_config():
+    if isdebug():
+        print()
+        print("========================= Deleting SVGO config ========================")
+        print()
+    Path(SVGO_CONFIG_FILE).unlink(missing_ok = True)
+    if isdebug():
+        print("Deleted.")
+        print()
+        print("=======================================================================")
+        print()
