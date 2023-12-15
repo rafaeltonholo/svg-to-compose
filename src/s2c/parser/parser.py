@@ -3,7 +3,7 @@ import urllib.parse
 
 from pathlib import Path
 from shutil import copy
-from config import ERRORS, NOT_SUPPORTED_FILE_ERROR, isdebug
+from config import ERRORS, NOT_SUPPORTED_FILE_ERROR, ROOT_PATH, isdebug
 from optimizer import optimizer
 from parser.file_template import template
 from parser.nodes.draw_node import ArcToDrawNode, CurveToDrawNode, DrawNode, HorizontalLineToDrawNode, LineToDrawNode, MoveToDrawNode, ReflectiveCurveToDrawNode, VerticalLineToDrawNode
@@ -211,13 +211,13 @@ def parse(
         exit(NOT_SUPPORTED_FILE_ERROR)
 
     # Copy file to work it locally
-    target_file_name = f"target{extension}"
+    target_file_name = f"{ROOT_PATH}/target{extension}"
     copy(file, target_file_name)
     target_file = Path(target_file_name)
 
     if optimize:
-        optimizer.optimize(file)
-        target_file = Path("target.xml")
+        optimizer.optimize(target_file)
+        target_file = Path(f"{ROOT_PATH}/target.xml")
     else:
         print(f"{SHELL_COLOR_WARNING} WARNING ⚠️ {SHELL_NO_COLOR}: Generating Vector paths without optimization.")
         print("             The image may be incomplete due to non-optimized svg issues.")
@@ -285,6 +285,7 @@ def __normalize_path(path: str) -> str:
         print("====================================================================")
         print()
 
+    path = path.replace(",", " ")
     parsed_path = ""
     last_char = ''
     for char in path:

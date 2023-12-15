@@ -1,8 +1,9 @@
-"""Top-level package for Svg to Compose."""
-# src/__init__.py
+from pathlib import Path
 
 __app_name__ = "s2c"
 __version__ = "1.0.0-alpha01"
+# This will refer to the root path of the project.
+ROOT_PATH = Path(__file__).parent.parent.parent
 
 (
     FILE_NOT_FOUND_ERROR,
