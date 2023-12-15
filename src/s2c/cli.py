@@ -6,6 +6,7 @@ from pathlib import Path
 from config import __version__, MISSING_CORE_DEPENDENCY_ERROR, OUTPUT_NOT_DIRECTORY_ERROR, set_debug
 from parser import parser
 from writer import write_file
+from optimizer import optimizer
 
 def build_args():
     parser = argparse.ArgumentParser(
@@ -160,6 +161,9 @@ def app():
         except Exception as e:
             errors.append(f"Failed to parse {file} to Jetpack Compose Icon. Error message: {str(e)}")
     
+    if optimize:
+        optimizer.delete_svgo_config()
+
     if len(errors) == 0:
         print("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
     else:

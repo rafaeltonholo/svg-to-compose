@@ -1,7 +1,7 @@
 import os
 
 from pathlib import Path
-from config import isdebug
+from config import ROOT_PATH, isdebug
 
 from utils.string_utils import pascal_case
 
@@ -37,6 +37,36 @@ def write(
         file.write(file_contents.lstrip())
 
     print("✅ Done writing the file")
+    if isdebug():
+        print()
+        print("========================== Deleting temp files =======================")
+        print()
+
+    temp_svg = Path(f"{ROOT_PATH}/target.svg")
+    if isdebug():
+        print("Deleting target.svg")
+    temp_svg.unlink(missing_ok = True)
+    if isdebug():
+        print("Deleted target.svg")
+
+    temp_optimized_svg = Path(f"{ROOT_PATH}/target.optimized.svg")
+    if isdebug():
+        print("Deleting target.optimized.svg")
+    temp_optimized_svg.unlink(missing_ok = True)
+    if isdebug():
+        print("Deleted target.optimized.svg")
+
+    temp_xml = Path(f"{ROOT_PATH}/target.xml")
+    if isdebug():
+        print("Deleting target.xml")
+    temp_xml.unlink(missing_ok = True)
+    if isdebug():
+        print("Deleted target.xml")
+
+    if isdebug():
+        print()
+        print("======================================================================")
+        print()
 
     if isdebug():
         print()
