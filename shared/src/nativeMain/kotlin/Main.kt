@@ -56,16 +56,37 @@ class Client : CliktCommand() {
         help = "Enable debug log.",
     ).flag()
 
+    private val verbose by option(
+        names = arrayOf("--verbose"),
+        help = "Enable verbose log.",
+    ).flag()
+
     override fun run() {
-        println("Args:")
-        println("   path = $path")
-        println("   pacakge = $pacakge")
-        println("   theme = $theme")
-        println("   output = $output")
-        println("   optimize = $optimize")
-        println("   contextProvider = $contextProvider")
-        println("   addToMaterial = $addToMaterial")
-        println("   debug = $debug")
+        if (verbose) {
+            println("Args:")
+            println("   path = $path")
+            println("   pacakge = $pacakge")
+            println("   theme = $theme")
+            println("   output = $output")
+            println("   optimize = $optimize")
+            println("   contextProvider = $contextProvider")
+            println("   addToMaterial = $addToMaterial")
+            println("   debug = $debug")
+            println("   verbose = $verbose")
+        }
+
+        AppConfig.debug = debug
+        AppConfig.verbose = verbose
+
+        Processor.run(
+            path = path,
+            pacakge = pacakge,
+            theme = theme,
+            output = output,
+            optimize = optimize,
+            contextProvider = contextProvider,
+            addToMaterial = addToMaterial,
+        )
     }
 
 }
