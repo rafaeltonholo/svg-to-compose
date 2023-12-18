@@ -15,6 +15,7 @@ kotlin {
         target.binaries {
             executable {
                 entryPoint = "main"
+                baseName = "s2c"
             }
         }
     }
