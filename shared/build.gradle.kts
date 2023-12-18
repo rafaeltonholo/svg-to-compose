@@ -7,7 +7,6 @@ kotlin {
     listOf(
         macosArm64(),
         macosX64(),
-        linuxArm64(),
         linuxX64(),
         mingwX64(),
     ).forEach { target ->
@@ -22,6 +21,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+        }
+
+        nativeMain.dependencies {
+            implementation(libs.clikt)
         }
     }
 }
