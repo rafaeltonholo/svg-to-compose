@@ -22,6 +22,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.com.kgit2.kommand)
             implementation(libs.com.squareup.okio)
             implementation(libs.xmlutil.core)
             implementation(libs.xmlutil.serialization)
