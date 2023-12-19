@@ -4,6 +4,8 @@ import dev.tonholo.s2c.domain.AndroidVector
 import dev.tonholo.s2c.domain.AndroidVectorNode
 import dev.tonholo.s2c.domain.Svg
 import dev.tonholo.s2c.domain.SvgNode
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ExitProgramException
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import nl.adaptivity.xmlutil.serialization.XML
@@ -112,7 +114,10 @@ sealed class ImageParser {
                 theme = theme,
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
-            ) ?: throw IllegalArgumentException("invalid file extension ($extension).")
+            ) ?: throw ExitProgramException(
+                errorCode = ErrorCode.NotSupportedFileError,
+                message = "invalid file extension ($extension)."
+            )
         }
     }
 }

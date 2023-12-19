@@ -1,6 +1,9 @@
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
 import okio.FileSystem
-import okio.IOException
+import okio.Path
 import okio.Path.Companion.toPath
 
 object Processor {
@@ -20,12 +23,15 @@ object Processor {
         val outputMetadata = fileSystem.metadata(outputPath)
 
         val files = mutableListOf(filePath)
+
+        println()
         if (inputMetadata.isDirectory) {
             println("🔍 Directory detected")
             if (outputMetadata.isDirectory.not()) {
                 println()
-                throw IOException(
-                    """❌ ERROR: when the input is a directory, the output MUST be directory too.
+                throw ExitProgramException(
+                    errorCode = ErrorCode.OutputNotDirectoryError,
+                    message = """❌ ERROR: when the input is a directory, the output MUST be directory too.
                         |If you pointed to a directory path, make sure the output directory already exists.
                         |""".trimMargin(),
                 )
@@ -37,10 +43,16 @@ object Processor {
                     it.name.endsWith(".svg") || it.name.endsWith(".xml")
                 },
             )
+        } else {
+            println("🔍 File detected")
+        }
+
+        if (optimize) {
+            Optimizer.verifyDependency(files.any { it.name.endsWith(".xml") })
         }
 
         for (file in files) {
-            ImageParser.parse(
+            processFile(
                 file = file,
                 optimize = optimize,
                 pkg = pacakge,
@@ -49,5 +61,24 @@ object Processor {
                 addToMaterial = addToMaterial,
             )
         }
+    }
+
+    private fun processFile(
+        file: Path,
+        optimize: Boolean,
+        pkg: String,
+        theme: String,
+        contextProvider: String?,
+        addToMaterial: Boolean
+    ) {
+        println("⏳ Processing ${file.name}")
+        ImageParser.parse(
+            file = file,
+            optimize = optimize,
+            pkg = pkg,
+            theme = theme,
+            contextProvider = contextProvider,
+            addToMaterial = addToMaterial,
+        )
     }
 }
