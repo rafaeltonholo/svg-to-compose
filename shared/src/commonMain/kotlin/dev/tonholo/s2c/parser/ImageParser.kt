@@ -1,9 +1,6 @@
 package dev.tonholo.s2c.parser
 
-import dev.tonholo.s2c.domain.AndroidVector
-import dev.tonholo.s2c.domain.AndroidVectorNode
-import dev.tonholo.s2c.domain.Svg
-import dev.tonholo.s2c.domain.SvgNode
+import dev.tonholo.s2c.domain.*
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import kotlinx.serialization.modules.SerializersModule
@@ -39,7 +36,7 @@ sealed class ImageParser {
         theme: String,
         contextProvider: String?,
         addToMaterial: Boolean,
-    )
+    ): IconFileContents
 
     protected fun readContent(file: Path): String {
         val content = FileSystem.SYSTEM.read(file) {
@@ -57,7 +54,7 @@ sealed class ImageParser {
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
-        ) {
+        ): IconFileContents {
             val content = readContent(file)
             println(content)
             val svg = xmlParser.decodeFromString(
@@ -65,6 +62,20 @@ sealed class ImageParser {
                 string = content,
             )
             println(svg)
+            val viewBox = svg.viewBox.split(" ").toMutableList()
+            val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
+
+            return IconFileContents(
+                pkg = pkg,
+                iconName = file.name.removeSuffix(".xml").removeSuffix(".svg"),
+                theme = theme,
+                width = svg.width.toFloat(),
+                height = svg.height.toFloat(),
+                viewportWidth = viewportWidth.toFloat(),
+                viewportHeight = viewportHeight.toFloat(),
+                nodes = svg.commands.mapNotNull { it.asNode(svg) },
+                contextProvider = contextProvider,
+            )
         }
     }
 
@@ -76,7 +87,7 @@ sealed class ImageParser {
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
-        ) {
+        ): IconFileContents {
             val content = readContent(file)
             println(content)
 
@@ -85,6 +96,18 @@ sealed class ImageParser {
                 string = content,
             )
             println(androidVector)
+
+            return IconFileContents(
+                pkg = pkg,
+                iconName = file.name.removeSuffix(".xml").removeSuffix(".svg"),
+                theme = theme,
+                width = androidVector.width.removeSuffix("dp").toFloat(),
+                height = androidVector.height.removeSuffix("dp").toFloat(),
+                viewportWidth = androidVector.viewportWidth.toFloat(),
+                viewportHeight = androidVector.viewportHeight.toFloat(),
+                nodes = listOf(),
+                contextProvider = contextProvider,
+            )
         }
 
     }
@@ -105,16 +128,16 @@ sealed class ImageParser {
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
-        ) {
+        ): String {
             val extension = file.name.substring(file.name.lastIndexOf("."), file.name.length)
-            parsers[extension]?.parse(
+            return parsers[extension]?.parse(
                 file = file,
                 optimize = optimize,
                 pkg = pkg,
                 theme = theme,
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
-            ) ?: throw ExitProgramException(
+            )?.materialize() ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "invalid file extension ($extension)."
             )
