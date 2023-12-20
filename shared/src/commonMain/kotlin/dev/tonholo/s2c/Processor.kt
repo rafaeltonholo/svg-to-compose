@@ -48,7 +48,17 @@ object Processor {
         }
 
         if (optimize) {
+            if (AppConfig.verbose) {
+                println()
+                println("Verifying optimization dependencies")
+                println()
+            }
             Optimizer.verifyDependency(files.any { it.name.endsWith(".xml") })
+            if (AppConfig.verbose) {
+                println()
+                println("Finished verification")
+                println()
+            }
         }
 
         for (file in files) {
@@ -72,7 +82,7 @@ object Processor {
         addToMaterial: Boolean
     ) {
         println("⏳ Processing ${file.name}")
-        ImageParser.parse(
+        val fileContents = ImageParser.parse(
             file = file,
             optimize = optimize,
             pkg = pkg,
@@ -80,5 +90,9 @@ object Processor {
             contextProvider = contextProvider,
             addToMaterial = addToMaterial,
         )
+
+        if (AppConfig.verbose) {
+            println("File contents = $fileContents")
+        }
     }
 }
