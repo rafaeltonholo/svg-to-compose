@@ -105,7 +105,7 @@ sealed class ImageParser {
                 height = androidVector.height.removeSuffix("dp").toFloat(),
                 viewportWidth = androidVector.viewportWidth.toFloat(),
                 viewportHeight = androidVector.viewportHeight.toFloat(),
-                nodes = listOf(),
+                nodes = androidVector.nodes.map { it.asNode() },
                 contextProvider = contextProvider,
             )
         }
