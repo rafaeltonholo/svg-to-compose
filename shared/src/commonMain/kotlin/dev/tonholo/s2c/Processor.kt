@@ -1,15 +1,24 @@
+package dev.tonholo.s2c
+
+import AppConfig
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.extensions.isDirectory
+import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
+import dev.tonholo.s2c.wirter.IconWriter
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 
-object Processor {
+class Processor(
+    private val iconWriter: IconWriter,
+) {
     fun run(
         path: String,
-        pacakge: String,
+        pkg: String,
         theme: String,
         output: String,
         optimize: Boolean,
@@ -20,14 +29,13 @@ object Processor {
         val outputPath = output.toPath()
         val fileSystem = FileSystem.SYSTEM
         val inputMetadata = fileSystem.metadata(filePath)
-        val outputMetadata = fileSystem.metadata(outputPath)
 
         val files = mutableListOf(filePath)
 
         println()
         if (inputMetadata.isDirectory) {
             println("🔍 Directory detected")
-            if (outputMetadata.isDirectory.not()) {
+            if (outputPath.isDirectory.not()) {
                 println()
                 throw ExitProgramException(
                     errorCode = ErrorCode.OutputNotDirectoryError,
@@ -65,10 +73,11 @@ object Processor {
             processFile(
                 file = file,
                 optimize = optimize,
-                pkg = pacakge,
+                pkg = pkg,
                 theme = theme,
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
+                output = outputPath,
             )
         }
     }
@@ -79,9 +88,10 @@ object Processor {
         pkg: String,
         theme: String,
         contextProvider: String?,
-        addToMaterial: Boolean
+        addToMaterial: Boolean,
+        output: Path,
     ) {
-        println("⏳ Processing ${file.name}")
+        output("⏳ Processing ${file.name}")
         val fileContents = ImageParser.parse(
             file = file,
             optimize = optimize,
@@ -91,8 +101,12 @@ object Processor {
             addToMaterial = addToMaterial,
         )
 
-        if (AppConfig.verbose) {
-            println("File contents = $fileContents")
-        }
+        verbose("File contents = $fileContents")
+
+        iconWriter.write(
+            iconName = file.name.removeSuffix(".svg").removeSuffix(".xml"),
+            fileContents = fileContents,
+            output = output,
+        )
     }
 }
