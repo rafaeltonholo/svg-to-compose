@@ -66,3 +66,18 @@ data class ClipPath(
     @XmlSerialName("pathData", ANDROID_NS, ANDROID_PREFIX)
     val pathData: String,
 )
+
+fun AndroidVectorNode.asNode(): ImageVectorNode = when (this) {
+    is AndroidVectorNode.Group -> asNode()
+    is AndroidVectorNode.Path -> asNode()
+}
+
+fun AndroidVectorNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
+    fillColor = fillColor.orEmpty(),
+    nodes = pathData.asNodes(),
+)
+
+fun AndroidVectorNode.Group.asNode(): ImageVectorNode.Group = ImageVectorNode.Group(
+    clipPath = clipPath.pathData.asNodes(),
+    nodes = paths.map { it.asNode() },
+)
