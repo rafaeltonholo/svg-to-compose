@@ -77,8 +77,8 @@ class Client : CliktCommand() {
             println("   verbose = $verbose")
         }
 
-        AppConfig.debug = debug
         AppConfig.verbose = verbose
+        AppConfig.debug = verbose || debug
 
         try {
             Processor.run(

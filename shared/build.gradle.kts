@@ -3,21 +3,28 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-kotlin {
+val rootBuildDir = File(project.rootDir.absolutePath, "build")
 
+kotlin {
     listOf(
         macosArm64(),
         macosX64(),
         linuxX64(),
         mingwX64(),
     ).forEach { target ->
-        
         target.binaries {
             executable {
                 entryPoint = "main"
                 baseName = "s2c"
             }
         }
+
+        val targetName = target.name.replaceFirstChar { it.uppercaseChar() }
+        task("buildDebug$targetName")
+            .dependsOn(
+                ":shared:compileKotlin$targetName",
+                ":shared:linkDebugExecutable$targetName"
+            )
     }
 
     sourceSets {

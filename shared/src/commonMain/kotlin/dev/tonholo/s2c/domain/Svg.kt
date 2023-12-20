@@ -13,7 +13,7 @@ data class Svg(
     val width: Int,
     val height: Int,
     val viewBox: String, /*"0 0 116 114"*/
-    val fill: String,
+    val fill: String?,
     @XmlElement
     @XmlPolyChildren(
         [
@@ -32,6 +32,7 @@ sealed interface SvgNode {
     data class Path(
         val d: String,
         val fill: String,
+        val opacity: Int?,
     ) : SvgNode
 
     @Serializable
@@ -57,3 +58,27 @@ sealed interface SvgNode {
     ) : SvgNode
 }
 
+fun SvgNode.asNode(svg: Svg? = null): ImageVectorNode? = when (this) {
+    is SvgNode.Group -> svg?.let { asNode(masks = svg.commands.filterIsInstance<SvgNode.Mask>()) }
+    is SvgNode.Mask -> null
+    is SvgNode.Path -> asNode()
+}
+
+fun SvgNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
+    fillColor = fill,
+    nodes = d.asNodes().toList(),
+)
+
+
+fun SvgNode.Group.asNode(
+    masks: List<SvgNode.Mask>,
+): ImageVectorNode.Group {
+    val clipPath = masks.first {
+        it.id == maskId.removePrefix("url(#").removeSuffix(")")
+    }.paths.flatMap { it.asNode().nodes }
+
+    return ImageVectorNode.Group(
+        clipPath = clipPath,
+        nodes = paths.map { it.asNode() },
+    )
+}
