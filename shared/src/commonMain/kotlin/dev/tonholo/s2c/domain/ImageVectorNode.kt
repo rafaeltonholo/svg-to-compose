@@ -71,7 +71,7 @@ sealed class PathNodes(
     val command: Char,
     val commandSize: Int,
 ) {
-    private val shouldClose = values.last().last().lowercase() == "z"
+    private val shouldClose = values[commandSize - 1].last().lowercase() == "z"
 
     abstract fun materialize(): String
 
@@ -348,9 +348,7 @@ fun String.asNodes(): List<PathNodes> {
     val nodes = mutableListOf<PathNodes>()
     while (commands.size > 0) {
         var current = commands.first()
-//        println("current=$current")
         var currentCommand = current.first()
-//        println("currentCommand=$currentCommand")
 
         if ((currentCommand.isDigit() || currentCommand == '-') && lastCommand != Char.EMPTY) {
             currentCommand = lastCommand
