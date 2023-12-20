@@ -64,6 +64,9 @@ sealed class ImageParser {
             println(svg)
             val viewBox = svg.viewBox.split(" ").toMutableList()
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
+            val imports = defaultImports +
+                    (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
+                    if (addToMaterial) materialContextProviderImport else setOf()
 
             return IconFileContents(
                 pkg = pkg,
@@ -75,6 +78,7 @@ sealed class ImageParser {
                 viewportHeight = viewportHeight.toFloat(),
                 nodes = svg.commands.mapNotNull { it.asNode(svg) },
                 contextProvider = contextProvider,
+                imports = imports,
             )
         }
     }
@@ -96,6 +100,9 @@ sealed class ImageParser {
                 string = content,
             )
             println(androidVector)
+            val imports = defaultImports +
+                    (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
+                    if (addToMaterial) materialContextProviderImport else setOf()
 
             return IconFileContents(
                 pkg = pkg,
@@ -107,6 +114,7 @@ sealed class ImageParser {
                 viewportHeight = androidVector.viewportHeight.toFloat(),
                 nodes = androidVector.nodes.map { it.asNode() },
                 contextProvider = contextProvider,
+                imports = imports,
             )
         }
 

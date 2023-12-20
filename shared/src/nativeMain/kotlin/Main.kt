@@ -3,7 +3,10 @@ import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.boolean
+import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.wirter.IconWriter
+import okio.FileSystem
 import platform.posix.exit
 
 class Client : CliktCommand() {
@@ -81,9 +84,13 @@ class Client : CliktCommand() {
         AppConfig.debug = verbose || debug
 
         try {
-            Processor.run(
+            Processor(
+                iconWriter = IconWriter(
+                    fileSystem = FileSystem.SYSTEM,
+                )
+            ).run(
                 path = path,
-                pacakge = pacakge,
+                pkg = pacakge,
                 theme = theme,
                 output = output,
                 optimize = optimize,
