@@ -13,7 +13,7 @@ sealed interface ImageVectorNode {
         val nodes: List<PathNodes>,
     ) : ImageVectorNode {
         override fun materialize(): String {
-            val realColor = fillColor.removePrefix("#").let { color ->
+            val realColor = fillColor.uppercase().removePrefix("#").let { color ->
                 when {
                     color.length == 6 -> "FF$color"
                     else -> color
