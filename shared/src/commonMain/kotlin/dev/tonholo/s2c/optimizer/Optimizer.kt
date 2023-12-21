@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.optimizer
 
-import AppConfig
 import com.kgit2.process.Command
 import com.kgit2.process.Stdio
 import dev.tonholo.s2c.error.ErrorCode
