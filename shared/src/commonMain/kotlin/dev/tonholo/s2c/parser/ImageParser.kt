@@ -3,6 +3,7 @@ package dev.tonholo.s2c.parser
 import dev.tonholo.s2c.domain.*
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.extensions.extension
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import nl.adaptivity.xmlutil.serialization.XML
@@ -31,7 +32,7 @@ sealed class ImageParser {
 
     abstract fun parse(
         file: Path,
-        optimize: Boolean,
+        iconName: String,
         pkg: String,
         theme: String,
         contextProvider: String?,
@@ -49,19 +50,17 @@ sealed class ImageParser {
     data object SvgParser : ImageParser() {
         override fun parse(
             file: Path,
-            optimize: Boolean,
+            iconName: String,
             pkg: String,
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
         ): IconFileContents {
             val content = readContent(file)
-            println(content)
             val svg = xmlParser.decodeFromString(
                 deserializer = Svg.serializer(),
                 string = content,
             )
-            println(svg)
             val viewBox = svg.viewBox.split(" ").toMutableList()
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
             val imports = defaultImports +
@@ -70,7 +69,7 @@ sealed class ImageParser {
 
             return IconFileContents(
                 pkg = pkg,
-                iconName = file.name.removeSuffix(".xml").removeSuffix(".svg"),
+                iconName = iconName,
                 theme = theme,
                 width = svg.width.toFloat(),
                 height = svg.height.toFloat(),
@@ -86,27 +85,25 @@ sealed class ImageParser {
     data object AndroidVectorParser : ImageParser() {
         override fun parse(
             file: Path,
-            optimize: Boolean,
+            iconName: String,
             pkg: String,
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
         ): IconFileContents {
             val content = readContent(file)
-            println(content)
 
             val androidVector = xmlParser.decodeFromString(
                 deserializer = AndroidVector.serializer(),
                 string = content,
             )
-            println(androidVector)
             val imports = defaultImports +
                     (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
                     if (addToMaterial) materialContextProviderImport else setOf()
 
             return IconFileContents(
                 pkg = pkg,
-                iconName = file.name.removeSuffix(".xml").removeSuffix(".svg"),
+                iconName = iconName,
                 theme = theme,
                 width = androidVector.width.removeSuffix("dp").toFloat(),
                 height = androidVector.height.removeSuffix("dp").toFloat(),
@@ -131,16 +128,16 @@ sealed class ImageParser {
 
         fun parse(
             file: Path,
-            optimize: Boolean,
+            iconName: String,
             pkg: String,
             theme: String,
             contextProvider: String?,
             addToMaterial: Boolean
         ): String {
-            val extension = file.name.substring(file.name.lastIndexOf("."), file.name.length)
+            val extension = file.extension
             return parsers[extension]?.parse(
                 file = file,
-                optimize = optimize,
+                iconName = iconName,
                 pkg = pkg,
                 theme = theme,
                 contextProvider = contextProvider,
