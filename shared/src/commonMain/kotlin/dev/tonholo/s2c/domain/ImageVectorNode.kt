@@ -4,6 +4,9 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.extensions.toInt
+import dev.tonholo.s2c.logger.debug
+import dev.tonholo.s2c.logger.debugEndSection
+import dev.tonholo.s2c.logger.debugSection
 
 sealed interface ImageVectorNode {
     fun materialize(): String
@@ -336,14 +339,10 @@ sealed class PathNodes(
 
 fun String.asNodes(): List<PathNodes> {
     val normalizedPath = normalizePath(this)
-    if (AppConfig.debug) {
-        println()
-        println("========================== Starting path ==========================")
-        println()
-    }
+    debugSection("Starting path")
 
     val commands = normalizedPath.split(" ").toMutableList()
-    println("commands=$commands")
+    debug("commands=$commands")
     var lastCommand = Char.EMPTY
     val nodes = mutableListOf<PathNodes>()
     while (commands.size > 0) {
@@ -408,13 +407,9 @@ fun String.asNodes(): List<PathNodes> {
 }
 
 private fun normalizePath(path: String): String {
-    if (AppConfig.debug) {
-        println()
-        println("========================= Normalizing path =========================")
-        println("Original path value = $path")
-        println("====================================================================")
-        println()
-    }
+    debugSection("Normalizing path")
+    debug("Original path value = $path")
+    debugEndSection()
 
     val parsedPath = StringBuilder()
     var lastChar = Char.EMPTY
@@ -429,13 +424,8 @@ private fun normalizePath(path: String): String {
         lastChar = char
     }
 
-    if (AppConfig.debug) {
-        println()
-        println("======================= Finished Normalizing =======================")
-        println("Normalized path value = $parsedPath")
-        println("====================================================================")
-        println()
-    }
+    debugSection("Finished Normalizing")
+    debug("Normalized path value = $parsedPath")
 
     return parsedPath.toString().trimStart()
 }

@@ -3,6 +3,9 @@ package dev.tonholo.s2c.domain
 import AppConfig
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
+import dev.tonholo.s2c.logger.debug
+import dev.tonholo.s2c.logger.debugEndSection
+import dev.tonholo.s2c.logger.debugSection
 
 val defaultImports = setOf(
     "androidx.compose.foundation.Image",
@@ -42,11 +45,9 @@ data class IconFileContents(
     val imports: Set<String> = defaultImports,
 ) {
     fun materialize(): String {
-        if (AppConfig.debug) {
-            println()
-            println("========================= Generating file =========================")
-            println(
-                """Parameters:
+        debugSection("Generating file")
+        debug(
+            """Parameters:
                    |    package=${pkg}
                    |    icon_name=${iconName}
                    |    theme=${theme}
@@ -58,14 +59,14 @@ data class IconFileContents(
                    |    context_provider=${contextProvider}
                    |    imports=${imports}
                    |    """.trimMargin()
-            )
-        }
+        )
 
         val indentSize = 12
         val pathNodes = nodes.joinToString("\n${" ".repeat(indentSize)}") {
             it.materialize()
                 .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
         }
+
         return """
             |package $pkg
             |
@@ -106,6 +107,8 @@ data class IconFileContents(
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |
-        """.trimMargin()
+        """.trimMargin().also {
+            debugEndSection()
+        }
     }
 }

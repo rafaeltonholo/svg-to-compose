@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.wirter
+package dev.tonholo.s2c.io
 
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.pascalCase
