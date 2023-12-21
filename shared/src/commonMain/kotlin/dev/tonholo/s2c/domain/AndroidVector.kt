@@ -74,10 +74,10 @@ fun AndroidVectorNode.asNode(): ImageVectorNode = when (this) {
 
 fun AndroidVectorNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
     fillColor = fillColor.orEmpty(),
-    nodes = pathData.asNodes(),
+    wrapper = pathData.asNodeWrapper(),
 )
 
 fun AndroidVectorNode.Group.asNode(): ImageVectorNode.Group = ImageVectorNode.Group(
-    clipPath = clipPath.pathData.asNodes(),
+    clipPath = clipPath.pathData.asNodeWrapper(),
     nodes = paths.map { it.asNode() },
 )

@@ -84,37 +84,38 @@ data class IconFileContents(
             |${imports.sorted().joinToString("\n"){ "import $it" }}
             |
             |val ${iconPropertyName}: ImageVector
-            |   get() {
-            |       val current = _${iconName.camelCase()}
-            |       if (current != null) return current
+            |    get() {
+            |        val current = _${iconName.camelCase()}
+            |        if (current != null) return current
             |
-            |       return ImageVector.Builder(
-            |           name = "${theme}.${iconName.pascalCase()}",
-            |           defaultWidth = ${width}.dp,
-            |           defaultHeight = ${height}.dp,
-            |           viewportWidth = ${viewportWidth}f,
-            |           viewportHeight = ${viewportHeight}f,
-            |       ).apply {
-            |           $pathNodes
-            |       }.build().also { _${iconName.camelCase()} = it }
-            |   }
+            |        return ImageVector.Builder(
+            |            name = "${theme}.${iconName.pascalCase()}",
+            |            defaultWidth = ${width}.dp,
+            |            defaultHeight = ${height}.dp,
+            |            viewportWidth = ${viewportWidth}f,
+            |            viewportHeight = ${viewportHeight}f,
+            |        ).apply {
+            |            $pathNodes
+            |        }.build().also { _${iconName.camelCase()} = it }
+            |    }
             |
             |@Preview
             |@Composable
             |private fun IconPreview() {
-            |   $theme {
-            |       Column(
-            |           verticalArrangement = Arrangement.spacedBy(8.dp),
-            |           horizontalAlignment = Alignment.CenterHorizontally,
-            |       ) {
-            |           Image(
-            |               imageVector = ${iconPropertyName},
-            |               contentDescription = null,
-            |               modifier = Modifier.size(100.dp),
-            |           )
-            |       }
-            |   }
+            |    $theme {
+            |        Column(
+            |            verticalArrangement = Arrangement.spacedBy(8.dp),
+            |            horizontalAlignment = Alignment.CenterHorizontally,
+            |        ) {
+            |            Image(
+            |                imageVector = ${iconPropertyName},
+            |                contentDescription = null,
+            |                modifier = Modifier.size(100.dp),
+            |            )
+            |        }
+            |    }
             |}
+            |
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |
