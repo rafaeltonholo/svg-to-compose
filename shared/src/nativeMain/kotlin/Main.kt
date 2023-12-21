@@ -5,7 +5,11 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.boolean
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.wirter.IconWriter
+import dev.tonholo.s2c.io.IconWriter
+import dev.tonholo.s2c.io.TempFileWriter
+import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.logger.printEmpty
+import dev.tonholo.s2c.logger.verbose
 import okio.FileSystem
 import platform.posix.exit
 
@@ -67,27 +71,29 @@ class Client : CliktCommand() {
     ).flag()
 
     override fun run() {
-        if (verbose) {
-            println("Args:")
-            println("   path = $path")
-            println("   pacakge = $pacakge")
-            println("   theme = $theme")
-            println("   output = $output")
-            println("   optimize = $optimize")
-            println("   contextProvider = $contextProvider")
-            println("   addToMaterial = $addToMaterial")
-            println("   debug = $debug")
-            println("   verbose = $verbose")
-        }
+        verbose("Args:")
+        verbose("   path = $path")
+        verbose("   pacakge = $pacakge")
+        verbose("   theme = $theme")
+        verbose("   output = $output")
+        verbose("   optimize = $optimize")
+        verbose("   contextProvider = $contextProvider")
+        verbose("   addToMaterial = $addToMaterial")
+        verbose("   debug = $debug")
+        verbose("   verbose = $verbose")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
 
         try {
+            val fileSystem = FileSystem.SYSTEM
             Processor(
                 iconWriter = IconWriter(
-                    fileSystem = FileSystem.SYSTEM,
-                )
+                    fileSystem = fileSystem,
+                ),
+                tempFileWriter = TempFileWriter(
+                    fileSystem = fileSystem,
+                ),
             ).run(
                 path = path,
                 pkg = pacakge,
@@ -98,8 +104,8 @@ class Client : CliktCommand() {
                 addToMaterial = addToMaterial,
             )
         } catch (e: ExitProgramException) {
-            println()
-            println(e.message)
+            printEmpty()
+            output(e.message.orEmpty())
             exit(e.errorCode.code)
         }
     }

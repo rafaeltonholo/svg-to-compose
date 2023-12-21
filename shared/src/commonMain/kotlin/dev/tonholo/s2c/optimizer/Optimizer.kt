@@ -5,6 +5,9 @@ import com.kgit2.process.Command
 import com.kgit2.process.Stdio
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
+import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.logger.printEmpty
+import dev.tonholo.s2c.logger.verbose
 
 sealed interface Optimizer {
     val command: String
@@ -19,11 +22,7 @@ sealed interface Optimizer {
             .spawn()
             .wait()
             .also {
-                if (AppConfig.verbose) {
-                    println()
-                    println("exit code = ${it.code}")
-                }
-
+                verbose("exit code = ${it.code}")
             }
             .code == 0
 
@@ -58,8 +57,8 @@ sealed interface Optimizer {
             var hasMissingDependency = false
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
-                    println()
-                    println(optimizer.errorMessage)
+                    printEmpty()
+                    output(optimizer.errorMessage)
                     hasMissingDependency = true
                 }
             }
