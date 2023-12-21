@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.io.gitlab.arturbosch.detekt)
 }
 
 val rootBuildDir = File(project.rootDir.absolutePath, "build")
@@ -39,4 +40,8 @@ kotlin {
             implementation(libs.clikt)
         }
     }
+}
+
+dependencies {
+    detektPlugins(libs.detekt.formatting)
 }
