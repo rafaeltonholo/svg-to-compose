@@ -42,6 +42,7 @@ data class IconFileContents(
     val viewportHeight: Float = height,
     val nodes: List<ImageVectorNode>,
     val contextProvider: String? = null,
+    val addToMaterial: Boolean = false,
     val imports: Set<String> = defaultImports,
 ) {
     fun materialize(): String {
@@ -61,6 +62,17 @@ data class IconFileContents(
                    |    """.trimMargin()
         )
 
+        val iconPropertyName = when {
+            contextProvider?.isNotEmpty() == true -> {
+                // as we add the dot in the next line, remove it in case the user adds a leftover dot
+                // to avoid compile issues.
+                contextProvider.removeSuffix(".")
+                "$contextProvider.${iconName.pascalCase()}"
+            }
+            addToMaterial -> "Icons.Filled.${iconName.pascalCase()}"
+            else -> iconName.pascalCase()
+        }
+
         val indentSize = 12
         val pathNodes = nodes.joinToString("\n${" ".repeat(indentSize)}") {
             it.materialize()
@@ -72,7 +84,7 @@ data class IconFileContents(
             |
             |${imports.sorted().joinToString("\n"){ "import $it" }}
             |
-            |val ${iconName.pascalCase()}: ImageVector
+            |val ${iconPropertyName}: ImageVector
             |   get() {
             |       val current = _${iconName.camelCase()}
             |       if (current != null) return current
@@ -97,7 +109,7 @@ data class IconFileContents(
             |           horizontalAlignment = Alignment.CenterHorizontally,
             |       ) {
             |           Image(
-            |               imageVector = ${iconName.pascalCase()},
+            |               imageVector = ${iconPropertyName},
             |               contentDescription = null,
             |               modifier = Modifier.size(100.dp),
             |           )

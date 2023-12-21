@@ -77,6 +77,7 @@ sealed class ImageParser {
                 viewportHeight = viewportHeight.toFloat(),
                 nodes = svg.commands.mapNotNull { it.asNode(svg) },
                 contextProvider = contextProvider,
+                addToMaterial = addToMaterial,
                 imports = imports,
             )
         }
@@ -111,6 +112,7 @@ sealed class ImageParser {
                 viewportHeight = androidVector.viewportHeight.toFloat(),
                 nodes = androidVector.nodes.map { it.asNode() },
                 contextProvider = contextProvider,
+                addToMaterial = addToMaterial,
                 imports = imports,
             )
         }
