@@ -4,6 +4,7 @@ clikt = "4.2.1"
 xmlutil = "0.86.3"
 okio = "3.7.0"
 com-kgit2-kommand = "1.2.0"
+detekt = "1.23.4"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
@@ -11,7 +12,9 @@ xmlutil-core = { group = "io.github.pdvrieze.xmlutil", name = "core", version.re
 xmlutil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlutil" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 com-kgit2-kommand = { group = "com.kgit2", name = "kommand", version.ref = "com-kgit2-kommand" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+io-gitlab-arturbosch-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
