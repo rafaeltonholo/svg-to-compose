@@ -13,7 +13,7 @@ sealed interface ImageVectorNode {
 
     data class Path(
         val fillColor: String,
-        val nodes: List<PathNodes>,
+        val wrapper: NodeWrapper,
     ) : ImageVectorNode {
         override fun materialize(): String {
             val realColor = fillColor.uppercase().removePrefix("#").let { color ->
@@ -22,16 +22,17 @@ sealed interface ImageVectorNode {
                     else -> color
                 }
             }
-            val normalizedNodes = "TODO"
             val indentSize = 4
-            val pathNodes = nodes.joinToString("\n\n${" ".repeat(indentSize)}") {
+            val pathNodes = wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
                 it.materialize()
                     .replace("\n", "\n${" ".repeat(indentSize)}") // Fix indent
+                    .trimEnd()
             }
+
             return """
-                |// $normalizedNodes
+                |// ${wrapper.normalizedPath}
                 |path(
-                |   fill = SolidColor(Color(0x$realColor)),
+                |    fill = SolidColor(Color(0x$realColor)),
                 |) {
                 |    $pathNodes
                 |}
@@ -40,32 +41,40 @@ sealed interface ImageVectorNode {
     }
 
     data class Group(
-        val clipPath: List<PathNodes>,
+        val clipPath: NodeWrapper,
         val nodes: List<Path>,
     ) : ImageVectorNode {
         override fun materialize(): String {
             val indentSize = 4
-            val clipPathData = clipPath
-                .joinToString("\n\n${" ".repeat(indentSize * 2)}") {
+            val clipPathData = clipPath.nodes
+                .joinToString("\n${" ".repeat(indentSize * 2)}") {
                     it.materialize()
                         .replace("\n", "\n${" ".repeat(indentSize * 2)}")
+                        .trimEnd()
                 }
             val groupPaths = nodes
-                .joinToString("\n\n${" ".repeat(indentSize)}") {
+                .joinToString("\n${" ".repeat(indentSize)}") {
                     it.materialize()
                         .replace("\n", "\n${" ".repeat(indentSize)}")
+                        .trimEnd()
                 }
             return """
                 |group(
-                |   clipPathData = PathData {
+                |    // ${clipPath.normalizedPath}
+                |    clipPathData = PathData {
                 |        $clipPathData
-                |   }
+                |    },
                 |) {
-                |   $groupPaths
+                |    $groupPaths
                 |}
                 """.trimMargin()
         }
     }
+
+    data class NodeWrapper(
+        val normalizedPath: String,
+        val nodes: List<PathNodes>,
+    ) // Support class to Paths. It should not inherit from ImageVectorNode
 }
 
 sealed class PathNodes(
@@ -81,7 +90,8 @@ sealed class PathNodes(
     protected fun closeCommand(): String = if (shouldClose) {
         """
         |close()
-        """.trimMargin()
+        |
+        |""".trimMargin()
     } else {
         ""
     }
@@ -149,13 +159,13 @@ sealed class PathNodes(
             return """
                 |// $command $a $b $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y
                 |arcTo${relative}(
-                |   $a,
-                |   $b,
-                |   theta = ${theta}f,
-                |   isMoreThanHalf = $isMoreThanHalf,
-                |   isPositiveArc = $isPositiveArc,
-                |   ${relativePrefix}x1 = ${x}f, 
-                |   ${relativePrefix}y1 = ${y}f,
+                |    $a,
+                |    $b,
+                |    theta = ${theta}f,
+                |    isMoreThanHalf = $isMoreThanHalf,
+                |    isPositiveArc = $isPositiveArc,
+                |    ${relativePrefix}x1 = ${x}f,
+                |    ${relativePrefix}y1 = ${y}f,
                 |)
                 |${closeCommand()}""".trimMargin()
         }
@@ -187,7 +197,7 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $y
-                |verticalLineTo${relative}(${relativePrefix}y = ${y}f) 
+                |verticalLineTo${relative}(${relativePrefix}y = ${y}f)
                 |${closeCommand()}""".trimMargin()
         }
     }
@@ -218,7 +228,7 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x
-                |horizontalLineTo${relative}(${relativePrefix}x = ${x}f) 
+                |horizontalLineTo${relative}(${relativePrefix}x = ${x}f)
                 |${closeCommand()}""".trimMargin()
         }
     }
@@ -288,12 +298,12 @@ sealed class PathNodes(
             return """
                 |// $command $x1 $y1 $x2 $y2 $x3 $y3
                 |curveTo${relative}(
-                |   ${relativePrefix}x1 = ${x1}f, 
-                |   ${relativePrefix}y1 = ${y1}f,
-                |   ${relativePrefix}x2 = ${x2}f, 
-                |   ${relativePrefix}y2 = ${y2}f,
-                |   ${relativePrefix}x3 = ${x3}f, 
-                |   ${relativePrefix}y3 = ${y3}f,
+                |    ${relativePrefix}x1 = ${x1}f,
+                |    ${relativePrefix}y1 = ${y1}f,
+                |    ${relativePrefix}x2 = ${x2}f,
+                |    ${relativePrefix}y2 = ${y2}f,
+                |    ${relativePrefix}x3 = ${x3}f,
+                |    ${relativePrefix}y3 = ${y3}f,
                 |)
                 |${closeCommand()}""".trimMargin()
         }
@@ -327,17 +337,17 @@ sealed class PathNodes(
             return """
                 |// $command $x1 $y1 $x2 $y2
                 |reflectiveCurveTo${relative}(
-                |   ${relativePrefix}x1 = ${x1}f, 
-                |   ${relativePrefix}y1 = ${y1}f,
-                |   ${relativePrefix}x2 = ${x2}f, 
-                |   ${relativePrefix}y2 = ${y2}f,
+                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}y1 = ${y1}f,
+                |    ${relativePrefix}x2 = ${x2}f, 
+                |    ${relativePrefix}y2 = ${y2}f,
                 |)
                 |${closeCommand()}""".trimMargin()
         }
     }
 }
 
-fun String.asNodes(): List<PathNodes> {
+fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
     debugSection("Starting path")
 
@@ -403,7 +413,10 @@ fun String.asNodes(): List<PathNodes> {
             commands.removeFirst()
         }
     }
-    return nodes
+    return ImageVectorNode.NodeWrapper(
+        normalizedPath = normalizedPath,
+        nodes = nodes,
+    )
 }
 
 private fun normalizePath(path: String): String {
