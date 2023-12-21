@@ -66,16 +66,34 @@ class Processor(
             verbose("Finished verification")
         }
 
+        val errors = mutableListOf<Exception>()
         for (file in files) {
-            processFile(
-                file = file,
-                optimize = optimize,
-                pkg = pkg,
-                theme = theme,
-                contextProvider = contextProvider,
-                addToMaterial = addToMaterial,
-                output = outputPath,
-            )
+            try {
+                processFile(
+                    file = file,
+                    optimize = optimize,
+                    pkg = pkg,
+                    theme = theme,
+                    contextProvider = contextProvider,
+                    addToMaterial = addToMaterial,
+                    output = outputPath,
+                )
+                printEmpty()
+            } catch (e: ExitProgramException) {
+                throw e
+            } catch (e: Exception) {
+                output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
+                errors.add(e)
+            }
+        }
+
+        if (errors.isEmpty()) {
+            output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
+        } else {
+            output("❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.")
+            output("Please see the logs for more information.")
+            printEmpty()
+            errors.mapNotNull { it.message }.forEach { debug(it) }
         }
     }
 
