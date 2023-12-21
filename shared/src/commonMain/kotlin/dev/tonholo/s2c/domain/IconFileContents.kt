@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.domain
 
-import AppConfig
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.debug

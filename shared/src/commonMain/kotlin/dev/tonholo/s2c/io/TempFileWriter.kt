@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.io
 
 import dev.tonholo.s2c.extensions.extension
-import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
 import okio.FileSystem
