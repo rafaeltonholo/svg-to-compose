@@ -1,7 +1,12 @@
+
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.eagerOption
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
@@ -12,6 +17,9 @@ import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
 import okio.FileSystem
 import platform.posix.exit
+
+fun main(args: Array<String>) = Client()
+    .main(args)
 
 class Client : CliktCommand() {
 
@@ -33,17 +41,20 @@ class Client : CliktCommand() {
 
     private val theme by option(
         names = arrayOf("-t", "--theme"),
-        help = "Specify project's theme name. This will take place in the Icon Preview composable function and in the ImageVector Builder's names.",
+        help = "Specify project's theme name. This will take place in the Icon Preview composable function and in " +
+                "the ImageVector Builder's names.",
     ).required()
 
     private val output by option(
         names = arrayOf("-o", "--output"),
-        help = "output filename; if no .kt extension specified, it will be automatically added. In case of the input is a directory, output MUST also be a directory.",
+        help = "output filename; if no .kt extension specified, it will be automatically added. In case of the input " +
+                "is a directory, output MUST also be a directory.",
     ).required()
 
     private val optimize by option(
         names = arrayOf("-opt", "--optmize"),
-        help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
+        help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
+                "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
     ).boolean().default(true)
 
     private val contextProvider by option(
@@ -111,7 +122,3 @@ class Client : CliktCommand() {
     }
 
 }
-
-
-fun main(args: Array<String>) = Client()
-    .main(args)

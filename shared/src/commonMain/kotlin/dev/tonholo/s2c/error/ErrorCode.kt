@@ -8,4 +8,5 @@ enum class ErrorCode(val code: Int) {
     NotSupportedFileError(code = 8),
     OutputNotDirectoryError(code = 9),
     MissingCoreDependency(code = 1000),
+    FailedToParseIconError(code = 2000),
 }

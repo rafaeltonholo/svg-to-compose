@@ -1,6 +1,14 @@
 package dev.tonholo.s2c.parser
 
-import dev.tonholo.s2c.domain.*
+import dev.tonholo.s2c.domain.AndroidVector
+import dev.tonholo.s2c.domain.AndroidVectorNode
+import dev.tonholo.s2c.domain.IconFileContents
+import dev.tonholo.s2c.domain.Svg
+import dev.tonholo.s2c.domain.SvgNode
+import dev.tonholo.s2c.domain.asNode
+import dev.tonholo.s2c.domain.defaultImports
+import dev.tonholo.s2c.domain.groupImports
+import dev.tonholo.s2c.domain.materialContextProviderImport
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension

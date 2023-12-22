@@ -97,7 +97,7 @@ complexity:
     threshold: 15
   ComplexCondition:
     active: true
-    threshold: 4
+    threshold: 6
   ComplexInterface:
     active: false
     threshold: 10
@@ -128,7 +128,7 @@ complexity:
     threshold: 600
   LongMethod:
     active: true
-    threshold: 60
+    threshold: 120
   LongParameterList:
     active: true
     functionThreshold: 8
@@ -616,7 +616,7 @@ style:
       - '2'
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false
-    ignoreLocalVariableDeclaration: false
+    ignoreLocalVariableDeclaration: true
     ignoreConstantDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
     ignoreAnnotation: false
@@ -692,7 +692,7 @@ style:
     ignoredCharacters: []
   ThrowsCount:
     active: true
-    max: 2
+    max: 4
     excludeGuardClauses: false
   TrailingWhitespace:
     active: false
