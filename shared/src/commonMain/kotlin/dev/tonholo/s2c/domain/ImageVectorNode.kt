@@ -138,7 +138,7 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
         lastCommand = currentCommand
         nodes.add(node)
         // Looping to avoid recreating a new list by using .drop() instead.
-        for (i in 1..node.commandSize) {
+        repeat(node.commandSize) {
             commands.removeFirst()
         }
     }

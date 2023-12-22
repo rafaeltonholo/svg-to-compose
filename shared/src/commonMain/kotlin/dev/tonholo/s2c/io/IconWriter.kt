@@ -2,7 +2,12 @@ package dev.tonholo.s2c.io
 
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.pascalCase
-import dev.tonholo.s2c.logger.*
+import dev.tonholo.s2c.logger.debug
+import dev.tonholo.s2c.logger.debugEndSection
+import dev.tonholo.s2c.logger.debugSection
+import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.logger.printEmpty
+import dev.tonholo.s2c.logger.verbose
 import okio.FileSystem
 import okio.Path
 

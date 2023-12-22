@@ -7,6 +7,8 @@ import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.debug
+import dev.tonholo.s2c.logger.debugEndSection
+import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
@@ -80,7 +82,8 @@ class Processor(
                 printEmpty()
             } catch (e: ExitProgramException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: @Suppress("TooGenericExceptionCaught") Exception) {
+                // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
                 errors.add(e)
             }
@@ -89,10 +92,20 @@ class Processor(
         if (errors.isEmpty()) {
             output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
         } else {
-            output("❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.")
-            output("Please see the logs for more information.")
-            printEmpty()
-            errors.mapNotNull { it.message }.forEach { debug(it) }
+            debugSection("Full error messages")
+            errors.filter { exception ->
+                exception.message?.isNotEmpty() == true
+            }.forEach { debug(it) }
+            debugEndSection()
+
+            throw ExitProgramException(
+                errorCode = ErrorCode.FailedToParseIconError,
+                message = """
+                    |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
+                    |Please see the logs for more information.
+                    |
+                    """.trimMargin()
+            )
         }
     }
 
