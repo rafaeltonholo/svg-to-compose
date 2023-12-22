@@ -2,7 +2,7 @@ package dev.tonholo.s2c.logger
 
 import AppConfig
 
-fun debug(message: String) {
+fun debug(message: Any) {
     if (AppConfig.debug) {
         println(message)
     }
@@ -20,7 +20,7 @@ fun debugSection(message: String) {
 fun debugEndSection() {
     if (AppConfig.debug) {
         println()
-        println("=".repeat(50))
+        println("=".repeat(n = 50))
         println()
     }
 }

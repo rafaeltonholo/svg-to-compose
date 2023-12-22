@@ -1,3 +1,7 @@
+// Suppressing MagicNumber in this file since we need to use array positions to access the proper value
+// while parsing the commands.
+@file:Suppress("MagicNumber")
+
 package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.extensions.toInt
