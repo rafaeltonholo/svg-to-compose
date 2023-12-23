@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.io
 
+import AppConfig.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
@@ -7,13 +8,12 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 
-private const val S2V_TEMP_FOLDER = ".s2c"
 private const val TARGET_FILENAME = "target"
 
 class TempFileWriter(
     private val fileSystem: FileSystem,
 ) {
-    private val tempFolder = S2V_TEMP_FOLDER.toPath()
+    private val tempFolder = S2C_TEMP_FOLDER.toPath()
 
     fun create(
         file: Path,
