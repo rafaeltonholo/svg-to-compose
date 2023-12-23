@@ -83,10 +83,10 @@ sealed class PathNodes(
             val command = if (isRelative) this.command else this.command.uppercaseChar()
             val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            val a = if (isRelative) "a" else "horizontalEllipseRadius" + " = ${this.a}f"
-            val b = if (isRelative) "b" else "verticalEllipseRadius" + " = ${this.b}f"
+            val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a}f"
+            val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b}f"
             return """
-                |// $command $a $b $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y
+                |// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y
                 |arcTo${relative}(
                 |    $a,
                 |    $b,

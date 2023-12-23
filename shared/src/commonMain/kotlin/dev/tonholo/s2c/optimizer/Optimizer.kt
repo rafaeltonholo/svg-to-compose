@@ -1,12 +1,19 @@
 package dev.tonholo.s2c.optimizer
 
+import AppConfig.S2C_TEMP_FOLDER
 import com.kgit2.process.Command
 import com.kgit2.process.Stdio
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
+import dev.tonholo.s2c.error.OptimizationException
+import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
+import okio.FileSystem
+import okio.IOException
+import okio.Path
+import okio.Path.Companion.toPath
 
 sealed interface Optimizer {
     val command: String
@@ -25,30 +32,107 @@ sealed interface Optimizer {
             }
             .code == 0
 
-    data object SvgoOptimizer : Optimizer {
+    fun run(file: Path)
+    fun runOptimization(
+        errorCode: ErrorCode,
+        vararg args: String,
+    ) {
+        verbose(
+            """
+                |Args:
+                |   errorCode=$errorCode,
+                |   args=${args.joinToString(" ")}
+            """.trimMargin()
+        )
+        output("⏳ Running $command")
+        try {
+            Command(command)
+                .args(*args)
+                .spawn()
+                .wait()
+        } catch (e: IOException) {
+            throw OptimizationException(errorCode)
+        }
+        output("✅ Finished $command")
+    }
+
+    data class SvgoOptimizer(
+        val fileSystem: FileSystem,
+    ) : Optimizer {
         override val command: String = "svgo"
         override val allowedExtension: String = ".svg"
+        override fun run(file: Path) {
+            val svgoConfigFilename = "svgo-config.js"
+            val tempFolder = S2C_TEMP_FOLDER.toPath()
+            val svgoConfigFile = tempFolder / svgoConfigFilename
+
+            // Create temp directory in case of not having it yet.
+            fileSystem.createDirectory(tempFolder)
+
+            if (!fileSystem.exists(svgoConfigFile)) {
+                output("⚙️ writing svgo config file")
+                val svgoConfig = """
+                    |module.exports = {
+                    |  plugins: [
+                    |      {
+                    |          name: "convertPathData",
+                    |          params: {
+                    |              leadingZero: false,
+                    |              floatPrecision: 2,
+                    |          }
+                    |      }
+                    |  ]
+                    |}
+                    """.trimMargin()
+                fileSystem.write(svgoConfigFile) {
+                    writeUtf8(svgoConfig)
+                }
+            }
+
+            runOptimization(
+                errorCode = ErrorCode.SvgoOptimizationError,
+                "$S2C_TEMP_FOLDER/target.svg",
+                "--config=$S2C_TEMP_FOLDER/$svgoConfigFilename",
+                "-o",
+                "$S2C_TEMP_FOLDER/target.optimized.svg",
+            )
+        }
     }
 
     data object S2vOptimizer : Optimizer {
         override val command: String = "s2v"
         override val allowedExtension: String = ".svg"
+
+        override fun run(file: Path) {
+            runOptimization(
+                errorCode = ErrorCode.S2vOptimizationError,
+                "-p", "2", "-i","$S2C_TEMP_FOLDER/target.optimized.svg", "-o", "$S2C_TEMP_FOLDER/target.xml"
+            )
+        }
     }
 
     data object AvocadoOptimizer : Optimizer {
         override val command: String = "avocado"
         override val allowedExtension: String = ".xml"
+
+        override fun run(file: Path) {
+            runOptimization(
+                errorCode = ErrorCode.AvocadoOptimizationError,
+                "$S2C_TEMP_FOLDER/target.xml"
+            )
+        }
     }
 
-    companion object {
+    class Factory(
+        fileSystem: FileSystem,
+    ) {
         private val svgOptimizers = setOf(
-            SvgoOptimizer,
+            SvgoOptimizer(fileSystem),
             S2vOptimizer,
         )
         private val xmlOptimizers = setOf(
             AvocadoOptimizer,
         )
-        val optimizers = svgOptimizers + xmlOptimizers
 
         fun verifyDependency(
             hasXml: Boolean,
@@ -83,6 +167,25 @@ sealed interface Optimizer {
                 )
             }
         }
+
+        fun optimize(file: Path) {
+            if (file.extension == ".svg") {
+                output("🏎️  Optimizing SVG")
+                svgOptimizers.forEach {
+                    printEmpty()
+                    it.run(file)
+                    printEmpty()
+                }
+            } else {
+                output("⚠️ XML detected, skipping SVG optimization")
+            }
+
+            output("🏎️  Optimizing XML")
+            xmlOptimizers.forEach {
+                printEmpty()
+                it.run(file)
+                printEmpty()
+            }
+        }
     }
 }
-

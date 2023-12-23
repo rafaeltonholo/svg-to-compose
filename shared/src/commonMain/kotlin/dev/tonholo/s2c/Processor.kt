@@ -61,15 +61,19 @@ class Processor(
             output("🔍 File detected")
         }
 
-        if (optimize) {
+        val optimizer = if (optimize) {
             verbose("Verifying optimization dependencies")
-            Optimizer.verifyDependency(files.any { it.name.endsWith(".xml") })
+            val optimizer = Optimizer.Factory(fileSystem)
+            optimizer.verifyDependency(files.any { it.name.endsWith(".xml") })
             verbose("Finished verification")
-        }
+            optimizer
+        } else null
 
         val errors = mutableListOf<Exception>()
         for (file in files) {
             try {
+                optimizer?.optimize(file)
+
                 processFile(
                     file = file,
                     optimize = optimize,
@@ -83,8 +87,10 @@ class Processor(
             } catch (e: ExitProgramException) {
                 throw e
             } catch (e: @Suppress("TooGenericExceptionCaught") Exception) {
+                printEmpty()
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
+                printEmpty()
                 errors.add(e)
             }
         }
