@@ -4,7 +4,7 @@ import AppConfig
 
 fun debug(message: Any) {
     if (AppConfig.debug) {
-        println(message)
+        println("D: $message")
     }
 }
 
@@ -27,7 +27,7 @@ fun debugEndSection() {
 
 fun verbose(message: String) {
     if (AppConfig.verbose) {
-        println(message)
+        println("V: $message")
     }
 }
 
