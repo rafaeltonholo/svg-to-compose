@@ -34,7 +34,18 @@ class Processor(
         val filePath = path.toPath()
         val outputPath = output.toPath()
         val fileSystem = FileSystem.SYSTEM
-        val inputMetadata = fileSystem.metadata(filePath)
+        val inputMetadata = try {
+            fileSystem.metadata(filePath)
+        } catch (e: okio.IOException) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.FileNotFoundError,
+                message = """
+                    |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
+                    |No SVG or XML file detected on the specified path.
+                    |
+                    """.trimMargin()
+            )
+        }
 
         val files = mutableListOf(filePath)
 
@@ -52,11 +63,24 @@ class Processor(
             }
 
             files.clear()
-            files.addAll(
-                fileSystem.list(filePath).filter {
+            val directoryFiles = fileSystem.list(filePath)
+                .filter {
                     it.name.endsWith(".svg") || it.name.endsWith(".xml")
-                },
+                }
+            verbose("svg/xml files = $directoryFiles")
+            files.addAll(
+                directoryFiles,
             )
+            if (files.isEmpty()) {
+                throw ExitProgramException(
+                    errorCode = ErrorCode.FileNotFoundError,
+                    message = """
+                    |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
+                    |No SVG or XML files detected in the directory.
+                    |
+                    """.trimMargin()
+                )
+            }
         } else {
             output("🔍 File detected")
         }

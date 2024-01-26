@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.optimizer
 
 import AppConfig.S2C_TEMP_FOLDER
-import com.kgit2.process.Command
-import com.kgit2.process.Stdio
+import com.kgit2.kommand.process.Command
+import com.kgit2.kommand.process.Stdio
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
@@ -23,14 +23,14 @@ sealed interface Optimizer {
 
     fun verifyDependency() =
         Command("command")
-            .args("-v", command)
+            .args(listOf("-v", command))
             .stdout(Stdio.Pipe)
+            .also { verbose(it.debugString()) }
             .spawn()
             .wait()
-            .also {
-                verbose("exit code = ${it.code}")
-            }
-            .code == 0
+            .also { code ->
+                verbose("exit code = $code")
+            } == 0
 
     fun run(file: Path)
     fun runOptimization(
@@ -47,7 +47,7 @@ sealed interface Optimizer {
         output("⏳ Running $command")
         try {
             Command(command)
-                .args(*args)
+                .args(args.toList())
                 .spawn()
                 .wait()
         } catch (e: IOException) {
@@ -147,6 +147,7 @@ sealed interface Optimizer {
             }
 
             svgOptimizers.forEach {
+                verbose("Verifying $it")
                 it.verifyDependency().also { hasDependency ->
                     showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
                 }
