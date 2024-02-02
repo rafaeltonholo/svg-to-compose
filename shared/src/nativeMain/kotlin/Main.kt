@@ -34,7 +34,7 @@ class Client : CliktCommand() {
         help = "file *.svg | *.xml | directory",
     )
 
-    private val pacakge by option(
+    private val pkg by option(
         names = arrayOf("-p", "--package"),
         help = "Specify icons's package. This will replace package at the top of the icon file",
     ).required()
@@ -52,7 +52,7 @@ class Client : CliktCommand() {
     ).required()
 
     private val optimize by option(
-        names = arrayOf("-opt", "--optmize"),
+        names = arrayOf("-opt", "--optimize"),
         help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
                 "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
     ).boolean().default(true)
@@ -84,7 +84,7 @@ class Client : CliktCommand() {
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
-        verbose("   pacakge = $pacakge")
+        verbose("   pacakge = $pkg")
         verbose("   theme = $theme")
         verbose("   output = $output")
         verbose("   optimize = $optimize")
@@ -107,7 +107,7 @@ class Client : CliktCommand() {
                 ),
             ).run(
                 path = path,
-                pkg = pacakge,
+                pkg = pkg,
                 theme = theme,
                 output = output,
                 optimize = optimize,
