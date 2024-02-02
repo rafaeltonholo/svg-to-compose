@@ -31,6 +31,7 @@ class Processor(
         contextProvider: String?,
         addToMaterial: Boolean,
     ) {
+        verbose("Start processor execution")
         val filePath = path.toPath()
         val outputPath = output.toPath()
         val fileSystem = FileSystem.SYSTEM
@@ -93,14 +94,12 @@ class Processor(
             optimizer
         } else null
 
-        val errors = mutableListOf<Exception>()
+        val errors = mutableListOf<Pair<Path, Exception>>()
         for (file in files) {
             try {
-                optimizer?.optimize(file)
-
                 processFile(
                     file = file,
-                    optimize = optimize,
+                    optimizer = optimizer,
                     pkg = pkg,
                     theme = theme,
                     contextProvider = contextProvider,
@@ -115,7 +114,7 @@ class Processor(
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
                 printEmpty()
-                errors.add(e)
+                errors.add(file to e)
             }
         }
 
@@ -123,7 +122,7 @@ class Processor(
             output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
         } else {
             debugSection("Full error messages")
-            errors.filter { exception ->
+            errors.filter { (_, exception) ->
                 exception.message?.isNotEmpty() == true
             }.forEach { debug(it) }
             debugEndSection()
@@ -131,9 +130,11 @@ class Processor(
             throw ExitProgramException(
                 errorCode = ErrorCode.FailedToParseIconError,
                 message = """
-                    |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
+                    |❌ Failure to parse (${errors.size}) SVG(s)/Android Vector Drawable(s) to Jetpack Compose.
                     |Please see the logs for more information.
                     |
+                    |Files failed to parse:
+                    |${errors.map { it.first }.joinToString("\n") { "    - $it" }}
                     """.trimMargin()
             )
         }
@@ -141,7 +142,7 @@ class Processor(
 
     private fun processFile(
         file: Path,
-        optimize: Boolean,
+        optimizer: Optimizer.Factory?,
         pkg: String,
         theme: String,
         contextProvider: String?,
@@ -153,8 +154,10 @@ class Processor(
         val iconName = file.name.removeSuffix(".svg").removeSuffix(".xml")
         val targetFile = tempFileWriter.create(
             file = file,
-            optimize = optimize,
+            optimize = optimizer != null,
         )
+
+        optimizer?.optimize(file)
 
         output("👓 Parsing the ${file.extension} file")
         val fileContents = ImageParser.parse(

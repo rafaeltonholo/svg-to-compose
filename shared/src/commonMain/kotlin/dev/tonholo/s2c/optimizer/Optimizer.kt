@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.optimizer
 
 import AppConfig.S2C_TEMP_FOLDER
+import com.kgit2.kommand.exception.KommandException
 import com.kgit2.kommand.process.Command
 import com.kgit2.kommand.process.Stdio
 import dev.tonholo.s2c.error.ErrorCode
@@ -11,7 +12,6 @@ import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
 import okio.FileSystem
-import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -49,8 +49,13 @@ sealed interface Optimizer {
             Command(command)
                 .args(args.toList())
                 .spawn()
-                .wait()
-        } catch (e: IOException) {
+                .waitWithOutput().let { output ->
+                    verbose(output.toString())
+                    if (!output.stderr.isNullOrBlank()) {
+                        throw OptimizationException(errorCode)
+                    }
+                }
+        } catch (e: KommandException) {
             throw OptimizationException(errorCode)
         }
         output("✅ Finished $command")
