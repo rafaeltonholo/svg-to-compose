@@ -1,6 +1,10 @@
 #!/bin/bash
 DEBUG=false
 VERBOSE=false
+PLATFORM_WINDOWS="mingwX64"
+PLATFORM_LINUX="linux86"
+PLATFORM_MAC_OS="macosX64"
+PLATFORM_MAC_M1="macosArm64"
 
 if [[ "$*" == *"--debug"* ]]; then
   DEBUG=true
@@ -30,18 +34,18 @@ fn_print_error() {
 fn_os_check() {
   unameOut=$(uname -a)
   case "${unameOut}" in
-      *Microsoft*)  PLATFORM="mingwX64";; # must be first since Windows subsystem for linux will have Linux in the name too
-      *microsoft*)  PLATFORM="mingwX64";; #WARNING: My v2 uses ubuntu 20.4 at the moment slightly different name may not always work
-      Linux*)       PLATFORM="linux86";;
-      Darwin*)      PLATFORM="macosX64";;
-      CYGWIN*)      PLATFORM="mingwX64";;
-      MINGW*)       PLATFORM="mingwX64";;
-      *Msys)        PLATFORM="mingwX64";;
+      *Microsoft*)  PLATFORM=$PLATFORM_WINDOWS;; # must be first since Windows subsystem for linux will have Linux in the name too
+      *microsoft*)  PLATFORM=$PLATFORM_WINDOWS;; #WARNING: My v2 uses ubuntu 20.4 at the moment slightly different name may not always work
+      Linux*)       PLATFORM=$PLATFORM_LINUX;;
+      Darwin*)      PLATFORM=$PLATFORM_MAC_OS;;
+      CYGWIN*)      PLATFORM=$PLATFORM_WINDOWS;;
+      MINGW*)       PLATFORM=$PLATFORM_WINDOWS;;
+      *Msys)        PLATFORM=$PLATFORM_WINDOWS;;
       *)            PLATFORM="UNKNOWN:${unameOut}"
   esac
 
-  if [[ ${PLATFORM} == "macosX64" ]] && sysctl -n machdep.cpu.brand_string | grep -q 'Apple M1'; then
-      PLATFORM="macosArm64"
+  if [[ ${PLATFORM} == $PLATFORM_MAC_OS ]] && sysctl -n machdep.cpu.brand_string | grep -q 'Apple M1'; then
+      PLATFORM=$PLATFORM_MAC_M1
   fi
 }
 
@@ -69,8 +73,15 @@ fn_main() {
 
   if [[ $must_download == true ]]; then
     fn_print_debug "Downloading binaries from Github"
+    # TODO.
   else
-    $bin_folder/s2c.exe "$@"
+    program_ext="kexe"
+
+    if [[ $PATFORM == $PLATFORM_WINDOWS ]]; then
+        program_ext="exe"
+    fi
+
+    command $bin_folder/s2c.$program_ext "$@"
   fi
 }
 
