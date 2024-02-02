@@ -17,6 +17,14 @@ kotlin {
             executable {
                 entryPoint = "main"
                 baseName = "s2c"
+
+                debuggable = true
+                runTask?.let {
+                    val args = providers.gradleProperty("runArgs")
+                    it.argumentProviders.add(CommandLineArgumentProvider {
+                        args.orNull?.split(" ")
+                    })
+                }
             }
         }
 
