@@ -34,6 +34,11 @@ kotlin {
                 ":shared:compileKotlin$targetName",
                 ":shared:linkDebugExecutable$targetName"
             )
+         task("buildRelease$targetName")
+            .dependsOn(
+                ":shared:compileKotlin$targetName",
+                ":shared:linkReleaseExecutable$targetName"
+            )
     }
 
     sourceSets {

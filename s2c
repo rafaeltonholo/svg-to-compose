@@ -31,6 +31,10 @@ fn_print_error() {
   echo "E: $1"
 }
 
+fn_print_info() {
+  echo "I: $1"
+}
+
 fn_os_check() {
   unameOut=$(uname -a)
   case "${unameOut}" in
@@ -44,7 +48,7 @@ fn_os_check() {
       *)            PLATFORM="UNKNOWN:${unameOut}"
   esac
 
-  if [[ ${PLATFORM} == $PLATFORM_MAC_OS ]] && sysctl -n machdep.cpu.brand_string | grep -q 'Apple M1'; then
+  if [[ $PLATFORM == "$PLATFORM_MAC_OS" ]] && sysctl -n machdep.cpu.brand_string | grep -q 'Apple M1'; then
       PLATFORM=$PLATFORM_MAC_M1
   fi
 }
@@ -55,6 +59,7 @@ fn_main() {
 
   bin_folder="bin"
   must_download=false
+  must_build=false
   if [[ ! -d "$bin_folder" ]]; then
     fn_print_verbose "Bin folder not present. Checking if it is the project folder..."
 
@@ -66,23 +71,40 @@ fn_main() {
       fn_print_verbose "Checking debug version for $PLATFORM"
       bin_folder="shared/build/bin/$PLATFORM/debugExecutable"
       if [[ ! -d "$bin_folder" ]]; then
-        must_download=true
+        if [[ ! -d "gradle" ]]; then
+          must_download=true
+        else
+          must_build=true
+        fi
       fi
     fi
   fi
 
   if [[ $must_download == true ]]; then
-    fn_print_debug "Downloading binaries from Github"
+    fn_print_info "Downloading binaries from Github"
     # TODO.
-  else
-    program_ext="kexe"
-
-    if [[ $PATFORM == $PLATFORM_WINDOWS ]]; then
-        program_ext="exe"
+  elif [[ $must_build == true ]]; then
+    fn_print_info "Found project structure, but not binaries. Build required."
+    if [[ $DEBUG == true ]] | [[ $VERBOSE == true ]]; then
+      build_type=Debug
+    else
+      build_type=Release
     fi
 
-    command $bin_folder/s2c.$program_ext "$@"
+    build_platform="$(tr '[:lower:]' '[:upper:]' <<< ${PLATFORM:0:1})${PLATFORM:1}"
+    build_command="build$build_type$build_platform"
+    build_type_folder="$(tr '[:upper]' '[:lower]' <<< ${build_type:0:1})${build_type:1}"
+    bin_folder="shared/build/bin/$PLATFORM/${build_type_folder}Executable"
+    command ./gradlew "$build_command"
   fi
+
+  program_ext="kexe"
+
+  if [[ $PLATFORM == "$PLATFORM_WINDOWS" ]]; then
+      program_ext="exe"
+  fi
+
+  command "$bin_folder"/s2c.$program_ext "$@"
 }
 
 fn_main "$@"
