@@ -15,6 +15,10 @@ if [[ "$*" == *"--verbose"* ]]; then
   VERBOSE=true
 fi
 
+if [[ "$*" == *"--upgrade"* ]]; then
+  MUST_UPGRADE=true
+fi
+
 fn_print_debug() {
   if [[ $DEBUG == true ]]; then
     echo "D: $1"
@@ -60,10 +64,18 @@ fn_main() {
   bin_folder="bin"
   must_download=false
   must_build=false
-  if [[ ! -d "$bin_folder" ]]; then
-    fn_print_verbose "Bin folder not present. Checking if it is the project folder..."
 
-    fn_os_check
+  fn_os_check
+
+  if [[ $MUST_UPGRADE == true ]]; then
+    fn_print_info "Upgrading SVG to Compose binaries"
+    if [[ ! -d "gradle" ]]; then
+      must_download=true
+    else
+      must_build=true
+    fi
+  elif [[ ! -d "$bin_folder" ]]; then
+    fn_print_verbose "Bin folder not present. Checking if it is the project folder..."
 
     fn_print_verbose "Checking release version for $PLATFORM"
     bin_folder="shared/build/bin/$PLATFORM/releaseExecutable"
@@ -96,6 +108,10 @@ fn_main() {
     build_type_folder="$(tr '[:upper]' '[:lower]' <<< ${build_type:0:1})${build_type:1}"
     bin_folder="shared/build/bin/$PLATFORM/${build_type_folder}Executable"
     command ./gradlew "$build_command"
+  fi
+
+  if [[ $MUST_UPGRADE == true ]]; then
+    exit 0
   fi
 
   program_ext="kexe"
