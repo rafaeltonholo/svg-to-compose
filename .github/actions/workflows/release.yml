@@ -1,0 +1,27 @@
+name: Release
+#on:
+#  push:
+#    tags:
+#      - 'v*.*.*'
+on: pull_request # for test purpose.
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        # os: [macOS-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest]
+
+    run-on: ${{matrix.os}}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Build Native Binary
+#        if: matrix.os == 'macOS-latest'
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          gradle-version: wrapper
+          job-id: ${{ matrix.os }}
+          arguments: buildRelease

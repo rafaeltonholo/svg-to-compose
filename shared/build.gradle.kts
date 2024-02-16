@@ -12,7 +12,15 @@ kotlin {
         macosX64(),
         linuxX64(),
         mingwX64(),
-    ).forEach { target ->
+    ).also { targets ->
+        task("buildRelease") {
+            dependsOn(targets.map { target ->
+                ":shared:linkReleaseExecutable${target.name.replaceFirstChar { it.uppercaseChar() }}"
+            })
+            description = "Build release binaries for all targets"
+            group = "build"
+        }
+    }.forEach { target ->
         target.binaries {
             executable {
                 entryPoint = "main"
@@ -29,16 +37,23 @@ kotlin {
         }
 
         val targetName = target.name.replaceFirstChar { it.uppercaseChar() }
-        task("buildDebug$targetName")
-            .dependsOn(
+        task("buildDebug$targetName") {
+            dependsOn(
                 ":shared:compileKotlin$targetName",
                 ":shared:linkDebugExecutable$targetName"
             )
-         task("buildRelease$targetName")
-            .dependsOn(
+            group = "build"
+            description = "Build debug binary for ${target.name}"
+        }
+
+        task("buildRelease$targetName") {
+            dependsOn(
                 ":shared:compileKotlin$targetName",
                 ":shared:linkReleaseExecutable$targetName"
             )
+            group = "build"
+            description = "Build release binary for ${target.name}"
+        }
     }
 
     sourceSets {
