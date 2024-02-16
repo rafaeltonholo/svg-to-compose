@@ -7,19 +7,19 @@ on: pull_request # for test purpose.
 
 jobs:
   release:
-    strategy:
-      matrix:
-        # os: [macOS-latest, windows-latest, ubuntu-latest]
-        os: [macos-latest]
+    runs-on: macos-latest
+#    strategy:
+#      matrix:
+        # os: [macos-latest, windows-latest, ubuntu-latest]
 
-    run-on: ${{matrix.os}}
+#    runs-on: ${{matrix.os}}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup
 
       - name: Build Native Binary
-#        if: matrix.os == 'macOS-latest'
+#        if: matrix.os == 'macos-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
