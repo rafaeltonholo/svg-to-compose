@@ -29,6 +29,14 @@ class IconWriter(
             printEmpty()
             output("📢 Output directory is missing. Creating it automatically.")
             fileSystem.createDirectory(output)
+        } else if (output.isDirectory.not()) {
+            output.parent?.let { parent ->
+                verbose("Checking if parent directory exists.")
+                if (fileSystem.exists(parent).not()) {
+                    output("Output parent's directory doesn't exists. Creating.")
+                    fileSystem.createDirectory(parent, mustCreate = true)
+                }
+            }
         }
 
         val targetFile = if (output.isDirectory) {

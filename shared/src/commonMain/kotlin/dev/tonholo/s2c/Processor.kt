@@ -4,6 +4,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.isDirectory
+import dev.tonholo.s2c.extensions.isFile
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.debug
@@ -33,7 +34,7 @@ class Processor(
     ) {
         verbose("Start processor execution")
         val filePath = path.toPath()
-        val outputPath = output.toPath()
+        var outputPath = output.toPath()
         val fileSystem = FileSystem.SYSTEM
         val inputMetadata = try {
             fileSystem.metadata(filePath)
@@ -84,6 +85,10 @@ class Processor(
             }
         } else {
             output("🔍 File detected")
+            if (outputPath.extension.isEmpty()) {
+                output("Output path is missing kotlin file extension. Appending it to the output.")
+                outputPath = "$output.kt".toPath()
+            }
         }
 
         val optimizer = if (optimize) {
@@ -151,7 +156,11 @@ class Processor(
     ) {
         output("⏳ Processing ${file.name}")
 
-        val iconName = file.name.removeSuffix(".svg").removeSuffix(".xml")
+        val iconName = if (output.isFile) {
+            output.segments.last().removeSuffix(output.extension)
+        } else {
+            file.name.removeSuffix(".svg").removeSuffix(".xml")
+        }
         val targetFile = tempFileWriter.create(
             file = file,
             optimize = optimizer != null,
