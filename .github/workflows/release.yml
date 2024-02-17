@@ -101,14 +101,15 @@ jobs:
         with:
           path: artifacts
           name: s2c
-      - name: Display structure of downloaded files
-        run: ls -R
       - name: Compress binaries
         run: |
-          zip -r s2c-linuxX64-binaries.zip artifacts/s2c-linuxX64-binaries
-          zip -r s2c-macosArm64-binaries.zip artifacts/s2c-macosArm64-binaries
-          zip -r s2c-macosX64-binaries.zip artifacts/s2c-macosX64-binaries
-          zip -r s2c-mingwX64-binaries.zip artifacts/s2c-mingwX64-binaries
+          cd artifacts
+          zip -r s2c-linuxX64-binaries.zip s2c-linuxX64-binaries
+          zip -r s2c-macosArm64-binaries.zip s2c-macosArm64-binaries
+          zip -r s2c-macosX64-binaries.zip s2c-macosX64-binaries
+          zip -r s2c-mingwX64-binaries.zip s2c-mingwX64-binaries
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Create Github release
         uses: marvinpinto/action-automatic-releases@latest
         with:
@@ -117,8 +118,8 @@ jobs:
           draft: true # For test purposes. Should be false
           prerelease: true # For test purposes. Should be false
           files: |
-            s2c-linuxX64-binaries.zip
-            s2c-macosArm64-binaries.zip
-            s2c-macosX64-binaries.zip
-            s2c-mingwX64-binaries.zip
-            s2c
+            artifacts/s2c-linuxX64-binaries.zip
+            artifacts/s2c-macosArm64-binaries.zip
+            artifacts/s2c-macosX64-binaries.zip
+            artifacts/s2c-mingwX64-binaries.zip
+            artifacts/s2c
