@@ -74,6 +74,14 @@ jobs:
           name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
           path: shared/build/bin/mingwX64/releaseExecutable/
           if-no-files-found: error
+
+      - name: Uploading script
+        uses: actions/upload-artifact@v4
+        with:
+          name: s2c
+          path: s2c
+          if-no-files-found: error
+
   upload-to-release:
     permissions: 
       contents: write
@@ -87,8 +95,19 @@ jobs:
             path: artifacts
             pattern: ${{ env.file-name }}-*-binaries
             merge-multiple: false
+      - name: Download script artifact
+        uses: actions/download-artifact@v4
+        with:
+            path: artifacts
+            name: s2c
       - name: Display structure of downloaded files
         run: ls -R
+      - name: Compress binaries
+        run: |
+          zip -r s2c-linuxX64-binaries.zip artifacts/s2c-linuxX64-binaries
+          zip -r s2c-macosArm64-binaries.zip artifacts/s2c-macosArm64-binaries
+          zip -r s2c-macosX64-binaries.zip artifacts/s2c-macosX64-binaries
+          zip -r s2c-mingwX64-binaries.zip artifacts/s2c-mingwX64-binaries
       - name: Create Github release
         uses: marvinpinto/action-automatic-releases@latest
         with:
@@ -97,4 +116,8 @@ jobs:
           draft: true # For test purposes. Should be false
           prerelease: true # For test purposes. Should be false
           files: |
-            artifacts/*
+            s2c-linuxX64-binaries.zip
+            s2c-macosArm64-binaries.zip
+            s2c-macosX64-binaries.zip
+            s2c-mingwX64-binaries.zip
+            s2c
