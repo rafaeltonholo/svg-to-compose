@@ -48,7 +48,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosArm64-binaries # add tag to file name.
-          path: shared/build/macosArm64/releaseExecutable/
+          path: ${{ github.workspace }}/shared/build/macosArm64/releaseExecutable/
           if-no-files-found: error
 
       - name: Uploading macos x64 binaries
@@ -56,7 +56,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
-          path: shared/build/macosX64/releaseExecutable/
+          path: ${{ github.workspace }}/shared/build/macosX64/releaseExecutable/
           if-no-files-found: error
 
       - name: Uploading linux binaries
@@ -64,7 +64,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
-          path: shared/build/linuxX64/releaseExecutable/
+          path: ${{ github.workspace }}/shared/build/linuxX64/releaseExecutable/
           if-no-files-found: error
 
       - name: Uploading linux binaries
@@ -72,7 +72,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         with:
           name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
-          path: shared/build/mingwX64/releaseExecutable/
+          path: ${{ github.workspace }}/shared/build/mingwX64/releaseExecutable/
           if-no-files-found: error
   upload-to-release:
     runs-on: ubuntu-latest
