@@ -77,6 +77,7 @@ jobs:
 
       - name: Uploading script
         uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest' # should only run once.
         with:
           name: s2c
           path: s2c
