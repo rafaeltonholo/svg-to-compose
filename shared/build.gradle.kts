@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -7,20 +9,30 @@ plugins {
 val rootBuildDir = File(project.rootDir.absolutePath, "build")
 
 kotlin {
-    listOf(
-        macosArm64(),
-        macosX64(),
-        linuxX64(),
-        mingwX64(),
-    ).also { targets ->
-        task("buildRelease") {
+    fun createReleaseTask(name: String, targets: List<KotlinNativeTargetWithHostTests>) {
+        task("release$name") {
             dependsOn(targets.map { target ->
                 ":shared:linkReleaseExecutable${target.name.replaceFirstChar { it.uppercaseChar() }}"
             })
-            description = "Build release binaries for all targets"
-            group = "build"
+            description = "Build release binaries for all $name targets"
+            group = "release"
         }
-    }.forEach { target ->
+    }
+
+    val macosTargets = listOf(
+        macosArm64(),
+        macosX64(),
+    ).also { targets -> createReleaseTask("MacOS", targets) }
+
+    val linuxTargets = listOf(
+        linuxX64(),
+    ).also { targets -> createReleaseTask("Linux", targets) }
+
+    val windowsTargets = listOf(
+        mingwX64(),
+    ).also { targets -> createReleaseTask("Windows", targets) }
+
+    (macosTargets + linuxTargets + windowsTargets).forEach { target ->
         target.binaries {
             executable {
                 entryPoint = "main"
