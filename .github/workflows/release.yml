@@ -86,7 +86,7 @@ jobs:
         run: ls -R
         working-directory: artifacts
       - name: Create Github release
-        uses: marvinpinto/actions@v1
+        uses: marvinpinto/actions@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: development
