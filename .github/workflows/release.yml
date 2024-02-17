@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup
 
-      - name: Build Native Binary for ${{ matrix.os }}
+      - name: Build Native Binary for macos
         if: matrix.os == 'macos-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
@@ -27,7 +27,7 @@ jobs:
           job-id: ${{ matrix.os }}
           arguments: releaseMacOS
 
-      - name: Build Native Binary for ${{ matrix.os }}
+      - name: Build Native Binary for Windows
         if: matrix.os == 'windows-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
@@ -35,7 +35,7 @@ jobs:
           job-id: ${{ matrix.os }}
           arguments: releaseWindows
 
-      - name: Build Native Binary for ${{ matrix.os }}
+      - name: Build Native Binary for Linux
         if: matrix.os == 'ubuntu-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
@@ -59,19 +59,19 @@ jobs:
           path: shared/build/bin/macosX64/releaseExecutable/
           if-no-files-found: error
 
-      - name: Uploading linux binaries
+      - name: Uploading Linux binaries
         uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'
         with:
-          name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
+          name: ${{ env.file-name }}-linuxX64-binaries # add tag to file name.
           path: shared/build/bin/linuxX64/releaseExecutable/
           if-no-files-found: error
 
-      - name: Uploading linux binaries
+      - name: Uploading Windows binaries
         uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest'
         with:
-          name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
+          name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
           path: shared/build/bin/mingwX64/releaseExecutable/
           if-no-files-found: error
   upload-to-release:
