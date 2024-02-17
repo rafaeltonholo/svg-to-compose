@@ -43,6 +43,9 @@ jobs:
           job-id: ${{ matrix.os }}
           arguments: releaseLinux
 
+      - name: Display structure of files
+        run: ls -R
+
       - name: Uploading macos Arm64 binaries
         uses: actions/upload-artifact@v4
         if: matrix.os == 'macos-latest'
