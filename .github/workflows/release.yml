@@ -4,6 +4,8 @@ name: Release
 #    tags:
 #      - 'v*.*.*'
 on: pull_request # for test purpose.
+env:
+  file-name: s2c
 
 jobs:
   create-release-binaries:
@@ -12,8 +14,6 @@ jobs:
          os: [macos-latest, windows-latest, ubuntu-latest]
 
     runs-on: ${{matrix.os}}
-    env:
-      file-name: s2c
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
@@ -79,12 +79,13 @@ jobs:
     needs: create-release-binaries
     steps:
       - name: Download release artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
             path: artifacts
+            pattern: ${{ env.file-name }}-*-binaries
+            merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: artifacts
       - name: Create Github release
         uses: marvinpinto/action-automatic-releases@latest
         with:
