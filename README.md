@@ -3,6 +3,7 @@ A command-line tool for convert SVG or an Android Vector Drawable (AVD) to Andro
 
 ## Table of content
 - [Why?](#why)
+- [Platform support](#platform-support)
 - [Installation](#installation)
 - [External dependencies](#external-dependencies)
 - [Using the command-line tool](#using-the-command-line-tool)
@@ -21,6 +22,17 @@ There are existing plugins available, but they usually don't optimize the svg be
 Icons.
 
 This command-line tool adds that functionality.
+
+## Platform support
+| Platform           | With optimization | Without optimization |
+|--------------------|:-----------------:|:--------------------:|
+| macOS Arm64        |         ✅         |          ✅           |
+| macOS x64          |         ✅         |          ✅           |
+| Linux x64          |         ✅         |          ❌           |
+| Windows (mingwX64) |         ✅         |          ❌           |
+| Windows (WSL)      |         ✅         |          ❌           |
+
+> Optimization is currently working only on macOS.
 
 ## Installation
 This CLI tool relies on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse the SVG/AVD file,
@@ -62,7 +74,7 @@ npm -g install avocado
 > If you don't want to optimize the SVG before converting it, you can just disable the optimization using the parameter
 > `-opt` or `--optimize` passing `false`.
 > 
-> Optimization is enabled by default.
+> Optimization is disabled <!-- see #platform-support --> by default.
 
 
 ## Using the command-line tool
