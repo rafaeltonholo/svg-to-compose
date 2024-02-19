@@ -73,14 +73,14 @@ sealed interface ImageVectorNode {
     data class NodeWrapper(
         val normalizedPath: String,
         val nodes: List<PathNodes>,
-    ) // Support class to Paths. It should not inherit from ImageVectorNode
+    ) // Support class to Paths. It should not be inherited from ImageVectorNode
 }
 
 fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
     debugSection("Starting path")
 
-    val commands = normalizedPath.split(" ").toMutableList()
+    val commands = normalizedPath.split(" ").filter { it.isNotEmpty() }.toMutableList()
     debug("commands=$commands")
     var lastCommand = Char.EMPTY
     val nodes = mutableListOf<PathNodes>()
