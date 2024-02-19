@@ -266,9 +266,9 @@ sealed class PathNodes(
             return """
                 |// $command $x1 $y1 $x2 $y2
                 |reflectiveCurveTo${relative}(
-                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
-                |    ${relativePrefix}x2 = ${x2}f, 
+                |    ${relativePrefix}x2 = ${x2}f,
                 |    ${relativePrefix}y2 = ${y2}f,
                 |)
                 |${closeCommand()}""".trimMargin()
@@ -303,9 +303,9 @@ sealed class PathNodes(
             return """
                 |// $command $x1 $y1 $x2 $y2
                 |quadTo${relative}(
-                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
-                |    ${relativePrefix}x2 = ${x2}f, 
+                |    ${relativePrefix}x2 = ${x2}f,
                 |    ${relativePrefix}y2 = ${y2}f,
                 |)
                 |${closeCommand()}""".trimMargin()
@@ -337,7 +337,7 @@ sealed class PathNodes(
             return """
                 |// $command $x1 $y1
                 |reflectiveQuadTo${relative}(
-                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
                 |)
                 |${closeCommand()}""".trimMargin()
