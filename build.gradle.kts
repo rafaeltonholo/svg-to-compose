@@ -8,6 +8,12 @@ plugins {
     alias(libs.plugins.io.gitlab.arturbosch.detekt)
 }
 
+buildscript {
+    dependencies {
+        classpath(libs.com.codingfeline.buildkonfig.gradle.plugin)
+    }
+}
+
 detekt {
     autoCorrect = true
     buildUponDefaultConfig = true // preconfigure defaults

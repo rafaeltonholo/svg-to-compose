@@ -1,9 +1,11 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.io.gitlab.arturbosch.detekt)
+    id(libs.plugins.com.codingfeline.buildkonfig.get().pluginId)
 }
 
 val rootBuildDir = File(project.rootDir.absolutePath, "build")
@@ -78,6 +80,21 @@ kotlin {
 
         nativeMain.dependencies {
             implementation(libs.clikt)
+        }
+    }
+}
+
+buildkonfig {
+    packageName = "dev.tonholo.s2c"
+    defaultConfigs {
+        val envFile = File("${rootDir.absolutePath}/app.properties")
+        val env = mutableListOf<Pair<String, String>>()
+        envFile.forEachLine { line ->
+            val (name, value) = line.split("=")
+            env += name to value
+        }
+        env.forEach { (name, value) ->
+            buildConfigField(STRING, name, value)
         }
     }
 }
