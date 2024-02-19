@@ -21,6 +21,10 @@ jobs:
       - name: Prepares environment for building
         uses: ./.github/actions/setup
 
+      - name: Prepare nodeJS enviroment for integrity check
+        uses: ./.github/actions/setup-nodejs
+        if: matrix.os == 'ubuntu-latest'
+
       - name: Build Native Binary for macos
         if: matrix.os == 'macos-latest'
         uses: burrunan/gradle-cache-action@v1
@@ -44,10 +48,6 @@ jobs:
           gradle-version: wrapper
           job-id: ${{ matrix.os }}
           arguments: releaseLinux
-
-      - name: Prepare nodeJS enviroment for integrity check
-        uses: ./.github/actions/setup-nodejs
-        if: matrix.os == 'ubuntu-latest'
 
       - name: CLI Integrity check
         uses: ./.github/actions/cli-integrity-check
