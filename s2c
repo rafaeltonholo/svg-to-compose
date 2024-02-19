@@ -1,4 +1,8 @@
 #!/bin/bash
+if [[ -f app.properties ]]; then
+  . app.properties
+fi
+
 DEBUG=false
 VERBOSE=false
 PLATFORM_WINDOWS="mingwX64"
@@ -39,6 +43,19 @@ fn_print_info() {
   echo "I: $1"
 }
 
+fn_fetch_latest_version() {
+  if [ "$VERSION" == "" ]; then
+    fn_print_verbose "The app.properties file was not found. Fetching from Github."
+    VERSION=$(curl -s https://api.github.com/repos/rafaeltonholo/svg-to-compose/releases/latest \
+    | grep "tag_name" \
+    | cut -d : -f 2,3 \
+    | tr -d \", \
+    | xargs -n 1 echo)
+  else
+    fn_print_verbose "Current version: $VERSION"
+  fi
+}
+
 fn_os_check() {
   unameOut=$(uname -a)
   case "${unameOut}" in
@@ -61,11 +78,18 @@ fn_main() {
   fn_print_verbose "Initializing SVG to Compose script"
   fn_print_verbose "Verifying binaries"
 
-  bin_folder="bin"
+  original_bin_folder="bin"
+  bin_folder=$original_bin_folder
   must_download=false
   must_build=false
 
   fn_os_check
+
+  program_ext="kexe"
+
+  if [[ $PLATFORM == "$PLATFORM_WINDOWS" ]]; then
+      program_ext="exe"
+  fi
 
   if [[ $MUST_UPGRADE == true ]]; then
     fn_print_info "Upgrading SVG to Compose binaries"
@@ -74,7 +98,7 @@ fn_main() {
     else
       must_build=true
     fi
-  elif [[ ! -d "$bin_folder" ]]; then
+  elif [[ ! -d "$bin_folder" ]] || [[ ! -f "$bin_folder/s2c.$program_ext" ]]; then
     fn_print_verbose "Bin folder not present. Checking if it is the project folder..."
 
     fn_print_verbose "Checking release version for $PLATFORM"
@@ -93,8 +117,29 @@ fn_main() {
   fi
 
   if [[ $must_download == true ]]; then
-    fn_print_info "Downloading binaries from Github"
-    # TODO.
+    bin_folder=$original_bin_folder
+    fn_print_info "⬇️ Downloading binaries from Github"
+    fn_fetch_latest_version
+    mkdir bin
+    binary_base_filename="s2c-${PLATFORM}-binaries"
+    binary_filename="${binary_base_filename}.zip"
+    fn_print_verbose "Binary name=$binary_filename"
+
+    download_url="https://github.com/rafaeltonholo/svg-to-compose/releases/download/$VERSION/$binary_filename"
+    fn_print_debug "Downloading from $download_url"
+    command curl -L "$download_url" \
+                 --output "bin/$binary_filename"
+
+    fn_print_info "🔓 Unzipping binaries"
+    command unzip -qq "bin/$binary_filename" -d "bin"
+
+    fn_print_info "🧹 Cleaning up zip files"
+    cp -vr bin/$binary_base_filename/* bin/
+    rm -r "bin/$binary_base_filename" "bin/$binary_filename"
+    fn_print_debug "Giving execution permission to binaries"
+    chmod +x "bin/s2c.$program_ext"
+
+    fn_print_info "✅ Binaries download completed."
   elif [[ $must_build == true ]]; then
     fn_print_info "Found project structure, but not binaries. Build required."
     if [[ $DEBUG == true ]] | [[ $VERBOSE == true ]]; then
@@ -112,12 +157,6 @@ fn_main() {
 
   if [[ $MUST_UPGRADE == true ]]; then
     exit 0
-  fi
-
-  program_ext="kexe"
-
-  if [[ $PLATFORM == "$PLATFORM_WINDOWS" ]]; then
-      program_ext="exe"
   fi
 
   command "$bin_folder"/s2c.$program_ext "$@"
