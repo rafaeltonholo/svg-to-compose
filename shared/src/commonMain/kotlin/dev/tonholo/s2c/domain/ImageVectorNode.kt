@@ -130,6 +130,16 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
                 isRelative = isRelative,
             )
 
+            current.startsWith(PathNodes.QuadTo.COMMAND) -> PathNodes.QuadTo(
+                values = commands,
+                isRelative = isRelative,
+            )
+
+            current.startsWith(PathNodes.ReflectiveQuadTo.COMMAND) -> PathNodes.ReflectiveQuadTo(
+                values = commands,
+                isRelative = isRelative,
+            )
+
             else -> throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "Not support SVG/Android Vector command. Command = $currentCommand"

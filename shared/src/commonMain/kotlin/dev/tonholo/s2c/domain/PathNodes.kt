@@ -274,4 +274,73 @@ sealed class PathNodes(
                 |${closeCommand()}""".trimMargin()
         }
     }
+
+    class QuadTo(
+        values: List<String>,
+        isRelative: Boolean,
+    ) : PathNodes(
+        values = values,
+        isRelative = isRelative,
+        command = COMMAND,
+        commandSize = 4,
+    ) {
+        companion object {
+            const val COMMAND = 'q'
+        }
+
+        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        private val y1 = values[1].toFloat()
+        private val x2 = values[2].toFloat()
+        private val y2 = values[3]
+            .lowercase()
+            .removeSuffix("z")
+            .toFloat()
+
+        override fun materialize(): String {
+            val command = if (isRelative) this.command else this.command.uppercaseChar()
+            val relative = if (isRelative) "Relative" else ""
+            val relativePrefix = if (isRelative) "d" else ""
+            return """
+                |// $command $x1 $y1 $x2 $y2
+                |quadTo${relative}(
+                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}y1 = ${y1}f,
+                |    ${relativePrefix}x2 = ${x2}f, 
+                |    ${relativePrefix}y2 = ${y2}f,
+                |)
+                |${closeCommand()}""".trimMargin()
+        }
+    }
+    class ReflectiveQuadTo(
+        values: List<String>,
+        isRelative: Boolean,
+    ) : PathNodes(
+        values = values,
+        isRelative = isRelative,
+        command = COMMAND,
+        commandSize = 4,
+    ) {
+        companion object {
+            const val COMMAND = 't'
+        }
+
+        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        private val y1 = values[1]
+            .lowercase()
+            .removeSuffix("z")
+            .toFloat()
+
+        override fun materialize(): String {
+            val command = if (isRelative) this.command else this.command.uppercaseChar()
+            val relative = if (isRelative) "Relative" else ""
+            val relativePrefix = if (isRelative) "d" else ""
+            return """
+                |// $command $x1 $y1
+                |reflectiveQuadTo${relative}(
+                |    ${relativePrefix}x1 = ${x1}f, 
+                |    ${relativePrefix}y1 = ${y1}f,
+                |)
+                |${closeCommand()}""".trimMargin()
+        }
+    }
 }
