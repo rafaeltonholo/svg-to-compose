@@ -1,10 +1,13 @@
 name: Set up NodeJS environment
 description: Prepares environment for NodeJS
 runs:
-  uses: actions/setup-node@v4
-  with:
-    node-version: 20
-    cache: 
-      'npm'
-  run: |
-    npm -g install svgo svg2vectordrawable avocado
+  using: 'composite'
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 
+          'npm'
+    - name: Install global dependencies
+      run: |
+        npm -g install svgo svg2vectordrawable avocado

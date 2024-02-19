@@ -43,10 +43,12 @@ jobs:
           job-id: ${{ matrix.os }}
           arguments: releaseLinux
 
-      - uses: ./.github/actions/setup-nodejs
+      - name: Prepare nodeJS enviroment for integrity check
+        uses: ./.github/actions/setup-nodejs
         if: matrix.os == 'ubuntu-latest'
 
-      - uses: ./.github/actions/cli-integrity-check
+      - name: CLI Integrity check
+        uses: ./.github/actions/cli-integrity-check
         if: matrix.os == 'ubuntu-latest'
         continue-on-error: false
 
