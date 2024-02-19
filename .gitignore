@@ -3,6 +3,7 @@ target.optimized.svg
 target.svg
 target.xml
 temp.kt
+integrity-check/
 
 .gradle
 build/

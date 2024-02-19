@@ -14,13 +14,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val ShieldSolid: ImageVector
+val ShieldSolidOptimized: ImageVector
     get() {
-        val current = _shieldSolid
+        val current = _shieldSolidOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.ShieldSolid",
+            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.ShieldSolidOptimized",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
@@ -117,7 +117,7 @@ val ShieldSolid: ImageVector
                 lineTo(x = 256.0f, y = 66.8f)
                 close()
             }
-        }.build().also { _shieldSolid = it }
+        }.build().also { _shieldSolidOptimized = it }
     }
 
 @Preview
@@ -129,7 +129,7 @@ private fun IconPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = ShieldSolid,
+                imageVector = ShieldSolidOptimized,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
             )
@@ -138,4 +138,4 @@ private fun IconPreview() {
 }
 
 @Suppress("ObjectPropertyName")
-private var _shieldSolid: ImageVector? = null
+private var _shieldSolidOptimized: ImageVector? = null
