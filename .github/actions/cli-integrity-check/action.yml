@@ -4,6 +4,7 @@ runs:
   using: composite
   steps:
     - name: Verify simple svg conversion without optimization
+      shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.NonOptimized.kt \
               -p -p dev.tonholo.composeicons.ui.icon \
@@ -20,6 +21,7 @@ runs:
         fi
 
     - name: Verify simple svg conversion with optimization
+      shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
               -p -p dev.tonholo.composeicons.ui.icon \
@@ -36,6 +38,7 @@ runs:
         fi
 
     - name: Verify complex svg conversion without optimization
+      shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.NonOptimized.kt \
               -p -p dev.tonholo.composeicons.ui.icon \
@@ -52,6 +55,7 @@ runs:
         fi
 
     - name: Verify complex svg conversion with optimization
+      shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.Optimized.kt \
               -p -p dev.tonholo.composeicons.ui.icon \
