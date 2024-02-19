@@ -15,7 +15,7 @@ runs:
       shell: bash
       run: |
         diff integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
-        if [[ -z "$?" ]]; then
+        if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -34,7 +34,7 @@ runs:
       shell: bash
       run: |
         diff integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
-        if [[ -z "$?" ]]; then
+        if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -53,7 +53,7 @@ runs:
       shell: bash
       run: |
         diff integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
-        if [[ -z "$?" ]]; then
+        if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -72,7 +72,7 @@ runs:
       shell: bash
       run: |
         diff integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
-        if [[ -z "$?" ]]; then
+        if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
