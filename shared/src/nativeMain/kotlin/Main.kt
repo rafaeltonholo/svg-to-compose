@@ -55,7 +55,7 @@ class Client : CliktCommand() {
         names = arrayOf("-opt", "--optimize"),
         help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
                 "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
-    ).boolean().default(true)
+    ).boolean().default(false) // TODO: Turned to false since optimization is only working on macOS.
 
     private val contextProvider by option(
         names = arrayOf("-cp", "--context-provider"),
