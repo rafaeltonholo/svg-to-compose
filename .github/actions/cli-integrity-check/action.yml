@@ -11,9 +11,11 @@ runs:
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
               samples/shield-halved-solid.svg
-        
-        diff_check=$(command diff integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt)
-        if [[ -z "$diff_check" ]]; then
+    - name: Compare files with diff
+      shell: bash
+      run: |
+        diff integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
+        if [[ -z "$?" ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -28,9 +30,11 @@ runs:
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
               samples/shield-halved-solid.svg
-        
-        diff_check=$(command diff integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt)
-        if [[ -z "$diff_check" ]]; then
+    - name: Compare files with diff
+      shell: bash
+      run: |
+        diff integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
+        if [[ -z "$?" ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -45,9 +49,11 @@ runs:
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
               samples/illustration.svg
-        
-        diff_check=$(command diff integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt)
-        if [[ -z "$diff_check" ]]; then
+    - name: Compare files with diff
+      shell: bash
+      run: |
+        diff integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
+        if [[ -z "$?" ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
@@ -62,9 +68,11 @@ runs:
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
               samples/illustration.svg
-        
-        diff_check=$(command diff integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt)
-        if [[ -z "$diff_check" ]]; then
+    - name: Compare files with diff
+      shell: bash
+      run: |
+        diff integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
+        if [[ -z "$?" ]]; then
           echo "✅ Integrity check pass"
         else
           echo "❌ Integrity check failed"
