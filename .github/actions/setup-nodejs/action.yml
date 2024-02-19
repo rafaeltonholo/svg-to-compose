@@ -3,6 +3,8 @@ description: Prepares environment for NodeJS
 runs:
   using: 'composite'
   steps:
+    - shell: bash
+      run: touch package-lock.json
     - uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -11,5 +13,4 @@ runs:
     - name: Install global dependencies
       shell: bash
       run: |
-        touch package-lock.json
         npm -g install svgo svg2vectordrawable avocado
