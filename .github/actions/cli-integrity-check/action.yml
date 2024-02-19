@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.NonOptimized.kt \
-              -p -p dev.tonholo.composeicons.ui.icon \
+              -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
               samples/shield-halved-solid.svg
@@ -24,7 +24,7 @@ runs:
       shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
-              -p -p dev.tonholo.composeicons.ui.icon \
+              -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
               samples/shield-halved-solid.svg
@@ -41,7 +41,7 @@ runs:
       shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.NonOptimized.kt \
-              -p -p dev.tonholo.composeicons.ui.icon \
+              -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
               samples/illustration.svg
@@ -58,7 +58,7 @@ runs:
       shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.Optimized.kt \
-              -p -p dev.tonholo.composeicons.ui.icon \
+              -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
               samples/illustration.svg
