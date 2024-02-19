@@ -17,7 +17,9 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
+
+      - name: Prepares environment for building
+        uses: ./.github/actions/setup
 
       - name: Build Native Binary for macos
         if: matrix.os == 'macos-latest'

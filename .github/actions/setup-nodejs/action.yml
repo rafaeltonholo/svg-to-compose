@@ -11,4 +11,5 @@ runs:
     - name: Install global dependencies
       shell: bash
       run: |
+        touch package-lock.json
         npm -g install svgo svg2vectordrawable avocado
