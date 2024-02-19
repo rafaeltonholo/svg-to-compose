@@ -1,0 +1,68 @@
+name: CLI Integrity check
+description: Runs the CLI command checking if it still works as intended
+runs:
+  using: composite
+  steps:
+    - name: Verify simple svg conversion without optimization
+      run: |
+        ./s2c -o integrity-check/ShieldSolid.NonOptimized.kt \
+              -p -p dev.tonholo.composeicons.ui.icon \
+              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+              -opt=false \
+              samples/shield-halved-solid.svg
+        
+        diff_check=$(command diff integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt)
+        if [[ -z "$diff_check" ]]; then
+          echo "✅ Integrity check pass"
+        else
+          echo "❌ Integrity check failed"
+          exit 1
+        fi
+
+    - name: Verify simple svg conversion with optimization
+      run: |
+        ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
+              -p -p dev.tonholo.composeicons.ui.icon \
+              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+              -opt=true \
+              samples/shield-halved-solid.svg
+        
+        diff_check=$(command diff integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt)
+        if [[ -z "$diff_check" ]]; then
+          echo "✅ Integrity check pass"
+        else
+          echo "❌ Integrity check failed"
+          exit 1
+        fi
+
+    - name: Verify complex svg conversion without optimization
+      run: |
+        ./s2c -o integrity-check/Illustration.NonOptimized.kt \
+              -p -p dev.tonholo.composeicons.ui.icon \
+              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+              -opt=false \
+              samples/illustration.svg
+        
+        diff_check=$(command diff integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt)
+        if [[ -z "$diff_check" ]]; then
+          echo "✅ Integrity check pass"
+        else
+          echo "❌ Integrity check failed"
+          exit 1
+        fi
+
+    - name: Verify complex svg conversion with optimization
+      run: |
+        ./s2c -o integrity-check/Illustration.Optimized.kt \
+              -p -p dev.tonholo.composeicons.ui.icon \
+              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+              -opt=true \
+              samples/illustration.svg
+        
+        diff_check=$(command diff integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt)
+        if [[ -z "$diff_check" ]]; then
+          echo "✅ Integrity check pass"
+        else
+          echo "❌ Integrity check failed"
+          exit 1
+        fi

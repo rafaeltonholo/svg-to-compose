@@ -43,6 +43,13 @@ jobs:
           job-id: ${{ matrix.os }}
           arguments: releaseLinux
 
+      - uses: ./.github/actions/setup-nodejs
+        if: matrix.os == 'ubuntu-latest'
+
+      - uses: ./.github/actions/cli-integrity-check
+        if: matrix.os == 'ubuntu-latest'
+        continue-on-error: false
+
       - name: Uploading macos Arm64 binaries
         uses: actions/upload-artifact@v4
         if: matrix.os == 'macos-latest'
