@@ -8,8 +8,7 @@ runs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-        cache: 
-          'npm'
+        cache: 'npm'
     - name: Install global dependencies
       shell: bash
       run: |
