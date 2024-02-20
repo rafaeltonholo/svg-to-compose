@@ -20,8 +20,8 @@ sealed interface Optimizer {
         get() = "⚠️ $command is required. Use npm -g install $command to install."
 
     fun verifyDependency() =
-        command(program = "command") {
-            args("-v", command)
+        command(program = command) {
+            args("--version")
             showStdout = false
             showStderr = false
         }.also { (code, _) ->
