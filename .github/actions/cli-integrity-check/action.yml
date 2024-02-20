@@ -1,10 +1,15 @@
 name: CLI Integrity check
 description: Runs the CLI command checking if it still works as intended
+inputs:
+  shell:
+    description: Which shell to run the script
+    required: true
+    default: bash
 runs:
   using: composite
   steps:
     - name: Verify simple svg conversion without optimization
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         ./s2c -o integrity-check/ShieldSolid.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
@@ -12,7 +17,7 @@ runs:
               -opt=false \
               samples/shield-halved-solid.svg
     - name: Compare files with diff
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         diff --strip-trailing-cr integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
         if [[ $? -eq 0 ]]; then
@@ -23,7 +28,7 @@ runs:
         fi
 
     - name: Verify complex svg conversion without optimization
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         ./s2c -o integrity-check/Illustration.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
@@ -31,7 +36,7 @@ runs:
               -opt=false \
               samples/illustration.svg
     - name: Compare files with diff
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         diff --strip-trailing-cr integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
         if [[ $? -eq 0 ]]; then
@@ -42,7 +47,7 @@ runs:
         fi
 
     - name: Verify simple svg conversion with optimization
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
@@ -50,7 +55,7 @@ runs:
               -opt=true \
               samples/shield-halved-solid.svg
     - name: Compare files with diff
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         diff --strip-trailing-cr integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
         if [[ $? -eq 0 ]]; then
@@ -61,7 +66,7 @@ runs:
         fi
 
     - name: Verify complex svg conversion with optimization
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         ./s2c -o integrity-check/Illustration.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
@@ -69,7 +74,7 @@ runs:
               -opt=true \
               samples/illustration.svg
     - name: Compare files with diff
-      shell: bash
+      shell: ${{ inputs.shell }}
       run: |
         diff --strip-trailing-cr integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
         if [[ $? -eq 0 ]]; then

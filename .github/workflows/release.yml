@@ -11,9 +11,18 @@ jobs:
   create-release-binaries:
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        os:
+          - runner: macos-latest
+            shell: bash
+          - runner: windows-latest
+            shell: msys2 {0}
+          - runner: ubuntu-latest
+            shell: bash
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os.runner }}
+    defaults:
+      run:
+        shell: ${{ matrix.os.shell }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
@@ -21,11 +30,28 @@ jobs:
       - name: Prepares environment for building
         uses: ./.github/actions/setup
 
+      - name: Setup mingwX64
+        uses: msys2/setup-msys2@v2
+        if: ${{ runner.os.runner == 'windows-latest' }}
+        with:
+          msystem: mingw64
+          update: true
+          path-type: inherit
+          install: >-
+            tar
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-extra-cmake-modules
+            mingw64/mingw-w64-x86_64-cyrus-sasl
+
       - name: Prepare nodeJS enviroment for integrity check
         uses: ./.github/actions/setup-nodejs
+        with:
+          shell: ${{ matrix.os.shell }}
 
       - name: Build Native Binary for macos
-        if: matrix.os == 'macos-latest'
+        if: matrix.os.runner == 'macos-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
@@ -33,7 +59,7 @@ jobs:
           arguments: releaseMacOS
 
       - name: Build Native Binary for Windows
-        if: matrix.os == 'windows-latest'
+        if: matrix.os.runner == 'windows-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
@@ -41,7 +67,7 @@ jobs:
           arguments: releaseWindows
 
       - name: Build Native Binary for Linux
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os.runner == 'ubuntu-latest'
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
@@ -50,11 +76,13 @@ jobs:
 
       - name: CLI Integrity check
         uses: ./.github/actions/cli-integrity-check
+        with:
+          shell: ${{ matrix.os.shell }}
         continue-on-error: true # should be false
 
       - name: Uploading macos Arm64 binaries
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'macos-latest'
+        if: matrix.os.runner == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosArm64-binaries # add tag to file name.
           path: shared/build/bin/macosArm64/releaseExecutable/
@@ -62,7 +90,7 @@ jobs:
 
       - name: Uploading macos x64 binaries
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'macos-latest'
+        if: matrix.os.runner == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
           path: shared/build/bin/macosX64/releaseExecutable/
@@ -70,7 +98,7 @@ jobs:
 
       - name: Uploading Linux binaries
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os.runner == 'ubuntu-latest'
         with:
           name: ${{ env.file-name }}-linuxX64-binaries # add tag to file name.
           path: shared/build/bin/linuxX64/releaseExecutable/
@@ -78,7 +106,7 @@ jobs:
 
       - name: Uploading Windows binaries
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'windows-latest'
+        if: matrix.os.runner == 'windows-latest'
         with:
           name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
           path: shared/build/bin/mingwX64/releaseExecutable/
@@ -86,7 +114,7 @@ jobs:
 
       - name: Uploading script
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest' # should only run once.
+        if: matrix.os.runner == 'ubuntu-latest' # should only run once.
         with:
           name: s2c
           path: s2c
