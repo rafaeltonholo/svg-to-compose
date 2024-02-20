@@ -28,7 +28,7 @@ This command-line tool adds that functionality.
 |--------------------|:-----------------:|:--------------------:|
 | macOS Arm64        |         ✅         |          ✅           |
 | macOS x64          |         ✅         |          ✅           |
-| Linux x64          |         ✅         |          ❌           |
+| Linux x64          |         ✅         |          ✅           |
 | Windows (mingwX64) |         ✅         |          ❌           |
 | Windows (WSL)      |         ✅         |          ❌           |
 
