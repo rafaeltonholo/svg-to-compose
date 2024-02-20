@@ -38,6 +38,8 @@ jobs:
           update: true
           path-type: inherit
           install: >-
+            touch
+            zip
             tar
             make
             mingw-w64-x86_64-gcc
@@ -45,7 +47,7 @@ jobs:
             mingw-w64-x86_64-extra-cmake-modules
             mingw64/mingw-w64-x86_64-cyrus-sasl
 
-      - name: Prepare nodeJS enviroment for integrity check
+      - name: Prepare nodeJS environment for integrity check
         uses: ./.github/actions/setup-nodejs
         with:
           shell: ${{ matrix.os.shell }}
@@ -55,7 +57,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
-          job-id: ${{ matrix.os }}
+          job-id: ${{ matrix.os.runner }}
           arguments: releaseMacOS
 
       - name: Build Native Binary for Windows
@@ -63,7 +65,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
-          job-id: ${{ matrix.os }}
+          job-id: ${{ matrix.os.runner }}
           arguments: releaseWindows
 
       - name: Build Native Binary for Linux
@@ -71,7 +73,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-version: wrapper
-          job-id: ${{ matrix.os }}
+          job-id: ${{ matrix.os.runner }}
           arguments: releaseLinux
 
       - name: CLI Integrity check
