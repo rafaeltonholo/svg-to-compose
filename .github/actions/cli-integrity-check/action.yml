@@ -14,26 +14,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
-        if [[ $? -eq 0 ]]; then
-          echo "✅ Integrity check pass"
-        else
-          echo "❌ Integrity check failed"
-          exit 1
-        fi
-
-    - name: Verify simple svg conversion with optimization
-      shell: bash
-      run: |
-        ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
-              -p dev.tonholo.composeicons.ui.icon \
-              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-              -opt=true \
-              samples/shield-halved-solid.svg
-    - name: Compare files with diff
-      shell: bash
-      run: |
-        diff integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
+        diff --strip-trailing-cr integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
@@ -52,7 +33,26 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
+        diff --strip-trailing-cr integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
+        if [[ $? -eq 0 ]]; then
+          echo "✅ Integrity check pass"
+        else
+          echo "❌ Integrity check failed"
+          exit 1
+        fi
+
+    - name: Verify simple svg conversion with optimization
+      shell: bash
+      run: |
+        ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
+              -p dev.tonholo.composeicons.ui.icon \
+              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+              -opt=true \
+              samples/shield-halved-solid.svg
+    - name: Compare files with diff
+      shell: bash
+      run: |
+        diff --strip-trailing-cr integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
@@ -71,7 +71,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
+        diff --strip-trailing-cr integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
