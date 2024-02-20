@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup mingwX64
         uses: msys2/setup-msys2@v2
-        if: ${{ runner.os.runner == 'windows-latest' }}
+        if: ${{ matrix.os.runner == 'windows-latest' }}
         with:
           msystem: mingw64
           update: true
