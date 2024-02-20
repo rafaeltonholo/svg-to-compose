@@ -1,20 +1,15 @@
 name: Set up NodeJS environment
 description: Prepares environment for NodeJS
-inputs:
-  shell:
-    description: Which shell to run the script
-    required: true
-    default: bash
 runs:
   using: 'composite'
   steps:
-    - shell: ${{ inputs.shell }}
+    - shell: bash
       run: touch package-lock.json
     - uses: actions/setup-node@v4
       with:
         node-version: 20
         cache: 'npm'
     - name: Install global dependencies
-      shell: ${{ inputs.shell }}
+      shell: bash
       run: |
         npm -g install svgo svg2vectordrawable avocado
