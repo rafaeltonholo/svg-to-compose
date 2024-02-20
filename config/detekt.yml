@@ -692,7 +692,7 @@ style:
     ignoredCharacters: []
   ThrowsCount:
     active: true
-    max: 4
+    max: 6
     excludeGuardClauses: false
   TrailingWhitespace:
     active: false

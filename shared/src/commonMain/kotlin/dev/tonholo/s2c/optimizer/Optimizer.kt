@@ -1,9 +1,7 @@
 package dev.tonholo.s2c.optimizer
 
 import AppConfig.S2C_TEMP_FOLDER
-import com.kgit2.kommand.exception.KommandException
-import com.kgit2.kommand.process.Command
-import com.kgit2.kommand.process.Stdio
+import dev.tonholo.s2c.command.command
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
@@ -22,15 +20,13 @@ sealed interface Optimizer {
         get() = "⚠️ $command is required. Use npm -g install $command to install."
 
     fun verifyDependency() =
-        Command("command")
-            .args(listOf("-v", command))
-            .stdout(Stdio.Pipe)
-            .also { verbose(it.debugString()) }
-            .spawn()
-            .wait()
-            .also { code ->
-                verbose("exit code = $code")
-            } == 0
+        command(program = "command") {
+            args("-v", command)
+            showStdout = false
+            showStderr = false
+        }.also { (code, _) ->
+            verbose("exit code = $code")
+        }.exitCode == 0
 
     fun run(file: Path)
     fun runOptimization(
@@ -46,17 +42,16 @@ sealed interface Optimizer {
         )
         output("⏳ Running $command")
         try {
-            Command(command)
-                .args(args.toList())
-                .spawn()
-                .waitWithOutput().let { output ->
-                    verbose(output.toString())
-                    if (!output.stderr.isNullOrBlank()) {
-                        throw OptimizationException(errorCode)
-                    }
+            command(program = command) {
+                args(*args)
+                trim = true
+            }.also { (exitCode, _) ->
+                if (exitCode != 0) {
+                    throw OptimizationException(errorCode)
                 }
-        } catch (e: KommandException) {
-            throw OptimizationException(errorCode)
+            }
+        } catch (e: IllegalStateException) {
+            throw OptimizationException(errorCode, throwable = e)
         }
         output("✅ Finished $command")
     }
@@ -111,7 +106,12 @@ sealed interface Optimizer {
         override fun run(file: Path) {
             runOptimization(
                 errorCode = ErrorCode.S2vOptimizationError,
-                "-p", "2", "-i","$S2C_TEMP_FOLDER/target.optimized.svg", "-o", "$S2C_TEMP_FOLDER/target.xml"
+                "-p",
+                "2",
+                "-i",
+                "$S2C_TEMP_FOLDER/target.optimized.svg",
+                "-o",
+                "$S2C_TEMP_FOLDER/target.xml",
             )
         }
     }
@@ -139,9 +139,7 @@ sealed interface Optimizer {
             AvocadoOptimizer,
         )
 
-        fun verifyDependency(
-            hasXml: Boolean,
-        ) {
+        fun verifyDependency() {
             var hasMissingDependency = false
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
@@ -157,11 +155,10 @@ sealed interface Optimizer {
                     showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
                 }
             }
-            if (hasXml) {
-                xmlOptimizers.forEach {
-                    it.verifyDependency().also { hasDependency ->
-                        showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
-                    }
+            xmlOptimizers.forEach {
+                verbose("Verifying $it")
+                it.verifyDependency().also { hasDependency ->
+                    showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
                 }
             }
 
@@ -177,8 +174,8 @@ sealed interface Optimizer {
         fun optimize(file: Path) {
             if (file.extension == ".svg") {
                 output("🏎️  Optimizing SVG")
+                printEmpty()
                 svgOptimizers.forEach {
-                    printEmpty()
                     it.run(file)
                     printEmpty()
                 }
