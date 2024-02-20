@@ -3,7 +3,6 @@ kotlin = "1.9.21"
 clikt = "4.2.1"
 xmlutil = "0.86.3"
 okio = "3.7.0"
-com-kgit2-kommand = "2.0.1"
 detekt = "1.23.4"
 build-konfig = "0.15.1"
 
@@ -12,7 +11,6 @@ clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt
 xmlutil-core = { group = "io.github.pdvrieze.xmlutil", name = "core", version.ref = "xmlutil" }
 xmlutil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlutil" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
-com-kgit2-kommand = { group = "com.kgit2", name = "kommand", version.ref = "com-kgit2-kommand" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 com-codingfeline-buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "build-konfig" }
 

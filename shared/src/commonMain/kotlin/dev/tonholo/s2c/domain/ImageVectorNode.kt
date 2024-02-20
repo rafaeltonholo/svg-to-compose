@@ -94,57 +94,7 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
         }
         val isRelative = currentCommand.isLowerCase()
         current = current.lowercase()
-        val node = when {
-            current.startsWith(PathNodes.MoveTo.COMMAND) -> PathNodes.MoveTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.ArcTo.COMMAND) -> PathNodes.ArcTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.VerticalLineTo.COMMAND) -> PathNodes.VerticalLineTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.HorizontalLineTo.COMMAND) -> PathNodes.HorizontalLineTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.LineTo.COMMAND) -> PathNodes.LineTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.CurveTo.COMMAND) -> PathNodes.CurveTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.ReflectiveCurveTo.COMMAND) -> PathNodes.ReflectiveCurveTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.QuadTo.COMMAND) -> PathNodes.QuadTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            current.startsWith(PathNodes.ReflectiveQuadTo.COMMAND) -> PathNodes.ReflectiveQuadTo(
-                values = commands,
-                isRelative = isRelative,
-            )
-
-            else -> throw ExitProgramException(
-                errorCode = ErrorCode.NotSupportedFileError,
-                message = "Not support SVG/Android Vector command. Command = $currentCommand"
-            )
-        }
+        val node = createNode(current, commands, isRelative, currentCommand)
         lastCommand = currentCommand
         nodes.add(node)
         // Looping to avoid recreating a new list by using .drop() instead.
@@ -155,6 +105,63 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
     return ImageVectorNode.NodeWrapper(
         normalizedPath = normalizedPath,
         nodes = nodes,
+    )
+}
+
+private fun createNode(
+    current: String,
+    commands: MutableList<String>,
+    isRelative: Boolean,
+    currentCommand: Char
+) = when {
+    current.startsWith(PathNodes.MoveTo.COMMAND) -> PathNodes.MoveTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.ArcTo.COMMAND) -> PathNodes.ArcTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.VerticalLineTo.COMMAND) -> PathNodes.VerticalLineTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.HorizontalLineTo.COMMAND) -> PathNodes.HorizontalLineTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.LineTo.COMMAND) -> PathNodes.LineTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.CurveTo.COMMAND) -> PathNodes.CurveTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.ReflectiveCurveTo.COMMAND) -> PathNodes.ReflectiveCurveTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.QuadTo.COMMAND) -> PathNodes.QuadTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    current.startsWith(PathNodes.ReflectiveQuadTo.COMMAND) -> PathNodes.ReflectiveQuadTo(
+        values = commands,
+        isRelative = isRelative,
+    )
+
+    else -> throw ExitProgramException(
+        errorCode = ErrorCode.NotSupportedFileError,
+        message = "Not support SVG/Android Vector command. Command = $currentCommand"
     )
 }
 

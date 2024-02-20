@@ -45,7 +45,8 @@ class Processor(
                     |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
                     |No SVG or XML file detected on the specified path.
                     |
-                    """.trimMargin()
+                    """.trimMargin(),
+                throwable = e,
             )
         }
 
@@ -94,7 +95,7 @@ class Processor(
         val optimizer = if (optimize) {
             verbose("Verifying optimization dependencies")
             val optimizer = Optimizer.Factory(fileSystem)
-            optimizer.verifyDependency(files.any { it.name.endsWith(".xml") })
+            optimizer.verifyDependency()
             verbose("Finished verification")
             optimizer
         } else null
