@@ -4,6 +4,7 @@ target.svg
 target.xml
 temp.kt
 integrity-check/
+local.properties
 
 .gradle
 build/
