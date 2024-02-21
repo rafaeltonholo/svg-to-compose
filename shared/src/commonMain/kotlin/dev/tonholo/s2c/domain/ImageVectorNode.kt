@@ -40,8 +40,7 @@ sealed interface ImageVectorNode {
             val pathParamsString = if (pathParams.isNotEmpty()){
                 """(
                 |${pathParams.joinToString("\n") { (param, value) -> "    $param = $value," }}
-                |)
-                """
+                |)"""
             } else {
                 ""
             }
