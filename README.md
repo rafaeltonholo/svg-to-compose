@@ -159,7 +159,7 @@ Command:
 ```
 Input file: ![shield-halved-solid.svg](samples/shield-halved-solid.svg)
 
-Output file: [ShieldSolid.nonoptimized.kt](samples/ShieldSolid.nonoptimized.kt)
+Output file: [ShieldSolid.nonoptimized.kt](samples/ShieldSolid.svg.nonoptimized.kt)
 
 #### With optimization
 Command:
@@ -173,7 +173,7 @@ Command:
 
 Input file: ![shield-halved-solid.svg](samples/shield-halved-solid.svg)
 
-Output file: [ShieldSolid.optimized.kt](samples/ShieldSolid.optimized.kt)
+Output file: [ShieldSolid.svg.optimized.kt](samples/ShieldSolid.svg.optimized.kt)
 
 
 ### Complex SVG file
@@ -189,7 +189,7 @@ Command:
 
 Input file: ![illustration.svg](samples/illustration.svg)
 
-Output file: [Illustration.optimized.kt](samples/Illustration.optimized.kt)
+Output file: [Illustration.svg.nonoptimized.kt](samples/Illustration.svg.nonoptimized.kt)
 
 #### With optimization
 Command:
@@ -203,7 +203,7 @@ Command:
 
 Input file: ![illustration.svg](samples/illustration.svg)
 
-Output file: [Illustration.optimized.kt](samples/Illustration.optimized.kt)
+Output file: [Illustration.svg.optimized.kt](samples/Illustration.svg.optimized.kt)
 
 
 # License

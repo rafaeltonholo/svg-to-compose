@@ -16,13 +16,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val IllustrationOptimized: ImageVector
+val IllustrationSvgOptimized: ImageVector
     get() {
-        val current = _illustrationOptimized
+        val current = _illustrationSvgOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.IllustrationOptimized",
+            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.IllustrationSvgOptimized",
             defaultWidth = 116.0.dp,
             defaultHeight = 114.0.dp,
             viewportWidth = 116.0f,
@@ -4927,7 +4927,7 @@ val IllustrationOptimized: ImageVector
                     dy3 = -2.06f,
                 )
             }
-        }.build().also { _illustrationOptimized = it }
+        }.build().also { _illustrationSvgOptimized = it }
     }
 
 @Preview
@@ -4939,7 +4939,7 @@ private fun IconPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = IllustrationOptimized,
+                imageVector = IllustrationSvgOptimized,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
             )
@@ -4948,4 +4948,4 @@ private fun IconPreview() {
 }
 
 @Suppress("ObjectPropertyName")
-private var _illustrationOptimized: ImageVector? = null
+private var _illustrationSvgOptimized: ImageVector? = null

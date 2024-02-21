@@ -14,19 +14,19 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val ShieldSolidOptimized: ImageVector
+val ShieldSolidXmlOptimized: ImageVector
     get() {
-        val current = _shieldSolidOptimized
+        val current = _shieldSolidXmlOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.ShieldSolidOptimized",
+            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.ShieldSolidXmlOptimized",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
             viewportHeight = 512.0f,
         ).apply {
-            // M256 0 c4.6 0 9.2 1 13.4 2.9 l188.3 79.9 c22 9.3 38.4 31 38.3 57.2 -0.5 99.2 -41.3 280.7 -213.6 363.2 -16.7 8 -36.1 8 -52.8 0 C57.3 420.7 16.5 239.2 16 140 c-0.1 -26.2 16.3 -47.9 38.3 -57.2 L242.7 2.9 C246.8 1 251.4 0 256 0 m0 66.8 v378 C394 378 431.1 230.1 432 141.4z
+            // M256 0 c4.6 0 9.2 1 13.4 2.9 l188.3 79.9 c22 9.3 38.4 31 38.3 57.2 -0.5 99.2 -41.3 280.7 -213.6 363.2 -16.7 8 -36.1 8 -52.8 0 C57.3 420.7 16.5 239.2 16 140 c-0.1 -26.2 16.3 -47.9 38.3 -57.2 L242.7 2.9 C246.8 1 251.4 0 256 0z m0 66.8 v378 C394 378 431.1 230.1 432 141.4 L256 66.8z
             path(
                 fill = SolidColor(Color(0xFF1E3050)),
             ) {
@@ -99,6 +99,7 @@ val ShieldSolidOptimized: ImageVector
                     x3 = 256.0f,
                     y3 = 0.0f,
                 )
+                close()
                 // m 0.0 66.8
                 moveToRelative(dx = 0.0f, dy = 66.8f)
                 // v 378.0
@@ -112,9 +113,11 @@ val ShieldSolidOptimized: ImageVector
                     x3 = 432.0f,
                     y3 = 141.4f,
                 )
+                // L 256.0 66.8
+                lineTo(x = 256.0f, y = 66.8f)
                 close()
             }
-        }.build().also { _shieldSolidOptimized = it }
+        }.build().also { _shieldSolidXmlOptimized = it }
     }
 
 @Preview
@@ -126,7 +129,7 @@ private fun IconPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = ShieldSolidOptimized,
+                imageVector = ShieldSolidXmlOptimized,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
             )
@@ -135,4 +138,4 @@ private fun IconPreview() {
 }
 
 @Suppress("ObjectPropertyName")
-private var _shieldSolidOptimized: ImageVector? = null
+private var _shieldSolidXmlOptimized: ImageVector? = null
