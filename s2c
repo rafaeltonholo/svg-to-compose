@@ -44,7 +44,7 @@ fn_print_info() {
 }
 
 fn_fetch_latest_version() {
-  if [ "$VERSION" == "" ]; then
+  if [ "$VERSION" == "" ] || [ $MUST_UPGRADE == true ]; then
     fn_print_verbose "The app.properties file was not found. Fetching from Github."
     VERSION=$(curl -s https://api.github.com/repos/rafaeltonholo/svg-to-compose/releases/latest \
     | grep "tag_name" \
@@ -78,7 +78,7 @@ fn_main() {
   fn_print_verbose "Initializing SVG to Compose script"
   fn_print_verbose "Verifying binaries"
 
-  original_bin_folder="bin"
+  original_bin_folder=".s2c/bin"
   bin_folder=$original_bin_folder
   must_download=false
   must_build=false

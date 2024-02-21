@@ -21,7 +21,7 @@ class TempFileWriter(
     ): Path {
         debugSection("Creating temporary file")
 
-        fileSystem.createDirectory(dir = tempFolder, mustCreate = false)
+        fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
 
         val extension = file.extension
         val targetFile = tempFolder / "${TARGET_FILENAME}${extension}"
@@ -30,7 +30,7 @@ class TempFileWriter(
 
         debugEndSection()
 
-        // When optimize is enable, we always end up with a xml file.
+        // When optimize is enabled, we always end up with a xml file.
         return if (optimize) tempFolder / "${TARGET_FILENAME}.xml" else targetFile
     }
 
