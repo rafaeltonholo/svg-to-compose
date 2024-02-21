@@ -88,9 +88,19 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
         var current = commands.first()
         var currentCommand = current.first()
 
-        if ((currentCommand.isDigit() || currentCommand == '-') && lastCommand != Char.EMPTY) {
-            currentCommand = lastCommand
-            current = lastCommand + current
+        if ((currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') && lastCommand != Char.EMPTY) {
+            currentCommand = if (lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND) {
+                // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
+                // for implicit absolute LineTo (L/l) command(s)
+                if (lastCommand.isLowerCase()) {
+                    PathNodes.LineTo.COMMAND
+                } else {
+                    PathNodes.LineTo.COMMAND.uppercaseChar()
+                }
+            } else {
+                lastCommand
+            }
+            current = currentCommand + current
         }
 
         debug("current commands list=$commands")
