@@ -4,6 +4,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
+import nl.adaptivity.xmlutil.serialization.XmlPolyChildren
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
 
 private const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
@@ -53,10 +54,16 @@ sealed interface AndroidVectorNode {
     @Serializable
     @SerialName("group")
     data class Group(
-        @XmlElement
         @SerialName("clip-path")
         val clipPath: ClipPath,
-        val paths: List<Path>,
+        @XmlElement
+        @XmlPolyChildren(
+            [
+                "path",
+                "group",
+            ]
+        )
+        val commands: List<@Polymorphic AndroidVectorNode>,
     ) : AndroidVectorNode
 }
 
@@ -79,5 +86,5 @@ fun AndroidVectorNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path
 
 fun AndroidVectorNode.Group.asNode(): ImageVectorNode.Group = ImageVectorNode.Group(
     clipPath = clipPath.pathData.asNodeWrapper(),
-    nodes = paths.map { it.asNode() },
+    commands = commands.map { it.asNode() },
 )

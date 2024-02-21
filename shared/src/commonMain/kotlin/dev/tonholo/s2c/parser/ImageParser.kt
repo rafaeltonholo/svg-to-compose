@@ -69,11 +69,16 @@ sealed class ImageParser {
                 deserializer = Svg.serializer(),
                 string = content,
             )
-            val viewBox = svg.viewBox.split(" ").toMutableList()
+            val viewBox = if (svg.viewBox != null ) {
+                svg.viewBox.split(" ").map { it.toFloat() }.toMutableList()
+            } else {
+                mutableListOf(svg.width.toFloat(), svg.height.toFloat())
+            }
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
             val imports = defaultImports +
                     (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
                     if (addToMaterial) materialContextProviderImport else setOf()
+            val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
 
             return IconFileContents(
                 pkg = pkg,
@@ -81,9 +86,9 @@ sealed class ImageParser {
                 theme = theme,
                 width = svg.width.toFloat(),
                 height = svg.height.toFloat(),
-                viewportWidth = viewportWidth.toFloat(),
-                viewportHeight = viewportHeight.toFloat(),
-                nodes = svg.commands.mapNotNull { it.asNode(svg) },
+                viewportWidth = viewportWidth,
+                viewportHeight = viewportHeight,
+                nodes = svg.commands.mapNotNull { it.asNode(masks = masks) },
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
                 imports = imports,

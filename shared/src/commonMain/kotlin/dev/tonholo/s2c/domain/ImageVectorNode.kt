@@ -18,6 +18,9 @@ sealed interface ImageVectorNode {
             val realColor = fillColor.uppercase().removePrefix("#").let { color ->
                 when {
                     color.length == 6 -> "FF$color"
+                    color.length == 3 -> "FF$color$color"
+                    color.isEmpty() || color.lowercase().contains("url") ->
+                        "FF000000 /* not supported color \"$color\" */" // not supported yet.
                     else -> color
                 }
             }
@@ -28,11 +31,24 @@ sealed interface ImageVectorNode {
                     .trimEnd()
             }
 
+            val pathParams = buildList {
+                if (fillColor.isNotEmpty()) {
+                    add("fill" to "SolidColor(Color(0x$realColor))")
+                }
+            }
+
+            val pathParamsString = if (pathParams.isNotEmpty()){
+                """(
+                |${pathParams.joinToString("\n") { (param, value) -> "    $param = $value," }}
+                |)
+                """
+            } else {
+                ""
+            }
+
             return """
                 |// ${wrapper.normalizedPath}
-                |path(
-                |    fill = SolidColor(Color(0x$realColor)),
-                |) {
+                |path$pathParamsString {
                 |    $pathNodes
                 |}
                 """.trimMargin()
@@ -40,30 +56,36 @@ sealed interface ImageVectorNode {
     }
 
     data class Group(
-        val clipPath: NodeWrapper,
-        val nodes: List<Path>,
+        val clipPath: NodeWrapper?,
+        val commands: List<ImageVectorNode>,
     ) : ImageVectorNode {
         override fun materialize(): String {
             val indentSize = 4
-            val clipPathData = clipPath.nodes
-                .joinToString("\n${" ".repeat(indentSize * 2)}") {
-                    it.materialize()
-                        .replace("\n", "\n${" ".repeat(indentSize * 2)}")
-                        .trimEnd()
-                }
-            val groupPaths = nodes
+            val groupPaths = commands
                 .joinToString("\n${" ".repeat(indentSize)}") {
                     it.materialize()
                         .replace("\n", "\n${" ".repeat(indentSize)}")
                         .trimEnd()
                 }
-            return """
-                |group(
+            val groupParams = if (clipPath != null) {
+                val clipPathData = clipPath.nodes
+                    .joinToString("\n${" ".repeat(indentSize * 2)}") {
+                        it.materialize()
+                            .replace("\n", "\n${" ".repeat(indentSize * 2)}")
+                            .trimEnd()
+                    }
+                """(
                 |    // ${clipPath.normalizedPath}
                 |    clipPathData = PathData {
                 |        $clipPathData
                 |    },
-                |) {
+                |)"""
+            } else {
+                ""
+            }
+
+            return """
+                |group$groupParams {
                 |    $groupPaths
                 |}
                 """.trimMargin()
