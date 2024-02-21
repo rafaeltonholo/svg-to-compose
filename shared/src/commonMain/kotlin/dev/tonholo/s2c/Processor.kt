@@ -1,5 +1,6 @@
 package dev.tonholo.s2c
 
+import AppConfig
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
@@ -119,6 +120,9 @@ class Processor(
                 printEmpty()
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
+                if (AppConfig.debug) {
+                    e.printStackTrace()
+                }
                 printEmpty()
                 errors.add(file to e)
             }
