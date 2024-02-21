@@ -55,7 +55,7 @@ sealed interface AndroidVectorNode {
     @SerialName("group")
     data class Group(
         @SerialName("clip-path")
-        val clipPath: ClipPath,
+        val clipPath: ClipPath?,
         @XmlElement
         @XmlPolyChildren(
             [
@@ -85,6 +85,6 @@ fun AndroidVectorNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path
 )
 
 fun AndroidVectorNode.Group.asNode(): ImageVectorNode.Group = ImageVectorNode.Group(
-    clipPath = clipPath.pathData.asNodeWrapper(),
+    clipPath = clipPath?.pathData?.asNodeWrapper(),
     commands = commands.map { it.asNode() },
 )
