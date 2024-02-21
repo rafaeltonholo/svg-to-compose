@@ -106,7 +106,7 @@ Arguments:
   <path>  file *.svg | *.xml | directory
 ```
 
-Convert a SVG to a Compose Icon:
+Convert an SVG to a Compose Icon:
 ```console
 s2c -o OutputIconFile.kt \
     -p your.app.package.icon \
@@ -130,7 +130,8 @@ s2c -o /my/desired/directory \
   /my/svg/or/xml/directory
 ```
 > [!WARNING]
-> If the output is not a directory, the CLI will not parse any icon and will finish the execution with an error.
+> If the input path is a directory and the output is not a directory,
+> the CLI will not parse any icon and will finish the execution with an error.
 
 Disabling SVG optimization:
 
