@@ -8,14 +8,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Verify simple svg conversion without optimization
+    - name: Verify simple ${{ inputs.type }} conversion without optimization
       shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
-              samples/shield-halved-solid.svg
+              samples/shield-halved-solid.${{ inputs.type }}
     - name: Compare files with diff
       shell: bash
       run: |
@@ -27,14 +27,14 @@ runs:
           exit 1
         fi
 
-    - name: Verify complex svg conversion without optimization
+    - name: Verify complex ${{ inputs.type }} conversion without optimization
       shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.${{ inputs.type }}.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
-              samples/illustration.svg
+              samples/illustration.${{ inputs.type }}
     - name: Compare files with diff
       shell: bash
       run: |
@@ -46,14 +46,14 @@ runs:
           exit 1
         fi
 
-    - name: Verify simple svg conversion with optimization
+    - name: Verify simple ${{ inputs.type }} conversion with optimization
       shell: bash
       run: |
         ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
-              samples/shield-halved-solid.svg
+              samples/shield-halved-solid.${{ inputs.type }}
     - name: Compare files with diff
       shell: bash
       run: |
@@ -65,14 +65,14 @@ runs:
           exit 1
         fi
 
-    - name: Verify complex svg conversion with optimization
+    - name: Verify complex ${{ inputs.type }} conversion with optimization
       shell: bash
       run: |
         ./s2c -o integrity-check/Illustration.${{ inputs.type }}.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
-              samples/illustration.svg
+              samples/illustration.${{ inputs.type }}
     - name: Compare files with diff
       shell: bash
       run: |
