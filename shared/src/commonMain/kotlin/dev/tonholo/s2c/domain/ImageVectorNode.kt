@@ -92,6 +92,10 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
             currentCommand = lastCommand
             current = lastCommand + current
         }
+
+        debug("current commands list=$commands")
+        debug("current=$current, currentCommand=$currentCommand")
+
         val isRelative = currentCommand.isLowerCase()
         current = current.lowercase()
         val node = createNode(current, commands, isRelative, currentCommand)
@@ -172,9 +176,15 @@ private fun normalizePath(path: String): String {
 
     val parsedPath = StringBuilder()
     var lastChar = Char.EMPTY
+    var dotCount = 0
     for (char in path.replace(",", " ")) {
+        if (char == '.') dotCount++
+        if (lastChar.isDigit() && char == ' ') dotCount = 0
+        if (lastChar == ' ') dotCount = if (char == '.') 1 else 0
+
         parsedPath.append(
-            if ((char.isLetter() && char.lowercaseChar() != 'z') || (lastChar.isDigit() && char == '-')) {
+            if ((char.isLetter() && char.lowercaseChar() != 'z') || (lastChar.isDigit() && char == '-') || dotCount == 2) {
+                dotCount = if (char == '.') 1 else 0
                 " $char"
             } else {
                 char
