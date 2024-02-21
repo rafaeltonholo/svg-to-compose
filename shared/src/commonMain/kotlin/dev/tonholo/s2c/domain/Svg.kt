@@ -12,7 +12,7 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 data class Svg(
     val width: Int,
     val height: Int,
-    val viewBox: String, /*"0 0 116 114"*/
+    val viewBox: String?, /*"0 0 116 114"*/
     val fill: String?,
     @XmlElement
     @XmlPolyChildren(
@@ -31,17 +31,31 @@ sealed interface SvgNode {
     @SerialName("path")
     data class Path(
         val d: String,
-        val fill: String,
-        val opacity: Int?,
+        val fill: String?,
+        val opacity: Float?,
+        @SerialName("fill-opacity")
+        val fillOpacity: Float?,
+        val style: String?,
     ) : SvgNode
 
     @Serializable
     @SerialName("g")
     data class Group(
-        val paths: List<Path>,
-        @XmlSerialName("mask")
         @SerialName("mask")
-        val maskId: String,
+        val maskId: String?,
+        @SerialName("filter")
+        val filterId: String?,
+        val opacity: Float?,
+        val style: String?,
+        @XmlElement
+        @XmlPolyChildren(
+            [
+                "path",
+                "g",
+                "mask",
+            ]
+        )
+        val commands: List<@Polymorphic SvgNode>,
     ) : SvgNode
 
     @Serializable
@@ -58,31 +72,30 @@ sealed interface SvgNode {
     ) : SvgNode
 }
 
-fun SvgNode.asNode(svg: Svg? = null): ImageVectorNode? = when (this) {
-    is SvgNode.Group -> svg?.let { asNode(masks = svg.commands.filterIsInstance<SvgNode.Mask>()) }
+fun SvgNode.asNode(masks: List<SvgNode.Mask>): ImageVectorNode? = when (this) {
+    is SvgNode.Group -> asNode(masks = masks)
     is SvgNode.Mask -> null
     is SvgNode.Path -> asNode()
 }
 
 fun SvgNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
-    fillColor = fill,
+    fillColor = fill.orEmpty(),
     wrapper = d.asNodeWrapper(),
 )
-
 
 fun SvgNode.Group.asNode(
     masks: List<SvgNode.Mask>,
 ): ImageVectorNode.Group {
 
     // Can a svg mask have more than one path?
-    // Currently, a group on ImageVector only receive a single PathData as a parameter. Not sure if it would support
-    // multiple path tags inside a mask from a svg.
-    val clipPath = masks.first {
-        it.id == maskId.removePrefix("url(#").removeSuffix(")")
-    }.paths.first().d.asNodeWrapper()
+    // Currently, a group on ImageVector only receives a single PathData as a parameter.
+    // Not sure if it would support multiple path tags inside a mask from a svg.
+    val clipPath = masks.firstOrNull {
+        it.id == maskId?.removePrefix("url(#")?.removeSuffix(")")
+    }?.paths?.first()?.d?.asNodeWrapper()
 
     return ImageVectorNode.Group(
         clipPath = clipPath,
-        nodes = paths.map { it.asNode() },
+        commands = commands.mapNotNull { it.asNode(masks) }
     )
 }

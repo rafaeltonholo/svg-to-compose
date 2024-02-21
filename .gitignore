@@ -5,6 +5,7 @@ target.xml
 temp.kt
 integrity-check/
 local.properties
+.s2c/
 
 .gradle
 build/
