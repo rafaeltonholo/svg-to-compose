@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
@@ -23,6 +23,8 @@ jobs:
 
       - name: Prepare nodeJS enviroment for integrity check
         uses: ./.github/actions/setup-nodejs
+        with:
+          os: ${{ matrix.os }}
       
       - name: Cache Kotlin Konan
         id: cache-kotlin-konan
@@ -58,7 +60,7 @@ jobs:
 
       - name: CLI Integrity check
         uses: ./.github/actions/cli-integrity-check
-        continue-on-error: true # should be false
+        continue-on-error: false
 
       - name: Uploading macos Arm64 binaries
         uses: actions/upload-artifact@v4
