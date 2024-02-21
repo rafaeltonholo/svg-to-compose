@@ -1,12 +1,17 @@
 name: CLI Integrity check
 description: Runs the CLI command checking if it still works as intended
+inputs:
+  type:
+    description: File type to parse
+    required: true
+    default: svg
 runs:
   using: composite
   steps:
     - name: Verify simple svg conversion without optimization
       shell: bash
       run: |
-        ./s2c -o integrity-check/ShieldSolid.NonOptimized.kt \
+        ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
@@ -14,7 +19,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff --strip-trailing-cr integrity-check/ShieldSolid.NonOptimized.kt samples/ShieldSolid.nonoptimized.kt
+        diff --strip-trailing-cr integrity-check/ShieldSolid.${{ inputs.type }}.NonOptimized.kt samples/ShieldSolid.${{ inputs.type }}.nonoptimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
@@ -25,7 +30,7 @@ runs:
     - name: Verify complex svg conversion without optimization
       shell: bash
       run: |
-        ./s2c -o integrity-check/Illustration.NonOptimized.kt \
+        ./s2c -o integrity-check/Illustration.${{ inputs.type }}.NonOptimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=false \
@@ -33,7 +38,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff --strip-trailing-cr integrity-check/Illustration.NonOptimized.kt samples/Illustration.nonoptimized.kt
+        diff --strip-trailing-cr integrity-check/Illustration.${{ inputs.type }}.NonOptimized.kt samples/Illustration.${{ inputs.type }}.nonoptimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
@@ -44,7 +49,7 @@ runs:
     - name: Verify simple svg conversion with optimization
       shell: bash
       run: |
-        ./s2c -o integrity-check/ShieldSolid.Optimized.kt \
+        ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
@@ -52,7 +57,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff --strip-trailing-cr integrity-check/ShieldSolid.Optimized.kt samples/ShieldSolid.optimized.kt
+        diff --strip-trailing-cr integrity-check/ShieldSolid.${{ inputs.type }}.Optimized.kt samples/ShieldSolid.${{ inputs.type }}.optimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
@@ -63,7 +68,7 @@ runs:
     - name: Verify complex svg conversion with optimization
       shell: bash
       run: |
-        ./s2c -o integrity-check/Illustration.Optimized.kt \
+        ./s2c -o integrity-check/Illustration.${{ inputs.type }}.Optimized.kt \
               -p dev.tonholo.composeicons.ui.icon \
               --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
               -opt=true \
@@ -71,7 +76,7 @@ runs:
     - name: Compare files with diff
       shell: bash
       run: |
-        diff --strip-trailing-cr integrity-check/Illustration.Optimized.kt samples/Illustration.optimized.kt
+        diff --strip-trailing-cr integrity-check/Illustration.${{ inputs.type }}.Optimized.kt samples/Illustration.${{ inputs.type }}.optimized.kt
         if [[ $? -eq 0 ]]; then
           echo "✅ Integrity check pass"
         else
