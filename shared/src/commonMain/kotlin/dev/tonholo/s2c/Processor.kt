@@ -47,7 +47,7 @@ class Processor(
                     |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
                     |No SVG or XML file detected on the specified path.
                     |
-                    """.trimMargin(),
+                """.trimMargin(),
                 throwable = e,
             )
         }
@@ -63,7 +63,8 @@ class Processor(
                     errorCode = ErrorCode.OutputNotDirectoryError,
                     message = """❌ ERROR: when the input is a directory, the output MUST be directory too.
                         |If you pointed to a directory path, make sure the output directory already exists.
-                        |""".trimMargin(),
+                        |
+                    """.trimMargin(),
                 )
             }
 
@@ -100,7 +101,9 @@ class Processor(
             optimizer.verifyDependency()
             verbose("Finished verification")
             optimizer
-        } else null
+        } else {
+            null
+        }
 
         val errors = mutableListOf<Pair<Path, Exception>>()
         for (file in files) {
@@ -118,7 +121,11 @@ class Processor(
                 printEmpty()
             } catch (e: ExitProgramException) {
                 throw e
-            } catch (e: @Suppress("TooGenericExceptionCaught") Exception) {
+            } catch (
+                e:
+                @Suppress("TooGenericExceptionCaught")
+                Exception
+            ) {
                 printEmpty()
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
@@ -147,7 +154,7 @@ class Processor(
                     |
                     |Files failed to parse:
                     |${errors.map { it.first }.joinToString("\n") { "    - $it" }}
-                    """.trimMargin()
+                """.trimMargin()
             )
         }
     }

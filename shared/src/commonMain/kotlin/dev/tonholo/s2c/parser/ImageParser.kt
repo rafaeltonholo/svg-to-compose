@@ -72,16 +72,16 @@ sealed class ImageParser {
                 deserializer = Svg.serializer(),
                 string = content,
             )
-            val viewBox = if (svg.viewBox != null ) {
+            val viewBox = if (svg.viewBox != null) {
                 svg.viewBox.split(" ").map { it.toFloat() }.toMutableList()
             } else {
                 mutableListOf(svg.width.toFloat(), svg.height.toFloat())
             }
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
             val imports = defaultImports +
-                    (if (noPreview) setOf() else previewImports) +
-                    (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
-                    if (addToMaterial) materialContextProviderImport else setOf()
+                (if (noPreview) setOf() else previewImports) +
+                (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
+                if (addToMaterial) materialContextProviderImport else setOf()
             val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
 
             return IconFileContents(
@@ -118,9 +118,9 @@ sealed class ImageParser {
                 string = content,
             )
             val imports = defaultImports +
-                    (if (noPreview) setOf() else previewImports) +
-                    (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
-                    if (addToMaterial) materialContextProviderImport else setOf()
+                (if (noPreview) setOf() else previewImports) +
+                (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
+                if (addToMaterial) materialContextProviderImport else setOf()
 
             return IconFileContents(
                 pkg = pkg,
@@ -137,7 +137,6 @@ sealed class ImageParser {
                 imports = imports,
             )
         }
-
     }
 
     companion object {

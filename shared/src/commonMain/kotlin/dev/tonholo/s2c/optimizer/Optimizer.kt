@@ -83,7 +83,7 @@ sealed interface Optimizer {
                     |      }
                     |  ]
                     |}
-                    """.trimMargin()
+                """.trimMargin()
                 fileSystem.write(svgoConfigFile) {
                     writeUtf8(svgoConfig)
                 }
@@ -166,7 +166,7 @@ sealed interface Optimizer {
                 throw MissingDependencyException(
                     errorCode = ErrorCode.MissingCoreDependency,
                     message = "Missing core dependency to optimizer. " +
-                            "Please install the dependency or use the CLI without the flag --optimizer",
+                        "Please install the dependency or use the CLI without the flag --optimizer",
                 )
             }
         }

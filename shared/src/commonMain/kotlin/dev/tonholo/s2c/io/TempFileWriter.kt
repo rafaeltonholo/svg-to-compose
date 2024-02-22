@@ -24,7 +24,7 @@ class TempFileWriter(
         fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
 
         val extension = file.extension
-        val targetFile = tempFolder / "${TARGET_FILENAME}${extension}"
+        val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
 
         fileSystem.copy(file, targetFile)
 
