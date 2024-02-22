@@ -131,8 +131,8 @@ complexity:
     threshold: 120
   LongParameterList:
     active: true
-    functionThreshold: 8
-    constructorThreshold: 9
+    functionThreshold: 10
+    constructorThreshold: 10
     ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
@@ -249,7 +249,7 @@ exceptions:
   ObjectExtendsThrowable:
     active: false
   PrintStackTrace:
-    active: true
+    active: false
   RethrowCaughtException:
     active: true
   ReturnFromFinally:

@@ -37,7 +37,7 @@ sealed interface ImageVectorNode {
                 }
             }
 
-            val pathParamsString = if (pathParams.isNotEmpty()){
+            val pathParamsString = if (pathParams.isNotEmpty()) {
                 """(
                 |${pathParams.joinToString("\n") { (param, value) -> "    $param = $value," }}
                 |)"""
@@ -110,16 +110,16 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
         var currentCommand = current.first()
 
         if ((currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') && lastCommand != Char.EMPTY) {
-            currentCommand = if (lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND) {
+            currentCommand = when {
                 // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
                 // for implicit absolute LineTo (L/l) command(s)
-                if (lastCommand.isLowerCase()) {
+                lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND && lastCommand.isLowerCase() ->
                     PathNodes.LineTo.COMMAND
-                } else {
+
+                lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND ->
                     PathNodes.LineTo.COMMAND.uppercaseChar()
-                }
-            } else {
-                lastCommand
+
+                else -> lastCommand
             }
             current = currentCommand + current
         }
@@ -200,6 +200,19 @@ private fun createNode(
     )
 }
 
+private inline fun resetDotCount(current: Char): Int =
+    if (current == '.') 1 else 0
+
+private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int =
+    if (char == '.') {
+        dotCount + 1
+    } else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {
+        resetDotCount(current = char)
+    } else {
+        dotCount
+    }
+
+
 private fun normalizePath(path: String): String {
     debugSection("Normalizing path")
     debug("Original path value = $path")
@@ -209,15 +222,17 @@ private fun normalizePath(path: String): String {
     var lastChar = Char.EMPTY
     var dotCount = 0
     for (char in path.replace(",", " ")) {
-        if (char == '.') dotCount++
-        if (lastChar.isDigit() && char.isWhitespace()) dotCount = 0
-        if (lastChar == ' ') dotCount = if (char == '.') 1 else 0
-        if (lastChar.isLetter() && char.isWhitespace()) continue
-        if (lastChar.isWhitespace() && char.isWhitespace()) continue
+        dotCount = calculateDotCount(char, dotCount, lastChar)
+        if ((lastChar.isLetter() && char.isWhitespace()) || (lastChar.isWhitespace() && char.isWhitespace())) {
+            continue
+        }
 
+        val isClosingCommand = (char.isLetter() && char.lowercaseChar() != 'z')
+        val isNegativeSign = (lastChar.isDigit() && char == '-')
+        val reachMaximumDotNumbers = dotCount == 2
         parsedPath.append(
-            if ((char.isLetter() && char.lowercaseChar() != 'z') || (lastChar.isDigit() && char == '-') || dotCount == 2) {
-                dotCount = if (char == '.') 1 else 0
+            if (isClosingCommand || isNegativeSign || reachMaximumDotNumbers) {
+                dotCount = resetDotCount(current = char)
                 " $char"
             } else {
                 char
