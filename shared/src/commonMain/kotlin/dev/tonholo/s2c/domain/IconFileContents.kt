@@ -7,6 +7,14 @@ import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
 
 val defaultImports = setOf(
+    "androidx.compose.ui.graphics.Color",
+    "androidx.compose.ui.graphics.SolidColor",
+    "androidx.compose.ui.graphics.vector.ImageVector",
+    "androidx.compose.ui.graphics.vector.path",
+    "androidx.compose.ui.unit.dp",
+)
+
+val previewImports = setOf(
     "androidx.compose.foundation.Image",
     "androidx.compose.foundation.layout.Arrangement",
     "androidx.compose.foundation.layout.Column",
@@ -14,12 +22,7 @@ val defaultImports = setOf(
     "androidx.compose.runtime.Composable",
     "androidx.compose.ui.Alignment",
     "androidx.compose.ui.Modifier",
-    "androidx.compose.ui.graphics.Color",
-    "androidx.compose.ui.graphics.SolidColor",
-    "androidx.compose.ui.graphics.vector.ImageVector",
-    "androidx.compose.ui.graphics.vector.path",
     "androidx.compose.ui.tooling.preview.Preview",
-    "androidx.compose.ui.unit.dp",
 )
 
 val groupImports = setOf(
@@ -42,6 +45,7 @@ data class IconFileContents(
     val nodes: List<ImageVectorNode>,
     val contextProvider: String? = null,
     val addToMaterial: Boolean = false,
+    val noPreview: Boolean = false,
     val imports: Set<String> = defaultImports,
 ) {
     fun materialize(): String {
@@ -68,6 +72,7 @@ data class IconFileContents(
                 contextProvider.removeSuffix(".")
                 "$contextProvider.${iconName.pascalCase()}"
             }
+
             addToMaterial -> "Icons.Filled.${iconName.pascalCase()}"
             else -> iconName.pascalCase()
         }
@@ -78,26 +83,7 @@ data class IconFileContents(
                 .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
         }
 
-        return """
-            |package $pkg
-            |
-            |${imports.sorted().joinToString("\n"){ "import $it" }}
-            |
-            |val ${iconPropertyName}: ImageVector
-            |    get() {
-            |        val current = _${iconName.camelCase()}
-            |        if (current != null) return current
-            |
-            |        return ImageVector.Builder(
-            |            name = "${theme}.${iconName.pascalCase()}",
-            |            defaultWidth = ${width}.dp,
-            |            defaultHeight = ${height}.dp,
-            |            viewportWidth = ${viewportWidth}f,
-            |            viewportHeight = ${viewportHeight}f,
-            |        ).apply {
-            |            $pathNodes
-            |        }.build().also { _${iconName.camelCase()} = it }
-            |    }
+        val preview = if (noPreview) "|" else """
             |
             |@Preview
             |@Composable
@@ -116,6 +102,29 @@ data class IconFileContents(
             |    }
             |}
             |
+            """
+
+        return """
+            |package $pkg
+            |
+            |${imports.sorted().joinToString("\n") { "import $it" }}
+            |
+            |val ${iconPropertyName}: ImageVector
+            |    get() {
+            |        val current = _${iconName.camelCase()}
+            |        if (current != null) return current
+            |
+            |        return ImageVector.Builder(
+            |            name = "${theme}.${iconName.pascalCase()}",
+            |            defaultWidth = ${width}.dp,
+            |            defaultHeight = ${height}.dp,
+            |            viewportWidth = ${viewportWidth}f,
+            |            viewportHeight = ${viewportHeight}f,
+            |        ).apply {
+            |            $pathNodes
+            |        }.build().also { _${iconName.camelCase()} = it }
+            |    }
+            ${preview.trim()}
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |

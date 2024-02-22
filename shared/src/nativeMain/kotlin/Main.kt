@@ -55,7 +55,7 @@ class Client : CliktCommand() {
         names = arrayOf("-opt", "--optimize"),
         help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
                 "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
-    ).boolean().default(false) // TODO: Turned to false since optimization is only working on macOS.
+    ).boolean().default(true)
 
     private val contextProvider by option(
         names = arrayOf("-cp", "--context-provider"),
@@ -81,6 +81,12 @@ class Client : CliktCommand() {
         help = "Enable verbose log.",
     ).flag()
 
+    private val noPreview by option(
+        names = arrayOf("-np", "--no-preview", "--kmp"),
+        help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
+                "KMP, since KMP doesn't support previews.",
+    ).flag()
+
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
@@ -92,6 +98,7 @@ class Client : CliktCommand() {
         verbose("   addToMaterial = $addToMaterial")
         verbose("   debug = $debug")
         verbose("   verbose = $verbose")
+        verbose("   noPreview = $noPreview")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -113,6 +120,7 @@ class Client : CliktCommand() {
                 optimize = optimize,
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
+                noPreview = noPreview,
             )
         } catch (e: ExitProgramException) {
             printEmpty()
