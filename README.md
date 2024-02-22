@@ -74,7 +74,7 @@ npm -g install avocado
 > If you don't want to optimize the SVG before converting it, you can just disable the optimization using the parameter
 > `-opt` or `--optimize` passing `false`.
 > 
-> Optimization is disabled <!-- see #platform-support --> by default.
+> Optimization is enabled by default.
 
 
 ## Using the command-line tool

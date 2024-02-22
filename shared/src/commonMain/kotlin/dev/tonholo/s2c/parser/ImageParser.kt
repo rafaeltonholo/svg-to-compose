@@ -9,6 +9,7 @@ import dev.tonholo.s2c.domain.asNode
 import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.groupImports
 import dev.tonholo.s2c.domain.materialContextProviderImport
+import dev.tonholo.s2c.domain.previewImports
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
@@ -45,6 +46,7 @@ sealed class ImageParser {
         theme: String,
         contextProvider: String?,
         addToMaterial: Boolean,
+        noPreview: Boolean,
     ): IconFileContents
 
     protected fun readContent(file: Path): String {
@@ -62,7 +64,8 @@ sealed class ImageParser {
             pkg: String,
             theme: String,
             contextProvider: String?,
-            addToMaterial: Boolean
+            addToMaterial: Boolean,
+            noPreview: Boolean,
         ): IconFileContents {
             val content = readContent(file)
             val svg = xmlParser.decodeFromString(
@@ -76,6 +79,7 @@ sealed class ImageParser {
             }
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
             val imports = defaultImports +
+                    (if (noPreview) setOf() else previewImports) +
                     (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
                     if (addToMaterial) materialContextProviderImport else setOf()
             val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
@@ -91,6 +95,7 @@ sealed class ImageParser {
                 nodes = svg.commands.mapNotNull { it.asNode(masks = masks) },
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
+                noPreview = noPreview,
                 imports = imports,
             )
         }
@@ -103,7 +108,8 @@ sealed class ImageParser {
             pkg: String,
             theme: String,
             contextProvider: String?,
-            addToMaterial: Boolean
+            addToMaterial: Boolean,
+            noPreview: Boolean,
         ): IconFileContents {
             val content = readContent(file)
 
@@ -112,6 +118,7 @@ sealed class ImageParser {
                 string = content,
             )
             val imports = defaultImports +
+                    (if (noPreview) setOf() else previewImports) +
                     (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
                     if (addToMaterial) materialContextProviderImport else setOf()
 
@@ -126,6 +133,7 @@ sealed class ImageParser {
                 nodes = androidVector.nodes.map { it.asNode() },
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
+                noPreview = noPreview,
                 imports = imports,
             )
         }
@@ -147,7 +155,8 @@ sealed class ImageParser {
             pkg: String,
             theme: String,
             contextProvider: String?,
-            addToMaterial: Boolean
+            addToMaterial: Boolean,
+            noPreview: Boolean,
         ): String {
             val extension = file.extension
             return parsers[extension]?.parse(
@@ -157,6 +166,7 @@ sealed class ImageParser {
                 theme = theme,
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
+                noPreview = noPreview,
             )?.materialize() ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "invalid file extension ($extension)."
