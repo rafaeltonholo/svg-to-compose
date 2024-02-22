@@ -137,7 +137,7 @@ jobs:
       - name: Get Release version
         id: getversion
         shell: bash
-        run: echo "{version}={$(cat artifacts/app.properties | grep '^VERSION=' | cut -d= -f2)}" >> $GITHUB_OUTPUT
+        run: echo "version=$(cat artifacts/app.properties | grep '^VERSION=' | cut -d= -f2)" >> $GITHUB_OUTPUT
       - name: Compress binaries
         run: |
           cd artifacts
