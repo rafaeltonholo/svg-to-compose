@@ -31,8 +31,8 @@ fun verbose(message: String) {
     }
 }
 
-fun output(message: String) {
+inline fun output(message: String) {
     println(message)
 }
 
-fun printEmpty() = println()
+inline fun printEmpty() = println()
