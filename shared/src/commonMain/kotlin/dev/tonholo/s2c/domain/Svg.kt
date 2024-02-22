@@ -12,7 +12,7 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 data class Svg(
     val width: Int,
     val height: Int,
-    val viewBox: String?, /*"0 0 116 114"*/
+    val viewBox: String?, // "0 0 116 114"
     val fill: String?,
     @XmlElement
     @XmlPolyChildren(
@@ -86,7 +86,6 @@ fun SvgNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
 fun SvgNode.Group.asNode(
     masks: List<SvgNode.Mask>,
 ): ImageVectorNode.Group {
-
     // Can a svg mask have more than one path?
     // Currently, a group on ImageVector only receives a single PathData as a parameter.
     // Not sure if it would support multiple path tags inside a mask from a svg.

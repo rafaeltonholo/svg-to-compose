@@ -20,7 +20,7 @@ sealed class PathNodes(
         """
         |close()
         |
-        |""".trimMargin()
+        """.trimMargin()
     } else {
         ""
     }
@@ -50,8 +50,9 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x $y
-                |moveTo${relative}(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
-                |${closeCommand()}""".trimMargin()
+                |moveTo$relative(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -87,7 +88,7 @@ sealed class PathNodes(
             val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b}f"
             return """
                 |// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y
-                |arcTo${relative}(
+                |arcTo$relative(
                 |    $a,
                 |    $b,
                 |    theta = ${theta}f,
@@ -96,7 +97,8 @@ sealed class PathNodes(
                 |    ${relativePrefix}x1 = ${x}f,
                 |    ${relativePrefix}y1 = ${y}f,
                 |)
-                |${closeCommand()}""".trimMargin()
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -126,8 +128,9 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $y
-                |verticalLineTo${relative}(${relativePrefix}y = ${y}f)
-                |${closeCommand()}""".trimMargin()
+                |verticalLineTo$relative(${relativePrefix}y = ${y}f)
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -157,8 +160,9 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x
-                |horizontalLineTo${relative}(${relativePrefix}x = ${x}f)
-                |${closeCommand()}""".trimMargin()
+                |horizontalLineTo$relative(${relativePrefix}x = ${x}f)
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -191,8 +195,9 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x $y
-                |lineTo${relative}(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
-                |${closeCommand()}""".trimMargin()
+                |lineTo$relative(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -226,7 +231,7 @@ sealed class PathNodes(
 
             return """
                 |// $command $x1 $y1 $x2 $y2 $x3 $y3
-                |curveTo${relative}(
+                |curveTo$relative(
                 |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
                 |    ${relativePrefix}x2 = ${x2}f,
@@ -234,7 +239,8 @@ sealed class PathNodes(
                 |    ${relativePrefix}x3 = ${x3}f,
                 |    ${relativePrefix}y3 = ${y3}f,
                 |)
-                |${closeCommand()}""".trimMargin()
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -265,13 +271,14 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x1 $y1 $x2 $y2
-                |reflectiveCurveTo${relative}(
+                |reflectiveCurveTo$relative(
                 |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
                 |    ${relativePrefix}x2 = ${x2}f,
                 |    ${relativePrefix}y2 = ${y2}f,
                 |)
-                |${closeCommand()}""".trimMargin()
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 
@@ -302,13 +309,14 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x1 $y1 $x2 $y2
-                |quadTo${relative}(
+                |quadTo$relative(
                 |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
                 |    ${relativePrefix}x2 = ${x2}f,
                 |    ${relativePrefix}y2 = ${y2}f,
                 |)
-                |${closeCommand()}""".trimMargin()
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
     class ReflectiveQuadTo(
@@ -336,11 +344,12 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return """
                 |// $command $x1 $y1
-                |reflectiveQuadTo${relative}(
+                |reflectiveQuadTo$relative(
                 |    ${relativePrefix}x1 = ${x1}f,
                 |    ${relativePrefix}y1 = ${y1}f,
                 |)
-                |${closeCommand()}""".trimMargin()
+                |${closeCommand()}
+            """.trimMargin()
         }
     }
 }

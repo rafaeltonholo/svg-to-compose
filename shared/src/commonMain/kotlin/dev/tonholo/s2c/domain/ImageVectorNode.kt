@@ -50,7 +50,7 @@ sealed interface ImageVectorNode {
                 |path$pathParamsString {
                 |    $pathNodes
                 |}
-                """.trimMargin()
+            """.trimMargin()
         }
     }
 
@@ -87,7 +87,7 @@ sealed interface ImageVectorNode {
                 |group$groupParams {
                 |    $groupPaths
                 |}
-                """.trimMargin()
+            """.trimMargin()
         }
     }
 
@@ -211,7 +211,6 @@ private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char):
     } else {
         dotCount
     }
-
 
 private fun normalizePath(path: String): String {
     debugSection("Normalizing path")

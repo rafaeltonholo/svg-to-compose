@@ -52,17 +52,18 @@ data class IconFileContents(
         debugSection("Generating file")
         debug(
             """Parameters:
-                   |    package=${pkg}
-                   |    icon_name=${iconName}
-                   |    theme=${theme}
-                   |    width=${width}
-                   |    height=${height}
-                   |    viewport_width=${viewportWidth}
-                   |    viewport_height=${viewportHeight}
+                   |    package=$pkg
+                   |    icon_name=$iconName
+                   |    theme=$theme
+                   |    width=$width
+                   |    height=$height
+                   |    viewport_width=$viewportWidth
+                   |    viewport_height=$viewportHeight
                    |    nodes=${nodes.map { it.materialize() }}
-                   |    context_provider=${contextProvider}
-                   |    imports=${imports}
-                   |    """.trimMargin()
+                   |    context_provider=$contextProvider
+                   |    imports=$imports
+                   |    
+            """.trimMargin()
         )
 
         val iconPropertyName = when {
@@ -83,7 +84,10 @@ data class IconFileContents(
                 .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
         }
 
-        val preview = if (noPreview) "|" else """
+        val preview = if (noPreview) {
+            "|"
+        } else {
+            """
             |
             |@Preview
             |@Composable
@@ -94,7 +98,7 @@ data class IconFileContents(
             |            horizontalAlignment = Alignment.CenterHorizontally,
             |        ) {
             |            Image(
-            |                imageVector = ${iconPropertyName},
+            |                imageVector = $iconPropertyName,
             |                contentDescription = null,
             |                modifier = Modifier.size(100.dp),
             |            )
@@ -103,21 +107,22 @@ data class IconFileContents(
             |}
             |
             """
+        }
 
         return """
             |package $pkg
             |
             |${imports.sorted().joinToString("\n") { "import $it" }}
             |
-            |val ${iconPropertyName}: ImageVector
+            |val $iconPropertyName: ImageVector
             |    get() {
             |        val current = _${iconName.camelCase()}
             |        if (current != null) return current
             |
             |        return ImageVector.Builder(
-            |            name = "${theme}.${iconName.pascalCase()}",
-            |            defaultWidth = ${width}.dp,
-            |            defaultHeight = ${height}.dp,
+            |            name = "$theme.${iconName.pascalCase()}",
+            |            defaultWidth = $width.dp,
+            |            defaultHeight = $height.dp,
             |            viewportWidth = ${viewportWidth}f,
             |            viewportHeight = ${viewportHeight}f,
             |        ).apply {
