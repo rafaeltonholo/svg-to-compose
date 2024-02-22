@@ -210,8 +210,10 @@ private fun normalizePath(path: String): String {
     var dotCount = 0
     for (char in path.replace(",", " ")) {
         if (char == '.') dotCount++
-        if (lastChar.isDigit() && char == ' ') dotCount = 0
+        if (lastChar.isDigit() && char.isWhitespace()) dotCount = 0
         if (lastChar == ' ') dotCount = if (char == '.') 1 else 0
+        if (lastChar.isLetter() && char.isWhitespace()) continue
+        if (lastChar.isWhitespace() && char.isWhitespace()) continue
 
         parsedPath.append(
             if ((char.isLetter() && char.lowercaseChar() != 'z') || (lastChar.isDigit() && char == '-') || dotCount == 2) {

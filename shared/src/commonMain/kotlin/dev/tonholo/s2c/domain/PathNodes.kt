@@ -318,7 +318,7 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 4,
+        commandSize = 2,
     ) {
         companion object {
             const val COMMAND = 't'
