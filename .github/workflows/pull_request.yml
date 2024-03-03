@@ -64,6 +64,7 @@ jobs:
           shell: bash
           run: |
             ./gradlew cleanAllTests allTests
+          continue-on-error: false
 
         - name: CLI Integrity check using SVG
           uses: ./.github/actions/cli-integrity-check
