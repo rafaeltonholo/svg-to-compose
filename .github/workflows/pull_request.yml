@@ -12,10 +12,48 @@ jobs:
         - name: Checkout the repo
           uses: actions/checkout@v4
 
-        - uses: ./.github/actions/build
+        - name: Checkout the repo
+          uses: actions/checkout@v4
+  
+        - name: Prepares environment for building
+          uses: ./.github/actions/setup
+  
+        - name: Prepare nodeJS enviroment for integrity check
+          uses: ./.github/actions/setup-nodejs
           with:
-            target: ${{ matrix.os }}
-          continue-on-error: false
+            os: ${{ matrix.os }}
+        
+        - name: Cache Kotlin Konan
+          id: cache-kotlin-konan
+          uses: actions/cache@v4
+          with:
+            path: |
+              ~/.konan/**/*
+            key: kotlin-konan-${{ matrix.os }}
+  
+        - name: Build Native Binary for macos
+          if: matrix.os == 'macos-latest'
+          uses: burrunan/gradle-cache-action@v1
+          with:
+            gradle-version: wrapper
+            job-id: ${{ matrix.os }}
+            arguments: releaseMacOS
+  
+        - name: Build Native Binary for Windows
+          if: matrix.os == 'windows-latest'
+          uses: burrunan/gradle-cache-action@v1
+          with:
+            gradle-version: wrapper
+            job-id: ${{ matrix.os }}
+            arguments: releaseWindows
+  
+        - name: Build Native Binary for Linux
+          if: matrix.os == 'ubuntu-latest'
+          uses: burrunan/gradle-cache-action@v1
+          with:
+            gradle-version: wrapper
+            job-id: ${{ matrix.os }}
+            arguments: releaseLinux
 
         - name: Running Detekt
           shell: bash
