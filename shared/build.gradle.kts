@@ -1,3 +1,4 @@
+
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
@@ -124,7 +125,7 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<Detekt>().configureEach {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
     exclude {
-        it.file.absolutePath.contains("build/")
+        it.file.absolutePath.contains("build")
     }
 }
 tasks.withType<DetektCreateBaselineTask>().configureEach {
