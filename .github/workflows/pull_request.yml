@@ -1,5 +1,7 @@
 name: Pull request check
-on: pull_request
+on: 
+  pull_request:
+    types: [synchronize]
 jobs:
   build:
     strategy:
@@ -7,7 +9,7 @@ jobs:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-        - uses: rafaeltonholo/svg-to-compose/.github/workflows/build.yml@main
+        - uses: ./.github/workflows/build.yml
         - name: Running Detekt
           shell: bash
           run: |
