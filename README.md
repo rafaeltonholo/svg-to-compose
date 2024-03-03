@@ -88,11 +88,11 @@ Usage: client [<options>] <path>
 
 Options:
   -v, --version                   Show this CLI version
-  -p, --package=<text>            Specify iconss package. This will replace package at the top of the icon file
+  -p, --package=<text>            Specify icons's package. This will replace package at the top of the icon file
   -t, --theme=<text>              Specify project's theme name. This will take place in the Icon Preview composable function and in the
                                   ImageVector Builder's names.
-  -o, --output=<text>             output filename; if no .kt extension specified, it will be automatically added. In case of the input is a
-                                  directory, output MUST also be a directory.
+  -o, --output=<text>             output filename; if no .kt extension specified, it will be automatically added. In case of the input
+                                  is a directory, output MUST also be a directory.
   -opt, --optimize=true|false     Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the
                                   following programs: svgo, svg2vectordrawable, avocado from NPM Registry
   -cp, --context-provider=<text>  Adds a custom context provider to the Icon definition. E.g.: s2c <args> -o MyIcon.kt -cp Icons.Filled
@@ -100,6 +100,10 @@ Options:
   --add-to-material               Add the icon to the Material Icons context provider.
   --debug                         Enable debug log.
   --verbose                       Enable verbose log.
+  -np, --no-preview, --kmp        Removes the preview function from the file. It is very useful if you are generating the icons for
+                                  KMP, since KMP doesn't support previews yet.
+  --make-internal                 Mark the icon as internal
+  --minified                      Remove all comments explaining the path logic creation and inline all method parameters.
   -h, --help                      Show this message and exit
 
 Arguments:

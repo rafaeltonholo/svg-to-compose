@@ -15,9 +15,11 @@ import okio.Path.Companion.toPath
 
 sealed interface Optimizer {
     val command: String
+    val installCommand: String
+        get() = command
     val allowedExtension: String
     val errorMessage: String
-        get() = "⚠️ $command is required. Use npm -g install $command to install."
+        get() = "⚠️ $command is required. Use npm -g install $installCommand to install."
 
     fun verifyDependency() =
         command(program = command) {
@@ -101,6 +103,7 @@ sealed interface Optimizer {
 
     data object S2vOptimizer : Optimizer {
         override val command: String = "s2v"
+        override val installCommand: String = "svg2vectordrawable"
         override val allowedExtension: String = ".svg"
 
         override fun run(file: Path) {
