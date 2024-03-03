@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [synchronize]
 jobs:
-  build:
+  build-and-check:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
