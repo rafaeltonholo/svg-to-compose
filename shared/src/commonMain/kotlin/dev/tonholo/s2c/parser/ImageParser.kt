@@ -19,6 +19,17 @@ import nl.adaptivity.xmlutil.serialization.XML
 import okio.FileSystem
 import okio.Path
 
+data class ParserConfig(
+    val pkg: String,
+    val theme: String,
+    val optimize: Boolean,
+    val contextProvider: String?,
+    val addToMaterial: Boolean,
+    val noPreview: Boolean,
+    val makeInternal: Boolean,
+    val minified: Boolean,
+)
+
 sealed class ImageParser {
     val xmlParser by lazy {
         val module = SerializersModule {
@@ -42,12 +53,7 @@ sealed class ImageParser {
     abstract fun parse(
         file: Path,
         iconName: String,
-        pkg: String,
-        theme: String,
-        contextProvider: String?,
-        addToMaterial: Boolean,
-        noPreview: Boolean,
-        makeInternal: Boolean,
+        config: ParserConfig,
     ): IconFileContents
 
     protected fun readContent(file: Path): String {
@@ -62,12 +68,7 @@ sealed class ImageParser {
         override fun parse(
             file: Path,
             iconName: String,
-            pkg: String,
-            theme: String,
-            contextProvider: String?,
-            addToMaterial: Boolean,
-            noPreview: Boolean,
-            makeInternal: Boolean,
+            config: ParserConfig,
         ): IconFileContents {
             val content = readContent(file)
             val svg = xmlParser.decodeFromString(
@@ -81,24 +82,24 @@ sealed class ImageParser {
             }
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
             val imports = defaultImports +
-                (if (noPreview) setOf() else previewImports) +
+                (if (config.noPreview) setOf() else previewImports) +
                 (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
-                if (addToMaterial) materialContextProviderImport else setOf()
+                if (config.addToMaterial) materialContextProviderImport else setOf()
             val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
 
             return IconFileContents(
-                pkg = pkg,
+                pkg = config.pkg,
                 iconName = iconName,
-                theme = theme,
+                theme = config.theme,
                 width = svg.width.toFloat(),
                 height = svg.height.toFloat(),
                 viewportWidth = viewportWidth,
                 viewportHeight = viewportHeight,
-                nodes = svg.commands.mapNotNull { it.asNode(masks = masks) },
-                contextProvider = contextProvider,
-                addToMaterial = addToMaterial,
-                noPreview = noPreview,
-                makeInternal = makeInternal,
+                nodes = svg.commands.mapNotNull { it.asNode(minified = config.minified, masks = masks) },
+                contextProvider = config.contextProvider,
+                addToMaterial = config.addToMaterial,
+                noPreview = config.noPreview,
+                makeInternal = config.makeInternal,
                 imports = imports,
             )
         }
@@ -108,12 +109,7 @@ sealed class ImageParser {
         override fun parse(
             file: Path,
             iconName: String,
-            pkg: String,
-            theme: String,
-            contextProvider: String?,
-            addToMaterial: Boolean,
-            noPreview: Boolean,
-            makeInternal: Boolean,
+            config: ParserConfig,
         ): IconFileContents {
             val content = readContent(file)
 
@@ -122,23 +118,23 @@ sealed class ImageParser {
                 string = content,
             )
             val imports = defaultImports +
-                (if (noPreview) setOf() else previewImports) +
+                (if (config.noPreview) setOf() else previewImports) +
                 (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
-                if (addToMaterial) materialContextProviderImport else setOf()
+                if (config.addToMaterial) materialContextProviderImport else setOf()
 
             return IconFileContents(
-                pkg = pkg,
+                pkg = config.pkg,
                 iconName = iconName,
-                theme = theme,
+                theme = config.theme,
                 width = androidVector.width.removeSuffix("dp").toFloat(),
                 height = androidVector.height.removeSuffix("dp").toFloat(),
                 viewportWidth = androidVector.viewportWidth.toFloat(),
                 viewportHeight = androidVector.viewportHeight.toFloat(),
-                nodes = androidVector.nodes.map { it.asNode() },
-                contextProvider = contextProvider,
-                addToMaterial = addToMaterial,
-                noPreview = noPreview,
-                makeInternal = makeInternal,
+                nodes = androidVector.nodes.map { it.asNode(minified = config.minified) },
+                contextProvider = config.contextProvider,
+                addToMaterial = config.addToMaterial,
+                noPreview = config.noPreview,
+                makeInternal = config.makeInternal,
                 imports = imports,
             )
         }
@@ -156,23 +152,13 @@ sealed class ImageParser {
         fun parse(
             file: Path,
             iconName: String,
-            pkg: String,
-            theme: String,
-            contextProvider: String?,
-            addToMaterial: Boolean,
-            noPreview: Boolean,
-            makeInternal: Boolean,
+            config: ParserConfig,
         ): String {
             val extension = file.extension
             return parsers[extension]?.parse(
                 file = file,
                 iconName = iconName,
-                pkg = pkg,
-                theme = theme,
-                contextProvider = contextProvider,
-                addToMaterial = addToMaterial,
-                noPreview = noPreview,
-                makeInternal = makeInternal,
+                config = config,
             )?.materialize() ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "invalid file extension ($extension)."

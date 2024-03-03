@@ -138,4 +138,80 @@ class PathNodesMoveToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates moveTo with no comment when minified`() {
+        // Arrange
+        val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
+        val relativeMoveToParams = MoveToParams(x = "123", y = "654")
+        val path = SvgNode.Path(
+            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelativeMoveToParams) {
+            val x = this.x.toFloat()
+            val y = this.y.toFloat()
+            assertContains(
+                array = materialized,
+                element = "moveTo(x = ${x}f, y = ${y}f)",
+            )
+        }
+        with(relativeMoveToParams) {
+            val x = this.x.toFloat()
+            val y = this.y.toFloat()
+            assertContains(
+                array = materialized,
+                element = "moveToRelative(dx = ${x}f, dy = ${y}f)"
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates moveTo with no comment and a close instruction when minified`() {
+        // Arrange
+        val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
+        val relativeMoveToParams = MoveToParams(x = "123", y = "654")
+        val path = SvgNode.Path(
+            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelativeMoveToParams) {
+            val x = this.x.toFloat()
+            val y = this.y.toFloat()
+            assertContains(
+                array = materialized,
+                element = """
+                    |moveTo(x = ${x}f, y = ${y}f)
+                    |close()
+                """.trimMargin(),
+            )
+        }
+        with(relativeMoveToParams) {
+            val x = this.x.toFloat()
+            val y = this.y.toFloat()
+            assertContains(
+                array = materialized,
+                element = """
+                    |moveToRelative(dx = ${x}f, dy = ${y}f)
+                    |close()
+                """.trimMargin(),
+            )
+        }
+    }
 }

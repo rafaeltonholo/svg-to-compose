@@ -139,4 +139,78 @@ class PathNodesHorizontalLineToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates horizontalLineTo with no comment when minified`() {
+        // Arrange
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
+        )
+        val relative = HorizontalLineParams(
+            x = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "H$nonRelative h$relative",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = "horizontalLineTo(x = ${x}f)",
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = "horizontalLineToRelative(dx = ${x}f)",
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates horizontalLineTo with no comment with close instruction when minified`() {
+        // Arrange
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
+        )
+        val relative = HorizontalLineParams(
+            x = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "H${nonRelative}z h${relative}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = """
+                |horizontalLineTo(x = ${x}f)
+                |close()""".trimMargin()
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = """
+                |horizontalLineToRelative(dx = ${x}f)
+                |close()""".trimMargin()
+            )
+        }
+    }
 }

@@ -192,4 +192,134 @@ class PathNodesCurveToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates curveTo with inlined parameters and no comment when minified`() {
+        // Arrange
+        val nonRelative = CurveToParams(
+            x1 = 15f,
+            y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
+            x3 = 0f,
+            y3 = 123f,
+        )
+        val relative = CurveToParams(
+            x1 = 321f,
+            y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
+            x3 = 10f,
+            y3 = 123f,
+        )
+        val path = SvgNode.Path(
+            d = "C$nonRelative c$relative",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("curveTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f,")
+                    append(" x3 = ${x3}f,")
+                    append(" y3 = ${y3}f")
+                    append(")")
+                }
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("curveToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f,")
+                    append(" dx3 = ${x3}f,")
+                    append(" dy3 = ${y3}f")
+                    append(")")
+                }
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates curveTo with inlined parameters and no comment with close instruction when minified`() {
+        // Arrange
+        val nonRelative = CurveToParams(
+            x1 = 15f,
+            y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
+            x3 = 0f,
+            y3 = 123f,
+        )
+        val relative = CurveToParams(
+            x1 = 321f,
+            y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
+            x3 = 10f,
+            y3 = 123f,
+        )
+        val path = SvgNode.Path(
+            d = "C${nonRelative}z c${relative}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("curveTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f,")
+                    append(" x3 = ${x3}f,")
+                    append(" y3 = ${y3}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                }
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("curveToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f,")
+                    append(" dx3 = ${x3}f,")
+                    append(" dy3 = ${y3}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                }
+            )
+        }
+    }
 }

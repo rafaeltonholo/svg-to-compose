@@ -97,7 +97,7 @@ sealed interface ImageVectorNode {
     ) // Support class to Paths. It should not be inherited from ImageVectorNode
 }
 
-fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
+fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
     debugSection("Starting path")
 
@@ -129,7 +129,7 @@ fun String.asNodeWrapper(): ImageVectorNode.NodeWrapper {
 
         val isRelative = currentCommand.isLowerCase()
         current = current.lowercase()
-        val node = createNode(current, commands, isRelative, currentCommand)
+        val node = createNode(current, commands, isRelative, currentCommand, minified)
         lastCommand = currentCommand
         nodes.add(node)
         // Looping to avoid recreating a new list by using .drop() instead.
@@ -147,51 +147,61 @@ private fun createNode(
     current: String,
     commands: MutableList<String>,
     isRelative: Boolean,
-    currentCommand: Char
+    currentCommand: Char,
+    minified: Boolean,
 ) = when {
     current.startsWith(PathNodes.MoveTo.COMMAND) -> PathNodes.MoveTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.ArcTo.COMMAND) -> PathNodes.ArcTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.VerticalLineTo.COMMAND) -> PathNodes.VerticalLineTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.HorizontalLineTo.COMMAND) -> PathNodes.HorizontalLineTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.LineTo.COMMAND) -> PathNodes.LineTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.CurveTo.COMMAND) -> PathNodes.CurveTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.ReflectiveCurveTo.COMMAND) -> PathNodes.ReflectiveCurveTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.QuadTo.COMMAND) -> PathNodes.QuadTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     current.startsWith(PathNodes.ReflectiveQuadTo.COMMAND) -> PathNodes.ReflectiveQuadTo(
         values = commands,
         isRelative = isRelative,
+        minified = minified,
     )
 
     else -> throw ExitProgramException(

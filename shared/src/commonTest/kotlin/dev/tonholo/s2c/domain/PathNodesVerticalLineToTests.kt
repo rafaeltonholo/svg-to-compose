@@ -139,4 +139,80 @@ class PathNodesVerticalLineToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates verticalLineTo with inlined parameters and no comment when minified`() {
+        // Arrange
+        val nonRelative = VerticalLineParams(
+            y = 8f,
+        )
+        val relative = VerticalLineParams(
+            y = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "V$nonRelative v$relative",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = "verticalLineTo(y = ${y}f)",
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = "verticalLineToRelative(dy = ${y}f)",
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates verticalLineTo with inlined parameters and no comment and close instruction when minified`() {
+        // Arrange
+        val nonRelative = VerticalLineParams(
+            y = 8f,
+        )
+        val relative = VerticalLineParams(
+            y = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "V${nonRelative}z v${relative}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = """
+                |verticalLineTo(y = ${y}f)
+                |close()
+                """.trimMargin(),
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = """
+                |verticalLineToRelative(dy = ${y}f)
+                |close()
+                """.trimMargin(),
+            )
+        }
+    }
 }

@@ -16,6 +16,7 @@ import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
+import dev.tonholo.s2c.parser.ParserConfig
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -26,14 +27,8 @@ class Processor(
 ) {
     fun run(
         path: String,
-        pkg: String,
-        theme: String,
         output: String,
-        optimize: Boolean,
-        contextProvider: String?,
-        addToMaterial: Boolean,
-        noPreview: Boolean,
-        makeInternal: Boolean,
+        config: ParserConfig,
     ) {
         verbose("Start processor execution")
         val filePath = path.toPath()
@@ -96,7 +91,7 @@ class Processor(
             }
         }
 
-        val optimizer = if (optimize) {
+        val optimizer = if (config.optimize) {
             verbose("Verifying optimization dependencies")
             val optimizer = Optimizer.Factory(fileSystem)
             optimizer.verifyDependency()
@@ -112,13 +107,8 @@ class Processor(
                 processFile(
                     file = file,
                     optimizer = optimizer,
-                    pkg = pkg,
-                    theme = theme,
-                    contextProvider = contextProvider,
-                    addToMaterial = addToMaterial,
                     output = outputPath,
-                    noPreview = noPreview,
-                    makeInternal = makeInternal,
+                    config = config,
                 )
                 printEmpty()
             } catch (e: ExitProgramException) {
@@ -164,13 +154,8 @@ class Processor(
     private fun processFile(
         file: Path,
         optimizer: Optimizer.Factory?,
-        pkg: String,
-        theme: String,
-        contextProvider: String?,
-        addToMaterial: Boolean,
         output: Path,
-        noPreview: Boolean,
-        makeInternal: Boolean,
+        config: ParserConfig,
     ) {
         output("⏳ Processing ${file.name}")
 
@@ -190,12 +175,7 @@ class Processor(
         val fileContents = ImageParser.parse(
             file = targetFile,
             iconName = iconName,
-            pkg = pkg,
-            theme = theme,
-            contextProvider = contextProvider,
-            addToMaterial = addToMaterial,
-            noPreview = noPreview,
-            makeInternal = makeInternal,
+            config = config,
         )
 
         verbose("File contents = $fileContents")

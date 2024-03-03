@@ -15,6 +15,7 @@ import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.parser.ParserConfig
 import okio.FileSystem
 import platform.posix.exit
 
@@ -42,19 +43,19 @@ class Client : CliktCommand() {
     private val theme by option(
         names = arrayOf("-t", "--theme"),
         help = "Specify project's theme name. This will take place in the Icon Preview composable function and in " +
-                "the ImageVector Builder's names.",
+            "the ImageVector Builder's names.",
     ).required()
 
     private val output by option(
         names = arrayOf("-o", "--output"),
         help = "output filename; if no .kt extension specified, it will be automatically added. In case of the input " +
-                "is a directory, output MUST also be a directory.",
+            "is a directory, output MUST also be a directory.",
     ).required()
 
     private val optimize by option(
         names = arrayOf("-opt", "--optimize"),
         help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
-                "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
+            "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
     ).boolean().default(true)
 
     private val contextProvider by option(
@@ -84,12 +85,17 @@ class Client : CliktCommand() {
     private val noPreview by option(
         names = arrayOf("-np", "--no-preview", "--kmp"),
         help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
-                "KMP, since KMP doesn't support previews.",
+            "KMP, since KMP doesn't support previews.",
     ).flag()
 
     private val makeInternal by option(
         names = arrayOf("--make-internal"),
         help = "Mark the icon as internal",
+    ).flag()
+
+    private val minified by option(
+        names = arrayOf("--minified"),
+        help = "Remove all comments explaining the path logic creation and inline all method parameters.",
     ).flag()
 
     override fun run() {
@@ -105,6 +111,7 @@ class Client : CliktCommand() {
         verbose("   verbose = $verbose")
         verbose("   noPreview = $noPreview")
         verbose("   makeInternal = $makeInternal")
+        verbose("   minified = $minified")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -120,14 +127,17 @@ class Client : CliktCommand() {
                 ),
             ).run(
                 path = path,
-                pkg = pkg,
-                theme = theme,
                 output = output,
-                optimize = optimize,
-                contextProvider = contextProvider,
-                addToMaterial = addToMaterial,
-                noPreview = noPreview,
-                makeInternal = makeInternal,
+                config = ParserConfig(
+                    pkg = pkg,
+                    theme = theme,
+                    optimize = optimize,
+                    contextProvider = contextProvider,
+                    addToMaterial = addToMaterial,
+                    noPreview = noPreview,
+                    makeInternal = makeInternal,
+                    minified = minified,
+                )
             )
         } catch (e: ExitProgramException) {
             printEmpty()
