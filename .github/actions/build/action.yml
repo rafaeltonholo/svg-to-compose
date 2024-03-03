@@ -1,5 +1,5 @@
 name: Build
-description: Build the project for target ${{inputs.target}}
+description: Build the project for target
 inputs:
   target:
     required: true
