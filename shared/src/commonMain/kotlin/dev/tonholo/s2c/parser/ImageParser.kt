@@ -47,6 +47,7 @@ sealed class ImageParser {
         contextProvider: String?,
         addToMaterial: Boolean,
         noPreview: Boolean,
+        makeInternal: Boolean,
     ): IconFileContents
 
     protected fun readContent(file: Path): String {
@@ -66,6 +67,7 @@ sealed class ImageParser {
             contextProvider: String?,
             addToMaterial: Boolean,
             noPreview: Boolean,
+            makeInternal: Boolean,
         ): IconFileContents {
             val content = readContent(file)
             val svg = xmlParser.decodeFromString(
@@ -96,6 +98,7 @@ sealed class ImageParser {
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
                 noPreview = noPreview,
+                makeInternal = makeInternal,
                 imports = imports,
             )
         }
@@ -110,6 +113,7 @@ sealed class ImageParser {
             contextProvider: String?,
             addToMaterial: Boolean,
             noPreview: Boolean,
+            makeInternal: Boolean,
         ): IconFileContents {
             val content = readContent(file)
 
@@ -134,6 +138,7 @@ sealed class ImageParser {
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
                 noPreview = noPreview,
+                makeInternal = makeInternal,
                 imports = imports,
             )
         }
@@ -156,6 +161,7 @@ sealed class ImageParser {
             contextProvider: String?,
             addToMaterial: Boolean,
             noPreview: Boolean,
+            makeInternal: Boolean,
         ): String {
             val extension = file.extension
             return parsers[extension]?.parse(
@@ -166,6 +172,7 @@ sealed class ImageParser {
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
                 noPreview = noPreview,
+                makeInternal = makeInternal,
             )?.materialize() ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "invalid file extension ($extension)."
