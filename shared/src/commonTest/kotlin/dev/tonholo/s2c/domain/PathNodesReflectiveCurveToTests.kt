@@ -174,4 +174,118 @@ class PathNodesReflectiveCurveToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates reflectiveCurveTo with inlined parameters and no comment`() {
+        // Arrange
+        val nonRelative = ReflectiveCurveToParams(
+            x1 = 15f,
+            y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
+        )
+        val relative = ReflectiveCurveToParams(
+            x1 = 321f,
+            y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
+        )
+        val path = SvgNode.Path(
+            d = "S$nonRelative s$relative",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("reflectiveCurveTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f")
+                    append(")")
+                },
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("reflectiveCurveToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f")
+                    append(")")
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates reflectiveCurveTo with inlined parameters and no comment and close instruction when minified`() {
+        // Arrange
+        val nonRelative = ReflectiveCurveToParams(
+            x1 = 15f,
+            y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
+        )
+        val relative = ReflectiveCurveToParams(
+            x1 = 321f,
+            y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
+        )
+        val path = SvgNode.Path(
+            d = "S${nonRelative}z s${relative}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("reflectiveCurveTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                },
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("reflectiveCurveToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                },
+            )
+        }
+    }
 }

@@ -1,7 +1,10 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -130,4 +133,15 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 
 dependencies {
     detektPlugins(libs.detekt.formatting)
+}
+
+tasks.withType<KotlinTest>().configureEach {
+    testLogging {
+        events(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = false
+        showStandardStreams = true
+    }
 }

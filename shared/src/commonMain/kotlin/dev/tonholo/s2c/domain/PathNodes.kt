@@ -11,6 +11,7 @@ sealed class PathNodes(
     val isRelative: Boolean,
     val command: Char,
     val commandSize: Int,
+    val minified: Boolean,
 ) {
     private val shouldClose = values[commandSize - 1].last().lowercase() == "z"
 
@@ -25,14 +26,42 @@ sealed class PathNodes(
         ""
     }
 
+    protected fun materialize(
+        comment: String,
+        fnName: String,
+        parameters: Set<String>,
+        forceInline: Boolean = false,
+    ): String = """
+        |${if (minified) "" else comment}
+        |$fnName${if (isRelative) "Relative" else ""}(${parameters.toParameters(forceInline)})
+        |${closeCommand()}
+    """.trimMargin().let {
+        if (minified) it.trim() else it
+    }
+
+    protected fun Set<String>.toParameters(forceInline: Boolean = false): String {
+        val indentSize = if (minified || forceInline) 0 else 4
+        val separator = if (minified || forceInline) "" else "\n"
+        val scape = if (minified || forceInline) " " else "|"
+        return joinToString(separator) {
+            "$scape${it.indented(indentSize)},"
+        }.let {
+            if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
+        }
+    }
+
+    private fun String.indented(indentSize: Int) = " ".repeat(indentSize) + this
+
     class MoveTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 2,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'm'
@@ -46,24 +75,29 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x $y
-                |moveTo$relative(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x $y",
+                fnName = "moveTo",
+                parameters = setOf(
+                    "${relativePrefix}x = ${x}f",
+                    "${relativePrefix}y = ${y}f",
+                ),
+                forceInline = true,
+            )
         }
     }
 
     class ArcTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 7,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'a'
@@ -82,34 +116,36 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
             val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a}f"
             val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b}f"
-            return """
-                |// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y
-                |arcTo$relative(
-                |    $a,
-                |    $b,
-                |    theta = ${theta}f,
-                |    isMoreThanHalf = $isMoreThanHalf,
-                |    isPositiveArc = $isPositiveArc,
-                |    ${relativePrefix}x1 = ${x}f,
-                |    ${relativePrefix}y1 = ${y}f,
-                |)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment =
+                "// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y",
+                fnName = "arcTo",
+                parameters = setOf(
+                    a,
+                    b,
+                    "theta = ${theta}f",
+                    "isMoreThanHalf = $isMoreThanHalf",
+                    "isPositiveArc = $isPositiveArc",
+                    "${relativePrefix}x1 = ${x}f",
+                    "${relativePrefix}y1 = ${y}f",
+                ),
+            )
         }
     }
 
     class VerticalLineTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 1,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'v'
@@ -124,24 +160,26 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $y
-                |verticalLineTo$relative(${relativePrefix}y = ${y}f)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $y",
+                fnName = "verticalLineTo",
+                parameters = setOf("${relativePrefix}y = ${y}f"),
+                forceInline = true,
+            )
         }
     }
 
     class HorizontalLineTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 1,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'h'
@@ -156,24 +194,26 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x
-                |horizontalLineTo$relative(${relativePrefix}x = ${x}f)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x",
+                fnName = "horizontalLineTo",
+                parameters = setOf("${relativePrefix}x = ${x}f"),
+                forceInline = true,
+            )
         }
     }
 
     class LineTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 2,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'l'
@@ -191,24 +231,29 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x $y
-                |lineTo$relative(${relativePrefix}x = ${x}f, ${relativePrefix}y = ${y}f)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x $y",
+                fnName = "lineTo",
+                parameters = setOf(
+                    "${relativePrefix}x = ${x}f",
+                    "${relativePrefix}y = ${y}f",
+                ),
+                forceInline = true,
+            )
         }
     }
 
     class CurveTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 6,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'c'
@@ -226,32 +271,33 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
 
-            return """
-                |// $command $x1 $y1 $x2 $y2 $x3 $y3
-                |curveTo$relative(
-                |    ${relativePrefix}x1 = ${x1}f,
-                |    ${relativePrefix}y1 = ${y1}f,
-                |    ${relativePrefix}x2 = ${x2}f,
-                |    ${relativePrefix}y2 = ${y2}f,
-                |    ${relativePrefix}x3 = ${x3}f,
-                |    ${relativePrefix}y3 = ${y3}f,
-                |)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x1 $y1 $x2 $y2 $x3 $y3",
+                fnName = "curveTo",
+                parameters = setOf(
+                    "${relativePrefix}x1 = ${x1}f",
+                    "${relativePrefix}y1 = ${y1}f",
+                    "${relativePrefix}x2 = ${x2}f",
+                    "${relativePrefix}y2 = ${y2}f",
+                    "${relativePrefix}x3 = ${x3}f",
+                    "${relativePrefix}y3 = ${y3}f",
+                ),
+            )
         }
     }
 
     class ReflectiveCurveTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 4,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 's'
@@ -267,29 +313,30 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x1 $y1 $x2 $y2
-                |reflectiveCurveTo$relative(
-                |    ${relativePrefix}x1 = ${x1}f,
-                |    ${relativePrefix}y1 = ${y1}f,
-                |    ${relativePrefix}x2 = ${x2}f,
-                |    ${relativePrefix}y2 = ${y2}f,
-                |)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x1 $y1 $x2 $y2",
+                fnName = "reflectiveCurveTo",
+                parameters = setOf(
+                    "${relativePrefix}x1 = ${x1}f",
+                    "${relativePrefix}y1 = ${y1}f",
+                    "${relativePrefix}x2 = ${x2}f",
+                    "${relativePrefix}y2 = ${y2}f",
+                ),
+            )
         }
     }
 
     class QuadTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 4,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 'q'
@@ -305,28 +352,30 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x1 $y1 $x2 $y2
-                |quadTo$relative(
-                |    ${relativePrefix}x1 = ${x1}f,
-                |    ${relativePrefix}y1 = ${y1}f,
-                |    ${relativePrefix}x2 = ${x2}f,
-                |    ${relativePrefix}y2 = ${y2}f,
-                |)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x1 $y1 $x2 $y2",
+                fnName = "quadTo",
+                parameters = setOf(
+                    "${relativePrefix}x1 = ${x1}f",
+                    "${relativePrefix}y1 = ${y1}f",
+                    "${relativePrefix}x2 = ${x2}f",
+                    "${relativePrefix}y2 = ${y2}f",
+                ),
+            )
         }
     }
+
     class ReflectiveQuadTo(
         values: List<String>,
         isRelative: Boolean,
+        minified: Boolean,
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
         commandSize = 2,
+        minified = minified,
     ) {
         companion object {
             const val COMMAND = 't'
@@ -340,16 +389,15 @@ sealed class PathNodes(
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relative = if (isRelative) "Relative" else ""
             val relativePrefix = if (isRelative) "d" else ""
-            return """
-                |// $command $x1 $y1
-                |reflectiveQuadTo$relative(
-                |    ${relativePrefix}x1 = ${x1}f,
-                |    ${relativePrefix}y1 = ${y1}f,
-                |)
-                |${closeCommand()}
-            """.trimMargin()
+            return materialize(
+                comment = "// $command $x1 $y1",
+                fnName = "reflectiveQuadTo",
+                parameters = setOf(
+                    "${relativePrefix}x1 = ${x1}f",
+                    "${relativePrefix}y1 = ${y1}f",
+                ),
+            )
         }
     }
 }

@@ -74,17 +74,17 @@ data class ClipPath(
     val pathData: String,
 )
 
-fun AndroidVectorNode.asNode(): ImageVectorNode = when (this) {
-    is AndroidVectorNode.Group -> asNode()
-    is AndroidVectorNode.Path -> asNode()
+fun AndroidVectorNode.asNode(minified: Boolean): ImageVectorNode = when (this) {
+    is AndroidVectorNode.Group -> asNode(minified)
+    is AndroidVectorNode.Path -> asNode(minified)
 }
 
-fun AndroidVectorNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
+fun AndroidVectorNode.Path.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
     fillColor = fillColor.orEmpty(),
-    wrapper = pathData.asNodeWrapper(),
+    wrapper = pathData.asNodeWrapper(minified),
 )
 
-fun AndroidVectorNode.Group.asNode(): ImageVectorNode.Group = ImageVectorNode.Group(
-    clipPath = clipPath?.pathData?.asNodeWrapper(),
-    commands = commands.map { it.asNode() },
+fun AndroidVectorNode.Group.asNode(minified: Boolean): ImageVectorNode.Group = ImageVectorNode.Group(
+    clipPath = clipPath?.pathData?.asNodeWrapper(minified),
+    commands = commands.map { it.asNode(minified) },
 )

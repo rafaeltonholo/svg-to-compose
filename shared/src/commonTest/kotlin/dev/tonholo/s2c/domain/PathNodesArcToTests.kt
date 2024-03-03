@@ -203,4 +203,142 @@ class PathNodesArcToTests {
             )
         }
     }
+
+    @Test
+    fun `ensure materialize generates arcTo with inlined parameters and no comment when minified`() {
+        // Arrange
+        val nonRelative = ArcParams(
+            a = 5f,
+            b = 3f,
+            theta = 20f,
+            isMoreThanHalf = false,
+            isPositiveArc = true,
+            x = 8f,
+            y = 8f,
+        )
+        val relative = ArcParams(
+            a = 15f,
+            b = 13f,
+            theta = 50f,
+            isMoreThanHalf = true,
+            isPositiveArc = false,
+            x = 18f,
+            y = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "A$nonRelative a$relative",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("arcTo(")
+                    append("horizontalEllipseRadius = ${a}f,")
+                    append(" verticalEllipseRadius = ${b}f,")
+                    append(" theta = ${theta}f,")
+                    append(" isMoreThanHalf = $isMoreThanHalf,")
+                    append(" isPositiveArc = $isPositiveArc,")
+                    append(" x1 = ${x}f,")
+                    append(" y1 = ${y}f")
+                    append(")")
+                },
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("arcToRelative(")
+                    append("a = ${a}f,")
+                    append(" b = ${b}f,")
+                    append(" theta = ${theta}f,")
+                    append(" isMoreThanHalf = $isMoreThanHalf,")
+                    append(" isPositiveArc = $isPositiveArc,")
+                    append(" dx1 = ${x}f,")
+                    append(" dy1 = ${y}f")
+                    append(")")
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `ensure materialize generates arcTo with inlined parameters and no comment with close instruction when minified`() {
+        // Arrange
+        val nonRelative = ArcParams(
+            a = 5f,
+            b = 3f,
+            theta = 20f,
+            isMoreThanHalf = false,
+            isPositiveArc = true,
+            x = 8f,
+            y = 8f,
+        )
+        val relative = ArcParams(
+            a = 15f,
+            b = 13f,
+            theta = 50f,
+            isMoreThanHalf = true,
+            isPositiveArc = false,
+            x = 18f,
+            y = 80f,
+        )
+        val path = SvgNode.Path(
+            d = "A${nonRelative}z a${relative}z",
+            fill = null,
+            opacity = null,
+            fillOpacity = null,
+            style = null,
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+
+        // Assert
+        with(nonRelative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("arcTo(")
+                    append("horizontalEllipseRadius = ${a}f,")
+                    append(" verticalEllipseRadius = ${b}f,")
+                    append(" theta = ${theta}f,")
+                    append(" isMoreThanHalf = $isMoreThanHalf,")
+                    append(" isPositiveArc = $isPositiveArc,")
+                    append(" x1 = ${x}f,")
+                    append(" y1 = ${y}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                },
+            )
+        }
+        with(relative) {
+            assertContains(
+                array = materialized,
+                element = buildString {
+                    append("arcToRelative(")
+                    append("a = ${a}f,")
+                    append(" b = ${b}f,")
+                    append(" theta = ${theta}f,")
+                    append(" isMoreThanHalf = $isMoreThanHalf,")
+                    append(" isPositiveArc = $isPositiveArc,")
+                    append(" dx1 = ${x}f,")
+                    append(" dy1 = ${y}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                }
+            )
+        }
+    }
 }

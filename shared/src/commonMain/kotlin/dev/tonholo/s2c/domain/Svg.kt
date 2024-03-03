@@ -72,29 +72,30 @@ sealed interface SvgNode {
     ) : SvgNode
 }
 
-fun SvgNode.asNode(masks: List<SvgNode.Mask>): ImageVectorNode? = when (this) {
-    is SvgNode.Group -> asNode(masks = masks)
+fun SvgNode.asNode(masks: List<SvgNode.Mask>, minified: Boolean = false): ImageVectorNode? = when (this) {
+    is SvgNode.Group -> asNode(masks, minified)
     is SvgNode.Mask -> null
-    is SvgNode.Path -> asNode()
+    is SvgNode.Path -> asNode(minified)
 }
 
-fun SvgNode.Path.asNode(): ImageVectorNode.Path = ImageVectorNode.Path(
+fun SvgNode.Path.asNode(minified: Boolean = false): ImageVectorNode.Path = ImageVectorNode.Path(
     fillColor = fill.orEmpty(),
-    wrapper = d.asNodeWrapper(),
+    wrapper = d.asNodeWrapper(minified),
 )
 
 fun SvgNode.Group.asNode(
     masks: List<SvgNode.Mask>,
+    minified: Boolean = false,
 ): ImageVectorNode.Group {
     // Can a svg mask have more than one path?
     // Currently, a group on ImageVector only receives a single PathData as a parameter.
     // Not sure if it would support multiple path tags inside a mask from a svg.
     val clipPath = masks.firstOrNull {
         it.id == maskId?.removePrefix("url(#")?.removeSuffix(")")
-    }?.paths?.first()?.d?.asNodeWrapper()
+    }?.paths?.first()?.d?.asNodeWrapper(minified)
 
     return ImageVectorNode.Group(
         clipPath = clipPath,
-        commands = commands.mapNotNull { it.asNode(masks) }
+        commands = commands.mapNotNull { it.asNode(masks, minified) }
     )
 }
