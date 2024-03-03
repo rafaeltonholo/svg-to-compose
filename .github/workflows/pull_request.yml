@@ -9,7 +9,9 @@ jobs:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-        - uses: ./.github/workflows/build.yml
+        - uses: rafaeltonholo/svg-to-compose/.github/workflows/build.yml@main
+          with:
+            target: ${{ matrix.os }}
         - name: Running Detekt
           shell: bash
           run: |
