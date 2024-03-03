@@ -87,6 +87,11 @@ class Client : CliktCommand() {
                 "KMP, since KMP doesn't support previews.",
     ).flag()
 
+    private val makeInternal by option(
+        names = arrayOf("--make-internal"),
+        help = "Mark the icon as internal",
+    ).flag()
+
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
@@ -99,6 +104,7 @@ class Client : CliktCommand() {
         verbose("   debug = $debug")
         verbose("   verbose = $verbose")
         verbose("   noPreview = $noPreview")
+        verbose("   makeInternal = $makeInternal")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -121,6 +127,7 @@ class Client : CliktCommand() {
                 contextProvider = contextProvider,
                 addToMaterial = addToMaterial,
                 noPreview = noPreview,
+                makeInternal = makeInternal,
             )
         } catch (e: ExitProgramException) {
             printEmpty()

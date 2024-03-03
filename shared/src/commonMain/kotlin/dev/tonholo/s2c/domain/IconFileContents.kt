@@ -46,6 +46,7 @@ data class IconFileContents(
     val contextProvider: String? = null,
     val addToMaterial: Boolean = false,
     val noPreview: Boolean = false,
+    val makeInternal: Boolean = false,
     val imports: Set<String> = defaultImports,
 ) {
     fun materialize(): String {
@@ -109,12 +110,14 @@ data class IconFileContents(
             """
         }
 
+        val visibilityModifier = if (makeInternal) "internal " else ""
+
         return """
             |package $pkg
             |
             |${imports.sorted().joinToString("\n") { "import $it" }}
             |
-            |val $iconPropertyName: ImageVector
+            |${visibilityModifier}val $iconPropertyName: ImageVector
             |    get() {
             |        val current = _${iconName.camelCase()}
             |        if (current != null) return current

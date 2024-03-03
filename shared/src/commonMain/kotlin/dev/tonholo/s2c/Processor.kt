@@ -33,6 +33,7 @@ class Processor(
         contextProvider: String?,
         addToMaterial: Boolean,
         noPreview: Boolean,
+        makeInternal: Boolean,
     ) {
         verbose("Start processor execution")
         val filePath = path.toPath()
@@ -117,6 +118,7 @@ class Processor(
                     addToMaterial = addToMaterial,
                     output = outputPath,
                     noPreview = noPreview,
+                    makeInternal = makeInternal,
                 )
                 printEmpty()
             } catch (e: ExitProgramException) {
@@ -168,6 +170,7 @@ class Processor(
         addToMaterial: Boolean,
         output: Path,
         noPreview: Boolean,
+        makeInternal: Boolean,
     ) {
         output("⏳ Processing ${file.name}")
 
@@ -192,6 +195,7 @@ class Processor(
             contextProvider = contextProvider,
             addToMaterial = addToMaterial,
             noPreview = noPreview,
+            makeInternal = makeInternal,
         )
 
         verbose("File contents = $fileContents")
