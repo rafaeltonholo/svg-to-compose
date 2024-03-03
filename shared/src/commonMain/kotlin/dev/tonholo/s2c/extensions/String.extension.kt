@@ -10,3 +10,5 @@ fun String.camelCase(): String = replaceDividers()
 
 fun String.pascalCase(): String = replaceDividers()
     .replaceFirstChar { it.uppercaseChar() }
+
+fun String.indented(indentSize: Int) = " ".repeat(indentSize) + this

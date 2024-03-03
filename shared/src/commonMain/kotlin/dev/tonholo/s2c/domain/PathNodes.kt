@@ -4,6 +4,7 @@
 
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.extensions.toInt
 
 sealed class PathNodes(
@@ -39,7 +40,7 @@ sealed class PathNodes(
         if (minified) it.trim() else it
     }
 
-    protected fun Set<String>.toParameters(forceInline: Boolean = false): String {
+    private fun Set<String>.toParameters(forceInline: Boolean = false): String {
         val indentSize = if (minified || forceInline) 0 else 4
         val separator = if (minified || forceInline) "" else "\n"
         val scape = if (minified || forceInline) " " else "|"
@@ -49,8 +50,6 @@ sealed class PathNodes(
             if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
         }
     }
-
-    private fun String.indented(indentSize: Int) = " ".repeat(indentSize) + this
 
     class MoveTo(
         values: List<String>,

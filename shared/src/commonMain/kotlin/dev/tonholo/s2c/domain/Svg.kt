@@ -81,6 +81,7 @@ fun SvgNode.asNode(masks: List<SvgNode.Mask>, minified: Boolean = false): ImageV
 fun SvgNode.Path.asNode(minified: Boolean = false): ImageVectorNode.Path = ImageVectorNode.Path(
     fillColor = fill.orEmpty(),
     wrapper = d.asNodeWrapper(minified),
+    minified = minified,
 )
 
 fun SvgNode.Group.asNode(
@@ -96,6 +97,7 @@ fun SvgNode.Group.asNode(
 
     return ImageVectorNode.Group(
         clipPath = clipPath,
-        commands = commands.mapNotNull { it.asNode(masks, minified) }
+        commands = commands.mapNotNull { it.asNode(masks, minified) },
+        minified = minified,
     )
 }

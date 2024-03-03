@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
+import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
@@ -13,6 +14,7 @@ sealed interface ImageVectorNode {
     data class Path(
         val fillColor: String,
         val wrapper: NodeWrapper,
+        val minified: Boolean,
     ) : ImageVectorNode {
         override fun materialize(): String {
             val realColor = fillColor.uppercase().removePrefix("#").let { color ->
@@ -45,9 +47,10 @@ sealed interface ImageVectorNode {
                 ""
             }
 
+            val comment = if (minified) "" else "// ${wrapper.normalizedPath}\n|"
+
             return """
-                |// ${wrapper.normalizedPath}
-                |path$pathParamsString {
+                |${comment}path$pathParamsString {
                 |    $pathNodes
                 |}
             """.trimMargin()
@@ -57,6 +60,7 @@ sealed interface ImageVectorNode {
     data class Group(
         val clipPath: NodeWrapper?,
         val commands: List<ImageVectorNode>,
+        val minified: Boolean,
     ) : ImageVectorNode {
         override fun materialize(): String {
             val indentSize = 4
@@ -73,8 +77,13 @@ sealed interface ImageVectorNode {
                             .replace("\n", "\n${" ".repeat(indentSize * 2)}")
                             .trimEnd()
                     }
-                """(
-                |    // ${clipPath.normalizedPath}
+
+                val clipPathComment = if (minified) {
+                    ""
+                } else {
+                    "\n|${"// ${clipPath.normalizedPath}".indented(4)}"
+                }
+                """($clipPathComment
                 |    clipPathData = PathData {
                 |        $clipPathData
                 |    },

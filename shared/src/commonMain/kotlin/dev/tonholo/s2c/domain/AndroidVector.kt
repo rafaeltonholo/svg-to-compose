@@ -82,9 +82,11 @@ fun AndroidVectorNode.asNode(minified: Boolean): ImageVectorNode = when (this) {
 fun AndroidVectorNode.Path.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
     fillColor = fillColor.orEmpty(),
     wrapper = pathData.asNodeWrapper(minified),
+    minified = minified,
 )
 
 fun AndroidVectorNode.Group.asNode(minified: Boolean): ImageVectorNode.Group = ImageVectorNode.Group(
     clipPath = clipPath?.pathData?.asNodeWrapper(minified),
     commands = commands.map { it.asNode(minified) },
+    minified = minified,
 )
