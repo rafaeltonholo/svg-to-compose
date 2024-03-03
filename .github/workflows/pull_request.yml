@@ -1,0 +1,29 @@
+name: Pull request check
+on: pull_request
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+        - uses: rafaeltonholo/svg-to-compose/.github/workflows/build.yml@main
+        - name: Running Detekt
+          shell: bash
+          run: |
+              ./gradlew detektMetadataCommonMain
+        - name: Verify unit tests
+          shell: bash
+          run: |
+            ./gradlew cleanAllTests allTests
+        - name: CLI Integrity check using SVG
+          uses: ./.github/actions/cli-integrity-check
+          with:
+            type: svg
+          continue-on-error: false
+  
+        - name: CLI Integrity check using XML
+          uses: ./.github/actions/cli-integrity-check
+          with:
+            type: xml
+          continue-on-error: false

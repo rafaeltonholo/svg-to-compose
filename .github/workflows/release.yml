@@ -1,65 +1,24 @@
 name: Release
-# on:
-#   pull_request:
-#     branches:
-#       - main
-#     types:
-#       - closed
-on: pull_request # for test purpose.
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+# on: pull_request # for test purpose.
 env:
   file-name: s2c
 
 jobs:
   create-release-binaries:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
 
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v4
-
-      - name: Prepares environment for building
-        uses: ./.github/actions/setup
-
-      - name: Prepare nodeJS enviroment for integrity check
-        uses: ./.github/actions/setup-nodejs
-        with:
-          os: ${{ matrix.os }}
-      
-      - name: Cache Kotlin Konan
-        id: cache-kotlin-konan
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.konan/**/*
-          key: kotlin-konan-${{ matrix.os }}
-
-      - name: Build Native Binary for macos
-        if: matrix.os == 'macos-latest'
-        uses: burrunan/gradle-cache-action@v1
-        with:
-          gradle-version: wrapper
-          job-id: ${{ matrix.os }}
-          arguments: releaseMacOS
-
-      - name: Build Native Binary for Windows
-        if: matrix.os == 'windows-latest'
-        uses: burrunan/gradle-cache-action@v1
-        with:
-          gradle-version: wrapper
-          job-id: ${{ matrix.os }}
-          arguments: releaseWindows
-
-      - name: Build Native Binary for Linux
-        if: matrix.os == 'ubuntu-latest'
-        uses: burrunan/gradle-cache-action@v1
-        with:
-          gradle-version: wrapper
-          job-id: ${{ matrix.os }}
-          arguments: releaseLinux
+      - uses: rafaeltonholo/svg-to-compose/.github/workflows/build.yml@main
 
       - name: CLI Integrity check using SVG
         uses: ./.github/actions/cli-integrity-check
@@ -116,7 +75,7 @@ jobs:
           if-no-files-found: error
 
   upload-to-release:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     permissions:
       contents: write
       deployments: write
