@@ -12,9 +12,10 @@ jobs:
         - name: Checkout the repo
           uses: actions/checkout@v4
 
-        - uses: ./github/actions/build
+        - uses: ./.github/actions/build
           with:
             target: ${{ matrix.os }}
+          continue-on-error: false
 
         - name: Running Detekt
           shell: bash
