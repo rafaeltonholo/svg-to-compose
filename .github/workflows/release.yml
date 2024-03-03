@@ -15,6 +15,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
       - uses: ./github/actions/build
         with:
           target: ${{ matrix.os }}

@@ -9,17 +9,23 @@ jobs:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
+        - name: Checkout the repo
+          uses: actions/checkout@v4
+
         - uses: ./github/actions/build
           with:
             target: ${{ matrix.os }}
+
         - name: Running Detekt
           shell: bash
           run: |
               ./gradlew detektMetadataCommonMain
+
         - name: Verify unit tests
           shell: bash
           run: |
             ./gradlew cleanAllTests allTests
+
         - name: CLI Integrity check using SVG
           uses: ./.github/actions/cli-integrity-check
           with:

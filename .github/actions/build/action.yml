@@ -6,9 +6,6 @@ inputs:
     type: string
 runs:
   using: composite
-  - name: Checkout the repo
-    uses: actions/checkout@v4
-
   - name: Prepares environment for building
     uses: ./.github/actions/setup
 
