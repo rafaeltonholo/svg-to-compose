@@ -85,7 +85,7 @@ class Client : CliktCommand() {
     private val noPreview by option(
         names = arrayOf("-np", "--no-preview", "--kmp"),
         help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
-            "KMP, since KMP doesn't support previews.",
+            "KMP, since KMP doesn't support previews yet.",
     ).flag()
 
     private val makeInternal by option(
