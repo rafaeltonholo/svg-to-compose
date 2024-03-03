@@ -15,7 +15,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: ./.github/workflows/build.yml
+      - uses: ./github/actions/build
+        with:
+          target: ${{ matrix.os }}
 
       - name: CLI Integrity check using SVG
         uses: ./.github/actions/cli-integrity-check

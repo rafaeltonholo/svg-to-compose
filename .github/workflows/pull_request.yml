@@ -7,15 +7,11 @@ jobs:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
-    uses: rafaeltonholo/svg-to-compose/.github/workflows/build.yml@main
-    with:
-      target: ${{ matrix.os }}
-  check:
-    strategy:
-      matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
+        - uses: ./github/actions/build
+          with:
+            target: ${{ matrix.os }}
         - name: Running Detekt
           shell: bash
           run: |
