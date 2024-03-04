@@ -32,7 +32,6 @@ This command-line tool adds that functionality.
 | Windows (mingwX64) |         ✅         |          ✅           |
 | Windows (WSL)      |         ✅         |    ❌ (not tested)    |
 
-> Optimization is currently working only on macOS.
 
 ## Installation
 This CLI tool relies on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse the SVG/AVD file,
