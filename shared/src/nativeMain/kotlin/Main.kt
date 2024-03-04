@@ -119,6 +119,7 @@ class Client : CliktCommand() {
         try {
             val fileSystem = FileSystem.SYSTEM
             Processor(
+                fileSystem = fileSystem,
                 iconWriter = IconWriter(
                     fileSystem = fileSystem,
                 ),

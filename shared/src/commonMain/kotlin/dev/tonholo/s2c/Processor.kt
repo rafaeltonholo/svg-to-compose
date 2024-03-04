@@ -22,6 +22,7 @@ import okio.Path
 import okio.Path.Companion.toPath
 
 class Processor(
+    private val fileSystem: FileSystem,
     private val iconWriter: IconWriter,
     private val tempFileWriter: TempFileWriter,
 ) {
@@ -33,7 +34,6 @@ class Processor(
         verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()
-        val fileSystem = FileSystem.SYSTEM
         val inputMetadata = try {
             fileSystem.metadata(filePath)
         } catch (e: okio.IOException) {
