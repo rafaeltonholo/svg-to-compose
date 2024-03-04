@@ -172,7 +172,7 @@ class Processor(
         optimizer?.optimize(file)
 
         output("👓 Parsing the ${file.extension} file")
-        val fileContents = ImageParser.parse(
+        val fileContents = ImageParser(fileSystem).parse(
             file = targetFile,
             iconName = iconName,
             config = config,

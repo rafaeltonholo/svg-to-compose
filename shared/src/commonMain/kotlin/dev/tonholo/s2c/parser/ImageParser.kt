@@ -30,7 +30,9 @@ data class ParserConfig(
     val minified: Boolean,
 )
 
-sealed class ImageParser {
+sealed class ImageParser(
+    private val fileSystem: FileSystem,
+) {
     val xmlParser by lazy {
         val module = SerializersModule {
             polymorphic(SvgNode::class) {
@@ -57,14 +59,16 @@ sealed class ImageParser {
     ): IconFileContents
 
     protected fun readContent(file: Path): String {
-        val content = FileSystem.SYSTEM.read(file) {
+        val content = fileSystem.read(file) {
             readUtf8()
         }
 
         return content
     }
 
-    data object SvgParser : ImageParser() {
+    class SvgParser(
+        fileSystem: FileSystem,
+    ) : ImageParser(fileSystem) {
         override fun parse(
             file: Path,
             iconName: String,
@@ -112,7 +116,9 @@ sealed class ImageParser {
         }
     }
 
-    data object AndroidVectorParser : ImageParser() {
+    class AndroidVectorParser(
+        fileSystem: FileSystem,
+    ) : ImageParser(fileSystem) {
         override fun parse(
             file: Path,
             iconName: String,
@@ -151,16 +157,28 @@ sealed class ImageParser {
         private const val SVG_EXTENSION = ".svg"
         private const val ANDROID_VECTOR_EXTENSION = ".xml"
 
-        private val parsers = mapOf(
-            SVG_EXTENSION to SvgParser,
-            ANDROID_VECTOR_EXTENSION to AndroidVectorParser
-        )
+        private lateinit var parsers: Map<String, ImageParser>
+
+        operator fun invoke(fileSystem: FileSystem): Companion {
+            parsers = mapOf(
+                SVG_EXTENSION to SvgParser(fileSystem),
+                ANDROID_VECTOR_EXTENSION to AndroidVectorParser(fileSystem),
+            )
+
+            return ImageParser // returning Companion to enable chain call.
+        }
 
         fun parse(
             file: Path,
             iconName: String,
             config: ParserConfig,
         ): String {
+            if (::parsers.isInitialized.not()) {
+                throw IllegalStateException(
+                    "Parsers not initialized. Call ImageParser(fileSystem) before calling ImageParser.parser()",
+                )
+            }
+
             val extension = file.extension
             return parsers[extension]?.parse(
                 file = file,

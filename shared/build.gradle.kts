@@ -76,6 +76,10 @@ kotlin {
         }
     }
 
+    // Enabled only for debugging purposes.
+    // Not meant to be a target.
+    jvm()
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.com.squareup.okio)
