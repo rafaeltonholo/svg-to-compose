@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlPolyChildren
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import kotlin.math.max
 
 @Serializable
 @XmlSerialName("svg", "http://www.w3.org/2000/svg")
@@ -36,6 +37,19 @@ sealed interface SvgNode {
         @SerialName("fill-opacity")
         val fillOpacity: Float?,
         val style: String?,
+        val stroke: String?,
+        @SerialName("stroke-width")
+        val strokeWidth: String?, // <length | percentage>
+        @SerialName("stroke-linejoin")
+        val strokeLineJoin: String?, // <arcs | bevel |miter | miter-clip | round>
+        @SerialName("stroke-linecap")
+        val strokeLineCap: String?,
+        @SerialName("fill-rule")
+        val fillRule: String?, // <nonzero | evenodd>
+        @SerialName("stroke-opacity")
+        val strokeOpacity: String?, // <0..1 | percentage>
+        @SerialName("stroke-miterlimit")
+        val strokeMiterLimit: Float?,
     ) : SvgNode
 
     @Serializable
@@ -72,19 +86,52 @@ sealed interface SvgNode {
     ) : SvgNode
 }
 
-fun SvgNode.asNode(masks: List<SvgNode.Mask>, minified: Boolean = false): ImageVectorNode? = when (this) {
-    is SvgNode.Group -> asNode(masks, minified)
+fun SvgNode.asNode(
+    width: Float,
+    height: Float,
+    masks: List<SvgNode.Mask>,
+    minified: Boolean = false,
+): ImageVectorNode? = when (this) {
+    is SvgNode.Group -> asNode(width, height, masks, minified)
     is SvgNode.Mask -> null
-    is SvgNode.Path -> asNode(minified)
+    is SvgNode.Path -> asNode(width, height, minified)
 }
 
-fun SvgNode.Path.asNode(minified: Boolean = false): ImageVectorNode.Path = ImageVectorNode.Path(
-    fillColor = fill.orEmpty(),
+fun SvgNode.Path.asNode(
+    width: Float,
+    height: Float,
+    minified: Boolean = false,
+): ImageVectorNode.Path = ImageVectorNode.Path(
+    params = ImageVectorNode.Path.Params(
+        fill = fill.orEmpty(),
+        fillAlpha = fillOpacity,
+        pathFillType = PathFillType(fillRule),
+        stroke = stroke,
+        strokeAlpha = strokeOpacity?.let {
+            if (it.contains("%")) {
+                max(width, height) * it.toInt() / 100f
+            } else {
+                it.toFloat()
+            }
+        },
+        strokeLineCap = StrokeCap(strokeLineCap),
+        strokeLineJoin = StrokeJoin(strokeLineJoin),
+        strokeMiterLimit = strokeMiterLimit,
+        strokeLineWidth = strokeWidth?.let {
+            if (it.contains("%")) {
+                max(width, height) * it.toInt() / 100f
+            } else {
+                it.toFloat()
+            }
+        },
+    ),
     wrapper = d.asNodeWrapper(minified),
     minified = minified,
 )
 
 fun SvgNode.Group.asNode(
+    width: Float,
+    height: Float,
     masks: List<SvgNode.Mask>,
     minified: Boolean = false,
 ): ImageVectorNode.Group {
@@ -97,7 +144,7 @@ fun SvgNode.Group.asNode(
 
     return ImageVectorNode.Group(
         clipPath = clipPath,
-        commands = commands.mapNotNull { it.asNode(masks, minified) },
+        commands = commands.mapNotNull { it.asNode(width, height, masks, minified) },
         minified = minified,
     )
 }

@@ -8,24 +8,84 @@ import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
 
+interface ComposeProperty {
+    fun toCompose(): String?
+}
+
+value class PathFillType private constructor(private val value: String) : ComposeProperty {
+    companion object {
+        val EvenOdd = PathFillType("EvenOdd")
+        val NonZero = PathFillType("NonZero")
+
+        operator fun invoke(value: String?): PathFillType? = value?.let {
+            return PathFillType(value.replaceFirstChar { it.uppercaseChar() })
+        }
+    }
+
+    override fun toCompose(): String? = when (this.value) {
+        EvenOdd.value, NonZero.value,
+        EvenOdd.value.lowercase(), NonZero.value.lowercase() ->
+            "${this::class::simpleName}.$value"
+
+        else -> null
+    }
+}
+
+value class StrokeCap private constructor(private val value: String) : ComposeProperty {
+    companion object {
+        val Butt = StrokeCap("Butt")
+        val Round = StrokeCap("Round")
+        val Square = StrokeCap("Square")
+
+        operator fun invoke(value: String?): StrokeCap? = value?.let {
+            return StrokeCap(value.replaceFirstChar { it.uppercaseChar() })
+        }
+    }
+
+    override fun toCompose(): String? = when (this) {
+        Butt, Round, Square -> "${this::class::simpleName}.$value"
+        else -> null // Unsupported by Compose
+    }
+}
+
+value class StrokeJoin private constructor(private val value: String) : ComposeProperty {
+    companion object {
+        val Miter = StrokeJoin("Miter")
+        val Round = StrokeJoin("Round")
+        val Bevel = StrokeJoin("Bevel")
+
+        operator fun invoke(value: String?): StrokeJoin? = value?.let {
+            return StrokeJoin(value.replaceFirstChar { it.uppercaseChar() })
+        }
+    }
+
+    override fun toCompose(): String? = when (this) {
+        Miter, Round, Bevel -> "${this::class::simpleName}.$value"
+        else -> null
+    }
+}
+
 sealed interface ImageVectorNode {
     fun materialize(): String
 
     data class Path(
-        val fillColor: String,
+        val params: Params,
         val wrapper: NodeWrapper,
         val minified: Boolean,
     ) : ImageVectorNode {
+        data class Params(
+            val fill: String,
+            val fillAlpha: Float? = null,
+            val pathFillType: PathFillType? = null,
+            val stroke: String? = null,
+            val strokeAlpha: Float? = null,
+            val strokeLineCap: StrokeCap? = null,
+            val strokeLineJoin: StrokeJoin? = null,
+            val strokeMiterLimit: Float? = null,
+            val strokeLineWidth: Float? = null,
+        )
+
         override fun materialize(): String {
-            val realColor = fillColor.uppercase().removePrefix("#").let { color ->
-                when {
-                    color.length == 6 -> "FF$color"
-                    color.length == 3 -> "FF$color$color"
-                    color.isEmpty() || color.lowercase().contains("url") ->
-                        "FF000000 /* not supported color \"$color\" */" // not supported yet.
-                    else -> color
-                }
-            }
             val indentSize = 4
             val pathNodes = wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
                 it.materialize()
@@ -34,8 +94,35 @@ sealed interface ImageVectorNode {
             }
 
             val pathParams = buildList {
-                if (fillColor.isNotEmpty()) {
-                    add("fill" to "SolidColor(Color(0x$realColor))")
+                with(params) {
+                    if (params.fill.isNotEmpty()) {
+                        val realColor = params.fill.uppercase().removePrefix("#").toComposeColor()
+                        add("fill" to "SolidColor(Color(0x$realColor))")
+                    }
+                    fillAlpha?.let {
+                        add("fillAlpha" to "${it}f")
+                    }
+                    pathFillType?.let {
+                        add("pathFillType" to "${it.toCompose()}")
+                    }
+                    stroke?.let {
+                        add("stroke" to it.toComposeColor())
+                    }
+                    strokeAlpha?.let {
+                        add("strokeAlpha" to "${it}f")
+                    }
+                    strokeLineCap?.let {
+                        add("strokeLineCap" to "${it.toCompose()}")
+                    }
+                    strokeLineJoin?.let {
+                        add("strokeLineJoin" to "${it.toCompose()}")
+                    }
+                    strokeMiterLimit?.let {
+                        add("strokeMiterLimit" to "${it}f")
+                    }
+                    strokeLineWidth?.let {
+                        add("strokeLineWidth" to "${it}f")
+                    }
                 }
             }
 
@@ -263,4 +350,12 @@ private fun normalizePath(path: String): String {
     debug("Normalized path value = $parsedPath")
 
     return parsedPath.toString().trimStart()
+}
+
+private fun String.toComposeColor(): String = when {
+    length == 6 -> "FF$this"
+    length == 3 -> "FF$this$this"
+    isEmpty() || lowercase().contains("url") ->
+        "FF000000 /* not supported this \"$this\" */" // not supported yet.
+    else -> this
 }

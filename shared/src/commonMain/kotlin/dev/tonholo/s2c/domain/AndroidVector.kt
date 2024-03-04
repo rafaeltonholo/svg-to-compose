@@ -36,7 +36,7 @@ sealed interface AndroidVectorNode {
         @XmlSerialName("fillAlpha", ANDROID_NS, ANDROID_PREFIX)
         val fillAlpha: Float?,
         @XmlSerialName("fillType", ANDROID_NS, ANDROID_PREFIX)
-        val fillType: String?, // evenOdd, noZero
+        val fillType: String?, // evenOdd, nonZero
         @XmlSerialName("strokeColor", ANDROID_NS, ANDROID_PREFIX)
         val strokeColor: String?,
         @XmlSerialName("strokeAlpha", ANDROID_NS, ANDROID_PREFIX)
@@ -80,7 +80,17 @@ fun AndroidVectorNode.asNode(minified: Boolean): ImageVectorNode = when (this) {
 }
 
 fun AndroidVectorNode.Path.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
-    fillColor = fillColor.orEmpty(),
+    params = ImageVectorNode.Path.Params(
+        fill = fillColor.orEmpty(),
+        fillAlpha = fillAlpha,
+        pathFillType = PathFillType(fillType),
+        stroke = strokeColor,
+        strokeAlpha = strokeAlpha,
+        strokeLineCap = StrokeCap(strokeLineCap),
+        strokeLineJoin = StrokeJoin(strokeLineJoin),
+        strokeMiterLimit = strokeMiterLimit,
+        strokeLineWidth = strokeWidth,
+    ),
     wrapper = pathData.asNodeWrapper(minified),
     minified = minified,
 )

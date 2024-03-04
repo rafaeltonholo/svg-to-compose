@@ -95,7 +95,14 @@ sealed class ImageParser {
                 height = svg.height.toFloat(),
                 viewportWidth = viewportWidth,
                 viewportHeight = viewportHeight,
-                nodes = svg.commands.mapNotNull { it.asNode(minified = config.minified, masks = masks) },
+                nodes = svg.commands.mapNotNull {
+                    it.asNode(
+                        width = svg.width.toFloat(),
+                        height = svg.height.toFloat(),
+                        minified = config.minified,
+                        masks = masks,
+                    )
+                },
                 contextProvider = config.contextProvider,
                 addToMaterial = config.addToMaterial,
                 noPreview = config.noPreview,
