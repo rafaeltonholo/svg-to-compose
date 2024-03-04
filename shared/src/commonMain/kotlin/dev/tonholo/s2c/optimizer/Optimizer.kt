@@ -75,15 +75,87 @@ sealed interface Optimizer {
                 output("⚙️ writing svgo config file")
                 val svgoConfig = """
                     |module.exports = {
-                    |  plugins: [
-                    |      {
-                    |          name: "convertPathData",
-                    |          params: {
-                    |              leadingZero: false,
-                    |              floatPrecision: 2,
-                    |          }
-                    |      }
-                    |  ]
+                    |    plugins: [
+                    |        {
+                    |            name: "addViewBoxWhenNotPresent",
+                    |            description: "Add a viewBox to the SVG tag, when it is not present, to fix issue related to svg2vectordrawable.",
+                    |            fn: () => {
+                    |                return {
+                    |                    element: {
+                    |                        enter: (node, parentNode) => {
+                    |                            // We are only adding the viewBox to the root element
+                    |                            // to fix a bug on svg2vectordrawable.
+                    |                            if (node.name !== "svg") {
+                    |                                return;
+                    |                            }
+                    |
+                    |                            if (
+                    |                                (!node.attributes.width || !node.attributes.height) &&
+                    |                                !node.attributes.viewBox
+                    |                            ) {
+                    |                                // Missing both width, height and viewBox. Nothing to do.
+                    |                                return;
+                    |                            }
+                    |
+                    |                            if (
+                    |                                node.attributes.viewBox ||
+                    |                                node.attributes.viewBox === ""
+                    |                            ) {
+                    |                                // The viewBox is present. Nothing to do.
+                    |                                return;
+                    |                            }
+                    |
+                    |                            const width = node.attributes.width.replace(/px${'$'}/, '')
+                    |                            const height = node.attributes.height.replace(/px${'$'}/, '')
+                    |                            node.attributes.viewBox = `0 0 ${'$'}{width} ${'$'}{height}`;
+                    |                        }
+                    |                    }
+                    |                }
+                    |            },
+                    |        },
+                    |        {
+                    |            name: "bakeWidthAndHeightFromViewBox",
+                    |            description: "Add a witdh and height to the SVG tag, when it is not present, extracting from viewBox.",
+                    |            fn: () => {
+                    |                return {
+                    |                    element: {
+                    |                        enter: (node, parentNode) => {
+                    |                            // We are only adding the viewBox to the root element
+                    |                            // to fix a bug on svg2vectordrawable.
+                    |                            if (node.name !== "svg") {
+                    |                                return;
+                    |                            }
+                    |                            if (!node.attributes.viewBox || node.attributes.viewBox === "") {
+                    |                                // ViewBox is not present. Nothing to do.
+                    |                                return;
+                    |                            }
+                    |
+                    |                            if (node.attributes.width && node.attributes.height) {
+                    |                                // Both width, height is present. Nothing to do.
+                    |                                return;
+                    |                            }
+                    |
+                    |                            const nums = node.attributes.viewBox.split(/[ ,]+/g);
+                    |                            if (nums.length !== 4) {
+                    |                                // Malformed viewbox. Nothing to do.
+                    |                                return;
+                    |                            }
+                    |
+                    |                            node.attributes.width = nums[2];
+                    |                            node.attributes.height = nums[3];
+                    |                        }
+                    |                    }
+                    |                }
+                    |            },
+                    |        },
+                    |        {
+                    |            name: "convertPathData",
+                    |            params: {
+                    |                leadingZero: false,
+                    |                floatPrecision: 2,
+                    |            }
+                    |        }
+                    |    ]
                     |}
                 """.trimMargin()
                 fileSystem.write(svgoConfigFile) {
