@@ -155,11 +155,20 @@ fn_main() {
     command ./gradlew "$build_command"
   fi
 
+  args=("$@")
   if [[ $MUST_UPGRADE == true ]]; then
-    exit 0
+    upgrade_flag="--upgrade"
+    # Iterate through the array and remove matching elements, preserving indices:
+    for i in "${!args[@]}"; do
+        if [[ "${args[i]}" = "$upgrade_flag" ]]; then
+            unset 'args[i]'
+            # Shift remaining elements to fill the gap:
+            args=("${args[@]}")
+        fi
+    done
   fi
 
-  command "$bin_folder"/s2c.$program_ext "$@"
+  command "$bin_folder"/s2c.$program_ext "${args[@]}"
 }
 
 fn_main "$@"
