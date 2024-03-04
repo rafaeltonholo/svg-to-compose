@@ -2,6 +2,10 @@ package dev.tonholo.s2c.extensions
 
 import kotlin.math.max
 
+private const val FULL_HEXADECIMAL_COLOR_SIZE = 6
+private const val HALF_HEXADECIMAL_COLOR_SIZE = 6
+private const val PERCENT = 100f
+
 private fun String.replaceDividers(): String {
     val pattern = "([_\\-. ])[a-zA-Z0-9]".toRegex()
     return replace(pattern) { it.value.last().uppercase() }
@@ -29,7 +33,7 @@ fun String.toLengthFloat(
     width: Float,
     height: Float,
 ): Float = if (this.contains("%")) {
-    max(width, height) * this.removeSuffix("%").toInt() / 100f
+    max(width, height) * this.removeSuffix("%").toInt() / PERCENT
 } else {
     this.toFloat()
 }
@@ -41,8 +45,8 @@ fun String.toComposeColor(): String = uppercase()
     .removePrefix("#")
     .let {
         when {
-            it.length == 6 -> "FF$it"
-            it.length == 3 -> "FF$it$it"
+            it.length == FULL_HEXADECIMAL_COLOR_SIZE -> "FF$it"
+            it.length == HALF_HEXADECIMAL_COLOR_SIZE -> "FF$it$it"
             it.isEmpty() || it.lowercase().contains("url") ->
                 "FF000000 /* not supported this \"$it\" */" // not supported yet.
             else -> it

@@ -201,7 +201,7 @@ sealed class ImageParser(
             config: ParserConfig,
         ): String {
             if (::parsers.isInitialized.not()) {
-                throw IllegalStateException(
+                error(
                     "Parsers not initialized. Call ImageParser(fileSystem) before calling ImageParser.parser()",
                 )
             }
