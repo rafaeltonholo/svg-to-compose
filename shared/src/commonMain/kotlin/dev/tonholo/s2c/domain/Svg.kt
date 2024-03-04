@@ -1,12 +1,12 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.extensions.toLengthFloat
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlPolyChildren
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
-import kotlin.math.max
 
 @Serializable
 @XmlSerialName("svg", "http://www.w3.org/2000/svg")
@@ -107,23 +107,11 @@ fun SvgNode.Path.asNode(
         fillAlpha = fillOpacity,
         pathFillType = PathFillType(fillRule),
         stroke = stroke,
-        strokeAlpha = strokeOpacity?.let {
-            if (it.contains("%")) {
-                max(width, height) * it.toInt() / 100f
-            } else {
-                it.toFloat()
-            }
-        },
+        strokeAlpha = strokeOpacity?.toLengthFloat(width, height),
         strokeLineCap = StrokeCap(strokeLineCap),
         strokeLineJoin = StrokeJoin(strokeLineJoin),
         strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth?.let {
-            if (it.contains("%")) {
-                max(width, height) * it.toInt() / 100f
-            } else {
-                it.toFloat()
-            }
-        },
+        strokeLineWidth = strokeWidth?.toLengthFloat(width, height),
     ),
     wrapper = d.asNodeWrapper(minified),
     minified = minified,

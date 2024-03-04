@@ -4,66 +4,10 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.extensions.toComposeColor
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
-
-interface ComposeProperty {
-    fun toCompose(): String?
-}
-
-value class PathFillType private constructor(private val value: String) : ComposeProperty {
-    companion object {
-        val EvenOdd = PathFillType("EvenOdd")
-        val NonZero = PathFillType("NonZero")
-
-        operator fun invoke(value: String?): PathFillType? = value?.let {
-            return PathFillType(value.replaceFirstChar { it.uppercaseChar() })
-        }
-    }
-
-    override fun toCompose(): String? = when (this.value) {
-        EvenOdd.value, NonZero.value,
-        EvenOdd.value.lowercase(), NonZero.value.lowercase() ->
-            "${this::class::simpleName}.$value"
-
-        else -> null
-    }
-}
-
-value class StrokeCap private constructor(private val value: String) : ComposeProperty {
-    companion object {
-        val Butt = StrokeCap("Butt")
-        val Round = StrokeCap("Round")
-        val Square = StrokeCap("Square")
-
-        operator fun invoke(value: String?): StrokeCap? = value?.let {
-            return StrokeCap(value.replaceFirstChar { it.uppercaseChar() })
-        }
-    }
-
-    override fun toCompose(): String? = when (this) {
-        Butt, Round, Square -> "${this::class::simpleName}.$value"
-        else -> null // Unsupported by Compose
-    }
-}
-
-value class StrokeJoin private constructor(private val value: String) : ComposeProperty {
-    companion object {
-        val Miter = StrokeJoin("Miter")
-        val Round = StrokeJoin("Round")
-        val Bevel = StrokeJoin("Bevel")
-
-        operator fun invoke(value: String?): StrokeJoin? = value?.let {
-            return StrokeJoin(value.replaceFirstChar { it.uppercaseChar() })
-        }
-    }
-
-    override fun toCompose(): String? = when (this) {
-        Miter, Round, Bevel -> "${this::class::simpleName}.$value"
-        else -> null
-    }
-}
 
 sealed interface ImageVectorNode {
     fun materialize(): String
@@ -85,6 +29,18 @@ sealed interface ImageVectorNode {
             val strokeLineWidth: Float? = null,
         )
 
+        fun pathImports(): Set<String> = buildSet {
+            if (params.pathFillType != null) {
+                add(PathFillType.IMPORT)
+            }
+            if (params.strokeLineCap != null) {
+                add(StrokeCap.IMPORT)
+            }
+            if (params.strokeLineJoin != null) {
+                add(StrokeJoin.IMPORT)
+            }
+        }
+
         override fun materialize(): String {
             val indentSize = 4
             val pathNodes = wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
@@ -96,8 +52,7 @@ sealed interface ImageVectorNode {
             val pathParams = buildList {
                 with(params) {
                     if (params.fill.isNotEmpty()) {
-                        val realColor = params.fill.uppercase().removePrefix("#").toComposeColor()
-                        add("fill" to "SolidColor(Color(0x$realColor))")
+                        add("fill" to params.fill.toComposeColor())
                     }
                     fillAlpha?.let {
                         add("fillAlpha" to "${it}f")
@@ -128,7 +83,7 @@ sealed interface ImageVectorNode {
 
             val pathParamsString = if (pathParams.isNotEmpty()) {
                 """(
-                |${pathParams.joinToString("\n") { (param, value) -> "    $param = $value," }}
+                |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".indented(4) }}
                 |)"""
             } else {
                 ""
@@ -350,12 +305,4 @@ private fun normalizePath(path: String): String {
     debug("Normalized path value = $parsedPath")
 
     return parsedPath.toString().trimStart()
-}
-
-private fun String.toComposeColor(): String = when {
-    length == 6 -> "FF$this"
-    length == 3 -> "FF$this$this"
-    isEmpty() || lowercase().contains("url") ->
-        "FF000000 /* not supported this \"$this\" */" // not supported yet.
-    else -> this
 }

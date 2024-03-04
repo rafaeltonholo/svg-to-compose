@@ -3,6 +3,7 @@ package dev.tonholo.s2c.parser
 import dev.tonholo.s2c.domain.AndroidVector
 import dev.tonholo.s2c.domain.AndroidVectorNode
 import dev.tonholo.s2c.domain.IconFileContents
+import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.Svg
 import dev.tonholo.s2c.domain.SvgNode
 import dev.tonholo.s2c.domain.asNode
@@ -66,6 +67,29 @@ sealed class ImageParser(
         return content
     }
 
+    protected fun createImports(
+        nodes: List<ImageVectorNode>,
+        config: ParserConfig,
+    ): Set<String> = buildSet {
+        addAll(defaultImports)
+        if (config.noPreview.not()) {
+            addAll(previewImports)
+        }
+        if (nodes.any { it is ImageVectorNode.Group }) {
+            addAll(groupImports)
+        }
+        if (config.addToMaterial) {
+            addAll(materialContextProviderImport)
+        }
+        val pathImports = nodes
+            .asSequence()
+            .filterIsInstance<ImageVectorNode.Path>()
+            .flatMap { it.pathImports() }
+            .toSet()
+
+        addAll(pathImports)
+    }
+
     class SvgParser(
         fileSystem: FileSystem,
     ) : ImageParser(fileSystem) {
@@ -85,11 +109,15 @@ sealed class ImageParser(
                 mutableListOf(svg.width.toFloat(), svg.height.toFloat())
             }
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
-            val imports = defaultImports +
-                (if (config.noPreview) setOf() else previewImports) +
-                (if (svg.commands.any { it is SvgNode.Group }) groupImports else setOf()) +
-                if (config.addToMaterial) materialContextProviderImport else setOf()
             val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
+            val nodes = svg.commands.mapNotNull {
+                it.asNode(
+                    width = svg.width.toFloat(),
+                    height = svg.height.toFloat(),
+                    minified = config.minified,
+                    masks = masks,
+                )
+            }
 
             return IconFileContents(
                 pkg = config.pkg,
@@ -99,19 +127,12 @@ sealed class ImageParser(
                 height = svg.height.toFloat(),
                 viewportWidth = viewportWidth,
                 viewportHeight = viewportHeight,
-                nodes = svg.commands.mapNotNull {
-                    it.asNode(
-                        width = svg.width.toFloat(),
-                        height = svg.height.toFloat(),
-                        minified = config.minified,
-                        masks = masks,
-                    )
-                },
+                nodes = nodes,
                 contextProvider = config.contextProvider,
                 addToMaterial = config.addToMaterial,
                 noPreview = config.noPreview,
                 makeInternal = config.makeInternal,
-                imports = imports,
+                imports = createImports(nodes, config),
             )
         }
     }
@@ -130,25 +151,31 @@ sealed class ImageParser(
                 deserializer = AndroidVector.serializer(),
                 string = content,
             )
-            val imports = defaultImports +
-                (if (config.noPreview) setOf() else previewImports) +
-                (if (androidVector.nodes.any { it is AndroidVectorNode.Group }) groupImports else setOf()) +
-                if (config.addToMaterial) materialContextProviderImport else setOf()
+
+            val width = androidVector.width.removeSuffix("dp").toFloat()
+            val height = androidVector.height.removeSuffix("dp").toFloat()
+            val nodes = androidVector.nodes.map {
+                it.asNode(
+                    width = width,
+                    height = height,
+                    minified = config.minified,
+                )
+            }
 
             return IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
-                width = androidVector.width.removeSuffix("dp").toFloat(),
-                height = androidVector.height.removeSuffix("dp").toFloat(),
+                width = width,
+                height = height,
                 viewportWidth = androidVector.viewportWidth.toFloat(),
                 viewportHeight = androidVector.viewportHeight.toFloat(),
-                nodes = androidVector.nodes.map { it.asNode(minified = config.minified) },
+                nodes = nodes,
                 contextProvider = config.contextProvider,
                 addToMaterial = config.addToMaterial,
                 noPreview = config.noPreview,
                 makeInternal = config.makeInternal,
-                imports = imports,
+                imports = createImports(nodes, config),
             )
         }
     }

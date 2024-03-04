@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.extensions.toLengthFloat
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -39,16 +40,20 @@ sealed interface AndroidVectorNode {
         val fillType: String?, // evenOdd, nonZero
         @XmlSerialName("strokeColor", ANDROID_NS, ANDROID_PREFIX)
         val strokeColor: String?,
+        // Although Android Vector only accepts Float, Svg accepts %.
+        // As we still parse the SVG to XML after optimizing, we need to deal with % here too.
         @XmlSerialName("strokeAlpha", ANDROID_NS, ANDROID_PREFIX)
-        val strokeAlpha: Float?,
+        val strokeAlpha: String?,
         @XmlSerialName("strokeLineCap", ANDROID_NS, ANDROID_PREFIX)
         val strokeLineCap: String?, // butt, round, square
         @XmlSerialName("strokeLineJoin", ANDROID_NS, ANDROID_PREFIX)
         val strokeLineJoin: String?, // miter, round, bevel
         @XmlSerialName("strokeMiterLimit", ANDROID_NS, ANDROID_PREFIX)
         val strokeMiterLimit: Float?,
+        // Although Android Vector only accepts Float, Svg accepts %.
+        // As we still parse the SVG to XML after optimizing, we need to deal with % here too.
         @XmlSerialName("strokeWidth", ANDROID_NS, ANDROID_PREFIX)
-        val strokeWidth: Float?,
+        val strokeWidth: String?,
     ) : AndroidVectorNode
 
     @Serializable
@@ -74,29 +79,41 @@ data class ClipPath(
     val pathData: String,
 )
 
-fun AndroidVectorNode.asNode(minified: Boolean): ImageVectorNode = when (this) {
-    is AndroidVectorNode.Group -> asNode(minified)
-    is AndroidVectorNode.Path -> asNode(minified)
+fun AndroidVectorNode.asNode(
+    width: Float,
+    height: Float,
+    minified: Boolean,
+): ImageVectorNode = when (this) {
+    is AndroidVectorNode.Group -> asNode(width, height, minified)
+    is AndroidVectorNode.Path -> asNode(width, height, minified)
 }
 
-fun AndroidVectorNode.Path.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
+fun AndroidVectorNode.Path.asNode(
+    width: Float,
+    height: Float,
+    minified: Boolean,
+): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
         fill = fillColor.orEmpty(),
         fillAlpha = fillAlpha,
         pathFillType = PathFillType(fillType),
         stroke = strokeColor,
-        strokeAlpha = strokeAlpha,
+        strokeAlpha = strokeAlpha?.toLengthFloat(width, height),
         strokeLineCap = StrokeCap(strokeLineCap),
         strokeLineJoin = StrokeJoin(strokeLineJoin),
         strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth,
+        strokeLineWidth = strokeWidth?.toLengthFloat(width, height),
     ),
     wrapper = pathData.asNodeWrapper(minified),
     minified = minified,
 )
 
-fun AndroidVectorNode.Group.asNode(minified: Boolean): ImageVectorNode.Group = ImageVectorNode.Group(
+fun AndroidVectorNode.Group.asNode(
+    width: Float,
+    height: Float,
+    minified: Boolean,
+): ImageVectorNode.Group = ImageVectorNode.Group(
     clipPath = clipPath?.pathData?.asNodeWrapper(minified),
-    commands = commands.map { it.asNode(minified) },
+    commands = commands.map { it.asNode(width, height, minified) },
     minified = minified,
 )
