@@ -40,6 +40,7 @@ sealed class ImageParser(
                 subclass(SvgNode.Path::class, SvgNode.Path.serializer())
                 subclass(SvgNode.Group::class, SvgNode.Group.serializer())
                 subclass(SvgNode.Mask::class, SvgNode.Mask.serializer())
+                subclass(SvgNode.Rect::class, SvgNode.Rect.serializer())
             }
             polymorphic(AndroidVectorNode::class) {
                 subclass(AndroidVectorNode.Path::class, AndroidVectorNode.Path.serializer())

@@ -92,6 +92,35 @@ sealed interface SvgNode {
         val height: Int,
         val paths: List<Path>,
     ) : SvgNode
+
+    @Serializable
+    @SerialName("rect")
+    data class Rect(
+        val x: Int?,
+        val y: Int?,
+        val width: Int,
+        val height: Int,
+        val rx: Int?,
+        val ry: Int?,
+        override val fill: String?,
+        override val opacity: Float?,
+        @SerialName("fill-opacity")
+        override val fillOpacity: Float?,
+        override val style: String?,
+        override val stroke: String?,
+        @SerialName("stroke-width")
+        override val strokeWidth: String?, // <length | percentage>
+        @SerialName("stroke-linejoin")
+        override val strokeLineJoin: String?, // <arcs | bevel |miter | miter-clip | round>
+        @SerialName("stroke-linecap")
+        override val strokeLineCap: String?,
+        @SerialName("fill-rule")
+        override val fillRule: String?, // <nonzero | evenodd>
+        @SerialName("stroke-opacity")
+        override val strokeOpacity: String?, // <0..1 | percentage>
+        @SerialName("stroke-miterlimit")
+        override val strokeMiterLimit: Float?,
+    ) : SvgNode, Element
 }
 
 fun SvgNode.asNode(
@@ -103,4 +132,5 @@ fun SvgNode.asNode(
     is SvgNode.Group -> asNode(width, height, masks, minified)
     is SvgNode.Mask -> null
     is SvgNode.Path -> asNode(width, height, minified)
+    is SvgNode.Rect -> asNode(width, height, minified)
 }

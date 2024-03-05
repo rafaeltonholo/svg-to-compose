@@ -5,6 +5,7 @@ import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
+import kotlin.math.max
 
 val defaultImports = setOf(
     "androidx.compose.ui.graphics.Color",
@@ -18,7 +19,8 @@ val previewImports = setOf(
     "androidx.compose.foundation.Image",
     "androidx.compose.foundation.layout.Arrangement",
     "androidx.compose.foundation.layout.Column",
-    "androidx.compose.foundation.layout.size",
+    "androidx.compose.foundation.layout.height",
+    "androidx.compose.foundation.layout.width",
     "androidx.compose.runtime.Composable",
     "androidx.compose.ui.Alignment",
     "androidx.compose.ui.Modifier",
@@ -101,7 +103,9 @@ data class IconFileContents(
             |            Image(
             |                imageVector = $iconPropertyName,
             |                contentDescription = null,
-            |                modifier = Modifier.size(100.dp),
+            |                modifier = Modifier
+            |                   .width((${max(width, viewportWidth)}).dp)
+            |                   .height((${max(height, viewportHeight)}).dp),
             |            )
             |        }
             |    }

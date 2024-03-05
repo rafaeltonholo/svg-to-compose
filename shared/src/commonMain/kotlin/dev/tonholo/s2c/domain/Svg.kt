@@ -19,6 +19,7 @@ data class Svg(
             "path",
             "g",
             "mask",
+            "rect",
         ]
     )
     val commands: List<@Polymorphic SvgNode>,

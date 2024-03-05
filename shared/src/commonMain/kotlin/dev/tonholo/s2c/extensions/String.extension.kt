@@ -3,7 +3,7 @@ package dev.tonholo.s2c.extensions
 import kotlin.math.max
 
 private const val FULL_HEXADECIMAL_COLOR_SIZE = 6
-private const val HALF_HEXADECIMAL_COLOR_SIZE = 6
+private const val HALF_HEXADECIMAL_COLOR_SIZE = 3
 private const val PERCENT = 100f
 
 private fun String.replaceDividers(): String {

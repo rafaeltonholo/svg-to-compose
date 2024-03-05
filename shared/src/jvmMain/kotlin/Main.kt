@@ -25,12 +25,12 @@ fun main() {
     val currentDir = Paths.get("")
     val projectDirectory = currentDir.toAbsolutePath().parent
 
-    val path = "${projectDirectory}/samples/compose-multiplatform.xml"
-    val output = "${projectDirectory}/integrity-check/ComposeMultiplatform.xml.Optimized.kt"
+    val path = "${projectDirectory}/samples/uk.svg"
+    val output = "${projectDirectory}/integrity-check/Uk.svg.NonOptimized.kt"
     val config = ParserConfig(
         pkg = "dev.tonholo.composeicons.ui.icon",
         theme = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme",
-        optimize = true,
+        optimize = false,
         contextProvider = null,
         addToMaterial = false,
         noPreview = false,

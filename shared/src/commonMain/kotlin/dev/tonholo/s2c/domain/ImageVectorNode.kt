@@ -273,6 +273,15 @@ private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char):
         dotCount
     }
 
+private fun StringBuilder.trimWhitespaceBeforeClose(
+    lastChar: Char,
+    current: Char,
+): StringBuilder = apply {
+    if (lastChar == ' ' && current == 'z') {
+        setLength(length - 1)
+    }
+}
+
 private fun normalizePath(path: String): String {
     debugSection("Normalizing path")
     debug("Original path value = $path")
@@ -287,17 +296,20 @@ private fun normalizePath(path: String): String {
             continue
         }
 
-        val isClosingCommand = (char.isLetter() && char.lowercaseChar() != 'z')
+        val isNotClosingCommand = (char.isLetter() && char.lowercaseChar() != 'z')
         val isNegativeSign = (lastChar.isDigit() && char == '-')
         val reachMaximumDotNumbers = dotCount == 2
-        parsedPath.append(
-            if (isClosingCommand || isNegativeSign || reachMaximumDotNumbers) {
-                dotCount = resetDotCount(current = char)
-                " $char"
-            } else {
-                char
-            }
-        )
+
+        parsedPath
+            .trimWhitespaceBeforeClose(lastChar, current = char)
+            .append(
+                if (isNotClosingCommand || isNegativeSign || reachMaximumDotNumbers) {
+                    dotCount = resetDotCount(current = char)
+                    " $char"
+                } else {
+                    char
+                }
+            )
         lastChar = char
     }
 
