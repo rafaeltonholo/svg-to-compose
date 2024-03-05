@@ -4,6 +4,7 @@
 
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.PathNodes.Companion.CLOSE_COMMAND
 import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.extensions.toInt
 
@@ -14,11 +15,15 @@ sealed class PathNodes(
     val commandSize: Int,
     val minified: Boolean,
 ) {
-    private val shouldClose = values[commandSize - 1].last().lowercase() == "z"
+    companion object {
+        const val CLOSE_COMMAND = "z"
+    }
+
+    private val shouldClose = values[commandSize - 1].last().lowercase() == CLOSE_COMMAND
 
     abstract fun materialize(): String
 
-    protected fun closeCommand(): String = if (shouldClose) {
+    private fun closeCommand(): String = if (shouldClose) {
         """
         |close()
         |
@@ -33,7 +38,7 @@ sealed class PathNodes(
         parameters: Set<String>,
         forceInline: Boolean = false,
     ): String = """
-        |${if (minified) "" else comment}
+        |${if (minified) "" else "${comment.replace("\\.0".toRegex(), "")}${if (shouldClose) "z" else ""}"}
         |$fnName${if (isRelative) "Relative" else ""}(${parameters.toParameters(forceInline)})
         |${closeCommand()}
     """.trimMargin().let {
@@ -59,17 +64,18 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 2,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'm'
+            const val COMMAND_SIZE = 2
         }
 
         private val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y = values[1]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -95,11 +101,12 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 7,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'a'
+            const val COMMAND_SIZE = 7
         }
 
         private val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
@@ -110,7 +117,7 @@ sealed class PathNodes(
         private val x = values[5].toFloat()
         private val y = values[6]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -143,18 +150,19 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 1,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'v'
+            const val COMMAND_SIZE = 1
         }
 
         private val y = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -177,18 +185,19 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 1,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'h'
+            const val COMMAND_SIZE = 1
         }
 
         private val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -211,11 +220,12 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 2,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'l'
+            const val COMMAND_SIZE = 2
         }
 
         private val x = values
@@ -225,7 +235,7 @@ sealed class PathNodes(
             .toFloat()
         private val y = values[1]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -251,11 +261,12 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 6,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'c'
+            const val COMMAND_SIZE = 6
         }
 
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
@@ -265,7 +276,7 @@ sealed class PathNodes(
         private val x3 = values[4].toFloat()
         private val y3 = values[5]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -295,11 +306,12 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 4,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 's'
+            const val COMMAND_SIZE = 4
         }
 
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
@@ -307,7 +319,7 @@ sealed class PathNodes(
         private val x2 = values[2].toFloat()
         private val y2 = values[3]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -334,11 +346,12 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 4,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 'q'
+            const val COMMAND_SIZE = 4
         }
 
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
@@ -346,7 +359,7 @@ sealed class PathNodes(
         private val x2 = values[2].toFloat()
         private val y2 = values[3]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -373,17 +386,18 @@ sealed class PathNodes(
         values = values,
         isRelative = isRelative,
         command = COMMAND,
-        commandSize = 2,
+        commandSize = COMMAND_SIZE,
         minified = minified,
     ) {
         companion object {
             const val COMMAND = 't'
+            const val COMMAND_SIZE = 2
         }
 
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y1 = values[1]
             .lowercase()
-            .removeSuffix("z")
+            .removeSuffix(CLOSE_COMMAND)
             .toFloat()
 
         override fun materialize(): String {
@@ -400,3 +414,126 @@ sealed class PathNodes(
         }
     }
 }
+
+@DslMarker
+annotation class PathNodesDsl
+
+@PathNodesDsl
+class PathNodesBuilder(val command: Char) {
+    private val commandMap = mapOf(
+        PathNodes.MoveTo.COMMAND to PathNodes.MoveTo.COMMAND_SIZE,
+        PathNodes.ArcTo.COMMAND to PathNodes.ArcTo.COMMAND_SIZE,
+        PathNodes.VerticalLineTo.COMMAND to PathNodes.VerticalLineTo.COMMAND_SIZE,
+        PathNodes.HorizontalLineTo.COMMAND to PathNodes.HorizontalLineTo.COMMAND_SIZE,
+        PathNodes.LineTo.COMMAND to PathNodes.LineTo.COMMAND_SIZE,
+        PathNodes.CurveTo.COMMAND to PathNodes.CurveTo.COMMAND_SIZE,
+        PathNodes.ReflectiveCurveTo.COMMAND to PathNodes.ReflectiveCurveTo.COMMAND_SIZE,
+        PathNodes.QuadTo.COMMAND to PathNodes.QuadTo.COMMAND_SIZE,
+        PathNodes.ReflectiveQuadTo.COMMAND to PathNodes.ReflectiveQuadTo.COMMAND_SIZE,
+    )
+
+    init {
+        check(command in commandMap.keys) {
+            "The command $command is not a Path command."
+        }
+    }
+
+    private var args: List<String>? = null
+    var isRelative: Boolean = false
+    var minified: Boolean = false
+
+    fun args(vararg args: Any) {
+        val parsedArgs = args.map { arg ->
+            when (arg) {
+                is String, is Number, is Char -> arg.toString()
+                is Boolean -> if (arg) "1" else "0"
+                else -> error("The argument type of ${arg::class} is unsupported.")
+            }
+        }
+        this.args = parsedArgs
+    }
+
+    private fun enforceArgumentSize(args: List<String>): List<String> {
+        val hasCloseCommand = args.last() == CLOSE_COMMAND
+        val size = if (hasCloseCommand) args.size - 1 else args.size
+        check(size == commandMap[command]) {
+            "Invalid number of arguments. Expected ${commandMap[command]}, given ${args.size}"
+        }
+
+        return if (hasCloseCommand) {
+            args.dropLast(1)
+                .mapIndexed { index: Int, s: String ->
+                    if (index == size - 1) "${s}z" else s
+                }
+        } else {
+            args
+        }
+    }
+
+    fun build(): PathNodes {
+        val args = checkNotNull(args) {
+            "Missing path arguments."
+        }
+
+        return when (command) {
+            PathNodes.MoveTo.COMMAND -> PathNodes.MoveTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.ArcTo.COMMAND -> PathNodes.ArcTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.VerticalLineTo.COMMAND -> PathNodes.VerticalLineTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.HorizontalLineTo.COMMAND -> PathNodes.HorizontalLineTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.LineTo.COMMAND -> PathNodes.LineTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.CurveTo.COMMAND -> PathNodes.CurveTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.ReflectiveCurveTo.COMMAND -> PathNodes.ReflectiveCurveTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.QuadTo.COMMAND -> PathNodes.QuadTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            PathNodes.ReflectiveQuadTo.COMMAND -> PathNodes.ReflectiveQuadTo(
+                values = enforceArgumentSize(args),
+                isRelative = isRelative,
+                minified = minified,
+            )
+
+            else -> error("Unsupported path command $command")
+        }
+    }
+}
+
+fun pathNode(command: Char, block: PathNodesBuilder.() -> Unit): PathNodes =
+    PathNodesBuilder(command).apply(block).build()
