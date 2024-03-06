@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.com.squareup.okio)
             implementation(libs.xmlutil.core)
             implementation(libs.xmlutil.serialization)
+            implementation(kotlin("reflect"))
         }
 
         nativeMain.dependencies {

@@ -34,6 +34,9 @@ sealed interface SvgNode {
 
         @SerialName("stroke-miterlimit")
         val strokeMiterLimit: Float?
+
+        @SerialName("stroke-dasharray")
+        val strokeDashArray: String?
     }
 
     @Serializable
@@ -58,6 +61,8 @@ sealed interface SvgNode {
         override val strokeOpacity: String?, // <0..1 | percentage>
         @SerialName("stroke-miterlimit")
         override val strokeMiterLimit: Float?,
+        @SerialName("stroke-dasharray")
+        override val strokeDashArray: String?,
     ) : SvgNode, Element
 
     @Serializable
@@ -120,6 +125,8 @@ sealed interface SvgNode {
         override val strokeOpacity: String?, // <0..1 | percentage>
         @SerialName("stroke-miterlimit")
         override val strokeMiterLimit: Float?,
+        @SerialName("stroke-dasharray")
+        override val strokeDashArray: String?,
     ) : SvgNode, Element
 }
 

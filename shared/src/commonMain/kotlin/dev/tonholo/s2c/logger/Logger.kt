@@ -31,6 +31,10 @@ fun verbose(message: String) {
     }
 }
 
+inline fun warn(message: String) {
+    println("WARNING ⚠️: $message") // TODO: add color to output.
+}
+
 inline fun output(message: String) {
     println(message)
 }

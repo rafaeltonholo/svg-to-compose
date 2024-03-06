@@ -52,7 +52,7 @@ sealed interface ImageVectorNode {
             val pathParams = buildList {
                 with(params) {
                     if (params.fill.isNotEmpty()) {
-                        add("fill" to params.fill.toComposeColor())
+                        params.fill.toComposeColor()?.let { add("fill" to it) }
                     }
                     fillAlpha?.let {
                         add("fillAlpha" to "${it}f")
@@ -60,8 +60,8 @@ sealed interface ImageVectorNode {
                     pathFillType?.let {
                         add("pathFillType" to "${it.toCompose()}")
                     }
-                    stroke?.let {
-                        add("stroke" to it.toComposeColor())
+                    stroke?.let { stroke ->
+                        stroke.toComposeColor()?.let { add("stroke" to it) }
                     }
                     strokeAlpha?.let {
                         add("strokeAlpha" to "${it}f")
