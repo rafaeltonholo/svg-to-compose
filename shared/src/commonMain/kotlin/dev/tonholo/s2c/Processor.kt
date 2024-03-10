@@ -9,7 +9,6 @@ import dev.tonholo.s2c.extensions.isFile
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
@@ -132,11 +131,11 @@ class Processor(
         if (errors.isEmpty()) {
             output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
         } else {
-            debugSection("Full error messages")
-            errors.filter { (_, exception) ->
-                exception.message?.isNotEmpty() == true
-            }.forEach { debug(it) }
-            debugEndSection()
+            debugSection("Full error messages") {
+                errors.filter { (_, exception) ->
+                    exception.message?.isNotEmpty() == true
+                }.forEach { debug(it) }
+            }
 
             throw ExitProgramException(
                 errorCode = ErrorCode.FailedToParseIconError,

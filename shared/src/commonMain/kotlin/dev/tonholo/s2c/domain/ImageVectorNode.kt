@@ -6,8 +6,9 @@ import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.extensions.toComposeColor
 import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
+import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.logger.verboseSection
 
 sealed interface ImageVectorNode {
     fun materialize(): String
@@ -150,43 +151,45 @@ sealed interface ImageVectorNode {
 
 fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
-    debugSection("Starting path")
+    val nodes = verboseSection("Starting path") {
+        val commands = normalizedPath.split(" ").filter { it.isNotEmpty() }.toMutableList()
+        verbose("commands=$commands")
+        var lastCommand = Char.EMPTY
+        val nodes = mutableListOf<PathNodes>()
+        while (commands.size > 0) {
+            var current = commands.first()
+            var currentCommand = current.first()
 
-    val commands = normalizedPath.split(" ").filter { it.isNotEmpty() }.toMutableList()
-    debug("commands=$commands")
-    var lastCommand = Char.EMPTY
-    val nodes = mutableListOf<PathNodes>()
-    while (commands.size > 0) {
-        var current = commands.first()
-        var currentCommand = current.first()
+            if ((currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') && lastCommand != Char.EMPTY) {
+                currentCommand = when {
+                    // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
+                    // for implicit absolute LineTo (L/l) command(s)
+                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND && lastCommand.isLowerCase() ->
+                        PathNodes.LineTo.COMMAND
 
-        if ((currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') && lastCommand != Char.EMPTY) {
-            currentCommand = when {
-                // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
-                // for implicit absolute LineTo (L/l) command(s)
-                lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND && lastCommand.isLowerCase() ->
-                    PathNodes.LineTo.COMMAND
+                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND ->
+                        PathNodes.LineTo.COMMAND.uppercaseChar()
 
-                lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND ->
-                    PathNodes.LineTo.COMMAND.uppercaseChar()
-
-                else -> lastCommand
+                    else -> lastCommand
+                }
+                current = currentCommand + current
             }
-            current = currentCommand + current
+
+            verbose("current commands list=$commands")
+            verbose("current=$current, currentCommand=$currentCommand")
+
+            val isRelative = currentCommand.isLowerCase()
+            current = current.lowercase()
+            val node = createNode(current, commands, isRelative, currentCommand, minified)
+            lastCommand = currentCommand
+            nodes.add(node)
+            // Looping to avoid recreating a new list by using .drop() instead.
+            repeat(node.commandSize) {
+                commands.removeFirst()
+            }
         }
 
-        debug("current commands list=$commands")
-        debug("current=$current, currentCommand=$currentCommand")
-
-        val isRelative = currentCommand.isLowerCase()
-        current = current.lowercase()
-        val node = createNode(current, commands, isRelative, currentCommand, minified)
-        lastCommand = currentCommand
-        nodes.add(node)
-        // Looping to avoid recreating a new list by using .drop() instead.
-        repeat(node.commandSize) {
-            commands.removeFirst()
-        }
+        return@verboseSection nodes
     }
     return ImageVectorNode.NodeWrapper(
         normalizedPath = normalizedPath,
@@ -283,9 +286,9 @@ private fun StringBuilder.trimWhitespaceBeforeClose(
 }
 
 private fun normalizePath(path: String): String {
-    debugSection("Normalizing path")
-    debug("Original path value = $path")
-    debugEndSection()
+    debugSection("Normalizing path") {
+        debug("Original path value = $path")
+    }
 
     val parsedPath = StringBuilder()
     var lastChar = Char.EMPTY
@@ -313,8 +316,9 @@ private fun normalizePath(path: String): String {
         lastChar = char
     }
 
-    debugSection("Finished Normalizing")
-    debug("Normalized path value = $parsedPath")
+    debugSection("Finished Normalizing") {
+        debug("Normalized path value = $parsedPath")
+    }
 
     return parsedPath.toString().trimStart()
 }

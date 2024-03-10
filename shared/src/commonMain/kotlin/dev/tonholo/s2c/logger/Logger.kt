@@ -8,21 +8,33 @@ fun debug(message: Any) {
     }
 }
 
-fun debugSection(message: String) {
+fun <T> debugSection(title: String, block: () -> T): T =
     if (AppConfig.debug) {
-        println()
-        val section = "=".repeat(25 - (message.length / 2))
-        println("$section $message $section")
-        println()
+        startSection(title)
+        block().also { endSection() }
+    } else {
+        block()
     }
+
+fun <T> verboseSection(title: String, block: () -> T) =
+    if (AppConfig.verbose) {
+        startSection(title)
+        block().also { endSection() }
+    } else {
+        block()
+    }
+
+private fun startSection(message: String) {
+    println()
+    val section = "=".repeat(25 - (message.length / 2))
+    println("$section $message $section")
+    println()
 }
 
-fun debugEndSection() {
-    if (AppConfig.debug) {
-        println()
-        println("=".repeat(n = 50))
-        println()
-    }
+private fun endSection() {
+    println()
+    println("=".repeat(n = 50))
+    println()
 }
 
 fun verbose(message: String) {

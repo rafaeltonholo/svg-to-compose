@@ -2,9 +2,8 @@ package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
-import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugEndSection
-import dev.tonholo.s2c.logger.debugSection
+import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.logger.verboseSection
 import kotlin.math.max
 
 val defaultImports = setOf(
@@ -51,22 +50,20 @@ data class IconFileContents(
     val makeInternal: Boolean = false,
     val imports: Set<String> = defaultImports,
 ) {
-    fun materialize(): String {
-        debugSection("Generating file")
-        debug(
+    fun materialize(): String = verboseSection("Generating file") {
+        verbose(
             """Parameters:
-                   |    package=$pkg
-                   |    icon_name=$iconName
-                   |    theme=$theme
-                   |    width=$width
-                   |    height=$height
-                   |    viewport_width=$viewportWidth
-                   |    viewport_height=$viewportHeight
-                   |    nodes=${nodes.map { it.materialize() }}
-                   |    context_provider=$contextProvider
-                   |    imports=$imports
-                   |    
-            """.trimMargin()
+           |    package=$pkg
+           |    icon_name=$iconName
+           |    theme=$theme
+           |    width=$width
+           |    height=$height
+           |    viewport_width=$viewportWidth
+           |    viewport_height=$viewportHeight
+           |    nodes=${nodes.map { it.materialize() }}
+           |    context_provider=$contextProvider
+           |    imports=$imports
+           |""".trimMargin()
         )
 
         val iconPropertyName = when {
@@ -116,7 +113,7 @@ data class IconFileContents(
 
         val visibilityModifier = if (makeInternal) "internal " else ""
 
-        return """
+        return@verboseSection """
             |package $pkg
             |
             |${imports.sorted().joinToString("\n") { "import $it" }}
@@ -140,8 +137,7 @@ data class IconFileContents(
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |
-        """.trimMargin().also {
-            debugEndSection()
-        }
+        """.trimMargin()
     }
+
 }

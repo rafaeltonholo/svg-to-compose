@@ -2,7 +2,6 @@ package dev.tonholo.s2c.io
 
 import AppConfig.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.extensions.extension
-import dev.tonholo.s2c.logger.debugEndSection
 import dev.tonholo.s2c.logger.debugSection
 import okio.FileSystem
 import okio.Path
@@ -19,26 +18,24 @@ class TempFileWriter(
         file: Path,
         optimize: Boolean,
     ): Path {
-        debugSection("Creating temporary file")
+        val targetFile = debugSection("Creating temporary file") {
+            fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
 
-        fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
+            val extension = file.extension
+            val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
 
-        val extension = file.extension
-        val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
+            fileSystem.copy(file, targetFile)
 
-        fileSystem.copy(file, targetFile)
+            return@debugSection targetFile
+        }
 
-        debugEndSection()
-
-        // When optimize is enabled, we always end up with a xml file.
+        // When optimize is enabled, we always end up with an XML file.
         return if (optimize) tempFolder / "${TARGET_FILENAME}.xml" else targetFile
     }
 
     fun clear() {
-        debugSection("Deleting temp files")
-
-        fileSystem.deleteRecursively(tempFolder)
-
-        debugEndSection()
+        debugSection("Deleting temp files") {
+            fileSystem.deleteRecursively(tempFolder)
+        }
     }
 }
