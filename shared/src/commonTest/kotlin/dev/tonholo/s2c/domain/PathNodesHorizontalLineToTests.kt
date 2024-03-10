@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -11,18 +15,17 @@ class PathNodesHorizontalLineToTests {
     data class HorizontalLineParams(
         val x: Float,
     ) {
-        override fun toString(): String = "$x"
+        override fun toString(): String = "$x".removeTrailingZero()
     }
+
+    private val root = XmlRootNode(children = mutableSetOf())
 
     @Test
     fun `ensure a 'h' command is parsed to HorizontalLineTo relative`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "h 8",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "h 8"),
         )
         // Act
         val node = path.asNode()
@@ -38,12 +41,9 @@ class PathNodesHorizontalLineToTests {
     @Test
     fun `ensure a 'H' command is parsed to HorizontalLineTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "H 8",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "H 8"),
         )
         // Act
         val node = path.asNode()
@@ -65,12 +65,9 @@ class PathNodesHorizontalLineToTests {
         val relative = HorizontalLineParams(
             x = 80f,
         )
-        val path = SvgNode.Path(
-            d = "H$nonRelative h$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
         val node = path.asNode()
@@ -106,12 +103,9 @@ class PathNodesHorizontalLineToTests {
         val relative = HorizontalLineParams(
             x = 80f,
         )
-        val path = SvgNode.Path(
-            d = "H${nonRelative}z h${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
         val node = path.asNode()
@@ -122,7 +116,7 @@ class PathNodesHorizontalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// H $this
+                |// H ${this}z
                 |horizontalLineTo(x = ${x}f)
                 |close()
                 |""".trimMargin()
@@ -132,7 +126,7 @@ class PathNodesHorizontalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// h $this
+                |// h ${this}z
                 |horizontalLineToRelative(dx = ${x}f)
                 |close()
                 |""".trimMargin()
@@ -149,12 +143,9 @@ class PathNodesHorizontalLineToTests {
         val relative = HorizontalLineParams(
             x = 80f,
         )
-        val path = SvgNode.Path(
-            d = "H$nonRelative h$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
         val node = path.asNode(minified = true)
@@ -184,12 +175,9 @@ class PathNodesHorizontalLineToTests {
         val relative = HorizontalLineParams(
             x = 80f,
         )
-        val path = SvgNode.Path(
-            d = "H${nonRelative}z h${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true)

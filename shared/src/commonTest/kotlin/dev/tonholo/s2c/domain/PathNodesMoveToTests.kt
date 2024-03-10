@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -8,16 +12,19 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class PathNodesMoveToTests {
-    private data class MoveToParams(val x: String, val y: String)
+    private data class MoveToParams(val x: String, val y: String) {
+        override fun toString(): String =
+            "$x $y".removeTrailingZero()
+    }
+
+    private val root = XmlRootNode(children = mutableSetOf())
+
     @Test
     fun `ensure a 'm' command is parsed to MoveTo relative`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "m85.122 64.795",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "m85.122 64.795"),
         )
         // Act
         val node = path.asNode()
@@ -33,12 +40,9 @@ class PathNodesMoveToTests {
     @Test
     fun `ensure a 'M' command is parsed to MoveTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "M85.122 64.795",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M85.122 64.795"),
         )
         // Act
         val node = path.asNode()
@@ -56,12 +60,9 @@ class PathNodesMoveToTests {
         // Arrange
         val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
-        val path = SvgNode.Path(
-            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
         val node = path.asNode()
@@ -74,7 +75,7 @@ class PathNodesMoveToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// M $x $y
+                |// M $this
                 |moveTo(x = ${x}f, y = ${y}f)
                 |
             """.trimMargin()
@@ -86,7 +87,7 @@ class PathNodesMoveToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// m $x $y
+                |// m $this
                 |moveToRelative(dx = ${x}f, dy = ${y}f)
                 |
             """.trimMargin()
@@ -99,12 +100,9 @@ class PathNodesMoveToTests {
         // Arrange
         val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
-        val path = SvgNode.Path(
-            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
         val node = path.asNode()
@@ -117,7 +115,7 @@ class PathNodesMoveToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// M $x $y
+                |// M ${this}z
                 |moveTo(x = ${x}f, y = ${y}f)
                 |close()
                 |
@@ -130,7 +128,7 @@ class PathNodesMoveToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// m $x $y
+                |// m ${this}z
                 |moveToRelative(dx = ${x}f, dy = ${y}f)
                 |close()
                 |
@@ -144,12 +142,9 @@ class PathNodesMoveToTests {
         // Arrange
         val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
-        val path = SvgNode.Path(
-            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
         val node = path.asNode(minified = true)
@@ -179,12 +174,9 @@ class PathNodesMoveToTests {
         // Arrange
         val nonRelativeMoveToParams = MoveToParams(x = "85.122", y = "64.795")
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
-        val path = SvgNode.Path(
-            d = "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
         val node = path.asNode(minified = true)

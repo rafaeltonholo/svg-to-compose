@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -12,18 +16,17 @@ class PathNodesLineToTests {
         val x: Float,
         val y: Float,
     ) {
-        override fun toString(): String = "$x $y"
+        override fun toString(): String = "$x $y".removeTrailingZero()
     }
+
+    private val root = XmlRootNode(children = mutableSetOf())
 
     @Test
     fun `ensure a 'l' command is parsed to LineTo relative`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "l 8 10",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "l 8 10"),
         )
         // Act
         val node = path.asNode()
@@ -39,12 +42,9 @@ class PathNodesLineToTests {
     @Test
     fun `ensure a 'L' command is parsed to LineTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "L 8 10",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "L 8 10"),
         )
         // Act
         val node = path.asNode()
@@ -68,12 +68,9 @@ class PathNodesLineToTests {
             x = 80f,
             y = 10f,
         )
-        val path = SvgNode.Path(
-            d = "L$nonRelative l$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "L$nonRelative l$relative"),
         )
         // Act
         val node = path.asNode()
@@ -111,12 +108,9 @@ class PathNodesLineToTests {
             x = 80f,
             y = 10f,
         )
-        val path = SvgNode.Path(
-            d = "L${nonRelative}z l${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "L${nonRelative}z l${relative}z"),
         )
         // Act
         val node = path.asNode()
@@ -127,7 +121,7 @@ class PathNodesLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// L $this
+                |// L ${this}z
                 |lineTo(x = ${x}f, y = ${y}f)
                 |close()
                 |""".trimMargin()
@@ -137,7 +131,7 @@ class PathNodesLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// l $this
+                |// l ${this}z
                 |lineToRelative(dx = ${x}f, dy = ${y}f)
                 |close()
                 |""".trimMargin()
@@ -156,12 +150,9 @@ class PathNodesLineToTests {
             x = 80f,
             y = 10f,
         )
-        val path = SvgNode.Path(
-            d = "L$nonRelative l$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "L$nonRelative l$relative"),
         )
         // Act
         val node = path.asNode(minified = true)
@@ -193,12 +184,9 @@ class PathNodesLineToTests {
             x = 80f,
             y = 10f,
         )
-        val path = SvgNode.Path(
-            d = "L${nonRelative}z l${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "L${nonRelative}z l${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true)

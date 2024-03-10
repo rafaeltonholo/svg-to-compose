@@ -7,8 +7,8 @@ import kotlin.math.abs
 value class StrokeDashArray(private val value: String) {
     val dashesAndGaps
         get() = value.split(" ")
-            .map { it.toFloat() }
-            .toFloatArray()
+            .map { it.toInt() }
+            .toIntArray()
 }
 
 private enum class StrokeDashDrawDirection(
@@ -25,7 +25,7 @@ private enum class StrokeDashDrawDirection(
         entries[(this.ordinal + 1) % entries.size]
 }
 
-fun StrokeDashArray.createDashedPathForRect(
+fun IntArray.createDashedPathForRect(
     x: Int,
     y: Int,
     width: Int,
@@ -33,8 +33,7 @@ fun StrokeDashArray.createDashedPathForRect(
     strokeWidth: Int,
     isMinified: Boolean,
 ): List<PathNodes> {
-    // store dashesAndGaps to avoid recreating the array on every position get.
-    val dashesAndGaps = dashesAndGaps
+    val dashesAndGaps = this
     val perimeter = 2f * (width + height)
     var drawLength = 0f
     var i = 0
@@ -52,7 +51,7 @@ fun StrokeDashArray.createDashedPathForRect(
         add(pathNode(PathNodes.MoveTo.COMMAND) { args(x, y) })
 
         while (drawLength < perimeter) {
-            val dashOrGap = dashesAndGaps[i % dashesAndGaps.size]
+            val dashOrGap = dashesAndGaps[i % dashesAndGaps.size].toFloat()
             val nextDrawLength = drawLength + dashOrGap
             val edge = edges[direction.ordinal]
             val atTheEdge = nextDrawLength >= edge

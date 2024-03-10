@@ -1,22 +1,18 @@
 package dev.tonholo.s2c.parser
 
-import dev.tonholo.s2c.domain.AndroidVector
-import dev.tonholo.s2c.domain.AndroidVectorNode
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.Svg
-import dev.tonholo.s2c.domain.SvgNode
-import dev.tonholo.s2c.domain.asNode
+import dev.tonholo.s2c.domain.avg.AvgElementNode
+import dev.tonholo.s2c.domain.avg.asNodes
 import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.groupImports
 import dev.tonholo.s2c.domain.materialContextProviderImport
 import dev.tonholo.s2c.domain.previewImports
+import dev.tonholo.s2c.domain.svg.SvgElementNode
+import dev.tonholo.s2c.domain.svg.asNodes
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import nl.adaptivity.xmlutil.serialization.XML
 import okio.FileSystem
 import okio.Path
 
@@ -34,26 +30,6 @@ data class ParserConfig(
 sealed class ImageParser(
     private val fileSystem: FileSystem,
 ) {
-    val xmlParser by lazy {
-        val module = SerializersModule {
-            polymorphic(SvgNode::class) {
-                subclass(SvgNode.Path::class, SvgNode.Path.serializer())
-                subclass(SvgNode.Group::class, SvgNode.Group.serializer())
-                subclass(SvgNode.Mask::class, SvgNode.Mask.serializer())
-                subclass(SvgNode.Rect::class, SvgNode.Rect.serializer())
-            }
-            polymorphic(AndroidVectorNode::class) {
-                subclass(AndroidVectorNode.Path::class, AndroidVectorNode.Path.serializer())
-                subclass(AndroidVectorNode.Group::class, AndroidVectorNode.Group.serializer())
-            }
-        }
-        XML(module) {
-            defaultPolicy {
-                autoPolymorphic = true
-            }
-        }
-    }
-
     abstract fun parse(
         file: Path,
         iconName: String,
@@ -100,25 +76,12 @@ sealed class ImageParser(
             config: ParserConfig,
         ): IconFileContents {
             val content = readContent(file)
-            val svg = xmlParser.decodeFromString(
-                deserializer = Svg.serializer(),
-                string = content,
-            )
-            val viewBox = if (svg.viewBox != null) {
-                svg.viewBox.split(" ").map { it.toFloat() }.toMutableList()
-            } else {
-                mutableListOf(svg.width.toFloat(), svg.height.toFloat())
-            }
+
+            val root = parse(content = content, rootTag = RootTag.Svg)
+            val svg = root.children.single { it is SvgElementNode } as SvgElementNode
+            val viewBox = svg.viewBox.toMutableList()
             val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
-            val masks = svg.commands.filterIsInstance<SvgNode.Mask>()
-            val nodes = svg.commands.mapNotNull {
-                it.asNode(
-                    width = svg.width.toFloat(),
-                    height = svg.height.toFloat(),
-                    minified = config.minified,
-                    masks = masks,
-                )
-            }
+            val nodes = svg.asNodes(minified = config.minified)
 
             return IconFileContents(
                 pkg = config.pkg,
@@ -148,29 +111,18 @@ sealed class ImageParser(
         ): IconFileContents {
             val content = readContent(file)
 
-            val androidVector = xmlParser.decodeFromString(
-                deserializer = AndroidVector.serializer(),
-                string = content,
-            )
-
-            val width = androidVector.width.removeSuffix("dp").toFloat()
-            val height = androidVector.height.removeSuffix("dp").toFloat()
-            val nodes = androidVector.nodes.map {
-                it.asNode(
-                    width = width,
-                    height = height,
-                    minified = config.minified,
-                )
-            }
+            val root = parse(content = content, rootTag = RootTag.Avg)
+            val avg = root.children.single { it is AvgElementNode } as AvgElementNode
+            val nodes = avg.asNodes(minified = config.minified)
 
             return IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
-                width = width,
-                height = height,
-                viewportWidth = androidVector.viewportWidth.toFloat(),
-                viewportHeight = androidVector.viewportHeight.toFloat(),
+                width = avg.width,
+                height = avg.height,
+                viewportWidth = avg.viewportWidth,
+                viewportHeight = avg.viewportHeight,
                 nodes = nodes,
                 contextProvider = config.contextProvider,
                 addToMaterial = config.addToMaterial,

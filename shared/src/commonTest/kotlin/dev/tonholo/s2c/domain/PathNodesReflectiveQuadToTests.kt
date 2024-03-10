@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -12,18 +16,17 @@ class PathNodesReflectiveQuadToTests {
         val x1: Float,
         val y1: Float,
     ) {
-        override fun toString(): String = "$x1 $y1"
+        override fun toString(): String = "$x1 $y1".removeTrailingZero()
     }
+
+    private val root = XmlRootNode(children = mutableSetOf())
 
     @Test
     fun `ensure a 't' command is parsed to ReflectiveQuadTo relative`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "t8.5.2", // should parse to t8.5 .2
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "t8.5.2"), // should parse to t8.5 .2
         )
         // Act
         val node = path.asNode()
@@ -39,12 +42,9 @@ class PathNodesReflectiveQuadToTests {
     @Test
     fun `ensure a 'T' command is parsed to ReflectiveQuadTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "T -2.5-6.5", // should parse to T-2.5 -6.5
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "T -2.5-6.5"), // should parse to T-2.5 -6.5
         )
         // Act
         val node = path.asNode()
@@ -68,12 +68,9 @@ class PathNodesReflectiveQuadToTests {
             x1 = 321f,
             y1 = 125f,
         )
-        val path = SvgNode.Path(
-            d = "T$nonRelative t$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "T$nonRelative t$relative"),
         )
         // Act
         val node = path.asNode()
@@ -117,12 +114,9 @@ class PathNodesReflectiveQuadToTests {
             x1 = 321f,
             y1 = 125f,
         )
-        val path = SvgNode.Path(
-            d = "T${nonRelative}z t${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "T${nonRelative}z t${relative}z"),
         )
         // Act
         val node = path.asNode()
@@ -133,7 +127,7 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// T $this
+                |// T ${this}z
                 |reflectiveQuadTo(
                 |    x1 = ${x1}f,
                 |    y1 = ${y1}f,
@@ -146,7 +140,7 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// t $this
+                |// t ${this}z
                 |reflectiveQuadToRelative(
                 |    dx1 = ${x1}f,
                 |    dy1 = ${y1}f,
@@ -168,12 +162,9 @@ class PathNodesReflectiveQuadToTests {
             x1 = 321f,
             y1 = 125f,
         )
-        val path = SvgNode.Path(
-            d = "T$nonRelative t$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "T$nonRelative t$relative"),
         )
         // Act
         val node = path.asNode(minified = true)
@@ -205,12 +196,9 @@ class PathNodesReflectiveQuadToTests {
             x1 = 321f,
             y1 = 125f,
         )
-        val path = SvgNode.Path(
-            d = "T${nonRelative}z t${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "T${nonRelative}z t${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true)

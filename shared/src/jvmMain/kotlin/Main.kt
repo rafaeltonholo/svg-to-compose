@@ -25,8 +25,8 @@ fun main() {
     val currentDir = Paths.get("")
     val projectDirectory = currentDir.toAbsolutePath().parent
 
-    val path = "${projectDirectory}/samples/rects/complex-rects.svg"
-    val output = "${projectDirectory}/integrity-check/ComplexRects.svg.NonOptimized.kt"
+    val path = "${projectDirectory}/samples/illustration.svg"
+    val output = "${projectDirectory}/integrity-check/Illustration.svg.NewXmlParse.kt"
     val config = ParserConfig(
         pkg = "dev.tonholo.composeicons.ui.icon",
         theme = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme",

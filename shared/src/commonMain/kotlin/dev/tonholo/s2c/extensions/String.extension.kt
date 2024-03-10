@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.extensions
 
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 private const val FULL_HEXADECIMAL_COLOR_SIZE = 6
 private const val HALF_HEXADECIMAL_COLOR_SIZE = 3
@@ -39,11 +38,6 @@ fun String.toLengthFloat(
     this.toFloat()
 }
 
-fun String.toLengthInt(
-    width: Int,
-    height: Int,
-): Int = toLengthFloat(width.toFloat(), height.toFloat()).roundToInt()
-
 /**
  * Converts a hexadecimal color into a SolidColor brush
  */
@@ -60,3 +54,6 @@ fun String.toComposeColor(): String? = uppercase()
     }
     .takeIf { it.lowercase() != "none" }
     ?.let { "SolidColor(Color(0x$it))" }
+
+
+fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")

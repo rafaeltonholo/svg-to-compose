@@ -4,7 +4,9 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 
 plugins {
@@ -83,9 +85,12 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.com.squareup.okio)
-            implementation(libs.xmlutil.core)
-            implementation(libs.xmlutil.serialization)
+            implementation(libs.com.fleeksoft.ksoup)
             implementation(kotlin("reflect"))
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
 
         nativeMain.dependencies {
@@ -150,4 +155,9 @@ tasks.withType<KotlinTest>().configureEach {
         showStackTraces = false
         showStandardStreams = true
     }
+}
+
+@OptIn(InternalKotlinGradlePluginApi::class)
+tasks.withType<KotlinJvmRun> {
+    isIgnoreExitValue = true
 }

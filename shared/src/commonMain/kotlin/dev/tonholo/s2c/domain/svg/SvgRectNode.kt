@@ -1,14 +1,44 @@
-package dev.tonholo.s2c.domain
+package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.domain.createDashedPathForRect
+import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.domain.pathNode
+import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
-import dev.tonholo.s2c.extensions.toLengthInt
 import dev.tonholo.s2c.logger.warn
 
-fun SvgNode.Rect.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
+class SvgRectNode(
+    parent: XmlParentNode,
+    attributes: MutableMap<String, String>,
+) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
+    val width: Int by attribute()
+    val height: Int by attribute()
+    val x: Int? by attribute()
+    val y: Int? by attribute()
+    val rx: Int? by attribute()
+    val ry: Int? by attribute()
+
+    override val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
+        it?.toLengthFloat(width = width.toFloat(), height = height.toFloat())
+    } // <length | percentage>
+
+    override val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
+        it?.toLengthFloat(width = width.toFloat(), height = height.toFloat())
+    } // <0..1 | percentage>
+
+    companion object {
+        const val TAG_NAME = "rect"
+    }
+}
+
+fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val xCornerSize = rx ?: ry ?: 0
     val yCornerSize = ry ?: rx ?: 0
     val x = x ?: 0
     val y = y ?: 0
+    val strokeDashArray = strokeDashArray
 
     return ImageVectorNode.NodeWrapper(
         normalizedPath = buildString {
@@ -17,32 +47,34 @@ fun SvgNode.Rect.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
             append("height=\"$height\" ")
             rx?.let { append("rx=\"$it\" ") }
             ry?.let { append("ry=\"$it\" ") }
-            fill?.let { append("fill=\"$it\" ") }
+            fill?.let { append("fill=\"${it.value}\" ") }
             opacity?.let { append("opacity=\"$it\" ") }
             fillOpacity?.let { append("fill-opacity=\"$it\" ") }
             style?.let { append("style=\"$it\" ") }
             stroke?.let { append("stroke=\"$it\" ") }
-            strokeWidth?.let { append("stroke-width=\"$it\" ") }
+            strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
             strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
             strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
             fillRule?.let { append("fill-rule=\"$it\" ") }
             strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
             strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
-            strokeDashArray?.let { append("stroke-dasharray=\"$it\" ") }
+            strokeDashArray?.let { dashArray ->
+                append("stroke-dasharray=\"${dashArray.joinToString(" ")}\" ")
+            }
             append("/>")
         },
         nodes = when {
-            !strokeDashArray.isNullOrEmpty() && rx == null && ry == null -> {
+            strokeDashArray != null && rx == null && ry == null -> {
                 warn(
                     "Parsing a `stroke-dasharray` attribute is experimental and " +
                         "might differ a little from the original."
                 )
-                StrokeDashArray(strokeDashArray).createDashedPathForRect(
+                strokeDashArray.createDashedPathForRect(
                     x = x,
                     y = y,
                     width = width,
                     height = height,
-                    strokeWidth = strokeWidth?.toLengthInt(width, height) ?: 1,
+                    strokeWidth = strokeWidth?.toInt() ?: 1,
                     isMinified = isMinified,
                 )
             }
@@ -126,21 +158,19 @@ fun SvgNode.Rect.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     )
 }
 
-fun SvgNode.Rect.asNode(
-    width: Float,
-    height: Float,
+fun SvgRectNode.asNode(
     minified: Boolean = false,
 ): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
-        fill = fill ?: "#000000", // Rect has a filling by default.
+        fill = fill.orDefault().value, // Rect has a filling by default.
         fillAlpha = fillOpacity,
-        pathFillType = PathFillType(fillRule),
-        stroke = stroke,
-        strokeAlpha = strokeOpacity?.toLengthFloat(width, height),
-        strokeLineCap = StrokeCap(strokeLineCap),
-        strokeLineJoin = StrokeJoin(strokeLineJoin),
+        pathFillType = fillRule,
+        stroke = stroke?.value,
+        strokeAlpha = strokeOpacity,
+        strokeLineCap = strokeLineCap,
+        strokeLineJoin = strokeLineJoin,
         strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth?.toLengthFloat(width, height) ?: stroke?.let { 1f },
+        strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
     ),
     wrapper = createPath(minified),
     minified = minified,

@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -14,18 +18,17 @@ class PathNodesQuadToTests {
         val x2: Float,
         val y2: Float,
     ) {
-        override fun toString(): String = "$x1 $y1 $x2 $y2"
+        override fun toString(): String = "$x1 $y1 $x2 $y2".removeTrailingZero()
     }
+
+    private val root = XmlRootNode(children = mutableSetOf())
 
     @Test
     fun `ensure a 'q' command is parsed to QuadTo relative`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "q8,2 8,8",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "q8,2 8,8"),
         )
         // Act
         val node = path.asNode()
@@ -41,12 +44,9 @@ class PathNodesQuadToTests {
     @Test
     fun `ensure a 'S' command is parsed to QuadTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "Q2,-2 4,5",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "Q2,-2 4,5"),
         )
         // Act
         val node = path.asNode()
@@ -74,12 +74,9 @@ class PathNodesQuadToTests {
             x2 = 510f,
             y2 = 51f,
         )
-        val path = SvgNode.Path(
-            d = "Q$nonRelative q$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "Q$nonRelative q$relative"),
         )
         // Act
         val node = path.asNode()
@@ -131,12 +128,9 @@ class PathNodesQuadToTests {
             x2 = 510f,
             y2 = 51f,
         )
-        val path = SvgNode.Path(
-            d = "Q${nonRelative}z q${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "Q${nonRelative}z q${relative}z"),
         )
         // Act
         val node = path.asNode()
@@ -147,7 +141,7 @@ class PathNodesQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// Q $this
+                |// Q ${this}z
                 |quadTo(
                 |    x1 = ${x1}f,
                 |    y1 = ${y1}f,
@@ -162,7 +156,7 @@ class PathNodesQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// q $this
+                |// q ${this}z
                 |quadToRelative(
                 |    dx1 = ${x1}f,
                 |    dy1 = ${y1}f,
@@ -190,12 +184,9 @@ class PathNodesQuadToTests {
             x2 = 510f,
             y2 = 51f,
         )
-        val path = SvgNode.Path(
-            d = "Q$nonRelative q$relative",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "Q$nonRelative q$relative"),
         )
         // Act
         val node = path.asNode(minified = true)
@@ -245,12 +236,9 @@ class PathNodesQuadToTests {
             x2 = 510f,
             y2 = 51f,
         )
-        val path = SvgNode.Path(
-            d = "Q${nonRelative}z q${relative}z",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "Q${nonRelative}z q${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true)

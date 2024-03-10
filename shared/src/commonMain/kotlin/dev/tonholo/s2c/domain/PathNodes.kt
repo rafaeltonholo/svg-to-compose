@@ -6,6 +6,7 @@ package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.domain.PathNodes.Companion.CLOSE_COMMAND
 import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 
 sealed class PathNodes(
@@ -38,7 +39,7 @@ sealed class PathNodes(
         parameters: Set<String>,
         forceInline: Boolean = false,
     ): String = """
-        |${if (minified) "" else "${comment.replace("\\.0".toRegex(), "")}${if (shouldClose) "z" else ""}"}
+        |${if (minified) "" else "${comment.removeTrailingZero()}${if (shouldClose) "z" else ""}"}
         |$fnName${if (isRelative) "Relative" else ""}(${parameters.toParameters(forceInline)})
         |${closeCommand()}
     """.trimMargin().let {
