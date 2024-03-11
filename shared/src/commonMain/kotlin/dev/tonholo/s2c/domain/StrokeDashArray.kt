@@ -12,8 +12,8 @@ value class StrokeDashArray(private val value: String) {
 }
 
 private enum class StrokeDashDrawDirection(
-    val command: Char,
-    val edgeCommand: Char,
+    val command: PathCommand,
+    val edgeCommand: PathCommand,
 ) {
     RIGHT(command = PathNodes.HorizontalLineTo.COMMAND, edgeCommand = PathNodes.VerticalLineTo.COMMAND),
     DOWN(command = PathNodes.VerticalLineTo.COMMAND, edgeCommand = RIGHT.command),

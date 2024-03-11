@@ -12,7 +12,7 @@ import dev.tonholo.s2c.extensions.toInt
 sealed class PathNodes(
     val values: List<String>,
     val isRelative: Boolean,
-    val command: Char,
+    val command: PathCommand,
     val commandSize: Int,
     val minified: Boolean,
 ) {
@@ -69,7 +69,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'm'
+            val COMMAND = PathCommand('m')
             const val COMMAND_SIZE = 2
         }
 
@@ -106,7 +106,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'a'
+            val COMMAND = PathCommand('a')
             const val COMMAND_SIZE = 7
         }
 
@@ -155,7 +155,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'v'
+            val COMMAND = PathCommand('v')
             const val COMMAND_SIZE = 1
         }
 
@@ -190,7 +190,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'h'
+            val COMMAND = PathCommand('h')
             const val COMMAND_SIZE = 1
         }
 
@@ -225,7 +225,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'l'
+            val COMMAND = PathCommand('l')
             const val COMMAND_SIZE = 2
         }
 
@@ -266,7 +266,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'c'
+            val COMMAND = PathCommand('c')
             const val COMMAND_SIZE = 6
         }
 
@@ -311,7 +311,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 's'
+            val COMMAND = PathCommand('s')
             const val COMMAND_SIZE = 4
         }
 
@@ -351,7 +351,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 'q'
+            val COMMAND = PathCommand('q')
             const val COMMAND_SIZE = 4
         }
 
@@ -391,7 +391,7 @@ sealed class PathNodes(
         minified = minified,
     ) {
         companion object {
-            const val COMMAND = 't'
+            val COMMAND = PathCommand('t')
             const val COMMAND_SIZE = 2
         }
 
@@ -536,5 +536,6 @@ class PathNodesBuilder(val command: Char) {
     }
 }
 
-fun pathNode(command: Char, block: PathNodesBuilder.() -> Unit): PathNodes =
-    PathNodesBuilder(command).apply(block).build()
+internal fun pathNode(command: PathCommand, configuration: PathNodesBuilder.() -> Unit): PathNodes =
+    PathNodesBuilder(command).apply(configuration).build()
+
