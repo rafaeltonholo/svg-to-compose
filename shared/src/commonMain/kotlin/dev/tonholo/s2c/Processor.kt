@@ -48,58 +48,17 @@ class Processor(
             )
         }
 
-        val files = mutableListOf(filePath)
-
         printEmpty()
-        if (inputMetadata.isDirectory) {
+        val files = if (inputMetadata.isDirectory) {
             output("🔍 Directory detected")
-            if (outputPath.isDirectory.not()) {
-                printEmpty()
-                throw ExitProgramException(
-                    errorCode = ErrorCode.OutputNotDirectoryError,
-                    message = """❌ ERROR: when the input is a directory, the output MUST be directory too.
-                        |If you pointed to a directory path, make sure the output directory already exists.
-                        |
-                    """.trimMargin(),
-                )
-            }
-
-            files.clear()
-            val directoryFiles = fileSystem.list(filePath)
-                .filter {
-                    it.name.endsWith(".svg") || it.name.endsWith(".xml")
-                }
-            verbose("svg/xml files = $directoryFiles")
-            files.addAll(
-                directoryFiles,
-            )
-            if (files.isEmpty()) {
-                throw ExitProgramException(
-                    errorCode = ErrorCode.FileNotFoundError,
-                    message = """
-                    |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
-                    |No SVG or XML files detected in the directory.
-                    |
-                    """.trimMargin()
-                )
-            }
+            findSvgAndXmlFilesInDirectory(outputPath, filePath)
         } else {
             output("🔍 File detected")
-            if (outputPath.extension.isEmpty()) {
-                output("Output path is missing kotlin file extension. Appending it to the output.")
-                outputPath = "$output.kt".toPath()
-            }
+            outputPath = ensureKotlinFileExtension(outputPath)
+            listOf(filePath)
         }
 
-        val optimizer = if (config.optimize) {
-            verbose("Verifying optimization dependencies")
-            val optimizer = Optimizer.Factory(fileSystem)
-            optimizer.verifyDependency()
-            verbose("Finished verification")
-            optimizer
-        } else {
-            null
-        }
+        val optimizer = createOptimizer(config)
 
         val errors = mutableListOf<Pair<Path, Exception>>()
         for (file in files) {
@@ -151,6 +110,100 @@ class Processor(
         }
     }
 
+    /**
+     * Ensures the output path has a Kotlin file extension (.kt).
+     *
+     * This function checks if the provided output path has a file extension.
+     * If the extension is missing, it appends ".kt". Otherwise, the original
+     * output path is returned.
+     *
+     * @param outputPath The intended output path.
+     * @return The validated output path with a guaranteed Kotlin file extension (.kt).
+     */
+    private fun ensureKotlinFileExtension(outputPath: Path): Path {
+        return if (outputPath.extension.isEmpty() || outputPath.extension != ".kt") {
+            output("Output path is missing kotlin file extension. Appending it to the output.")
+            "$outputPath.kt".toPath()
+        } else {
+            outputPath
+        }
+    }
+
+    /**
+     * Finds SVG and XML files within a directory.
+     *
+     * This function searches for files with the extensions ".svg" and ".xml" in the
+     * specified directory.
+     *
+     * - It throws an [ExitProgramException] with [ErrorCode.OutputNotDirectoryError]
+     * if the output path is not a directory.
+     * - It throws an [ExitProgramException] with [ErrorCode.FileNotFoundError] if no
+     * SVG or XML files are found in the directory.
+     *
+     * @param outputPath The path to the directory to search for files.
+     * @param filePath The path of the current directory being processed.
+     * @throws ExitProgramException If an error occurs during processing.
+     * @return A List containing all the discovered SVG/XML files.
+     */
+    private fun findSvgAndXmlFilesInDirectory(outputPath: Path, filePath: Path): List<Path> = buildList {
+        if (outputPath.isDirectory.not()) {
+            printEmpty()
+            throw ExitProgramException(
+                errorCode = ErrorCode.OutputNotDirectoryError,
+                message = """❌ ERROR: when the input is a directory, the output MUST be directory too.
+                            |If you pointed to a directory path, make sure the output directory already exists.
+                            |
+                """.trimMargin(),
+            )
+        }
+
+        val directoryFiles = fileSystem.list(filePath)
+            .filter {
+                it.name.endsWith(".svg") || it.name.endsWith(".xml")
+            }
+        verbose("svg/xml files = $directoryFiles")
+        addAll(
+            directoryFiles,
+        )
+
+        if (isEmpty()) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.FileNotFoundError,
+                message = """
+                        |❌ Failure to parse SVG/Android Vector Drawable to Jetpack Compose.
+                        |No SVG or XML files detected in the directory.
+                        |
+                """.trimMargin()
+            )
+        }
+    }
+
+    private fun createOptimizer(config: ParserConfig) = if (config.optimize) {
+        verbose("Verifying optimization dependencies")
+        val optimizer = Optimizer.Factory(fileSystem)
+        optimizer.verifyDependency()
+        verbose("Finished verification")
+        optimizer
+    } else {
+        null
+    }
+
+    /**
+     * This function processes files to convert SVG or Android Vector Drawable to
+     * Jetpack Compose icons.
+     *
+     * @param file The path of the file that this function is processing.
+     * It expects a Path object which contains the complete directory path of the
+     * file to be converted.
+     * @param optimizer An optional Optimizer Factory object that can be used to
+     * optimize the SVG.  If an Optimizer object is passed, the SVG will be optimized
+     * before conversion. If set to null, the SVG will not be optimized.
+     * @param output The path location where the result files are expected to be stored
+     * after SVG conversion. It expects a Path object which contains the complete
+     * directory path where files will be saved.
+     * @param config The Parser Configuration. This contains settings for the conversion
+     * process. This function raises an exception if something goes wrong during the process.
+     */
     private fun processFile(
         file: Path,
         optimizer: Optimizer.Factory?,
