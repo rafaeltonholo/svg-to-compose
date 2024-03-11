@@ -58,13 +58,24 @@ class Client : CliktCommand() {
             "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
     ).boolean().default(true)
 
+    @Deprecated("Context provider is a wrong naming for what this is supposed to do.")
     private val contextProvider by option(
         names = arrayOf("-cp", "--context-provider"),
         help = """
-        Adds a custom context provider to the Icon definition.
-        E.g.: s2c <args> -o MyIcon.kt -cp Icons.Filled my-icon.svg will creates the Compose Icon:
-        val Icons.Filled.MyIcon: ImageVector.
+        Deprecated: use --receiver-type or -rt instead.
         """.trimIndent(),
+        hidden = true,
+    )
+
+    private val receiverType by option(
+        names = arrayOf("-rt", "--receiver-type"),
+        help = """
+        |Adds a receiver type to the Icon definition. This will generate the Icon as a extension of the passed argument.
+        |
+        |E.g.: `s2c <args> -o MyIcon.kt -rt Icons.Filled my-icon.svg` will creates the Compose Icon:
+        |
+        |`val Icons.Filled.MyIcon: ImageVector`.
+        """.trimMargin(),
     )
 
     private val addToMaterial by option(
@@ -105,7 +116,7 @@ class Client : CliktCommand() {
         verbose("   theme = $theme")
         verbose("   output = $output")
         verbose("   optimize = $optimize")
-        verbose("   contextProvider = $contextProvider")
+        verbose("   receiverType = $receiverType")
         verbose("   addToMaterial = $addToMaterial")
         verbose("   debug = $debug")
         verbose("   verbose = $verbose")
@@ -133,7 +144,7 @@ class Client : CliktCommand() {
                     pkg = pkg,
                     theme = theme,
                     optimize = optimize,
-                    contextProvider = contextProvider,
+                    receiverType = receiverType ?: @Suppress("DEPRECATION") contextProvider,
                     addToMaterial = addToMaterial,
                     noPreview = noPreview,
                     makeInternal = makeInternal,

@@ -21,7 +21,6 @@ class IconWriter(
         printEmpty()
         output("📝 Writing icon file on $output")
         debugSection("Writing document") {
-
             val outputExists = fileSystem.exists(output)
             verbose("outputExists=$outputExists")
             if (output.isDirectory && outputExists.not()) {

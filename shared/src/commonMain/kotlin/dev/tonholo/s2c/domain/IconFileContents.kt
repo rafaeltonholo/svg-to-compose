@@ -31,7 +31,7 @@ val groupImports = setOf(
     "androidx.compose.ui.graphics.vector.group",
 )
 
-val materialContextProviderImport = setOf(
+val materialReceiverTypeImport = setOf(
     "androidx.compose.material.icons.Icons"
 )
 
@@ -44,7 +44,7 @@ data class IconFileContents(
     val viewportWidth: Float = width,
     val viewportHeight: Float = height,
     val nodes: List<ImageVectorNode>,
-    val contextProvider: String? = null,
+    val receiverType: String? = null,
     val addToMaterial: Boolean = false,
     val noPreview: Boolean = false,
     val makeInternal: Boolean = false,
@@ -61,17 +61,18 @@ data class IconFileContents(
            |    viewport_width=$viewportWidth
            |    viewport_height=$viewportHeight
            |    nodes=${nodes.map { it.materialize() }}
-           |    context_provider=$contextProvider
+           |    receiver_type=$receiverType
            |    imports=$imports
-           |""".trimMargin()
+           |
+            """.trimMargin()
         )
 
         val iconPropertyName = when {
-            contextProvider?.isNotEmpty() == true -> {
+            receiverType?.isNotEmpty() == true -> {
                 // as we add the dot in the next line, remove it in case the user adds a leftover dot
                 // to avoid compile issues.
-                contextProvider.removeSuffix(".")
-                "$contextProvider.${iconName.pascalCase()}"
+                receiverType.removeSuffix(".")
+                "$receiverType.${iconName.pascalCase()}"
             }
 
             addToMaterial -> "Icons.Filled.${iconName.pascalCase()}"
@@ -139,5 +140,4 @@ data class IconFileContents(
             |
         """.trimMargin()
     }
-
 }

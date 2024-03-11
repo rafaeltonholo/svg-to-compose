@@ -6,7 +6,7 @@ import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.asNodes
 import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.groupImports
-import dev.tonholo.s2c.domain.materialContextProviderImport
+import dev.tonholo.s2c.domain.materialReceiverTypeImport
 import dev.tonholo.s2c.domain.previewImports
 import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.asNodes
@@ -16,17 +16,19 @@ import dev.tonholo.s2c.extensions.extension
 import okio.FileSystem
 import okio.Path
 
-data class ParserConfig(
-    val pkg: String,
-    val theme: String,
-    val optimize: Boolean,
-    val contextProvider: String?,
-    val addToMaterial: Boolean,
-    val noPreview: Boolean,
-    val makeInternal: Boolean,
-    val minified: Boolean,
-)
-
+/**
+ * A sealed class [ImageParser] that provides methods to parse SVG
+ * and Android Vector Drawable Images and returns an [IconFileContents]
+ * object.
+ *
+ * The class requires a [FileSystem] parameter.
+ *
+ * @property fileSystem a [FileSystem] instance that allows reading from the file system.
+ * @constructor Creates an [ImageParser] object with the specified [FileSystem].
+ *
+ * @see [ImageParser.SvgParser]
+ * @see [ImageParser.AndroidVectorParser]
+ */
 sealed class ImageParser(
     private val fileSystem: FileSystem,
 ) {
@@ -56,7 +58,7 @@ sealed class ImageParser(
             addAll(groupImports)
         }
         if (config.addToMaterial) {
-            addAll(materialContextProviderImport)
+            addAll(materialReceiverTypeImport)
         }
         val pathImports = nodes
             .asSequence()
@@ -92,7 +94,7 @@ sealed class ImageParser(
                 viewportWidth = viewportWidth,
                 viewportHeight = viewportHeight,
                 nodes = nodes,
-                contextProvider = config.contextProvider,
+                receiverType = config.receiverType,
                 addToMaterial = config.addToMaterial,
                 noPreview = config.noPreview,
                 makeInternal = config.makeInternal,
@@ -124,7 +126,7 @@ sealed class ImageParser(
                 viewportWidth = avg.viewportWidth,
                 viewportHeight = avg.viewportHeight,
                 nodes = nodes,
-                contextProvider = config.contextProvider,
+                receiverType = config.receiverType,
                 addToMaterial = config.addToMaterial,
                 noPreview = config.noPreview,
                 makeInternal = config.makeInternal,
