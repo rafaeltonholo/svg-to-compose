@@ -26,6 +26,29 @@ class Processor(
     private val iconWriter: IconWriter,
     private val tempFileWriter: TempFileWriter,
 ) {
+    /**
+     * Starts the processor execution.
+     *
+     * This function is the main entry point for the SVG and Android Vector
+     * Drawable parser.
+     *
+     * It identifies whether the input path provided is a file or a directory.
+     *
+     * If it's a directory, it finds all SVG and XML files (not recursive)
+     * within and processes each of them.
+     *
+     * If it's a file, the system ensures it has a Kotlin file extension and
+     * proceeds with the processing.
+     *
+     * Any processing errors are captured and logged. Successful completion
+     * is also logged.
+     *
+     * @param path The input path for the SVG or Android Vector Drawable file(s).
+     * @param output The path where the output file(s) should be stored.
+     * @param config The configuration parameters for the parser.
+     * @throws ExitProgramException In case of an error while parsing the files,
+     * or if no files are found at the specified path.
+     */
     fun run(
         path: String,
         output: String,
