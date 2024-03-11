@@ -1,12 +1,14 @@
 package dev.tonholo.s2c.domain.delegate
 
+import dev.tonholo.s2c.domain.svg.SvgLength
+import dev.tonholo.s2c.domain.svg.toSvgLengthOrNull
 import dev.tonholo.s2c.domain.xml.XmlChildNodeWithAttributes
-import kotlin.reflect.KClassifier
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 @Suppress("UNCHECKED_CAST")
 class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
-    private val kClassifier: KClassifier,
+    private val kClass: KClass<*>,
     private val isNullable: Boolean,
     private val name: String? = null,
     private val namespace: String? = null,
@@ -23,7 +25,8 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         }
 
         return transform(
-            when (kClassifier) {
+            when (kClass) {
+                SvgLength::class -> value?.toSvgLengthOrNull()
                 Int::class -> value?.toIntOrNull()
                 String::class -> value
                 Float::class -> value?.toFloatOrNull()
@@ -58,7 +61,7 @@ inline fun <reified TAttribute : Any?> attribute(
     namespace: String? = null,
 ): AttributeDelegate<TAttribute, TAttribute> =
     AttributeDelegate(
-        kClassifier = TAttribute::class,
+        kClass = TAttribute::class,
         isNullable = null is TAttribute,
         name = name,
         namespace = namespace,
@@ -85,7 +88,7 @@ inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
     noinline transform: (TAttribute) -> TTransform,
 ): AttributeDelegate<TAttribute, TTransform> {
     return AttributeDelegate(
-        kClassifier = TAttribute::class,
+        kClass = TAttribute::class,
         isNullable = null is TAttribute,
         name = name,
         namespace = namespace,
