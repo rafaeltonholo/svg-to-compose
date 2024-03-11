@@ -1,15 +1,15 @@
 package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.domain.builder.pathNode
-import kotlin.jvm.JvmInline
 import kotlin.math.abs
 
-@JvmInline
-value class StrokeDashArray(private val value: String) {
-    val dashesAndGaps
-        get() = value.split(" ")
-            .map { it.toInt() }
-            .toIntArray()
+class StrokeDashArray(value: String) {
+    val dashesAndGaps = value
+        .split(" ")
+        .map { it.toInt() }
+        .toIntArray()
+
+    override fun toString(): String = dashesAndGaps.joinToString(" ")
 }
 
 private enum class StrokeDashDrawDirection(
@@ -26,7 +26,7 @@ private enum class StrokeDashDrawDirection(
         entries[(this.ordinal + 1) % entries.size]
 }
 
-fun IntArray.createDashedPathForRect(
+fun StrokeDashArray.createDashedPathForRect(
     x: Int,
     y: Int,
     width: Int,
@@ -34,7 +34,6 @@ fun IntArray.createDashedPathForRect(
     strokeWidth: Int,
     isMinified: Boolean,
 ): List<PathNodes> {
-    val dashesAndGaps = this
     val perimeter = 2f * (width + height)
     var drawLength = 0f
     var i = 0

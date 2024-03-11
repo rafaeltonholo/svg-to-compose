@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.createDashedPathForRect
 import dev.tonholo.s2c.domain.delegate.attribute

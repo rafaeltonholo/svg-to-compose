@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.PathFillType
 import dev.tonholo.s2c.domain.StrokeCap
+import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.StrokeJoin
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlChildNodeWithAttributes
@@ -50,8 +51,8 @@ abstract class SvgGraphicNode(
 
     val strokeMiterLimit: Float? by attribute(name = "stroke-miterlimit")
 
-    val strokeDashArray: IntArray? by attribute<String?, _>(name = "stroke-dasharray") { strokeDashArray ->
-        strokeDashArray?.split(" ")?.map { it.toInt() }?.toIntArray()
+    val strokeDashArray: StrokeDashArray? by attribute<String?, _>(name = "stroke-dasharray") { strokeDashArray ->
+        strokeDashArray?.let(::StrokeDashArray)
     }
 
     override fun toString(): String {
