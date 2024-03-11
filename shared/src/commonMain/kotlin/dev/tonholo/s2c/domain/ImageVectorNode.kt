@@ -50,37 +50,7 @@ sealed interface ImageVectorNode {
                     .trimEnd()
             }
 
-            val pathParams = buildList {
-                with(params) {
-                    if (params.fill.isNotEmpty()) {
-                        params.fill.toComposeColor()?.let { add("fill" to it) }
-                    }
-                    fillAlpha?.let {
-                        add("fillAlpha" to "${it}f")
-                    }
-                    pathFillType?.let {
-                        add("pathFillType" to "${it.toCompose()}")
-                    }
-                    stroke?.let { stroke ->
-                        stroke.toComposeColor()?.let { add("stroke" to it) }
-                    }
-                    strokeAlpha?.let {
-                        add("strokeAlpha" to "${it}f")
-                    }
-                    strokeLineCap?.let {
-                        add("strokeLineCap" to "${it.toCompose()}")
-                    }
-                    strokeLineJoin?.let {
-                        add("strokeLineJoin" to "${it.toCompose()}")
-                    }
-                    strokeMiterLimit?.let {
-                        add("strokeMiterLimit" to "${it}f")
-                    }
-                    strokeLineWidth?.let {
-                        add("strokeLineWidth" to "${it}f")
-                    }
-                }
-            }
+            val pathParams = buildParameterList()
 
             val pathParamsString = if (pathParams.isNotEmpty()) {
                 """(
@@ -97,6 +67,38 @@ sealed interface ImageVectorNode {
                 |    $pathNodes
                 |}
             """.trimMargin()
+        }
+
+        private fun buildParameterList(): List<Pair<String, String>> = buildList {
+            with(params) {
+                if (params.fill.isNotEmpty()) {
+                    params.fill.toComposeColor()?.let { add("fill" to it) }
+                }
+                fillAlpha?.let {
+                    add("fillAlpha" to "${it}f")
+                }
+                pathFillType?.let {
+                    add("pathFillType" to "${it.toCompose()}")
+                }
+                stroke?.let { stroke ->
+                    stroke.toComposeColor()?.let { add("stroke" to it) }
+                }
+                strokeAlpha?.let {
+                    add("strokeAlpha" to "${it}f")
+                }
+                strokeLineCap?.let {
+                    add("strokeLineCap" to "${it.toCompose()}")
+                }
+                strokeLineJoin?.let {
+                    add("strokeLineJoin" to "${it.toCompose()}")
+                }
+                strokeMiterLimit?.let {
+                    add("strokeMiterLimit" to "${it}f")
+                }
+                strokeLineWidth?.let {
+                    add("strokeLineWidth" to "${it}f")
+                }
+            }
         }
     }
 
@@ -159,15 +161,16 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
         while (commands.size > 0) {
             var current = commands.first()
             var currentCommand = current.first()
-
-            if ((currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') && lastCommand != Char.EMPTY) {
+            val isContinuation = (currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') &&
+                lastCommand != Char.EMPTY
+            if (isContinuation) {
                 currentCommand = when {
                     // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
                     // for implicit absolute LineTo (L/l) command(s)
-                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND && lastCommand.isLowerCase() ->
-                        PathNodes.LineTo.COMMAND
+                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND.value && lastCommand.isLowerCase() ->
+                        PathNodes.LineTo.COMMAND.value
 
-                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND ->
+                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND.value ->
                         PathNodes.LineTo.COMMAND.uppercaseChar()
 
                     else -> lastCommand

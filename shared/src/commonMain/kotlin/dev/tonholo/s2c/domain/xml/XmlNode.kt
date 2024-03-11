@@ -31,9 +31,13 @@ open class XmlElementNode(
     override val attributes: MutableMap<String, String>,
     override val name: String,
 ) : XmlChildNodeWithAttributes, XmlParentNode {
-    override fun toString(): String {
+    override fun toString(): String = buildString {
+        append("{name:\"$name\",")
+        append(" attributes: ${attributes.toJsString()}, ")
+        append("children: ${children.toJsString()}, ")
         // Swallow parent toString to avoid infinity toString loop.
-        return "{name:\"$name\", attributes:${attributes.toJsString()}, children:${children.toJsString()}, parent:\"${parent.name}\"}"
+        append("parent:\"${parent.name}\"")
+        append("}")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -55,7 +59,6 @@ open class XmlElementNode(
         result = 31 * result + name.hashCode()
         return result
     }
-
 }
 
 data class XmlTextElementNode(

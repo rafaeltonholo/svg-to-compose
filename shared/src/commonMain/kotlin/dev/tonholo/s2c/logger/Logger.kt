@@ -43,6 +43,7 @@ fun verbose(message: String) {
     }
 }
 
+@Suppress("ForbiddenComment")
 inline fun warn(message: String) {
     println("WARNING ⚠️: $message") // TODO: add color to output.
 }

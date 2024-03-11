@@ -55,5 +55,4 @@ fun String.toComposeColor(): String? = uppercase()
     .takeIf { it.lowercase() != "none" }
     ?.let { "SolidColor(Color(0x$it))" }
 
-
-fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
+inline fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")

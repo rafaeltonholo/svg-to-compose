@@ -8,6 +8,8 @@ interface ComposeProperty {
 
 @JvmInline
 value class PathFillType private constructor(private val value: String) : ComposeProperty {
+    override fun toString(): String = value
+
     companion object {
         const val IMPORT = "androidx.compose.ui.graphics.PathFillType"
         val EvenOdd = PathFillType("EvenOdd")
@@ -29,6 +31,8 @@ value class PathFillType private constructor(private val value: String) : Compos
 
 @JvmInline
 value class StrokeCap private constructor(private val value: String) : ComposeProperty {
+    override fun toString(): String = value
+
     companion object {
         const val IMPORT = "androidx.compose.ui.graphics.StrokeCap"
         val Butt = StrokeCap("Butt")
@@ -48,6 +52,8 @@ value class StrokeCap private constructor(private val value: String) : ComposePr
 
 @JvmInline
 value class StrokeJoin private constructor(private val value: String) : ComposeProperty {
+    override fun toString(): String = value
+
     companion object {
         const val IMPORT = "androidx.compose.ui.graphics.StrokeJoin"
         val Miter = StrokeJoin("Miter")
