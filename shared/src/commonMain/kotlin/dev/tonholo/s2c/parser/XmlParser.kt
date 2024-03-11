@@ -3,6 +3,7 @@ package dev.tonholo.s2c.parser
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
 import com.fleeksoft.ksoup.parser.Parser
+import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.avg.AvgClipPath
 import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
@@ -22,33 +23,27 @@ import dev.tonholo.s2c.logger.verboseSection
 import dev.tonholo.s2c.logger.warn
 import kotlin.time.measureTimedValue
 
-enum class RootTag(val tag: String, val fileExtension: String) {
-    Avg(tag = "vector", fileExtension = "xml"),
-    Svg(tag = "svg", fileExtension = "svg"),
-    ;
-}
-
 /**
  * Parse an SVG to an Android Vector Drawable
  *
  * @param content The XML content's file
- * @param rootTag The root tag from the XML file
+ * @param fileType The root tag from the XML file
  * @return The XML as an object
  */
-fun parse(content: String, rootTag: RootTag): XmlRootNode = verboseSection("Parsing $rootTag file") {
+fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Parsing $fileType file") {
     val strippedXml = Regex("\\r?\\n\\s*").replace(content, "")
     val (node, duration) = measureTimedValue {
         val xmlParser = Parser.xmlParser()
         val doc = xmlParser.parseInput(html = strippedXml, baseUri = "")
-        val node = doc.getElementsByTag(tagName = rootTag.tag)
+        val node = doc.getElementsByTag(tagName = fileType.tag)
         if (node.size != 1) {
-            error("Not a proper ${rootTag.fileExtension.uppercase()} file.")
+            error("Not a proper ${fileType.extension.uppercase()} file.")
         }
 
         val rootNode = node.single()
         traverseSvgTree(rootNode)
     }
-    verbose("Parsed ${rootTag.fileExtension.uppercase()} within ${duration.inWholeMilliseconds}ms")
+    verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
     node
 }
 
@@ -76,7 +71,6 @@ private fun traverseSvgTree(rootNode: Element): XmlRootNode {
                         stack += it
                     }
                 }
-
             }
 
             else -> {

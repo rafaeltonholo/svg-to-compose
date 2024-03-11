@@ -1,6 +1,7 @@
 package dev.tonholo.s2c
 
 import AppConfig
+import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
@@ -161,7 +162,7 @@ class Processor(
         val iconName = if (output.isFile) {
             output.segments.last().removeSuffix(output.extension)
         } else {
-            file.name.removeSuffix(".svg").removeSuffix(".xml")
+            file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
         }
         val targetFile = tempFileWriter.create(
             file = file,

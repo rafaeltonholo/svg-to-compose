@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.parser
 
+import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.avg.AvgElementNode
@@ -79,10 +80,9 @@ sealed class ImageParser(
         ): IconFileContents {
             val content = readContent(file)
 
-            val root = parse(content = content, rootTag = RootTag.Svg)
+            val root = parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgElementNode } as SvgElementNode
-            val viewBox = svg.viewBox.toMutableList()
-            val (viewportHeight, viewportWidth) = viewBox.removeLast() to viewBox.removeLast()
+            val (_, _, viewportWidth, viewportHeight) = svg.viewBox
             val nodes = svg.asNodes(minified = config.minified)
 
             return IconFileContents(
@@ -113,7 +113,7 @@ sealed class ImageParser(
         ): IconFileContents {
             val content = readContent(file)
 
-            val root = parse(content = content, rootTag = RootTag.Avg)
+            val root = parse(content = content, fileType = FileType.Avg)
             val avg = root.children.single { it is AvgElementNode } as AvgElementNode
             val nodes = avg.asNodes(minified = config.minified)
 
