@@ -2,9 +2,9 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.createDashedPathForRect
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.pathNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
 import dev.tonholo.s2c.logger.warn
@@ -41,121 +41,142 @@ fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val strokeDashArray = strokeDashArray
 
     return ImageVectorNode.NodeWrapper(
-        normalizedPath = buildString {
-            append("<rect ")
-            append("width=\"$width\" ")
-            append("height=\"$height\" ")
-            rx?.let { append("rx=\"$it\" ") }
-            ry?.let { append("ry=\"$it\" ") }
-            fill?.let { append("fill=\"${it.value}\" ") }
-            opacity?.let { append("opacity=\"$it\" ") }
-            fillOpacity?.let { append("fill-opacity=\"$it\" ") }
-            style?.let { append("style=\"$it\" ") }
-            stroke?.let { append("stroke=\"$it\" ") }
-            strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
-            strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
-            strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
-            fillRule?.let { append("fill-rule=\"$it\" ") }
-            strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
-            strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
-            strokeDashArray?.let { dashArray ->
-                append("stroke-dasharray=\"${dashArray.joinToString(" ")}\" ")
-            }
-            append("/>")
-        },
+        normalizedPath = buildNormalizedPath(),
         nodes = when {
-            strokeDashArray != null && rx == null && ry == null -> {
-                warn(
-                    "Parsing a `stroke-dasharray` attribute is experimental and " +
-                        "might differ a little from the original."
-                )
-                strokeDashArray.createDashedPathForRect(
-                    x = x,
-                    y = y,
-                    width = width,
-                    height = height,
-                    strokeWidth = strokeWidth?.toInt() ?: 1,
-                    isMinified = isMinified,
-                )
-            }
+            strokeDashArray != null && rx == null && ry == null ->
+                createDashedRect(strokeDashArray, x, y, isMinified)
 
-            xCornerSize == 0 && yCornerSize == 0 -> {
-                listOf(
-                    pathNode(command = PathNodes.MoveTo.COMMAND) {
-                        args(x, y)
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
-                        args(width)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
-                        args(height)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
-                        args(x, PathNodes.CLOSE_COMMAND)
-                        minified = isMinified
-                    },
-                )
-            }
+            xCornerSize == 0 && yCornerSize == 0 ->
+                createRegularRect(x, y, isMinified)
 
-            else -> {
-                listOf(
-                    pathNode(command = PathNodes.MoveTo.COMMAND) {
-                        args(x, y + yCornerSize)
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.ArcTo.COMMAND) {
-                        args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, -yCornerSize)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
-                        args(width - xCornerSize * 2)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.ArcTo.COMMAND) {
-                        args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, yCornerSize)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
-                        args(height - yCornerSize * 2)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.ArcTo.COMMAND) {
-                        args(xCornerSize, yCornerSize, 0, false, true, -xCornerSize, yCornerSize)
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
-                        args(-(width - xCornerSize * 2))
-                        isRelative = true
-                        minified = isMinified
-                    },
-                    pathNode(command = PathNodes.ArcTo.COMMAND) {
-                        args(
-                            xCornerSize,
-                            yCornerSize,
-                            0,
-                            0,
-                            true,
-                            -xCornerSize,
-                            -yCornerSize,
-                            PathNodes.CLOSE_COMMAND,
-                        )
-                        isRelative = true
-                        minified = isMinified
-                    },
-                )
-            }
+            else ->
+                createRoundedCornerRect(x, y, yCornerSize, isMinified, xCornerSize)
         },
     )
+}
+
+private fun SvgRectNode.createDashedRect(
+    strokeDashArray: StrokeDashArray,
+    x: Int,
+    y: Int,
+    isMinified: Boolean
+): List<PathNodes> {
+    warn(
+        "Parsing a `stroke-dasharray` attribute is experimental and " +
+            "might differ a little from the original."
+    )
+    return strokeDashArray.createDashedPathForRect(
+        x = x,
+        y = y,
+        width = width,
+        height = height,
+        strokeWidth = strokeWidth?.toInt() ?: 1,
+        isMinified = isMinified,
+    )
+}
+
+private fun SvgRectNode.createRegularRect(
+    x: Int,
+    y: Int,
+    isMinified: Boolean
+) = listOf(
+    pathNode(command = PathNodes.MoveTo.COMMAND) {
+        args(x, y)
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+        args(width)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
+        args(height)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+        args(x)
+        close = true
+        minified = isMinified
+    },
+)
+
+private fun SvgRectNode.createRoundedCornerRect(
+    x: Int,
+    y: Int,
+    yCornerSize: Int,
+    isMinified: Boolean,
+    xCornerSize: Int
+) = listOf(
+    pathNode(command = PathNodes.MoveTo.COMMAND) {
+        args(x, y + yCornerSize)
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.ArcTo.COMMAND) {
+        args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, -yCornerSize)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+        args(width - xCornerSize * 2)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.ArcTo.COMMAND) {
+        args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, yCornerSize)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
+        args(height - yCornerSize * 2)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.ArcTo.COMMAND) {
+        args(xCornerSize, yCornerSize, 0, false, true, -xCornerSize, yCornerSize)
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+        args(-(width - xCornerSize * 2))
+        isRelative = true
+        minified = isMinified
+    },
+    pathNode(command = PathNodes.ArcTo.COMMAND) {
+        args(
+            xCornerSize,
+            yCornerSize,
+            0,
+            0,
+            true,
+            -xCornerSize,
+            -yCornerSize,
+        )
+        isRelative = true
+        minified = isMinified
+        close = true
+    },
+)
+
+private fun SvgRectNode.buildNormalizedPath(): String = buildString {
+    append("<rect ")
+    append("width=\"$width\" ")
+    append("height=\"$height\" ")
+    rx?.let { append("rx=\"$it\" ") }
+    ry?.let { append("ry=\"$it\" ") }
+    fill?.let { append("fill=\"${it.value}\" ") }
+    opacity?.let { append("opacity=\"$it\" ") }
+    fillOpacity?.let { append("fill-opacity=\"$it\" ") }
+    style?.let { append("style=\"$it\" ") }
+    stroke?.let { append("stroke=\"${it.value}\" ") }
+    strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
+    strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
+    strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
+    fillRule?.let { append("fill-rule=\"$it\" ") }
+    strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
+    strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
+    strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
+    append("/>")
 }
 
 fun SvgRectNode.asNode(

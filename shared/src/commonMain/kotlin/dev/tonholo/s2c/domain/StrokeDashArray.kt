@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.builder.pathNode
 import kotlin.jvm.JvmInline
 import kotlin.math.abs
 
@@ -78,14 +79,10 @@ private fun MutableList<PathNodes>.addCloseCommand() {
     removeLast().let { node ->
         add(
             pathNode(node.command) {
-                val values = node.values
-                args(
-                    *values.mapIndexed { index: Int, value: String ->
-                        if (index == values.lastIndex) "${value}z" else value
-                    }.toTypedArray(),
-                )
+                args(node.values)
                 isRelative = node.isRelative
                 minified = node.minified
+                close = true
             },
         )
     }
@@ -139,7 +136,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
         moveArg?.let {
             add(
                 pathNode(command = PathNodes.MoveTo.COMMAND) {
-                    args(*it)
+                    args(it.toList())
                     isRelative = true
                     minified = isMinified
                 }
@@ -222,10 +219,9 @@ private fun MutableList<PathNodes>.addGap(
     }
     add(
         pathNode(PathNodes.MoveTo.COMMAND) {
-            args(*moveArgs)
+            args(moveArgs.toList())
             isRelative = true
             minified = isMinified
         },
     )
 }
-
