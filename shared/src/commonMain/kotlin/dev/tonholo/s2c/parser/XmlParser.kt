@@ -8,6 +8,7 @@ import dev.tonholo.s2c.domain.avg.AvgClipPath
 import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
 import dev.tonholo.s2c.domain.avg.AvgPathNode
+import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
@@ -153,9 +154,8 @@ inline fun createSvgElement(node: Element, parent: XmlParentNode) = when (node.t
         attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
     )
 
-    AvgElementNode.TAG_NAME -> AvgElementNode(
+    SvgCircleNode.TAG_NAME -> SvgCircleNode(
         parent = parent,
-        children = mutableSetOf(),
         attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
     )
 

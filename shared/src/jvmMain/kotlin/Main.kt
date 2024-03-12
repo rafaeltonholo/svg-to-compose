@@ -24,7 +24,7 @@ fun main() {
     }
 
     val suffix = "NewXmlParse"
-    val (_, path, output) = SampleFile.Svg.RoundedRect(suffix)
+    val (_, path, output) = SampleFile.Svg.DashArrayCircle(suffix)
     val config = ParserConfig(
         pkg = "dev.tonholo.composeicons.ui.icon",
         theme = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme",
@@ -71,39 +71,47 @@ private sealed class SampleFile(
     sealed interface Svg {
         data class ShieldSolid(val suffix: String) : SampleFile(
             input = "samples/shield-halved-solid.svg",
-            output = "integrity-check/ShieldSolid.svg.$suffix.kt"
+            output = "integrity-check/ShieldSolid.svg.$suffix.kt",
         )
 
         data class Illustration(val suffix: String) : SampleFile(
             input = "samples/illustration.svg",
-            output = "integrity-check/Illustration.svg.$suffix.kt"
+            output = "integrity-check/Illustration.svg.$suffix.kt",
         )
 
         data class Rects(val suffix: String) : SampleFile(
             input = "samples/rects/rects.svg",
-            output = "integrity-check/Rects.svg.$suffix.kt"
+            output = "integrity-check/Rects.svg.$suffix.kt",
         )
 
         data class ComplexRects(val suffix: String) : SampleFile(
             input = "samples/rects/complex-rects.svg",
-            output = "integrity-check/ComplexRects.svg.$suffix.kt"
+            output = "integrity-check/ComplexRects.svg.$suffix.kt",
         )
 
         data class RoundedRect(val suffix: String) : SampleFile(
             input = "samples/rects/rounded-rect.svg",
-            output = "integrity-check/RoundedRect.svg.$suffix.kt"
+            output = "integrity-check/RoundedRect.svg.$suffix.kt",
+        )
+        data class SimpleCircle(val suffix: String) : SampleFile(
+            input = "samples/circle/simple-circle.svg",
+            output = "integrity-check/SimpleCircle.svg.$suffix.kt",
+        )
+        data class DashArrayCircle(val suffix: String) : SampleFile(
+            input = "samples/circle/dasharray-circle.svg",
+            output = "integrity-check/DashArrayCircle.svg.$suffix.kt",
         )
     }
 
     sealed interface Avg {
         data class ShieldSolid(val suffix: String) : SampleFile(
             input = "samples/shield-halved-solid.xml",
-            output = "integrity-check/ShieldSolid.xml.$suffix.kt"
+            output = "integrity-check/ShieldSolid.xml.$suffix.kt",
         )
 
         data class Illustration(val suffix: String) : SampleFile(
             input = "samples/illustration.xml",
-            output = "integrity-check/Illustration.xml.$suffix.kt"
+            output = "integrity-check/Illustration.xml.$suffix.kt",
         )
 
     }

@@ -71,5 +71,6 @@ inline fun SvgNode.asNode(
     is SvgGroupNode -> asNode(masks, minified)
     is SvgPathNode -> asNode(minified)
     is SvgRectNode -> asNode(minified)
+    is SvgCircleNode -> asNode(minified)
     else -> null
 }

@@ -12,6 +12,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     private val isNullable: Boolean,
     private val name: String? = null,
     private val namespace: String? = null,
+    private val defaultValue: TTransform? = null,
     private val transform: (TAttribute) -> TTransform = { it as TTransform },
 ) {
     private fun key(property: KProperty<*>): String =
@@ -20,8 +21,12 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     operator fun getValue(element: XmlChildNodeWithAttributes, property: KProperty<*>): TTransform {
         val key = key(property)
         val value = element.attributes[key]
-        if (isNullable.not() && value == null) {
+        if (isNullable.not() && value == null && defaultValue == null) {
             error("Required attribute '$key' on tag '${element.name}' was not found")
+        }
+
+        if (isNullable.not() && value == null && defaultValue != null) {
+            return defaultValue
         }
 
         return transform(
@@ -59,12 +64,14 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
 inline fun <reified TAttribute : Any?> attribute(
     name: String? = null,
     namespace: String? = null,
+    defaultValue: TAttribute? = null,
 ): AttributeDelegate<TAttribute, TAttribute> =
     AttributeDelegate(
         kClass = TAttribute::class,
         isNullable = null is TAttribute,
         name = name,
         namespace = namespace,
+        defaultValue = defaultValue,
     )
 
 /**
@@ -85,6 +92,7 @@ inline fun <reified TAttribute : Any?> attribute(
 inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
     name: String? = null,
     namespace: String? = null,
+    defaultValue: TTransform? = null,
     noinline transform: (TAttribute) -> TTransform,
 ): AttributeDelegate<TAttribute, TTransform> {
     return AttributeDelegate(
@@ -92,6 +100,7 @@ inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
         isNullable = null is TAttribute,
         name = name,
         namespace = namespace,
+        defaultValue = defaultValue,
         transform = transform,
     )
 }

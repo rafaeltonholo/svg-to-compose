@@ -34,7 +34,25 @@ class SvgRectNode(
     }
 }
 
-fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
+fun SvgRectNode.asNode(
+    minified: Boolean = false,
+): ImageVectorNode.Path = ImageVectorNode.Path(
+    params = ImageVectorNode.Path.Params(
+        fill = fill.orDefault().value, // Rect has a filling by default.
+        fillAlpha = fillOpacity,
+        pathFillType = fillRule,
+        stroke = stroke?.value,
+        strokeAlpha = strokeOpacity,
+        strokeLineCap = strokeLineCap,
+        strokeLineJoin = strokeLineJoin,
+        strokeMiterLimit = strokeMiterLimit,
+        strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
+    ),
+    wrapper = createPath(minified),
+    minified = minified,
+)
+
+private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val xCornerSize = rx ?: ry ?: 0
     val yCornerSize = ry ?: rx ?: 0
     val x = x ?: 0
@@ -165,35 +183,6 @@ private fun SvgRectNode.buildNormalizedPath(): String = buildString {
     append("height=\"$height\" ")
     rx?.let { append("rx=\"$it\" ") }
     ry?.let { append("ry=\"$it\" ") }
-    fill?.let { append("fill=\"${it.value}\" ") }
-    opacity?.let { append("opacity=\"$it\" ") }
-    fillOpacity?.let { append("fill-opacity=\"$it\" ") }
-    style?.let { append("style=\"$it\" ") }
-    stroke?.let { append("stroke=\"${it.value}\" ") }
-    strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
-    strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
-    strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
-    fillRule?.let { append("fill-rule=\"$it\" ") }
-    strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
-    strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
-    strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
+    append(graphicNodeParams())
     append("/>")
 }
-
-fun SvgRectNode.asNode(
-    minified: Boolean = false,
-): ImageVectorNode.Path = ImageVectorNode.Path(
-    params = ImageVectorNode.Path.Params(
-        fill = fill.orDefault().value, // Rect has a filling by default.
-        fillAlpha = fillOpacity,
-        pathFillType = fillRule,
-        stroke = stroke?.value,
-        strokeAlpha = strokeOpacity,
-        strokeLineCap = strokeLineCap,
-        strokeLineJoin = strokeLineJoin,
-        strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
-    ),
-    wrapper = createPath(minified),
-    minified = minified,
-)

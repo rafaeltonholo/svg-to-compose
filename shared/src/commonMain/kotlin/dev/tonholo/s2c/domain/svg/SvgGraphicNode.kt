@@ -55,6 +55,21 @@ abstract class SvgGraphicNode(
         strokeDashArray?.let(::StrokeDashArray)
     }
 
+    fun graphicNodeParams(): String = buildString {
+        fill?.let { append("fill=\"${it.value}\" ") }
+        opacity?.let { append("opacity=\"$it\" ") }
+        fillOpacity?.let { append("fill-opacity=\"$it\" ") }
+        style?.let { append("style=\"$it\" ") }
+        stroke?.let { append("stroke=\"${it.value}\" ") }
+        strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
+        strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
+        strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
+        fillRule?.let { append("fill-rule=\"$it\" ") }
+        strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
+        strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
+        strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
+    }
+
     override fun toString(): String {
         // Swallow parent toString to avoid infinity toString loop.
         return "{name:\"$name\", attributes:${attributes.toJsString()}, parent:\"${parent.name}\"}"
