@@ -159,7 +159,7 @@ Command:
       -opt=false \
       <parent-path>/shield-halved-solid.svg
 ```
-Input file: ![shield-halved-solid.svg](samples/shield-halved-solid.svg)
+Input file: ![shield-halved-solid.svg](samples/svg/shield-halved-solid.svg)
 
 Output file: [ShieldSolid.nonoptimized.kt](samples/ShieldSolid.svg.nonoptimized.kt)
 
@@ -173,7 +173,7 @@ Command:
       <parent-path>/shield-halved-solid.svg
 ```
 
-Input file: ![shield-halved-solid.svg](samples/shield-halved-solid.svg)
+Input file: ![shield-halved-solid.svg](samples/svg/shield-halved-solid.svg)
 
 Output file: [ShieldSolid.svg.optimized.kt](samples/ShieldSolid.svg.optimized.kt)
 
@@ -189,7 +189,7 @@ Command:
       <parent-path>/illustration.svg
 ```
 
-Input file: ![illustration.svg](samples/illustration.svg)
+Input file: ![illustration.svg](samples/svg/illustration.svg)
 
 Output file: [Illustration.svg.nonoptimized.kt](samples/Illustration.svg.nonoptimized.kt)
 
@@ -203,7 +203,7 @@ Command:
       <parent-path>/illustration.svg
 ```
 
-Input file: ![illustration.svg](samples/illustration.svg)
+Input file: ![illustration.svg](samples/svg/illustration.svg)
 
 Output file: [Illustration.svg.optimized.kt](samples/Illustration.svg.optimized.kt)
 
