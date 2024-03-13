@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.parser
 
+import com.fleeksoft.ksoup.nodes.Attributes
+import com.fleeksoft.ksoup.nodes.Comment
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
 import com.fleeksoft.ksoup.parser.Parser
@@ -18,7 +20,6 @@ import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
-import dev.tonholo.s2c.domain.xml.XmlTextElementNode
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
 import dev.tonholo.s2c.logger.warn
@@ -32,7 +33,9 @@ import kotlin.time.measureTimedValue
  * @return The XML as an object
  */
 fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Parsing $fileType file") {
-    val strippedXml = Regex("\\r?\\n\\s*").replace(content, "")
+    val strippedXml = content
+        .replace("\\r?\\n".toRegex(), "")
+        .replace("\\s{2,}".toRegex(), " ")
     val (node, duration) = measureTimedValue {
         val xmlParser = Parser.xmlParser()
         val doc = xmlParser.parseInput(html = strippedXml, baseUri = "")
@@ -42,13 +45,13 @@ fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Pa
         }
 
         val rootNode = node.single()
-        traverseSvgTree(rootNode)
+        traverseSvgTree(rootNode, fileType)
     }
     verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
     node
 }
 
-private fun traverseSvgTree(rootNode: Element): XmlRootNode {
+private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode {
     val root = XmlRootNode(children = mutableSetOf())
     var currentDepth = 0
     val stack = mutableListOf<XmlParentNode>(root)
@@ -63,16 +66,22 @@ private fun traverseSvgTree(rootNode: Element): XmlRootNode {
 
         val parent = current
         val element = when (node) {
-            is TextNode -> XmlTextElementNode(parent = parent, value = node.text())
-
             is Element -> {
-                createElement(node, parent, rootTag = rootNode.tagName()).also {
+                createElement(
+                    node = node,
+                    parent = parent,
+                    fileType = fileType,
+                ).also {
                     if (it is XmlElementNode && node.childrenSize() > 0) {
                         current = it
                         stack += it
                     }
                 }
             }
+
+            // Ignored elements
+            is TextNode,
+            is Comment -> null
 
             else -> {
                 warn("not supported node '${node.nodeName()}'.")
@@ -92,79 +101,94 @@ private fun traverseSvgTree(rootNode: Element): XmlRootNode {
 private inline fun createElement(
     node: Element,
     parent: XmlParentNode,
-    rootTag: String,
-): XmlNode = when (rootTag) {
-    AvgElementNode.TAG_NAME -> createAvgElement(node, parent)
-    SvgElementNode.TAG_NAME -> createSvgElement(node, parent)
-    else -> createDefaultElement(node, parent)
+    fileType: FileType,
+): XmlNode = when (fileType) {
+    FileType.Avg -> createAvgElement(node.tagName(), node.attributes(), parent)
+    FileType.Svg -> createSvgElement(node.tagName(), node.attributes(), parent)
 }
 
-inline fun createAvgElement(node: Element, parent: XmlParentNode) = when (node.tagName()) {
-    AvgElementNode.TAG_NAME -> AvgElementNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+inline fun createAvgElement(
+    nodeName: String,
+    attributes: Attributes,
+    parent: XmlParentNode,
+): XmlNode {
+    return when (nodeName) {
+        AvgElementNode.TAG_NAME -> AvgElementNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    AvgPathNode.TAG_NAME -> AvgPathNode(
-        parent = parent,
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        AvgPathNode.TAG_NAME -> AvgPathNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    AvgClipPath.TAG_NAME -> AvgClipPath(
-        parent = parent,
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        AvgClipPath.TAG_NAME -> AvgClipPath(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    AvgGroupNode.TAG_NAME -> AvgGroupNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        AvgGroupNode.TAG_NAME -> AvgGroupNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    else -> createDefaultElement(node, parent)
+        else -> createDefaultElement(nodeName, attributes, parent)
+    }
 }
 
-inline fun createSvgElement(node: Element, parent: XmlParentNode) = when (node.tagName()) {
-    SvgElementNode.TAG_NAME -> SvgElementNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+inline fun createSvgElement(
+    nodeName: String,
+    attributes: Attributes,
+    parent: XmlParentNode,
+): XmlNode {
+    return when (nodeName) {
+        SvgElementNode.TAG_NAME -> SvgElementNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    SvgPathNode.TAG_NAME -> SvgPathNode(
-        parent = parent,
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        SvgPathNode.TAG_NAME -> SvgPathNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    SvgRectNode.TAG_NAME -> SvgRectNode(
-        parent = parent,
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        SvgRectNode.TAG_NAME -> SvgRectNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    SvgGroupNode.TAG_NAME -> SvgGroupNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        SvgGroupNode.TAG_NAME -> SvgGroupNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    SvgMaskNode.TAG_NAME -> SvgMaskNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        SvgMaskNode.TAG_NAME -> SvgMaskNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    SvgCircleNode.TAG_NAME -> SvgCircleNode(
-        parent = parent,
-        attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    )
+        SvgCircleNode.TAG_NAME -> SvgCircleNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-    else -> createDefaultElement(node, parent)
+        else -> createDefaultElement(nodeName, attributes, parent)
+    }
 }
 
-inline fun createDefaultElement(node: Element, parent: XmlParentNode) = XmlElementNode(
+inline fun createDefaultElement(
+    nodeName: String,
+    attributes: Attributes,
+    parent: XmlParentNode,
+) = XmlElementNode(
     parent = parent,
     children = mutableSetOf(),
-    attributes = node.attributes().associate { it.key to it.value }.toMutableMap(),
-    name = node.tagName(),
+    attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+    name = nodeName,
 )

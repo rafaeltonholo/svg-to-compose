@@ -61,26 +61,6 @@ open class XmlElementNode(
     }
 }
 
-data class XmlTextElementNode(
-    override val parent: XmlParentNode,
-    override val name: String = "#text",
-    val value: String,
-) : XmlChildNode {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is XmlTextElementNode) return false
-
-        if (name != other.name) return false
-        if (value != other.value) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
-}
-
 fun Map<String, String>.toJsString() =
     "[${map { "{\"${it.key}\":\"${it.value}\"}" }.joinToString(",")}]"
 
