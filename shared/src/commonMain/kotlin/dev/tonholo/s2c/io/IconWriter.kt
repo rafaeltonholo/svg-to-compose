@@ -26,7 +26,7 @@ class IconWriter(
             if (output.isDirectory && outputExists.not()) {
                 printEmpty()
                 output("📢 Output directory is missing. Creating it automatically.")
-                fileSystem.createDirectory(output)
+                fileSystem.createDirectories(output)
             } else if (output.isDirectory.not()) {
                 output.parent?.let { parent ->
                     verbose("Checking if parent directory exists.")

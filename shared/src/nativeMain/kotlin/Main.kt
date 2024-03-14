@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.github.ajalt.clikt.parameters.types.int
 import dev.tonholo.s2c.BuildKonfig
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
@@ -109,6 +110,18 @@ class Client : CliktCommand() {
         help = "Remove all comments explaining the path logic creation and inline all method parameters.",
     ).flag()
 
+    private val recursive by option(
+        names = arrayOf("-r", "--recursive"),
+        help = "Enables parsing of all files in the input directory, including those in subdirectories up " +
+            "to a maximum depth of ${AppConfig.MAX_RECURSIVE_DEPTH}",
+    ).flag()
+
+    private val recursiveDepth by option(
+        names = arrayOf("--recursive-depth", "--depth"),
+        help = "The depth level for recursive file search within directory. " +
+            "The default value is ${AppConfig.MAX_RECURSIVE_DEPTH}."
+    ).int().default(AppConfig.MAX_RECURSIVE_DEPTH)
+
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
@@ -123,6 +136,8 @@ class Client : CliktCommand() {
         verbose("   noPreview = $noPreview")
         verbose("   makeInternal = $makeInternal")
         verbose("   minified = $minified")
+        verbose("   recursive = $recursive")
+        verbose("   recursiveDepth = $recursiveDepth")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -149,7 +164,9 @@ class Client : CliktCommand() {
                     noPreview = noPreview,
                     makeInternal = makeInternal,
                     minified = minified,
-                )
+                ),
+                recursive = recursive,
+                maxDepth = recursiveDepth,
             )
         } catch (e: ExitProgramException) {
             printEmpty()

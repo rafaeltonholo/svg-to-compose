@@ -39,26 +39,6 @@ open class XmlElementNode(
         append("parent:\"${parent.name}\"")
         append("}")
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as XmlElementNode
-
-        if (children != other.children) return false
-        if (attributes != other.attributes) return false
-        if (name != other.name) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = children.hashCode()
-        result = 31 * result + attributes.hashCode()
-        result = 31 * result + name.hashCode()
-        return result
-    }
 }
 
 fun Map<String, String>.toJsString() =

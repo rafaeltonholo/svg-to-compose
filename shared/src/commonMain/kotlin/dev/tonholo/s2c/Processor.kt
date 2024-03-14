@@ -7,6 +7,7 @@ import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.isFile
+import dev.tonholo.s2c.extensions.listRecursively
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.debug
@@ -14,6 +15,7 @@ import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.logger.warn
 import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
@@ -53,6 +55,8 @@ class Processor(
         path: String,
         output: String,
         config: ParserConfig,
+        recursive: Boolean,
+        maxDepth: Int = AppConfig.MAX_RECURSIVE_DEPTH,
     ) {
         verbose("Start processor execution")
         val filePath = path.toPath()
@@ -72,12 +76,22 @@ class Processor(
         }
 
         printEmpty()
+        var runRecursively = recursive
         val files = if (inputMetadata.isDirectory) {
             output("🔍 Directory detected")
-            findSvgAndXmlFilesInDirectory(outputPath, filePath)
+            findSvgAndXmlFilesInDirectory(
+                outputPath = outputPath,
+                filePath = filePath,
+                recursive = recursive,
+                maxDepth = maxDepth,
+            )
         } else {
             output("🔍 File detected")
             outputPath = ensureKotlinFileExtension(outputPath)
+            if (runRecursively) {
+                warn("Recursive flag added to a file. Ignoring recursive search.")
+                runRecursively = false
+            }
             listOf(filePath)
         }
 
@@ -91,6 +105,8 @@ class Processor(
                     optimizer = optimizer,
                     output = outputPath,
                     config = config,
+                    recursive = runRecursively,
+                    basePath = filePath,
                 )
                 printEmpty()
             } catch (e: ExitProgramException) {
@@ -165,10 +181,17 @@ class Processor(
      *
      * @param outputPath The path to the directory to search for files.
      * @param filePath The path of the current directory being processed.
+     * @param recursive Enable recursive directory search.
+     * @param maxDepth Define how deep the recursive directory should go.
      * @throws ExitProgramException If an error occurs during processing.
      * @return A List containing all the discovered SVG/XML files.
      */
-    private fun findSvgAndXmlFilesInDirectory(outputPath: Path, filePath: Path): List<Path> = buildList {
+    private fun findSvgAndXmlFilesInDirectory(
+        outputPath: Path,
+        filePath: Path,
+        recursive: Boolean,
+        maxDepth: Int,
+    ): List<Path> = buildList {
         if (outputPath.isDirectory.not()) {
             printEmpty()
             throw ExitProgramException(
@@ -180,14 +203,22 @@ class Processor(
             )
         }
 
-        val directoryFiles = fileSystem.list(filePath)
+        val deep = if (recursive) {
+            debug("Recursive directory search is enabled. Verifying all directories until depth $maxDepth")
+            maxDepth
+        } else {
+            0
+        }
+
+        val imageFiles = fileSystem
+            .listRecursively(filePath, maxDepth = deep)
             .filter {
-                it.name.endsWith(".svg") || it.name.endsWith(".xml")
+                it.name.endsWith(FileType.Svg.extension) || it.name.endsWith(FileType.Avg.extension)
             }
-        verbose("svg/xml files = $directoryFiles")
-        addAll(
-            directoryFiles,
-        )
+
+        verbose("svg/xml files = $imageFiles")
+
+        addAll(imageFiles)
 
         if (isEmpty()) {
             throw ExitProgramException(
@@ -232,6 +263,8 @@ class Processor(
         optimizer: Optimizer.Factory?,
         output: Path,
         config: ParserConfig,
+        recursive: Boolean,
+        basePath: Path,
     ) {
         output("⏳ Processing ${file.name}")
 
@@ -247,19 +280,44 @@ class Processor(
 
         optimizer?.optimize(file)
 
+        val relativePackage = if (recursive.not() || file == basePath) {
+            ""
+        } else {
+            buildString {
+                val stack = mutableListOf<String>()
+                var parent = file.parent
+                while (parent != null && parent != basePath) {
+                    stack += parent.name
+                    parent = parent.parent
+                }
+                while (stack.isNotEmpty()) {
+                    append(".${stack.removeLast()}")
+                }
+            }
+        }
+
+        val pkg = "${config.pkg}$relativePackage"
+
         output("👓 Parsing the ${file.extension} file")
         val fileContents = ImageParser(fileSystem).parse(
             file = targetFile,
             iconName = iconName,
-            config = config,
+            config = config.copy(
+                pkg = pkg,
+            ),
         )
 
         verbose("File contents = $fileContents")
 
+        val iconOutput = if (recursive.not() || file == basePath) {
+            output
+        } else {
+            output / relativePackage.removePrefix(".").replace(".", "/")
+        }
         iconWriter.write(
             iconName = iconName,
             fileContents = fileContents,
-            output = output,
+            output = iconOutput,
         )
 
         tempFileWriter.clear()
