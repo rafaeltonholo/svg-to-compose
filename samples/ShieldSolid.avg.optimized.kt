@@ -1,9 +1,10 @@
-package dev.tonholo.composeicons.ui.icon
+package dev.tonholo.sampleApp.ui.icon.avg
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,13 +15,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val ShieldSolidXmlOptimized: ImageVector
+val ShieldSolidAvgOptimized: ImageVector
     get() {
-        val current = _shieldSolidXmlOptimized
+        val current = _shieldSolidAvgOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.ShieldSolidXmlOptimized",
+            name = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme.ShieldSolidAvgOptimized",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
@@ -30,9 +31,9 @@ val ShieldSolidXmlOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF1E3050)),
             ) {
-                // M 256.0 0.0
+                // M 256 0
                 moveTo(x = 256.0f, y = 0.0f)
-                // c 4.6 0.0 9.2 1.0 13.4 2.9
+                // c 4.6 0 9.2 1 13.4 2.9
                 curveToRelative(
                     dx1 = 4.6f,
                     dy1 = 0.0f,
@@ -43,7 +44,7 @@ val ShieldSolidXmlOptimized: ImageVector
                 )
                 // l 188.3 79.9
                 lineToRelative(dx = 188.3f, dy = 79.9f)
-                // c 22.0 9.3 38.4 31.0 38.3 57.2
+                // c 22 9.3 38.4 31 38.3 57.2
                 curveToRelative(
                     dx1 = 22.0f,
                     dy1 = 9.3f,
@@ -61,7 +62,7 @@ val ShieldSolidXmlOptimized: ImageVector
                     dx3 = -213.6f,
                     dy3 = 363.2f,
                 )
-                // c -16.7 8.0 -36.1 8.0 -52.8 0.0
+                // c -16.7 8 -36.1 8 -52.8 0
                 curveToRelative(
                     dx1 = -16.7f,
                     dy1 = 8.0f,
@@ -70,7 +71,7 @@ val ShieldSolidXmlOptimized: ImageVector
                     dx3 = -52.8f,
                     dy3 = 0.0f,
                 )
-                // C 57.3 420.7 16.5 239.2 16.0 140.0
+                // C 57.3 420.7 16.5 239.2 16 140
                 curveTo(
                     x1 = 57.3f,
                     y1 = 420.7f,
@@ -90,7 +91,7 @@ val ShieldSolidXmlOptimized: ImageVector
                 )
                 // L 242.7 2.9
                 lineTo(x = 242.7f, y = 2.9f)
-                // C 246.8 1.0 251.4 0.0 256.0 0.0
+                // C 246.8 1 251.4 0 256 0z
                 curveTo(
                     x1 = 246.8f,
                     y1 = 1.0f,
@@ -100,11 +101,11 @@ val ShieldSolidXmlOptimized: ImageVector
                     y3 = 0.0f,
                 )
                 close()
-                // m 0.0 66.8
+                // m 0 66.8
                 moveToRelative(dx = 0.0f, dy = 66.8f)
-                // v 378.0
+                // v 378
                 verticalLineToRelative(dy = 378.0f)
-                // C 394.0 378.0 431.1 230.1 432.0 141.4
+                // C 394 378 431.1 230.1 432 141.4
                 curveTo(
                     x1 = 394.0f,
                     y1 = 378.0f,
@@ -113,29 +114,31 @@ val ShieldSolidXmlOptimized: ImageVector
                     x3 = 432.0f,
                     y3 = 141.4f,
                 )
-                // L 256.0 66.8
+                // L 256 66.8z
                 lineTo(x = 256.0f, y = 66.8f)
                 close()
             }
-        }.build().also { _shieldSolidXmlOptimized = it }
+        }.build().also { _shieldSolidAvgOptimized = it }
     }
 
 @Preview
 @Composable
 private fun IconPreview() {
-    dev.tonholo.composeicons.ui.theme.ComposeIconsTheme {
+    dev.tonholo.sampleApp.ui.theme.SampleAppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = ShieldSolidXmlOptimized,
+                imageVector = ShieldSolidAvgOptimized,
                 contentDescription = null,
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier
+                    .width((512.0).dp)
+                    .height((512.0).dp),
             )
         }
     }
 }
 
 @Suppress("ObjectPropertyName")
-private var _shieldSolidXmlOptimized: ImageVector? = null
+private var _shieldSolidAvgOptimized: ImageVector? = null

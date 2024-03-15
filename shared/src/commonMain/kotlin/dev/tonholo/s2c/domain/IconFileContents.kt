@@ -102,8 +102,8 @@ data class IconFileContents(
             |                imageVector = $iconPropertyName,
             |                contentDescription = null,
             |                modifier = Modifier
-            |                   .width((${max(width, viewportWidth)}).dp)
-            |                   .height((${max(height, viewportHeight)}).dp),
+            |                    .width((${max(width, viewportWidth)}).dp)
+            |                    .height((${max(height, viewportHeight)}).dp),
             |            )
             |        }
             |    }

@@ -1,9 +1,10 @@
-package dev.tonholo.composeicons.ui.icon
+package dev.tonholo.sampleApp.ui.icon.avg
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,13 +17,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val IllustrationXmlOptimized: ImageVector
+val IllustrationAvgOptimized: ImageVector
     get() {
-        val current = _illustrationXmlOptimized
+        val current = _illustrationAvgOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.IllustrationXmlOptimized",
+            name = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme.IllustrationAvgOptimized",
             defaultWidth = 116.0.dp,
             defaultHeight = 114.0.dp,
             viewportWidth = 116.0f,
@@ -34,7 +35,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 56.78 113.12
                 moveTo(x = 56.78f, y = 113.12f)
-                // c -3.01 0.0 -6.06 -0.25 -9.06 -0.74
+                // c -3.01 0 -6.06 -0.25 -9.06 -0.74
                 curveToRelative(
                     dx1 = -3.01f,
                     dy1 = 0.0f,
@@ -207,7 +208,7 @@ val IllustrationXmlOptimized: ImageVector
                     x3 = 56.64f,
                     y3 = 0.88f,
                 )
-                // c 3.25 0.0 6.53 0.29 9.76 0.85
+                // c 3.25 0 6.53 0.29 9.76 0.85
                 curveToRelative(
                     dx1 = 3.25f,
                     dy1 = 0.0f,
@@ -225,7 +226,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 46.37f,
                     dy3 = 52.73f,
                 )
-                // c 2.79 2.0 3.84 5.64 2.44 8.5
+                // c 2.79 2 3.84 5.64 2.44 8.5
                 curveToRelative(
                     dx1 = 2.79f,
                     dy1 = 2.0f,
@@ -435,7 +436,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -1.31f,
                     dy3 = 0.59f,
                 )
-                // c 0.0 0.0 -0.44 0.19 -0.59 0.25
+                // c 0 0 -0.44 0.19 -0.59 0.25
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -462,7 +463,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.81f,
                     dy3 = 0.97f,
                 )
-                // c -5.42 1.72 -11.07 2.6 -16.79 2.6
+                // c -5.42 1.72 -11.07 2.6 -16.79 2.6z
                 curveToRelative(
                     dx1 = -5.42f,
                     dy1 = 1.72f,
@@ -506,7 +507,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.93f,
                     dy3 = 4.26f,
                 )
-                // c -0.54 2.06 -1.19 4.06 -1.96 6.0
+                // c -0.54 2.06 -1.19 4.06 -1.96 6
                 curveToRelative(
                     dx1 = -0.54f,
                     dy1 = 2.06f,
@@ -564,7 +565,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.54f,
                     dy3 = 0.33f,
                 )
-                // c -2.44 1.39 -5.0 2.59 -7.65 3.58
+                // c -2.44 1.39 -5 2.59 -7.65 3.58
                 curveToRelative(
                     dx1 = -2.44f,
                     dy1 = 1.39f,
@@ -710,7 +711,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.42f,
                     dy3 = -15.48f,
                 )
-                // c 5.03 -28.67 32.34 -47.83 61.0 -42.8
+                // c 5.03 -28.67 32.34 -47.83 61 -42.8
                 curveToRelative(
                     dx1 = 5.03f,
                     dy1 = -28.67f,
@@ -719,7 +720,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 61.0f,
                     dy3 = -42.8f,
                 )
-                // c 25.46 4.46 43.42 26.5 43.59 51.45
+                // c 25.46 4.46 43.42 26.5 43.59 51.45z
                 curveToRelative(
                     dx1 = 25.46f,
                     dy1 = 4.46f,
@@ -770,7 +771,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.2f,
                     dy3 = 1.76f,
                 )
-                // L 39.05 62.75
+                // L 39.05 62.75z
                 lineTo(x = 39.05f, y = 62.75f)
                 close()
             }
@@ -834,7 +835,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -1.25f,
                     dy3 = -12.04f,
                 )
-                // c -0.36 -5.16 -0.39 -10.0 0.43 -12.13
+                // c -0.36 -5.16 -0.39 -10 0.43 -12.13
                 curveToRelative(
                     dx1 = -0.36f,
                     dy1 = -5.16f,
@@ -887,7 +888,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.35f,
                     dy3 = -2.92f,
                 )
-                // c 0.0 -0.08 0.01 -0.17 0.01 -0.25
+                // c 0 -0.08 0.01 -0.17 0.01 -0.25
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.08f,
@@ -1057,7 +1058,7 @@ val IllustrationXmlOptimized: ImageVector
                 )
                 // v 0.03
                 verticalLineToRelative(dy = 0.03f)
-                // s 2.0 -0.49 4.73 -1.03
+                // s 2 -0.49 4.73 -1.03
                 reflectiveCurveToRelative(
                     dx1 = 2.0f,
                     dy1 = -0.49f,
@@ -1102,7 +1103,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.4f,
                     dy3 = 0.87f,
                 )
-                // l 13.16 31.9
+                // l 13.16 31.9z
                 lineToRelative(dx = 13.16f, dy = 31.9f)
                 close()
             }
@@ -1166,7 +1167,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.39f,
                     dy3 = 0.46f,
                 )
-                // c 0.15 0.36 0.07 0.78 -0.13 1.11
+                // c 0.15 0.36 0.07 0.78 -0.13 1.11z
                 curveToRelative(
                     dx1 = 0.15f,
                     dy1 = 0.36f,
@@ -1194,7 +1195,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx2 = -5.05f,
                     dy2 = -10.97f,
                 )
-                // c 0.0 -4.51 2.9 -5.91 4.51 -5.91
+                // c 0 -4.51 2.9 -5.91 4.51 -5.91
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -4.51f,
@@ -1203,7 +1204,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 4.51f,
                     dy3 = -5.91f,
                 )
-                // c 0.09 0.0 0.17 0.02 0.26 0.04
+                // c 0.09 0 0.17 0.02 0.26 0.04
                 curveToRelative(
                     dx1 = 0.09f,
                     dy1 = 0.0f,
@@ -1239,7 +1240,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 6.77f,
                     dy3 = 7.55f,
                 )
-                // c 1.83 3.12 4.2 9.57 4.2 9.57
+                // c 1.83 3.12 4.2 9.57 4.2 9.57z
                 curveToRelative(
                     dx1 = 1.83f,
                     dy1 = 3.12f,
@@ -1310,7 +1311,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.64f,
                     dy3 = 0.95f,
                 )
-                // c 0.05 0.26 0.04 0.53 -0.04 0.79
+                // c 0.05 0.26 0.04 0.53 -0.04 0.79z
                 curveToRelative(
                     dx1 = 0.05f,
                     dy1 = 0.26f,
@@ -1367,7 +1368,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.35f,
                     dy3 = -1.13f,
                 )
-                // c 0.0 -0.53 0.13 -1.28 0.47 -1.83
+                // c 0 -0.53 0.13 -1.28 0.47 -1.83
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.53f,
@@ -1376,7 +1377,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.47f,
                     dy3 = -1.83f,
                 )
-                // c 3.88 0.18 6.99 0.81 7.58 1.85
+                // c 3.88 0.18 6.99 0.81 7.58 1.85z
                 curveToRelative(
                     dx1 = 3.88f,
                     dy1 = 0.18f,
@@ -1400,7 +1401,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx2 = -0.08f,
                     dy2 = -0.28f,
                 )
-                // C 38.58 68.58 38.3 67.3 38.3 66.0
+                // C 38.58 68.58 38.3 67.3 38.3 66
                 curveTo(
                     x1 = 38.58f,
                     y1 = 68.58f,
@@ -1409,7 +1410,7 @@ val IllustrationXmlOptimized: ImageVector
                     x3 = 38.3f,
                     y3 = 66.0f,
                 )
-                // c 0.0 -0.92 0.14 -1.86 0.57 -2.55
+                // c 0 -0.92 0.14 -1.86 0.57 -2.55
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.92f,
@@ -1427,7 +1428,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 10.05f,
                     dy3 = -12.3f,
                 )
-                // c 1.33 -1.29 2.5 -2.31 3.48 -3.0
+                // c 1.33 -1.29 2.5 -2.31 3.48 -3
                 curveToRelative(
                     dx1 = 1.33f,
                     dy1 = -1.29f,
@@ -1445,7 +1446,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.35f,
                     dy3 = -1.05f,
                 )
-                // c 0.2 0.0 0.36 0.04 0.51 0.13
+                // c 0.2 0 0.36 0.04 0.51 0.13
                 curveToRelative(
                     dx1 = 0.2f,
                     dy1 = 0.0f,
@@ -1472,7 +1473,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.59f,
                     dy3 = 1.92f,
                 )
-                // c 0.0 0.31 -0.03 0.65 -0.1 1.03
+                // c 0 0.31 -0.03 0.65 -0.1 1.03
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.31f,
@@ -1562,7 +1563,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.11f,
                     dy3 = -1.09f,
                 )
-                // c 0.0 -0.91 -0.27 -1.59 -0.66 -2.11
+                // c 0 -0.91 -0.27 -1.59 -0.66 -2.11
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.91f,
@@ -1589,7 +1590,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.67f,
                     dy3 = -0.16f,
                 )
-                // c -0.69 0.0 -1.52 0.39 -2.53 1.1
+                // c -0.69 0 -1.52 0.39 -2.53 1.1
                 curveToRelative(
                     dx1 = -0.69f,
                     dy1 = 0.0f,
@@ -1598,7 +1599,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.53f,
                     dy3 = 1.1f,
                 )
-                // c -1.0 0.71 -2.18 1.73 -3.52 3.04
+                // c -1 0.71 -2.18 1.73 -3.52 3.04
                 curveToRelative(
                     dx1 = -1.0f,
                     dy1 = 0.71f,
@@ -1625,7 +1626,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.62f,
                     dy3 = 2.71f,
                 )
-                // c 0.0 1.8 0.52 3.51 0.52 3.51
+                // c 0 1.8 0.52 3.51 0.52 3.51
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 1.8f,
@@ -1643,7 +1644,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.2f,
                     dy3 = 0.11f,
                 )
-                // c 0.08 -0.03 0.13 -0.11 0.11 -0.2
+                // c 0.08 -0.03 0.13 -0.11 0.11 -0.2z
                 curveToRelative(
                     dx1 = 0.08f,
                     dy1 = -0.03f,
@@ -1666,7 +1667,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = -0.16f, dy = 0.01f)
                 // l 0.03 0.16
                 lineToRelative(dx = 0.03f, dy = 0.16f)
-                // c 0.01 0.0 0.31 -0.07 0.83 -0.19
+                // c 0.01 0 0.31 -0.07 0.83 -0.19
                 curveToRelative(
                     dx1 = 0.01f,
                     dy1 = 0.0f,
@@ -1693,7 +1694,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 5.67f,
                     dy3 = -1.06f,
                 )
-                // c 1.82 -0.42 3.41 -1.0 4.19 -2.16
+                // c 1.82 -0.42 3.41 -1 4.19 -2.16
                 curveToRelative(
                     dx1 = 1.82f,
                     dy1 = -0.42f,
@@ -1711,7 +1712,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.79f,
                     dy3 = -2.76f,
                 )
-                // c 0.0 -0.97 -0.26 -1.91 -0.77 -2.6
+                // c 0 -0.97 -0.26 -1.91 -0.77 -2.6
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.97f,
@@ -1740,7 +1741,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -1.21f,
                     dy3 = -0.05f,
                 )
-                // c -1.54 0.0 -3.85 0.16 -6.32 0.43
+                // c -1.54 0 -3.85 0.16 -6.32 0.43
                 curveToRelative(
                     dx1 = -1.54f,
                     dy1 = 0.0f,
@@ -1749,7 +1750,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -6.32f,
                     dy3 = 0.43f,
                 )
-                // c -2.74 0.31 -5.66 0.76 -8.0 1.31
+                // c -2.74 0.31 -5.66 0.76 -8 1.31
                 curveToRelative(
                     dx1 = -2.74f,
                     dy1 = 0.31f,
@@ -1785,7 +1786,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.42f,
                     dy3 = 4.47f,
                 )
-                // c 0.0 1.73 0.12 3.45 0.24 4.81
+                // c 0 1.73 0.12 3.45 0.24 4.81
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 1.73f,
@@ -1821,7 +1822,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.14f,
                     dy3 = -0.18f,
                 )
-                // c 0.0 0.0 -0.09 -0.82 -0.23 -2.12
+                // c 0 0 -0.09 -0.82 -0.23 -2.12
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -1848,7 +1849,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.24f,
                     dy3 = -4.79f,
                 )
-                // c 0.0 -1.57 0.11 -3.13 0.42 -4.39
+                // c 0 -1.57 0.11 -3.13 0.42 -4.39
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -1.57f,
@@ -1875,7 +1876,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 11.82f,
                     dy3 = -3.86f,
                 )
-                // c 2.31 -0.55 5.23 -1.0 7.95 -1.31
+                // c 2.31 -0.55 5.23 -1 7.95 -1.31
                 curveToRelative(
                     dx1 = 2.31f,
                     dy1 = -0.55f,
@@ -1893,7 +1894,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 6.29f,
                     dy3 = -0.43f,
                 )
-                // c 0.48 0.0 0.88 0.02 1.18 0.05
+                // c 0.48 0 0.88 0.02 1.18 0.05
                 curveToRelative(
                     dx1 = 0.48f,
                     dy1 = 0.0f,
@@ -1922,7 +1923,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.71f,
                     dy3 = 2.4f,
                 )
-                // c 0.0 0.9 -0.24 1.85 -0.74 2.59
+                // c 0 0.9 -0.24 1.85 -0.74 2.59
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.9f,
@@ -1978,7 +1979,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.17f,
                     dy3 = 0.15f,
                 )
-                // c 0.09 -0.01 0.15 -0.08 0.14 -0.17
+                // c 0.09 -0.01 0.15 -0.08 0.14 -0.17z
                 curveToRelative(
                     dx1 = 0.09f,
                     dy1 = -0.01f,
@@ -2044,7 +2045,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.53f,
                     dy3 = -2.6f,
                 )
-                // c 0.0 -0.47 -0.05 -0.85 -0.14 -1.11
+                // c 0 -0.47 -0.05 -0.85 -0.14 -1.11
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.47f,
@@ -2090,7 +2091,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.39f,
                     dy3 = -0.07f,
                 )
-                // c -0.2 0.0 -0.4 0.01 -0.61 0.01
+                // c -0.2 0 -0.4 0.01 -0.61 0.01
                 curveToRelative(
                     dx1 = -0.2f,
                     dy1 = 0.0f,
@@ -2099,7 +2100,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.61f,
                     dy3 = 0.01f,
                 )
-                // c -5.37 0.06 -9.15 0.21 -12.0 1.68
+                // c -5.37 0.06 -9.15 0.21 -12 1.68
                 curveToRelative(
                     dx1 = -5.37f,
                     dy1 = 0.06f,
@@ -2126,7 +2127,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -5.68f,
                     dy3 = 9.85f,
                 )
-                // c -0.04 0.07 0.0 0.17 0.07 0.21
+                // c -0.04 0.07 0 0.17 0.07 0.21
                 curveToRelative(
                     dx1 = -0.04f,
                     dy1 = 0.07f,
@@ -2135,7 +2136,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.07f,
                     dy3 = 0.21f,
                 )
-                // c 0.08 0.03 0.18 0.0 0.22 -0.08
+                // c 0.08 0.03 0.18 0 0.22 -0.08
                 curveToRelative(
                     dx1 = 0.08f,
                     dy1 = 0.03f,
@@ -2144,7 +2145,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.22f,
                     dy3 = -0.08f,
                 )
-                // c 0.0 0.0 0.08 -0.17 0.23 -0.47
+                // c 0 0 0.08 -0.17 0.23 -0.47
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -2191,7 +2192,7 @@ val IllustrationXmlOptimized: ImageVector
                 )
                 // h 0.61
                 horizontalLineToRelative(dx = 0.61f)
-                // c 0.81 0.0 1.61 0.02 2.37 0.06
+                // c 0.81 0 1.61 0.02 2.37 0.06
                 curveToRelative(
                     dx1 = 0.81f,
                     dy1 = 0.0f,
@@ -2200,7 +2201,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.37f,
                     dy3 = 0.06f,
                 )
-                // c 1.94 0.09 3.68 0.29 5.0 0.59
+                // c 1.94 0.09 3.68 0.29 5 0.59
                 curveToRelative(
                     dx1 = 1.94f,
                     dy1 = 0.09f,
@@ -2315,7 +2316,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.1f,
                     dy3 = 0.2f,
                 )
-                // c 0.08 0.02 0.17 -0.02 0.2 -0.11
+                // c 0.08 0.02 0.17 -0.02 0.2 -0.11z
                 curveToRelative(
                     dx1 = 0.08f,
                     dy1 = 0.02f,
@@ -2368,7 +2369,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.3f,
                     dy3 = -2.44f,
                 )
-                // c -0.06 -0.06 -0.16 -0.06 -0.22 0.0
+                // c -0.06 -0.06 -0.16 -0.06 -0.22 0
                 curveToRelative(
                     dx1 = -0.06f,
                     dy1 = -0.06f,
@@ -2377,7 +2378,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.22f,
                     dy3 = 0.0f,
                 )
-                // s -0.07 0.16 -0.01 0.22
+                // s -0.07 0.16 -0.01 0.22z
                 reflectiveCurveToRelative(
                     dx1 = -0.07f,
                     dy1 = 0.16f,
@@ -2446,7 +2447,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 4.04f,
                     dy3 = 6.2f,
                 )
-                // c 0.09 0.12 0.2 0.25 0.32 0.4
+                // c 0.09 0.12 0.2 0.25 0.32 0.4z
                 curveToRelative(
                     dx1 = 0.09f,
                     dy1 = 0.12f,
@@ -2485,7 +2486,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.27f,
                     dy3 = -0.9f,
                 )
-                // c 0.02 -0.68 -0.51 -1.23 -1.0 -1.71
+                // c 0.02 -0.68 -0.51 -1.23 -1 -1.71
                 curveToRelative(
                     dx1 = 0.02f,
                     dy1 = -0.68f,
@@ -2521,7 +2522,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.41f,
                     dy3 = 0.66f,
                 )
-                // c 0.29 0.19 0.6 0.42 0.96 0.33
+                // c 0.29 0.19 0.6 0.42 0.96 0.33z
                 curveToRelative(
                     dx1 = 0.29f,
                     dy1 = 0.19f,
@@ -2547,7 +2548,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.07f,
                     dy3 = 3.87f,
                 )
-                // c 0.0 2.44 -0.12 3.81 -0.37 5.95
+                // c 0 2.44 -0.12 3.81 -0.37 5.95
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 2.44f,
@@ -2592,7 +2593,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.09f,
                     dy3 = -10.51f,
                 )
-                // c 0.24 -2.15 0.36 -3.55 0.36 -6.0
+                // c 0.24 -2.15 0.36 -3.55 0.36 -6
                 curveToRelative(
                     dx1 = 0.24f,
                     dy1 = -2.15f,
@@ -2601,7 +2602,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.36f,
                     dy3 = -6.0f,
                 )
-                // c 0.0 -1.05 -0.02 -2.3 -0.06 -3.88
+                // c 0 -1.05 -0.02 -2.3 -0.06 -3.88
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -1.05f,
@@ -2619,7 +2620,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.2f,
                     dy3 = -0.18f,
                 )
-                // c -0.11 0.0 -0.19 0.09 -0.19 0.19
+                // c -0.11 0 -0.19 0.09 -0.19 0.19z
                 curveToRelative(
                     dx1 = -0.11f,
                     dy1 = 0.0f,
@@ -2635,7 +2636,7 @@ val IllustrationXmlOptimized: ImageVector
                 clipPathData = PathData {
                     // M 55.18 24.7
                     moveTo(x = 55.18f, y = 24.7f)
-                    // c -0.6 0.0 -1.4 -0.25 -1.77 -0.33
+                    // c -0.6 0 -1.4 -0.25 -1.77 -0.33
                     curveToRelative(
                         dx1 = -0.6f,
                         dy1 = 0.0f,
@@ -2689,7 +2690,7 @@ val IllustrationXmlOptimized: ImageVector
                         dx3 = 1.27f,
                         dy3 = -0.36f,
                     )
-                    // c 1.01 0.0 2.1 0.55 2.98 1.14
+                    // c 1.01 0 2.1 0.55 2.98 1.14
                     curveToRelative(
                         dx1 = 1.01f,
                         dy1 = 0.0f,
@@ -2725,7 +2726,7 @@ val IllustrationXmlOptimized: ImageVector
                         dx3 = 0.62f,
                         dy3 = 2.12f,
                     )
-                    // c -0.13 0.12 -0.35 0.16 -0.59 0.16
+                    // c -0.13 0.12 -0.35 0.16 -0.59 0.16z
                     curveToRelative(
                         dx1 = -0.13f,
                         dy1 = 0.12f,
@@ -2749,7 +2750,7 @@ val IllustrationXmlOptimized: ImageVector
                     verticalLineTo(y = 12.61f)
                     // H 41.23
                     horizontalLineTo(x = 41.23f)
-                    // V 24.7
+                    // V 24.7z
                     verticalLineTo(y = 24.7f)
                     close()
                 }
@@ -2760,7 +2761,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 41.15 32.67
                 moveTo(x = 41.15f, y = 32.67f)
-                // c -0.68 0.0 -1.35 -0.09 -1.96 -0.37
+                // c -0.68 0 -1.35 -0.09 -1.96 -0.37
                 curveToRelative(
                     dx1 = -0.68f,
                     dy1 = 0.0f,
@@ -2805,7 +2806,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 3.53f,
                     dy3 = -0.29f,
                 )
-                // c 1.01 0.0 2.03 0.06 3.03 0.18
+                // c 1.01 0 2.03 0.06 3.03 0.18
                 curveToRelative(
                     dx1 = 1.01f,
                     dy1 = 0.0f,
@@ -2850,7 +2851,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -12.07f,
                     dy3 = 4.51f,
                 )
-                // c -0.38 0.03 -0.75 0.06 -1.13 0.06
+                // c -0.38 0.03 -0.75 0.06 -1.13 0.06z
                 curveToRelative(
                     dx1 = -0.38f,
                     dy1 = 0.03f,
@@ -2867,7 +2868,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 49.31 41.52
                 moveTo(x = 49.31f, y = 41.52f)
-                // c -1.08 0.0 -2.17 -0.48 -2.66 -1.43
+                // c -1.08 0 -2.17 -0.48 -2.66 -1.43
                 curveToRelative(
                     dx1 = -1.08f,
                     dy1 = 0.0f,
@@ -2930,7 +2931,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.63f,
                     dy3 = -0.77f,
                 )
-                // c 0.08 0.0 0.15 0.01 0.22 0.04
+                // c 0.08 0 0.15 0.01 0.22 0.04
                 curveToRelative(
                     dx1 = 0.08f,
                     dy1 = 0.0f,
@@ -2984,7 +2985,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -3.22f,
                     dy3 = 2.81f,
                 )
-                // c -0.37 0.13 -0.76 0.19 -1.15 0.19
+                // c -0.37 0.13 -0.76 0.19 -1.15 0.19z
                 curveToRelative(
                     dx1 = -0.37f,
                     dy1 = 0.13f,
@@ -3019,7 +3020,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.3f,
                     dy3 = 0.21f,
                 )
-                // c -0.01 0.01 -0.02 0.02 -0.03 0.02
+                // c -0.01 0.01 -0.02 0.02 -0.03 0.02z
                 curveToRelative(
                     dx1 = -0.01f,
                     dy1 = 0.01f,
@@ -3036,7 +3037,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 63.25 26.39
                 moveTo(x = 63.25f, y = 26.39f)
-                // c -1.78 0.0 -4.19 -0.12 -4.52 -0.83
+                // c -1.78 0 -4.19 -0.12 -4.52 -0.83
                 curveToRelative(
                     dx1 = -1.78f,
                     dy1 = 0.0f,
@@ -3072,7 +3073,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.22f,
                     dy3 = -0.31f,
                 )
-                // c 0.71 0.0 1.41 0.12 2.06 0.4
+                // c 0.71 0 1.41 0.12 2.06 0.4
                 curveToRelative(
                     dx1 = 0.71f,
                     dy1 = 0.0f,
@@ -3108,7 +3109,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -6.65f,
                     dy3 = 1.13f,
                 )
-                // c -0.31 0.01 -0.97 0.03 -1.75 0.03
+                // c -0.31 0.01 -0.97 0.03 -1.75 0.03z
                 curveToRelative(
                     dx1 = -0.31f,
                     dy1 = 0.01f,
@@ -3120,7 +3121,7 @@ val IllustrationXmlOptimized: ImageVector
                 close()
                 // m -5.55 -1.08
                 moveToRelative(dx = -5.55f, dy = -1.08f)
-                // c -1.25 0.0 -1.94 -4.08 -2.13 -4.99
+                // c -1.25 0 -1.94 -4.08 -2.13 -4.99
                 curveToRelative(
                     dx1 = -1.25f,
                     dy1 = 0.0f,
@@ -3156,7 +3157,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.46f,
                     dy3 = -1.04f,
                 )
-                // c 0.54 0.0 1.07 0.15 1.51 0.47
+                // c 0.54 0 1.07 0.15 1.51 0.47
                 curveToRelative(
                     dx1 = 0.54f,
                     dy1 = 0.0f,
@@ -3192,12 +3193,12 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -3.04f,
                     dy3 = 5.55f,
                 )
-                // H 57.7
+                // H 57.7z
                 horizontalLineTo(x = 57.7f)
                 close()
                 // m 13.2 11.78
                 moveToRelative(dx = 13.2f, dy = 11.78f)
-                // c -0.91 0.0 -1.87 -0.37 -2.7 -0.81
+                // c -0.91 0 -1.87 -0.37 -2.7 -0.81
                 curveToRelative(
                     dx1 = -0.91f,
                     dy1 = 0.0f,
@@ -3206,7 +3207,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.7f,
                     dy3 = -0.81f,
                 )
-                // c -2.0 -1.05 -3.8 -2.45 -5.38 -4.07
+                // c -2 -1.05 -3.8 -2.45 -5.38 -4.07
                 curveToRelative(
                     dx1 = -2.0f,
                     dy1 = -1.05f,
@@ -3233,7 +3234,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.38f,
                     dy3 = -0.52f,
                 )
-                // c 1.41 0.0 3.44 0.57 4.05 0.71
+                // c 1.41 0 3.44 0.57 4.05 0.71
                 curveToRelative(
                     dx1 = 1.41f,
                     dy1 = 0.0f,
@@ -3269,7 +3270,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -1.18f,
                     dy3 = 3.83f,
                 )
-                // c -0.42 0.22 -0.86 0.32 -1.32 0.32
+                // c -0.42 0.22 -0.86 0.32 -1.32 0.32z
                 curveToRelative(
                     dx1 = -0.42f,
                     dy1 = 0.22f,
@@ -3286,7 +3287,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 59.24 43.76
                 moveTo(x = 59.24f, y = 43.76f)
-                // c -0.42 0.0 -0.83 -0.08 -1.22 -0.22
+                // c -0.42 0 -0.83 -0.08 -1.22 -0.22
                 curveToRelative(
                     dx1 = -0.42f,
                     dy1 = 0.0f,
@@ -3304,7 +3305,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.16f,
                     dy3 = -0.09f,
                 )
-                // c -0.01 0.0 -0.02 0.01 -0.03 0.01
+                // c -0.01 0 -0.02 0.01 -0.03 0.01
                 curveToRelative(
                     dx1 = -0.01f,
                     dy1 = 0.0f,
@@ -3358,7 +3359,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.13f,
                     dy3 = -1.82f,
                 )
-                // c 0.03 0.0 0.06 0.01 0.09 0.01
+                // c 0.03 0 0.06 0.01 0.09 0.01
                 curveToRelative(
                     dx1 = 0.03f,
                     dy1 = 0.0f,
@@ -3403,7 +3404,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.86f,
                     dy3 = 2.03f,
                 )
-                // c -0.09 0.01 -0.18 0.01 -0.27 0.01
+                // c -0.09 0.01 -0.18 0.01 -0.27 0.01z
                 curveToRelative(
                     dx1 = -0.09f,
                     dy1 = 0.01f,
@@ -3429,7 +3430,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.19f,
                     dy3 = -0.08f,
                 )
-                // c 0.01 0.0 0.02 0.0 0.03 -0.01
+                // c 0.01 0 0.02 0 0.03 -0.01
                 curveToRelative(
                     dx1 = 0.01f,
                     dy1 = 0.0f,
@@ -3438,7 +3439,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.03f,
                     dy3 = -0.01f,
                 )
-                // c 0.07 0.0 0.13 0.04 0.16 0.09
+                // c 0.07 0 0.13 0.04 0.16 0.09z
                 curveToRelative(
                     dx1 = 0.07f,
                     dy1 = 0.0f,
@@ -3464,7 +3465,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.66f,
                     dy3 = -3.29f,
                 )
-                // c -0.09 1.14 -0.46 2.53 -0.66 3.29
+                // c -0.09 1.14 -0.46 2.53 -0.66 3.29z
                 curveToRelative(
                     dx1 = -0.09f,
                     dy1 = 1.14f,
@@ -3535,7 +3536,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -3.52f,
                     dy3 = -4.11f,
                 )
-                // c -1.84 -0.89 -4.18 -1.0 -6.09 -0.26
+                // c -1.84 -0.89 -4.18 -1 -6.09 -0.26z
                 curveToRelative(
                     dx1 = -1.84f,
                     dy1 = -0.89f,
@@ -3633,7 +3634,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.39f,
                     dy3 = -1.37f,
                 )
-                // c 1.63 -5.84 3.18 -12.06 4.54 -18.0
+                // c 1.63 -5.84 3.18 -12.06 4.54 -18
                 curveToRelative(
                     dx1 = 1.63f,
                     dy1 = -5.84f,
@@ -3642,7 +3643,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 4.54f,
                     dy3 = -18.0f,
                 )
-                // c 1.29 -5.62 2.4 -11.0 3.26 -15.59
+                // c 1.29 -5.62 2.4 -11 3.26 -15.59
                 curveToRelative(
                     dx1 = 1.29f,
                     dy1 = -5.62f,
@@ -3678,7 +3679,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.25f,
                     dy3 = -0.17f,
                 )
-                // c 0.12 0.02 0.2 0.13 0.17 0.24
+                // c 0.12 0.02 0.2 0.13 0.17 0.24z
                 curveToRelative(
                     dx1 = 0.12f,
                     dy1 = 0.02f,
@@ -3767,7 +3768,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.74f,
                     dy3 = -5.6f,
                 )
-                // c -1.25 -2.05 -2.74 -3.95 -4.42 -5.66
+                // c -1.25 -2.05 -2.74 -3.95 -4.42 -5.66z
                 curveToRelative(
                     dx1 = -1.25f,
                     dy1 = -2.05f,
@@ -3847,7 +3848,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.62f,
                     dy3 = -1.72f,
                 )
-                // c -2.32 -0.74 -4.73 -1.26 -7.17 -1.32
+                // c -2.32 -0.74 -4.73 -1.26 -7.17 -1.32z
                 curveToRelative(
                     dx1 = -2.32f,
                     dy1 = -0.74f,
@@ -3864,7 +3865,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 79.51 70.27
                 moveTo(x = 79.51f, y = 70.27f)
-                // c -1.0 1.19 -1.91 2.74 -1.47 4.23
+                // c -1 1.19 -1.91 2.74 -1.47 4.23
                 curveToRelative(
                     dx1 = -1.0f,
                     dy1 = 1.19f,
@@ -3918,7 +3919,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -6.42f,
                     dy3 = 2.8f,
                 )
-                // c -2.13 1.32 -4.08 2.94 -5.69 4.87
+                // c -2.13 1.32 -4.08 2.94 -5.69 4.87z
                 curveToRelative(
                     dx1 = -2.13f,
                     dy1 = 1.32f,
@@ -3957,7 +3958,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -4.64f,
                     dy3 = -1.05f,
                 )
-                // c -2.41 0.1 -4.77 0.7 -7.0 1.61
+                // c -2.41 0.1 -4.77 0.7 -7 1.61
                 curveToRelative(
                     dx1 = -2.41f,
                     dy1 = 0.1f,
@@ -3984,7 +3985,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 6.64f,
                     dy3 = 2.25f,
                 )
-                // c 2.46 0.46 4.99 0.57 7.47 0.24
+                // c 2.46 0.46 4.99 0.57 7.47 0.24z
                 curveToRelative(
                     dx1 = 2.46f,
                     dy1 = 0.46f,
@@ -4050,7 +4051,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 4.52f,
                     dy3 = -5.36f,
                 )
-                // c 1.32 -2.13 2.34 -4.45 2.94 -6.88
+                // c 1.32 -2.13 2.34 -4.45 2.94 -6.88z
                 curveToRelative(
                     dx1 = 1.32f,
                     dy1 = -2.13f,
@@ -4089,7 +4090,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.41f,
                     dy3 = -4.1f,
                 )
-                // c -1.73 -1.69 -3.78 -3.0 -5.97 -4.01
+                // c -1.73 -1.69 -3.78 -3 -5.97 -4.01
                 curveToRelative(
                     dx1 = -1.73f,
                     dy1 = -1.69f,
@@ -4116,7 +4117,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.9f,
                     dy3 = 6.39f,
                 )
-                // c 1.35 2.1 3.0 4.03 4.94 5.61
+                // c 1.35 2.1 3 4.03 4.94 5.61z
                 curveToRelative(
                     dx1 = 1.35f,
                     dy1 = 2.1f,
@@ -4187,7 +4188,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -1.95f,
                     dy3 = -6.35f,
                 )
-                // c -1.76 -0.73 -4.67 9.8 -5.1 11.25
+                // c -1.76 -0.73 -4.67 9.8 -5.1 11.25z
                 curveToRelative(
                     dx1 = -1.76f,
                     dy1 = -0.73f,
@@ -4258,7 +4259,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.92f,
                     dy3 = -5.25f,
                 )
-                // c -1.81 -1.37 -4.33 -2.01 -6.56 -1.62
+                // c -1.81 -1.37 -4.33 -2.01 -6.56 -1.62z
                 curveToRelative(
                     dx1 = -1.81f,
                     dy1 = -1.37f,
@@ -4320,7 +4321,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.9f,
                     dy3 = 4.15f,
                 )
-                // c 1.22 4.37 1.15 8.6 0.5 13.09
+                // c 1.22 4.37 1.15 8.6 0.5 13.09z
                 curveToRelative(
                     dx1 = 1.22f,
                     dy1 = 4.37f,
@@ -4332,7 +4333,7 @@ val IllustrationXmlOptimized: ImageVector
                 close()
                 // m -0.79 1.74
                 moveToRelative(dx = -0.79f, dy = 1.74f)
-                // c 2.55 -1.8 5.89 -1.82 9.0 -2.14
+                // c 2.55 -1.8 5.89 -1.82 9 -2.14
                 curveToRelative(
                     dx1 = 2.55f,
                     dy1 = -1.8f,
@@ -4377,7 +4378,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -4.29f,
                     dy3 = 1.56f,
                 )
-                // c -3.97 2.2 -6.93 5.22 -9.67 8.84
+                // c -3.97 2.2 -6.93 5.22 -9.67 8.84z
                 curveToRelative(
                     dx1 = -3.97f,
                     dy1 = 2.2f,
@@ -4510,7 +4511,7 @@ val IllustrationXmlOptimized: ImageVector
                 )
                 // l 0.09 0.34
                 lineToRelative(dx = 0.09f, dy = 0.34f)
-                // c 0.09 0.34 0.19 0.68 0.28 1.01
+                // c 0.09 0.34 0.19 0.68 0.28 1.01z
                 curveToRelative(
                     dx1 = 0.09f,
                     dy1 = 0.34f,
@@ -4599,7 +4600,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.73f,
                     dy3 = -5.61f,
                 )
-                // c 1.26 -2.04 2.75 -3.94 4.43 -5.65
+                // c 1.26 -2.04 2.75 -3.94 4.43 -5.65z
                 curveToRelative(
                     dx1 = 1.26f,
                     dy1 = -2.04f,
@@ -4634,7 +4635,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.56f,
                     dy3 = 2.41f,
                 )
-                // c -0.06 0.62 -0.49 1.16 -1.0 1.53
+                // c -0.06 0.62 -0.49 1.16 -1 1.53
                 curveToRelative(
                     dx1 = -0.06f,
                     dy1 = 0.62f,
@@ -4679,7 +4680,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.62f,
                     dy3 = -1.72f,
                 )
-                // c 2.32 -0.75 4.72 -1.26 7.16 -1.33
+                // c 2.32 -0.75 4.72 -1.26 7.16 -1.33z
                 curveToRelative(
                     dx1 = 2.32f,
                     dy1 = -0.75f,
@@ -4696,7 +4697,7 @@ val IllustrationXmlOptimized: ImageVector
             ) {
                 // M 36.92 75.79
                 moveTo(x = 36.92f, y = 75.79f)
-                // c 1.0 1.2 1.91 2.74 1.48 4.24
+                // c 1 1.2 1.91 2.74 1.48 4.24
                 curveToRelative(
                     dx1 = 1.0f,
                     dy1 = 1.2f,
@@ -4750,7 +4751,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 6.43f,
                     dy3 = 2.81f,
                 )
-                // c 2.13 1.32 4.07 2.94 5.68 4.86
+                // c 2.13 1.32 4.07 2.94 5.68 4.86z
                 curveToRelative(
                     dx1 = 2.13f,
                     dy1 = 1.32f,
@@ -4816,7 +4817,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -6.64f,
                     dy3 = 2.26f,
                 )
-                // c -2.46 0.46 -4.99 0.57 -7.48 0.24
+                // c -2.46 0.46 -4.99 0.57 -7.48 0.24z
                 curveToRelative(
                     dx1 = -2.46f,
                     dy1 = 0.46f,
@@ -4882,7 +4883,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -4.52f,
                     dy3 = -5.36f,
                 )
-                // c -1.32 -2.12 -2.35 -4.44 -2.94 -6.88
+                // c -1.32 -2.12 -2.35 -4.44 -2.94 -6.88z
                 curveToRelative(
                     dx1 = -1.32f,
                     dy1 = -2.12f,
@@ -4948,7 +4949,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.89f,
                     dy3 = 6.38f,
                 )
-                // c -1.35 2.11 -3.0 4.04 -4.95 5.62
+                // c -1.35 2.11 -3 4.04 -4.95 5.62z
                 curveToRelative(
                     dx1 = -1.35f,
                     dy1 = 2.11f,
@@ -5019,7 +5020,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 1.95f,
                     dy3 = -6.35f,
                 )
-                // c 1.75 -0.73 4.67 9.79 5.1 11.25
+                // c 1.75 -0.73 4.67 9.79 5.1 11.25z
                 curveToRelative(
                     dx1 = 1.75f,
                     dy1 = -0.73f,
@@ -5090,7 +5091,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 2.92f,
                     dy3 = -5.25f,
                 )
-                // c 1.81 -1.37 4.33 -2.01 6.56 -1.62
+                // c 1.81 -1.37 4.33 -2.01 6.56 -1.62z
                 curveToRelative(
                     dx1 = 1.81f,
                     dy1 = -1.37f,
@@ -5152,7 +5153,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 3.69f,
                     dy3 = 2.68f,
                 )
-                // c 3.22 3.2 5.23 6.93 6.87 11.16
+                // c 3.22 3.2 5.23 6.93 6.87 11.16z
                 curveToRelative(
                     dx1 = 3.22f,
                     dy1 = 3.2f,
@@ -5209,7 +5210,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.97f,
                     dy3 = 3.46f,
                 )
-                // c -2.38 3.87 -3.47 7.96 -4.08 12.46
+                // c -2.38 3.87 -3.47 7.96 -4.08 12.46z
                 curveToRelative(
                     dx1 = -2.38f,
                     dy1 = 3.87f,
@@ -5221,7 +5222,7 @@ val IllustrationXmlOptimized: ImageVector
                 close()
                 // m 7.47 -39.53
                 moveToRelative(dx = 7.47f, dy = -39.53f)
-                // c 0.0 -0.01 0.13 -0.29 0.37 -0.8
+                // c 0 -0.01 0.13 -0.29 0.37 -0.8
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = -0.01f,
@@ -5239,7 +5240,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 5.02f,
                     dy3 = -10.33f,
                 )
-                // c 1.05 -2.05 2.08 -4.0 2.95 -5.47
+                // c 1.05 -2.05 2.08 -4 2.95 -5.47
                 curveToRelative(
                     dx1 = 1.05f,
                     dy1 = -2.05f,
@@ -5318,7 +5319,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -4.08f,
                     dy3 = -3.2f,
                 )
-                // c -0.37 0.0 -0.73 0.06 -1.07 0.19
+                // c -0.37 0 -0.73 0.06 -1.07 0.19
                 curveToRelative(
                     dx1 = -0.37f,
                     dy1 = 0.0f,
@@ -5354,7 +5355,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -7.37f,
                     dy3 = 14.87f,
                 )
-                // c -0.03 0.08 0.0 0.18 0.08 0.21
+                // c -0.03 0.08 0 0.18 0.08 0.21
                 curveToRelative(
                     dx1 = -0.03f,
                     dy1 = 0.08f,
@@ -5363,7 +5364,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = 0.08f,
                     dy3 = 0.21f,
                 )
-                // c 0.08 0.04 0.17 0.0 0.21 -0.07
+                // c 0.08 0.04 0.17 0 0.21 -0.07z
                 curveToRelative(
                     dx1 = 0.08f,
                     dy1 = 0.04f,
@@ -5390,7 +5391,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = 5.48f, dy = 2.99f)
                 // l -3.11 7.23
                 lineToRelative(dx = -3.11f, dy = 7.23f)
-                // l 5.0 -5.56
+                // l 5 -5.56
                 lineToRelative(dx = 5.0f, dy = -5.56f)
                 // l 2.56 7.75
                 lineToRelative(dx = 2.56f, dy = 7.75f)
@@ -5398,7 +5399,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = -0.14f, dy = -8.85f)
                 // l 8.18 -0.93
                 lineToRelative(dx = 8.18f, dy = -0.93f)
-                // l -8.73 -1.69
+                // l -8.73 -1.69z
                 lineToRelative(dx = -8.73f, dy = -1.69f)
                 close()
                 // m -72.15 2.52
@@ -5413,7 +5414,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = 5.49f, dy = 2.99f)
                 // l -3.11 7.23
                 lineToRelative(dx = -3.11f, dy = 7.23f)
-                // l 5.0 -5.56
+                // l 5 -5.56
                 lineToRelative(dx = 5.0f, dy = -5.56f)
                 // l 2.56 7.75
                 lineToRelative(dx = 2.56f, dy = 7.75f)
@@ -5421,7 +5422,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = -0.14f, dy = -8.84f)
                 // l 8.18 -0.94
                 lineToRelative(dx = 8.18f, dy = -0.94f)
-                // l -8.73 -1.69
+                // l -8.73 -1.69z
                 lineToRelative(dx = -8.73f, dy = -1.69f)
                 close()
                 // M 59.4 95.99
@@ -5444,7 +5445,7 @@ val IllustrationXmlOptimized: ImageVector
                 lineToRelative(dx = -0.14f, dy = -8.84f)
                 // l 8.17 -0.94
                 lineToRelative(dx = 8.17f, dy = -0.94f)
-                // l -8.72 -1.69
+                // l -8.72 -1.69z
                 lineToRelative(dx = -8.72f, dy = -1.69f)
                 close()
             }
@@ -5502,7 +5503,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.74f,
                     dy3 = 5.03f,
                 )
-                // c 0.0 0.0 -1.04 -4.34 -2.12 -4.78
+                // c 0 0 -1.04 -4.34 -2.12 -4.78
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -5511,7 +5512,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.12f,
                     dy3 = -4.78f,
                 )
-                // c -1.09 -0.45 -4.44 -0.7 -4.44 -0.7
+                // c -1.09 -0.45 -4.44 -0.7 -4.44 -0.7z
                 curveToRelative(
                     dx1 = -1.09f,
                     dy1 = -0.45f,
@@ -5571,7 +5572,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.3f,
                     dy3 = 4.54f,
                 )
-                // c 0.0 0.0 0.39 -4.45 -0.5 -5.21
+                // c 0 0 0.39 -4.45 -0.5 -5.21
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -5580,7 +5581,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.5f,
                     dy3 = -5.21f,
                 )
-                // c -0.88 -0.77 -3.99 -2.07 -3.99 -2.07
+                // c -0.88 -0.77 -3.99 -2.07 -3.99 -2.07z
                 curveToRelative(
                     dx1 = -0.88f,
                     dy1 = -0.77f,
@@ -5640,7 +5641,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -2.3f,
                     dy3 = 4.54f,
                 )
-                // c 0.0 0.0 0.4 -4.45 -0.49 -5.21
+                // c 0 0 0.4 -4.45 -0.49 -5.21
                 curveToRelative(
                     dx1 = 0.0f,
                     dy1 = 0.0f,
@@ -5649,7 +5650,7 @@ val IllustrationXmlOptimized: ImageVector
                     dx3 = -0.49f,
                     dy3 = -5.21f,
                 )
-                // c -0.89 -0.77 -4.0 -2.06 -4.0 -2.06
+                // c -0.89 -0.77 -4 -2.06 -4 -2.06z
                 curveToRelative(
                     dx1 = -0.89f,
                     dy1 = -0.77f,
@@ -5660,25 +5661,27 @@ val IllustrationXmlOptimized: ImageVector
                 )
                 close()
             }
-        }.build().also { _illustrationXmlOptimized = it }
+        }.build().also { _illustrationAvgOptimized = it }
     }
 
 @Preview
 @Composable
 private fun IconPreview() {
-    dev.tonholo.composeicons.ui.theme.ComposeIconsTheme {
+    dev.tonholo.sampleApp.ui.theme.SampleAppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                imageVector = IllustrationXmlOptimized,
+                imageVector = IllustrationAvgOptimized,
                 contentDescription = null,
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier
+                    .width((116.0).dp)
+                    .height((114.0).dp),
             )
         }
     }
 }
 
 @Suppress("ObjectPropertyName")
-private var _illustrationXmlOptimized: ImageVector? = null
+private var _illustrationAvgOptimized: ImageVector? = null

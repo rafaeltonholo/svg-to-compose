@@ -1,9 +1,10 @@
-package dev.tonholo.composeicons.ui.icon
+package dev.tonholo.sampleApp.ui.icon.avg
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +23,7 @@ val IllustrationXmlNonOptimized: ImageVector
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.composeicons.ui.theme.ComposeIconsTheme.IllustrationXmlNonOptimized",
+            name = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme.IllustrationXmlNonOptimized",
             defaultWidth = 116.0.dp,
             defaultHeight = 114.0.dp,
             viewportWidth = 116.0f,
@@ -299,7 +300,7 @@ val IllustrationXmlNonOptimized: ImageVector
                 )
                 // L 106.32 89.66
                 lineTo(x = 106.32f, y = 89.66f)
-                // C 107.29 90.0 108.06 90.75 108.41 91.71
+                // C 107.29 90 108.06 90.75 108.41 91.71
                 curveTo(
                     x1 = 107.29f,
                     y1 = 90.0f,
@@ -469,7 +470,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 73.57f,
                     y3 = 110.52f,
                 )
-                // C 68.15 112.24 62.5 113.12 56.78 113.12
+                // C 68.15 112.24 62.5 113.12 56.78 113.12z
                 curveTo(
                     x1 = 68.15f,
                     y1 = 112.24f,
@@ -540,7 +541,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 96.89f,
                     y3 = 91.72f,
                 )
-                // C 94.05 95.0 90.82 97.91 87.28 100.4
+                // C 94.05 95 90.82 97.91 87.28 100.4
                 curveTo(
                     x1 = 94.05f,
                     y1 = 95.0f,
@@ -735,7 +736,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 66.11f,
                     y3 = 5.37f,
                 )
-                // C 91.57 9.83 109.53 31.87 109.7 56.82
+                // C 91.57 9.83 109.53 31.87 109.7 56.82z
                 curveTo(
                     x1 = 91.57f,
                     y1 = 9.83f,
@@ -788,7 +789,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 54.08f,
                     y3 = 47.04f,
                 )
-                // L 39.05 62.75
+                // L 39.05 62.75z
                 lineTo(x = 39.05f, y = 62.75f)
                 close()
             }
@@ -1117,7 +1118,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 73.72f,
                     y3 = 67.63f,
                 )
-                // C 74.0 68.15 74.12 68.5 74.12 68.5
+                // C 74 68.15 74.12 68.5 74.12 68.5
                 curveTo(
                     x1 = 74.0f,
                     y1 = 68.15f,
@@ -1126,7 +1127,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 74.12f,
                     y3 = 68.5f,
                 )
-                // L 87.28 100.4
+                // L 87.28 100.4z
                 lineTo(x = 87.28f, y = 100.4f)
                 close()
             }
@@ -1136,7 +1137,7 @@ val IllustrationXmlNonOptimized: ImageVector
             ) {
                 // M 55.47 48.66
                 moveTo(x = 55.47f, y = 48.66f)
-                // C 55.28 49.0 54.98 49.26 54.69 49.52
+                // C 55.28 49 54.98 49.26 54.69 49.52
                 curveTo(
                     x1 = 55.28f,
                     y1 = 49.0f,
@@ -1190,7 +1191,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 55.6f,
                     y3 = 47.55f,
                 )
-                // C 55.75 47.91 55.67 48.33 55.47 48.66
+                // C 55.75 47.91 55.67 48.33 55.47 48.66z
                 curveTo(
                     x1 = 55.75f,
                     y1 = 47.91f,
@@ -1265,7 +1266,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 71.32f,
                     y3 = 62.59f,
                 )
-                // C 73.15 65.71 75.52 72.16 75.52 72.16
+                // C 73.15 65.71 75.52 72.16 75.52 72.16z
                 curveTo(
                     x1 = 73.15f,
                     y1 = 65.71f,
@@ -1291,7 +1292,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 65.58f,
                     y3 = 66.99f,
                 )
-                // C 64.31 67.24 63.0 67.33 61.71 67.24
+                // C 64.31 67.24 63 67.33 61.71 67.24
                 curveTo(
                     x1 = 64.31f,
                     y1 = 67.24f,
@@ -1336,7 +1337,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 68.18f,
                     y3 = 64.48f,
                 )
-                // C 68.23 64.74 68.22 65.01 68.14 65.27
+                // C 68.23 64.74 68.22 65.01 68.14 65.27z
                 curveTo(
                     x1 = 68.23f,
                     y1 = 64.74f,
@@ -1373,7 +1374,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 70.23f,
                     y3 = 78.55f,
                 )
-                // C 69.0 78.71 67.75 78.69 66.53 78.5
+                // C 69 78.71 67.75 78.69 66.53 78.5
                 curveTo(
                     x1 = 69.0f,
                     y1 = 78.71f,
@@ -1391,7 +1392,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 65.27f,
                     y3 = 77.96f,
                 )
-                // C 65.0 77.66 64.92 77.24 64.92 76.83
+                // C 65 77.66 64.92 77.24 64.92 76.83
                 curveTo(
                     x1 = 65.0f,
                     y1 = 77.66f,
@@ -1400,7 +1401,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 64.92f,
                     y3 = 76.83f,
                 )
-                // C 64.92 76.3 65.05 75.55 65.39 75.0
+                // C 64.92 76.3 65.05 75.55 65.39 75
                 curveTo(
                     x1 = 64.92f,
                     y1 = 76.3f,
@@ -1409,7 +1410,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 65.39f,
                     y3 = 75.0f,
                 )
-                // C 69.27 75.18 72.38 75.81 72.97 76.85
+                // C 69.27 75.18 72.38 75.81 72.97 76.85z
                 curveTo(
                     x1 = 69.27f,
                     y1 = 75.18f,
@@ -1435,7 +1436,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 38.73f,
                     y3 = 69.14f,
                 )
-                // C 38.58 68.58 38.3 67.3 38.3 66.0
+                // C 38.58 68.58 38.3 67.3 38.3 66
                 curveTo(
                     x1 = 38.58f,
                     y1 = 68.58f,
@@ -1651,7 +1652,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 38.6f,
                     y3 = 63.29f,
                 )
-                // C 38.13 64.06 37.98 65.04 37.98 66.0
+                // C 38.13 64.06 37.98 65.04 37.98 66
                 curveTo(
                     x1 = 38.13f,
                     y1 = 64.06f,
@@ -1678,7 +1679,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 38.7f,
                     y3 = 69.62f,
                 )
-                // C 38.78 69.59 38.83 69.51 38.81 69.42
+                // C 38.78 69.59 38.83 69.51 38.81 69.42z
                 curveTo(
                     x1 = 38.78f,
                     y1 = 69.59f,
@@ -1985,7 +1986,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 64.03f,
                     y3 = 71.59f,
                 )
-                // C 62.23 72.0 60.15 72.24 58.36 72.65
+                // C 62.23 72 60.15 72.24 58.36 72.65
                 curveTo(
                     x1 = 62.23f,
                     y1 = 72.0f,
@@ -2023,7 +2024,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 50.11f,
                     y3 = 76.83f,
                 )
-                // C 50.2 76.82 50.26 76.75 50.25 76.66
+                // C 50.2 76.82 50.26 76.75 50.25 76.66z
                 curveTo(
                     x1 = 50.2f,
                     y1 = 76.82f,
@@ -2112,7 +2113,7 @@ val IllustrationXmlNonOptimized: ImageVector
                 verticalLineTo(y = 76.85f)
                 // L 73.11 76.77
                 lineTo(x = 73.11f, y = 76.77f)
-                // C 72.93 76.46 72.6 76.22 72.15 76.0
+                // C 72.93 76.46 72.6 76.22 72.15 76
                 curveTo(
                     x1 = 72.93f,
                     y1 = 76.46f,
@@ -2150,7 +2151,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 62.4f,
                     y3 = 74.79f,
                 )
-                // C 57.03 74.85 53.25 75.0 50.4 76.47
+                // C 57.03 74.85 53.25 75 50.4 76.47
                 curveTo(
                     x1 = 57.03f,
                     y1 = 74.85f,
@@ -2348,7 +2349,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 60.19f,
                     y3 = 83.94f,
                 )
-                // C 59.0 84.08 57.95 84.2 57.2 84.28
+                // C 59 84.08 57.95 84.2 57.2 84.28
                 curveTo(
                     x1 = 59.0f,
                     y1 = 84.08f,
@@ -2386,7 +2387,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 53.76f,
                     y3 = 91.44f,
                 )
-                // C 53.84 91.46 53.93 91.42 53.96 91.33
+                // C 53.84 91.46 53.93 91.42 53.96 91.33z
                 curveTo(
                     x1 = 53.84f,
                     y1 = 91.46f,
@@ -2412,7 +2413,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 56.59f,
                     y3 = 91.93f,
                 )
-                // C 56.65 92.0 56.75 92.0 56.81 91.94
+                // C 56.65 92 56.75 92 56.81 91.94
                 curveTo(
                     x1 = 56.65f,
                     y1 = 92.0f,
@@ -2448,7 +2449,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 54.3f,
                     y3 = 89.28f,
                 )
-                // C 54.24 89.34 54.23 89.44 54.29 89.5
+                // C 54.24 89.34 54.23 89.44 54.29 89.5z
                 curveTo(
                     x1 = 54.24f,
                     y1 = 89.34f,
@@ -2519,7 +2520,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 64.23f,
                     y3 = 54.64f,
                 )
-                // C 64.32 54.76 64.43 54.89 64.55 55.04
+                // C 64.32 54.76 64.43 54.89 64.55 55.04z
                 curveTo(
                     x1 = 64.32f,
                     y1 = 54.76f,
@@ -2599,7 +2600,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 45.73f,
                     y3 = 50.55f,
                 )
-                // C 46.02 50.74 46.33 50.97 46.69 50.88
+                // C 46.02 50.74 46.33 50.97 46.69 50.88z
                 curveTo(
                     x1 = 46.02f,
                     y1 = 50.74f,
@@ -2670,7 +2671,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.76f,
                     y3 = 53.52f,
                 )
-                // C 58.0 51.37 58.12 49.97 58.12 47.52
+                // C 58 51.37 58.12 49.97 58.12 47.52
                 curveTo(
                     x1 = 58.0f,
                     y1 = 51.37f,
@@ -2697,7 +2698,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.86f,
                     y3 = 43.46f,
                 )
-                // C 57.75 43.46 57.67 43.55 57.67 43.65
+                // C 57.75 43.46 57.67 43.55 57.67 43.65z
                 curveTo(
                     x1 = 57.75f,
                     y1 = 43.46f,
@@ -2803,7 +2804,7 @@ val IllustrationXmlNonOptimized: ImageVector
                         x3 = 55.77f,
                         y3 = 24.54f,
                     )
-                    // C 55.64 24.66 55.42 24.7 55.18 24.7
+                    // C 55.64 24.66 55.42 24.7 55.18 24.7z
                     curveTo(
                         x1 = 55.64f,
                         y1 = 24.66f,
@@ -2828,7 +2829,7 @@ val IllustrationXmlNonOptimized: ImageVector
                         verticalLineTo(y = 12.61f)
                         // H 41.23
                         horizontalLineTo(x = 41.23f)
-                        // V 24.7
+                        // V 24.7z
                         verticalLineTo(y = 24.7f)
                         close()
                     }
@@ -2930,7 +2931,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 42.28f,
                     y3 = 32.61f,
                 )
-                // C 41.9 32.64 41.53 32.67 41.15 32.67
+                // C 41.9 32.64 41.53 32.67 41.15 32.67z
                 curveTo(
                     x1 = 41.9f,
                     y1 = 32.64f,
@@ -3019,7 +3020,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 56.52f,
                     y3 = 27.14f,
                 )
-                // C 56.97 27.33 57.06 28.05 57.0 28.91
+                // C 56.97 27.33 57.06 28.05 57 28.91
                 curveTo(
                     x1 = 56.97f,
                     y1 = 27.33f,
@@ -3028,7 +3029,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.0f,
                     y3 = 28.91f,
                 )
-                // C 56.73 29.83 56.52 31.0 56.34 32.2
+                // C 56.73 29.83 56.52 31 56.34 32.2
                 curveTo(
                     x1 = 56.73f,
                     y1 = 29.83f,
@@ -3064,7 +3065,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 50.46f,
                     y3 = 41.33f,
                 )
-                // C 50.09 41.46 49.7 41.52 49.31 41.52
+                // C 50.09 41.46 49.7 41.52 49.31 41.52z
                 curveTo(
                     x1 = 50.09f,
                     y1 = 41.46f,
@@ -3099,7 +3100,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 54.38f,
                     y3 = 28.08f,
                 )
-                // C 54.37 28.09 54.36 28.1 54.35 28.1
+                // C 54.37 28.09 54.36 28.1 54.35 28.1z
                 curveTo(
                     x1 = 54.37f,
                     y1 = 28.09f,
@@ -3179,7 +3180,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 71.65f,
                     y3 = 25.23f,
                 )
-                // C 69.52 25.97 67.26 26.32 65.0 26.36
+                // C 69.52 25.97 67.26 26.32 65 26.36
                 curveTo(
                     x1 = 69.52f,
                     y1 = 25.97f,
@@ -3188,7 +3189,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 65.0f,
                     y3 = 26.36f,
                 )
-                // C 64.69 26.37 64.03 26.39 63.25 26.39
+                // C 64.69 26.37 64.03 26.39 63.25 26.39z
                 curveTo(
                     x1 = 64.69f,
                     y1 = 26.37f,
@@ -3241,7 +3242,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 59.33f,
                     y3 = 8.85f,
                 )
-                // C 59.87 8.85 60.4 9.0 60.84 9.32
+                // C 59.87 8.85 60.4 9 60.84 9.32
                 curveTo(
                     x1 = 59.87f,
                     y1 = 8.85f,
@@ -3277,7 +3278,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.72f,
                     y3 = 25.31f,
                 )
-                // C 57.72 25.31 57.71 25.31 57.7 25.31
+                // C 57.72 25.31 57.71 25.31 57.7 25.31z
                 curveTo(
                     x1 = 57.72f,
                     y1 = 25.31f,
@@ -3366,7 +3367,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 72.22f,
                     y3 = 36.77f,
                 )
-                // C 71.8 36.99 71.36 37.09 70.9 37.09
+                // C 71.8 36.99 71.36 37.09 70.9 37.09z
                 curveTo(
                     x1 = 71.8f,
                     y1 = 36.99f,
@@ -3446,7 +3447,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 56.34f,
                     y3 = 32.2f,
                 )
-                // C 56.54 31.44 56.91 30.05 57.0 28.91
+                // C 56.54 31.44 56.91 30.05 57 28.91
                 curveTo(
                     x1 = 56.54f,
                     y1 = 31.44f,
@@ -3509,7 +3510,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 59.51f,
                     y3 = 43.75f,
                 )
-                // C 59.42 43.76 59.33 43.76 59.24 43.76
+                // C 59.42 43.76 59.33 43.76 59.24 43.76z
                 curveTo(
                     x1 = 59.42f,
                     y1 = 43.76f,
@@ -3553,7 +3554,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.86f,
                     y3 = 43.45f,
                 )
-                // C 57.93 43.45 57.99 43.49 58.02 43.54
+                // C 57.93 43.45 57.99 43.49 58.02 43.54z
                 curveTo(
                     x1 = 57.93f,
                     y1 = 43.45f,
@@ -3570,7 +3571,7 @@ val IllustrationXmlNonOptimized: ImageVector
             ) {
                 // M 56.34 32.2
                 moveTo(x = 56.34f, y = 32.2f)
-                // C 56.52 31.0 56.73 29.83 57.0 28.91
+                // C 56.52 31 56.73 29.83 57 28.91
                 curveTo(
                     x1 = 56.52f,
                     y1 = 31.0f,
@@ -3579,7 +3580,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 57.0f,
                     y3 = 28.91f,
                 )
-                // C 56.91 30.05 56.54 31.44 56.34 32.2
+                // C 56.91 30.05 56.54 31.44 56.34 32.2z
                 curveTo(
                     x1 = 56.91f,
                     y1 = 30.05f,
@@ -3605,7 +3606,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 52.59f,
                     y3 = 24.35f,
                 )
-                // C 52.21 25.12 52.85 26.0 53.49 26.57
+                // C 52.21 25.12 52.85 26 53.49 26.57
                 curveTo(
                     x1 = 52.21f,
                     y1 = 25.12f,
@@ -3650,7 +3651,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 59.77f,
                     y3 = 23.76f,
                 )
-                // C 57.93 22.87 55.59 22.76 53.68 23.5
+                // C 57.93 22.87 55.59 22.76 53.68 23.5z
                 curveTo(
                     x1 = 57.93f,
                     y1 = 22.87f,
@@ -3793,7 +3794,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 93.17f,
                     y3 = 61.09f,
                 )
-                // C 93.29 61.11 93.37 61.22 93.34 61.33
+                // C 93.29 61.11 93.37 61.22 93.34 61.33z
                 curveTo(
                     x1 = 93.29f,
                     y1 = 61.11f,
@@ -3882,7 +3883,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 88.43f,
                     y3 = 51.56f,
                 )
-                // C 87.18 49.51 85.69 47.61 84.01 45.9
+                // C 87.18 49.51 85.69 47.61 84.01 45.9z
                 curveTo(
                     x1 = 87.18f,
                     y1 = 49.51f,
@@ -3962,7 +3963,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 88.88f,
                     y3 = 59.21f,
                 )
-                // C 86.56 58.47 84.15 57.95 81.71 57.89
+                // C 86.56 58.47 84.15 57.95 81.71 57.89z
                 curveTo(
                     x1 = 86.56f,
                     y1 = 58.47f,
@@ -4033,7 +4034,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 85.2f,
                     y3 = 65.4f,
                 )
-                // C 83.07 66.72 81.12 68.34 79.51 70.27
+                // C 83.07 66.72 81.12 68.34 79.51 70.27z
                 curveTo(
                     x1 = 83.07f,
                     y1 = 66.72f,
@@ -4104,7 +4105,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 101.02f,
                     y3 = 63.62f,
                 )
-                // C 103.48 64.08 106.01 64.19 108.49 63.86
+                // C 103.48 64.08 106.01 64.19 108.49 63.86z
                 curveTo(
                     x1 = 103.48f,
                     y1 = 64.08f,
@@ -4175,7 +4176,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 97.86f,
                     y3 = 55.52f,
                 )
-                // C 99.18 53.39 100.2 51.07 100.8 48.64
+                // C 99.18 53.39 100.2 51.07 100.8 48.64z
                 curveTo(
                     x1 = 99.18f,
                     y1 = 53.39f,
@@ -4246,7 +4247,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 97.36f,
                     y3 = 69.5f,
                 )
-                // C 98.71 71.6 100.36 73.53 102.3 75.11
+                // C 98.71 71.6 100.36 73.53 102.3 75.11z
                 curveTo(
                     x1 = 98.71f,
                     y1 = 71.6f,
@@ -4317,7 +4318,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 93.48f,
                     y3 = 62.93f,
                 )
-                // C 91.72 62.2 88.81 72.73 88.38 74.18
+                // C 91.72 62.2 88.81 72.73 88.38 74.18z
                 curveTo(
                     x1 = 91.72f,
                     y1 = 62.2f,
@@ -4388,7 +4389,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 95.9f,
                     y3 = 59.64f,
                 )
-                // C 94.09 58.27 91.57 57.63 89.34 58.02
+                // C 94.09 58.27 91.57 57.63 89.34 58.02z
                 curveTo(
                     x1 = 94.09f,
                     y1 = 58.27f,
@@ -4450,7 +4451,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 83.75f,
                     y3 = 87.19f,
                 )
-                // C 84.97 91.56 84.9 95.79 84.25 100.28
+                // C 84.97 91.56 84.9 95.79 84.25 100.28z
                 curveTo(
                     x1 = 84.97f,
                     y1 = 91.56f,
@@ -4512,7 +4513,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 93.13f,
                     y3 = 93.18f,
                 )
-                // C 89.16 95.38 86.2 98.4 83.46 102.02
+                // C 89.16 95.38 86.2 98.4 83.46 102.02z
                 curveTo(
                     x1 = 89.16f,
                     y1 = 95.38f,
@@ -4556,7 +4557,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 30.18f,
                     y3 = 98.96f,
                 )
-                // C 29.05 94.63 28.0 90.26 27.04 86.11
+                // C 29.05 94.63 28 90.26 27.04 86.11
                 curveTo(
                     x1 = 29.05f,
                     y1 = 94.63f,
@@ -4666,7 +4667,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 31.6f,
                     y3 = 102.59f,
                 )
-                // C 31.69 102.93 31.79 103.27 31.88 103.6
+                // C 31.69 102.93 31.79 103.27 31.88 103.6z
                 curveTo(
                     x1 = 31.69f,
                     y1 = 102.93f,
@@ -4746,7 +4747,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 25.27f,
                     y3 = 62.69f,
                 )
-                // C 25.99 60.74 26.91 58.86 28.0 57.08
+                // C 25.99 60.74 26.91 58.86 28 57.08
                 curveTo(
                     x1 = 25.99f,
                     y1 = 60.74f,
@@ -4755,7 +4756,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 28.0f,
                     y3 = 57.08f,
                 )
-                // C 29.26 55.04 30.75 53.14 32.43 51.43
+                // C 29.26 55.04 30.75 53.14 32.43 51.43z
                 curveTo(
                     x1 = 29.26f,
                     y1 = 55.04f,
@@ -4835,7 +4836,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 27.56f,
                     y3 = 64.74f,
                 )
-                // C 29.88 63.99 32.28 63.48 34.72 63.41
+                // C 29.88 63.99 32.28 63.48 34.72 63.41z
                 curveTo(
                     x1 = 29.88f,
                     y1 = 63.99f,
@@ -4870,7 +4871,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 34.53f,
                     y3 = 82.22f,
                 )
-                // C 32.93 82.02 31.55 81.0 30.4 79.87
+                // C 32.93 82.02 31.55 81 30.4 79.87
                 curveTo(
                     x1 = 32.93f,
                     y1 = 82.02f,
@@ -4906,7 +4907,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 31.24f,
                     y3 = 70.93f,
                 )
-                // C 33.37 72.25 35.31 73.87 36.92 75.79
+                // C 33.37 72.25 35.31 73.87 36.92 75.79z
                 curveTo(
                     x1 = 33.37f,
                     y1 = 72.25f,
@@ -4977,7 +4978,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 15.42f,
                     y3 = 69.15f,
                 )
-                // C 12.96 69.61 10.43 69.72 7.94 69.39
+                // C 12.96 69.61 10.43 69.72 7.94 69.39z
                 curveTo(
                     x1 = 12.96f,
                     y1 = 69.61f,
@@ -5048,7 +5049,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 18.58f,
                     y3 = 61.04f,
                 )
-                // C 17.26 58.92 16.23 56.6 15.64 54.16
+                // C 17.26 58.92 16.23 56.6 15.64 54.16z
                 curveTo(
                     x1 = 17.26f,
                     y1 = 58.92f,
@@ -5083,7 +5084,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 7.74f,
                     y3 = 78.16f,
                 )
-                // C 7.97 76.56 9.0 75.19 10.15 74.06
+                // C 7.97 76.56 9 75.19 10.15 74.06
                 curveTo(
                     x1 = 7.97f,
                     y1 = 76.56f,
@@ -5119,7 +5120,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 19.08f,
                     y3 = 75.02f,
                 )
-                // C 17.73 77.13 16.08 79.06 14.13 80.64
+                // C 17.73 77.13 16.08 79.06 14.13 80.64z
                 curveTo(
                     x1 = 17.73f,
                     y1 = 77.13f,
@@ -5154,7 +5155,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 25.23f,
                     y3 = 86.84f,
                 )
-                // C 23.88 87.0 22.46 86.37 21.67 85.26
+                // C 23.88 87 22.46 86.37 21.67 85.26
                 curveTo(
                     x1 = 23.88f,
                     y1 = 87.0f,
@@ -5190,7 +5191,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 22.96f,
                     y3 = 68.46f,
                 )
-                // C 24.71 67.73 27.63 78.25 28.06 79.71
+                // C 24.71 67.73 27.63 78.25 28.06 79.71z
                 curveTo(
                     x1 = 24.71f,
                     y1 = 67.73f,
@@ -5261,7 +5262,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 20.53f,
                     y3 = 65.17f,
                 )
-                // C 22.34 63.8 24.86 63.16 27.09 63.55
+                // C 22.34 63.8 24.86 63.16 27.09 63.55z
                 curveTo(
                     x1 = 22.34f,
                     y1 = 63.8f,
@@ -5323,7 +5324,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 24.52f,
                     y3 = 90.63f,
                 )
-                // C 27.74 93.83 29.75 97.56 31.39 101.79
+                // C 27.74 93.83 29.75 97.56 31.39 101.79z
                 curveTo(
                     x1 = 27.74f,
                     y1 = 93.83f,
@@ -5385,7 +5386,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 35.49f,
                     y3 = 90.51f,
                 )
-                // C 33.11 94.38 32.02 98.47 31.41 102.97
+                // C 33.11 94.38 32.02 98.47 31.41 102.97z
                 curveTo(
                     x1 = 33.11f,
                     y1 = 94.38f,
@@ -5519,7 +5520,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 48.52f,
                     y3 = 44.35f,
                 )
-                // C 47.91 45.03 47.0 46.53 45.96 48.43
+                // C 47.91 45.03 47 46.53 45.96 48.43
                 curveTo(
                     x1 = 47.91f,
                     y1 = 45.03f,
@@ -5546,7 +5547,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 38.67f,
                     y3 = 63.51f,
                 )
-                // C 38.75 63.55 38.84 63.51 38.88 63.44
+                // C 38.75 63.55 38.84 63.51 38.88 63.44z
                 curveTo(
                     x1 = 38.75f,
                     y1 = 63.55f,
@@ -5581,7 +5582,7 @@ val IllustrationXmlNonOptimized: ImageVector
                 lineTo(x = 98.25f, y = 43.24f)
                 // L 106.43 42.31
                 lineTo(x = 106.43f, y = 42.31f)
-                // L 97.7 40.62
+                // L 97.7 40.62z
                 lineTo(x = 97.7f, y = 40.62f)
                 close()
             }
@@ -5609,7 +5610,7 @@ val IllustrationXmlNonOptimized: ImageVector
                 lineTo(x = 26.1f, y = 45.77f)
                 // L 34.28 44.83
                 lineTo(x = 34.28f, y = 44.83f)
-                // L 25.55 43.14
+                // L 25.55 43.14z
                 lineTo(x = 25.55f, y = 43.14f)
                 close()
             }
@@ -5637,7 +5638,7 @@ val IllustrationXmlNonOptimized: ImageVector
                 lineTo(x = 59.95f, y = 98.62f)
                 // L 68.12 97.68
                 lineTo(x = 68.12f, y = 97.68f)
-                // L 59.4 95.99
+                // L 59.4 95.99z
                 lineTo(x = 59.4f, y = 95.99f)
                 close()
             }
@@ -5674,7 +5675,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 71.41f,
                     y3 = 45.15f,
                 )
-                // C 72.33 46.18 76.0 46.13 76.0 46.13
+                // C 72.33 46.18 76 46.13 76 46.13
                 curveTo(
                     x1 = 72.33f,
                     y1 = 46.18f,
@@ -5683,7 +5684,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 76.0f,
                     y3 = 46.13f,
                 )
-                // C 76.0 46.13 72.7 46.75 72.05 47.91
+                // C 76 46.13 72.7 46.75 72.05 47.91
                 curveTo(
                     x1 = 76.0f,
                     y1 = 46.13f,
@@ -5710,7 +5711,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 69.19f,
                     y3 = 48.16f,
                 )
-                // C 68.1 47.71 64.75 47.46 64.75 47.46
+                // C 68.1 47.71 64.75 47.46 64.75 47.46z
                 curveTo(
                     x1 = 68.1f,
                     y1 = 47.71f,
@@ -5790,7 +5791,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 94.53f,
                     y3 = 79.62f,
                 )
-                // C 93.65 78.85 90.54 77.55 90.54 77.55
+                // C 93.65 78.85 90.54 77.55 90.54 77.55z
                 curveTo(
                     x1 = 93.65f,
                     y1 = 78.85f,
@@ -5870,7 +5871,7 @@ val IllustrationXmlNonOptimized: ImageVector
                     x3 = 19.09f,
                     y3 = 84.08f,
                 )
-                // C 18.2 83.31 15.09 82.02 15.09 82.02
+                // C 18.2 83.31 15.09 82.02 15.09 82.02z
                 curveTo(
                     x1 = 18.2f,
                     y1 = 83.31f,
@@ -5887,7 +5888,7 @@ val IllustrationXmlNonOptimized: ImageVector
 @Preview
 @Composable
 private fun IconPreview() {
-    dev.tonholo.composeicons.ui.theme.ComposeIconsTheme {
+    dev.tonholo.sampleApp.ui.theme.SampleAppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -5895,7 +5896,9 @@ private fun IconPreview() {
             Image(
                 imageVector = IllustrationXmlNonOptimized,
                 contentDescription = null,
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier
+                    .width((116.0).dp)
+                    .height((114.0).dp),
             )
         }
     }
