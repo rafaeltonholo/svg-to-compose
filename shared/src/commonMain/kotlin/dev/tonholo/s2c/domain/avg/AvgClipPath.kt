@@ -10,7 +10,10 @@ class AvgClipPath(
 ) : XmlChildNodeWithAttributes, AvgNode {
     override val name: String = TAG_NAME
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
+
     companion object {
         const val TAG_NAME = "clip-path"
     }
+
+    override fun toString(): String = toJsString()
 }

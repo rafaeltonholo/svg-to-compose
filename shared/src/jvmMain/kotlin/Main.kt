@@ -1,5 +1,4 @@
 import dev.tonholo.s2c.Processor
-import dev.tonholo.s2c.command.command
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
@@ -17,20 +16,16 @@ import kotlin.system.exitProcess
  */
 fun main() {
     AppConfig.debug = false
-    // forces to use node v18.14.2, which has installed, on my machine,
-    // svgo, s2v and avocado.
-    command(program = "nvm") {
-        args("use", "18.14.2")
-    }.also { println(it) }
-
-    val suffix = "NewXmlParse"
-    val (pkg, _, path, output) = SampleFile.Svg.AndroidDevelopers(
+    val suffix = "Optimized"
+    val (pkg, path, output) = SampleFile.Directory(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
-        suffix = suffix,
     )
     val config = ParserConfig(
         pkg = pkg.value,
         theme = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme",
+        // When enabling the optimize flag,
+        // make sure your default node has installed
+        // svgo and avocado.
         optimize = true,
         receiverType = null,
         addToMaterial = false,
@@ -70,8 +65,12 @@ private value class SampleAppPackage(val value: String) {
         SampleAppPackage(this.value + value)
 }
 
+private fun SampleAppPackage.svg(): SampleAppPackage = this + ".svg"
+private fun SampleAppPackage.avg(): SampleAppPackage = this + ".avg"
+
+
 private sealed class SampleFile(
-    open val sampleAppPackage: SampleAppPackage,
+    val sampleAppPackage: SampleAppPackage,
     input: String,
     output: String,
 ) {
@@ -83,8 +82,9 @@ private sealed class SampleFile(
     val input = "$projectDirectory/$input"
     val output = "$projectDirectory/$output"
 
-    operator fun component3(): String = input
-    operator fun component4(): String = output
+    operator fun component1(): SampleAppPackage = sampleAppPackage
+    operator fun component2(): String = input
+    operator fun component3(): String = output
 
     class Directory(
         sampleAppPackage: SampleAppPackage,
@@ -92,96 +92,91 @@ private sealed class SampleFile(
         sampleAppPackage = sampleAppPackage,
         input = "samples/",
         output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.toDirectory()}"
-    ) {
-        operator fun component1(): SampleAppPackage = sampleAppPackage
-        operator fun component2(): String = ""
-    }
+    )
 
     sealed interface Svg {
         companion object {
             private const val BASE_PATH = "samples/svg/"
         }
+
         class All(
             sampleAppPackage: SampleAppPackage,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.plus(".svg"),
+            sampleAppPackage = sampleAppPackage.svg(),
             input = BASE_PATH,
-            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.plus(".svg").toDirectory()}",
-        ) {
-            operator fun component1(): SampleAppPackage = sampleAppPackage
-            operator fun component2(): String = ""
-        }
+            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+        )
 
-        data class ShieldSolid(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class ShieldSolid(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/shield-halved-solid.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/ShieldSolid.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
         )
 
-        data class Illustration(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class Illustration(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/illustration.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/Illustration.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Illustration.$suffix.kt",
         )
 
-        data class Rects(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class Rects(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/rects.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/Rects.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
         )
 
-        data class ComplexRects(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class ComplexRects(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/complex-rects.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/ComplexRects.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ComplexRects.$suffix.kt",
         )
 
-        data class RoundedRect(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class RoundedRect(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/rounded-rect.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/RoundedRect.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RoundedRect.$suffix.kt",
         )
 
-        data class SimpleCircle(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class SimpleCircle(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/circle/simple-circle.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/SimpleCircle.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/SimpleCircle.$suffix.kt",
         )
 
-        data class DashArrayCircle(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class DashArrayCircle(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/circle/dasharray-circle.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/DashArrayCircle.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
         )
 
-        data class AndroidDevelopers(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class AndroidDevelopers(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/android-developers.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/AndroidDevelopers.svg.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
         )
     }
 
@@ -189,33 +184,31 @@ private sealed class SampleFile(
         companion object {
             private const val BASE_PATH = "samples/avg/"
         }
+
         class All(
             sampleAppPackage: SampleAppPackage,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.plus(".avg"),
+            sampleAppPackage = sampleAppPackage.avg(),
             input = BASE_PATH,
-            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.plus(".avg").toDirectory()}",
-        ) {
-            operator fun component1(): SampleAppPackage = sampleAppPackage
-            operator fun component2(): String = ""
-        }
-
-        data class ShieldSolid(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
-            input = "$BASE_PATH/shield-halved-solid.xml",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/ShieldSolid.xml.$suffix.kt",
+            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.avg().toDirectory()}",
         )
 
-        data class Illustration(
-            override val sampleAppPackage: SampleAppPackage,
-            val suffix: String,
+        class ShieldSolid(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
         ) : SampleFile(
-            sampleAppPackage = sampleAppPackage,
+            sampleAppPackage = sampleAppPackage.avg(),
+            input = "$BASE_PATH/shield-halved-solid.xml",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.avg().toDirectory()}/ShieldSolid.$suffix.kt",
+        )
+
+        class Illustration(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.avg(),
             input = "$BASE_PATH/illustration.xml",
-            output = "$ROOT_SAMPLE_APP_PATH/$sampleAppPackage/Illustration.xml.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.avg().toDirectory()}/Illustration.$suffix.kt",
         )
     }
 }

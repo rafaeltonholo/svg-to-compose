@@ -180,13 +180,13 @@ sealed class ImageParser(
     /**
      * [AndroidVectorParser] is a subclass of [ImageParser].
      *
-     * This class is responsible for parsing AVG file type and creates
+     * This class is responsible for parsing an AVG file type and creates
      * all the required information to generate a Jetpack Compose Icon.
      *
      * @constructor Takes a FileSystem parameter.
      *
-     * @param fileSystem Main tool that helps to manage files and allows
-     * to read data from the file system.
+     * @param fileSystem The Main tool that helps to manage files and allows
+     * reading data from the file system.
      */
     class AndroidVectorParser(
         fileSystem: FileSystem,

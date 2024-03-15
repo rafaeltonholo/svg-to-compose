@@ -14,6 +14,15 @@ sealed interface XmlChildNode : XmlNode {
 
 interface XmlChildNodeWithAttributes : XmlChildNode {
     val attributes: MutableMap<String, String>
+
+    override fun toString(): String
+
+    fun toJsString(): String = buildString {
+        append("{")
+        append("\"name\":\"$name\", ")
+        append("\"attributes\":$attributes.toJsString()")
+        append("}")
+    }
 }
 
 data class XmlRootNode(

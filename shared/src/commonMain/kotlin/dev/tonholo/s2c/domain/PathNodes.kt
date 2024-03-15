@@ -18,8 +18,8 @@ import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 
 /**
- * PathNodes is a sealed class which contains multiple classes to represent
- * different commands of SVG/AVG path.
+ * PathNodes is a sealed class that contains multiple classes to represent
+ * different commands of an SVG/AVG path.
  * These classes include: [MoveTo], [ArcTo], [VerticalLineTo], [HorizontalLineTo],
  * [LineTo], [CurveTo], [ReflectiveCurveTo], [QuadTo] and [ReflectiveQuadTo].
  *

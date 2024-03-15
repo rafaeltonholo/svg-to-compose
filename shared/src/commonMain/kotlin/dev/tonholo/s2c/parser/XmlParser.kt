@@ -36,6 +36,7 @@ fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Pa
     val strippedXml = content
         .replace("\\r?\\n".toRegex(), "")
         .replace("\\s{2,}".toRegex(), " ")
+        .replace("> <", "><")
     val (node, duration) = measureTimedValue {
         val xmlParser = Parser.xmlParser()
         val doc = xmlParser.parseInput(html = strippedXml, baseUri = "")
@@ -54,7 +55,9 @@ fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Pa
 private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode {
     val root = XmlRootNode(children = mutableSetOf())
     var currentDepth = 0
-    val stack = mutableListOf<XmlParentNode>(root)
+    val stack = ArrayDeque<XmlParentNode>().apply {
+        addLast(root)
+    }
     var current: XmlParentNode = root
     rootNode.traverse { node, depth ->
         if (currentDepth > depth) {
@@ -74,7 +77,7 @@ private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode 
                 ).also {
                     if (it is XmlElementNode && node.childrenSize() > 0) {
                         current = it
-                        stack += it
+                        stack.addLast(it)
                     }
                 }
             }
@@ -121,6 +124,7 @@ inline fun createAvgElement(
 
         AvgPathNode.TAG_NAME -> AvgPathNode(
             parent = parent,
+            children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
 

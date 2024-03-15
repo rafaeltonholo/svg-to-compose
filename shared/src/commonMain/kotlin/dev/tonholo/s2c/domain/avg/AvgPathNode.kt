@@ -6,15 +6,16 @@ import dev.tonholo.s2c.domain.StrokeCap
 import dev.tonholo.s2c.domain.StrokeJoin
 import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlChildNodeWithAttributes
+import dev.tonholo.s2c.domain.xml.XmlElementNode
+import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
 
 class AvgPathNode(
-    override val parent: XmlParentNode,
-    override val attributes: MutableMap<String, String>,
-) : XmlChildNodeWithAttributes, AvgNode {
-    override val name: String = TAG_NAME
+    parent: XmlParentNode,
+    override val children: MutableSet<XmlNode>,
+    attributes: MutableMap<String, String>,
+) : XmlElementNode(parent, children, attributes, TAG_NAME), AvgNode {
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
 
     val fillColor: String? by attribute(namespace = AvgNode.NAMESPACE)
