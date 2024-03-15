@@ -60,10 +60,6 @@ This script relies on three others to perform the **optimization**:
 ```console
 npm -g install svgo
 ```
-- [SVG2VectorDrawable](https://github.com/Ashung/svg2vectordrawable): Converts the SVG to an Android Vector.
-```console
-npm install -g svg2vectordrawable
-```
 - [Avocado](https://github.com/alexjlockwood/avocado): Optimizes Android VectorDrawable and AnimatedVectorDrawable xml 
 files.
 ```console

@@ -95,14 +95,14 @@ class Processor(
             listOf(filePath)
         }
 
-        val optimizer = createOptimizer(config)
+        val optimizers = createOptimizers(files, config)
 
         val errors = mutableListOf<Pair<Path, Exception>>()
         for (file in files) {
             try {
                 processFile(
                     file = file,
-                    optimizer = optimizer,
+                    optimizers = optimizers,
                     output = outputPath,
                     config = config,
                     recursive = runRecursively,
@@ -232,12 +232,15 @@ class Processor(
         }
     }
 
-    private fun createOptimizer(config: ParserConfig) = if (config.optimize) {
+    private fun createOptimizers(files: List<Path>, config: ParserConfig) = if (config.optimize) {
         verbose("Verifying optimization dependencies")
-        val optimizer = Optimizer.Factory(fileSystem)
-        optimizer.verifyDependency()
+        val optimizers = Optimizer.Factory(fileSystem)
+        optimizers.verifyDependency(
+            hasSvg = files.any { it.extension == FileType.Svg.extension },
+            hasAvg = files.any { it.extension == FileType.Avg.extension },
+        )
         verbose("Finished verification")
-        optimizer
+        optimizers
     } else {
         null
     }
@@ -249,7 +252,7 @@ class Processor(
      * @param file The path of the file that this function is processing.
      * It expects a Path object which contains the complete directory path of the
      * file to be converted.
-     * @param optimizer An optional Optimizer Factory object that can be used to
+     * @param optimizers An optional Optimizer Factory object that can be used to
      * optimize the SVG.  If an Optimizer object is passed, the SVG will be optimized
      * before conversion. If set to null, the SVG will not be optimized.
      * @param output The path location where the result files are expected to be stored
@@ -260,7 +263,7 @@ class Processor(
      */
     private fun processFile(
         file: Path,
-        optimizer: Optimizer.Factory?,
+        optimizers: Optimizer.Factory?,
         output: Path,
         config: ParserConfig,
         recursive: Boolean,
@@ -273,22 +276,22 @@ class Processor(
         } else {
             file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
         }
+        val parent = file.parent
         val targetFile = tempFileWriter.create(
             file = file,
-            optimize = optimizer != null,
         )
 
-        optimizer?.optimize(file)
+        val finalFile = optimizers?.optimize(targetFile) ?: targetFile
 
         val relativePackage = if (recursive.not() || file == basePath) {
             ""
         } else {
             buildString {
                 val stack = mutableListOf<String>()
-                var parent = file.parent
-                while (parent != null && parent != basePath) {
-                    stack += parent.name
-                    parent = parent.parent
+                var currentParent = parent
+                while (currentParent != null && currentParent != basePath) {
+                    stack += currentParent.name
+                    currentParent = currentParent.parent
                 }
                 while (stack.isNotEmpty()) {
                     append(".${stack.removeLast()}")
@@ -298,9 +301,9 @@ class Processor(
 
         val pkg = "${config.pkg}$relativePackage"
 
-        output("👓 Parsing the ${file.extension} file")
+        output("👓 Parsing the ${finalFile.extension} file")
         val fileContents = ImageParser(fileSystem).parse(
-            file = targetFile,
+            file = finalFile,
             iconName = iconName,
             config = config.copy(
                 pkg = pkg,

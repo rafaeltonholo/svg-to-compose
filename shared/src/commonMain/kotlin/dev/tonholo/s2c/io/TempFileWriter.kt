@@ -16,21 +16,15 @@ class TempFileWriter(
 
     fun create(
         file: Path,
-        optimize: Boolean,
-    ): Path {
-        val targetFile = debugSection("Creating temporary file") {
-            fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
+    ): Path = debugSection("Creating temporary file") {
+        fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
 
-            val extension = file.extension
-            val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
+        val extension = file.extension
+        val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
 
-            fileSystem.copy(file, targetFile)
+        fileSystem.copy(file, targetFile)
 
-            return@debugSection targetFile
-        }
-
-        // When optimize is enabled, we always end up with an XML file.
-        return if (optimize) tempFolder / "${TARGET_FILENAME}.xml" else targetFile
+        return@debugSection targetFile
     }
 
     fun clear() {
