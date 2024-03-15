@@ -77,7 +77,12 @@ fun String.toComposeColor(): String? = uppercase()
             }
 
             it.length == FULL_HEXADECIMAL_COLOR_SIZE -> "FF$it"
-            it.length == HALF_HEXADECIMAL_COLOR_SIZE -> "FF$it$it"
+
+            it.length == HALF_HEXADECIMAL_COLOR_SIZE -> {
+                val (r, g, b) = it.toCharArray()
+                "FF$r$r$g$g$b$b"
+            }
+
             it.isEmpty() || it.lowercase().contains("url") ->
                 "FF000000 /* not supported this \"$it\" */" // not supported yet.
             else -> it
