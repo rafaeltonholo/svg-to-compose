@@ -120,7 +120,7 @@ fn_main() {
     bin_folder=$original_bin_folder
     fn_print_info "⬇️ Downloading binaries from Github"
     fn_fetch_latest_version
-    mkdir bin
+    mkdir -p $bin_folder
     binary_base_filename="s2c-${PLATFORM}-binaries"
     binary_filename="${binary_base_filename}.zip"
     fn_print_verbose "Binary name=$binary_filename"
@@ -128,16 +128,16 @@ fn_main() {
     download_url="https://github.com/rafaeltonholo/svg-to-compose/releases/download/$VERSION/$binary_filename"
     fn_print_debug "Downloading from $download_url"
     command curl -L "$download_url" \
-                 --output "bin/$binary_filename"
+                 --output "$bin_folder/$binary_filename"
 
     fn_print_info "🔓 Unzipping binaries"
-    command unzip -qq "bin/$binary_filename" -d "bin"
+    command unzip -qq "$bin_folder/$binary_filename" -d $bin_folder
 
     fn_print_info "🧹 Cleaning up zip files"
-    cp -vr bin/$binary_base_filename/* bin/
-    rm -r "bin/$binary_base_filename" "bin/$binary_filename"
+    cp -vr $bin_folder/$binary_base_filename/* $bin_folder/
+    rm -r "${bin_folder:?}/${binary_base_filename}" "${bin_folder:?}/${binary_filename}"
     fn_print_debug "Giving execution permission to binaries"
-    chmod +x "bin/s2c.$program_ext"
+    chmod +x "$bin_folder/s2c.$program_ext"
 
     fn_print_info "✅ Binaries download completed."
   elif [[ $must_build == true ]]; then
