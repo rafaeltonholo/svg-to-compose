@@ -74,6 +74,7 @@ export default {
         overrides: {
           removeViewBox: false,
           convertShapeToPath: false,
+          convertPathData: false,
         },
       },
     },
@@ -86,7 +87,7 @@ export default {
     },
     {
       name: "addDefaultFillToShapes",
-      description: "Addes a default filling color for shapes",
+      description: "Adds a default filling color for shapes",
       fn: () => {
         return {
           element: {
