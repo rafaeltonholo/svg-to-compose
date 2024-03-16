@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.21"
+kotlin = "1.9.23"
 clikt = "4.2.1"
 xmlutil = "0.86.3"
 okio = "3.7.0"
