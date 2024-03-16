@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.23"
-clikt = "4.2.1"
+clikt = "4.2.2"
 xmlutil = "0.86.3"
 okio = "3.7.0"
 detekt = "1.23.5"
