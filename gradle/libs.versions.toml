@@ -3,7 +3,7 @@ kotlin = "1.9.21"
 clikt = "4.2.1"
 xmlutil = "0.86.3"
 okio = "3.7.0"
-detekt = "1.23.4"
+detekt = "1.23.5"
 build-konfig = "0.15.1"
 
 [libraries]
