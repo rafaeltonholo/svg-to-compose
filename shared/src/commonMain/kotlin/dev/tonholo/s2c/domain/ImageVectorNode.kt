@@ -167,11 +167,11 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
                 currentCommand = when {
                     // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
                     // for implicit absolute LineTo (L/l) command(s)
-                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND.value && lastCommand.isLowerCase() ->
-                        PathNodes.LineTo.COMMAND.value
+                    lastCommand.lowercaseChar() == PathCommand.MoveTo.value && lastCommand.isLowerCase() ->
+                        PathCommand.LineTo.value
 
-                    lastCommand.lowercaseChar() == PathNodes.MoveTo.COMMAND.value ->
-                        PathNodes.LineTo.COMMAND.uppercaseChar()
+                    lastCommand.lowercaseChar() == PathCommand.MoveTo.value ->
+                        PathCommand.LineTo.uppercaseChar()
 
                     else -> lastCommand
                 }
@@ -187,7 +187,7 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
             lastCommand = currentCommand
             nodes.add(node)
             // Looping to avoid recreating a new list by using .drop() instead.
-            repeat(node.commandSize) {
+            repeat(node.command.size) {
                 commands.removeFirst()
             }
         }
@@ -206,65 +206,45 @@ private fun createNode(
     isRelative: Boolean,
     currentCommand: Char,
     minified: Boolean,
-) = when {
-    current.startsWith(PathNodes.MoveTo.COMMAND) -> PathNodes.MoveTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
+) = try {
+    val pathCommand = current.first().toPathCommand()
+    when {
+        pathCommand != null -> pathCommand.createNode(commands, isRelative, minified)
 
-    current.startsWith(PathNodes.ArcTo.COMMAND) -> PathNodes.ArcTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
+        else -> throw ExitProgramException(
+            errorCode = ErrorCode.NotSupportedFileError,
+            message = "Not support SVG/Android Vector command. Command = $currentCommand"
+        )
+    }
+} catch (e: NumberFormatException) {
+    debug(
+        """
+        |Error while parsing Path command. Received parameters:
+        |current = $current,
+        |commands = $commands,
+        |isRelative = $isRelative,
+        |currentCommand = $currentCommand,
+        |minified = $minified,
+        |
+        """.trimMargin()
     )
-
-    current.startsWith(PathNodes.VerticalLineTo.COMMAND) -> PathNodes.VerticalLineTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
+    throw e
+} catch (e: NoSuchElementException) {
+    debug(
+        """
+        |Error while parsing Path command. 
+        |Path string must not be empty.
+        |
+        |Received parameters:
+        |current = $current,
+        |commands = $commands,
+        |isRelative = $isRelative,
+        |currentCommand = $currentCommand,
+        |minified = $minified,
+        |
+        """.trimMargin()
     )
-
-    current.startsWith(PathNodes.HorizontalLineTo.COMMAND) -> PathNodes.HorizontalLineTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    current.startsWith(PathNodes.LineTo.COMMAND) -> PathNodes.LineTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    current.startsWith(PathNodes.CurveTo.COMMAND) -> PathNodes.CurveTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    current.startsWith(PathNodes.ReflectiveCurveTo.COMMAND) -> PathNodes.ReflectiveCurveTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    current.startsWith(PathNodes.QuadTo.COMMAND) -> PathNodes.QuadTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    current.startsWith(PathNodes.ReflectiveQuadTo.COMMAND) -> PathNodes.ReflectiveQuadTo(
-        values = commands,
-        isRelative = isRelative,
-        minified = minified,
-    )
-
-    else -> throw ExitProgramException(
-        errorCode = ErrorCode.NotSupportedFileError,
-        message = "Not support SVG/Android Vector command. Command = $currentCommand"
-    )
+    throw e
 }
 
 private inline fun resetDotCount(current: Char): Int =
@@ -296,24 +276,44 @@ private fun normalizePath(path: String): String {
     val parsedPath = StringBuilder()
     var lastChar = Char.EMPTY
     var dotCount = 0
+    // The path always starts with move to.
+    var command = PathCommand.MoveTo
+
+    var arcCommandPosition = -1
     for (char in path.replace(",", " ")) {
         dotCount = calculateDotCount(char, dotCount, lastChar)
         if ((lastChar.isLetter() && char.isWhitespace()) || (lastChar.isWhitespace() && char.isWhitespace())) {
             continue
         }
 
-        val isNotClosingCommand = (char.isLetter() && char.lowercaseChar() != 'z')
+        val isNotClosingCommand = (char.isLetter() && char.lowercaseChar() != PathCommand.Close.value)
         val isNegativeSign = (lastChar.isDigit() && char == '-')
         val reachMaximumDotNumbers = dotCount == 2
+
+        char.toPathCommand()?.let {
+            command = it
+        }
+        arcCommandPosition = calculateArcCommandPosition(
+            command, position = arcCommandPosition, current = char, lastChar = lastChar,
+        )
+        val isSweepFlagWithNoSpace = arcCommandPosition == PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
+            lastChar.isDigit() &&
+            char.isWhitespace().not()
 
         parsedPath
             .trimWhitespaceBeforeClose(lastChar, current = char)
             .append(
-                if (isNotClosingCommand || isNegativeSign || reachMaximumDotNumbers) {
-                    dotCount = resetDotCount(current = char)
-                    " $char"
-                } else {
-                    char
+                when {
+                    isNotClosingCommand || isNegativeSign || reachMaximumDotNumbers -> {
+                        dotCount = resetDotCount(current = char)
+                        " $char"
+                    }
+
+                    isSweepFlagWithNoSpace -> " $char "
+
+                    else -> {
+                        char
+                    }
                 }
             )
         lastChar = char
@@ -324,4 +324,20 @@ private fun normalizePath(path: String): String {
     }
 
     return parsedPath.toString().trimStart()
+}
+
+private fun calculateArcCommandPosition(
+    command: PathCommand,
+    position: Int,
+    current: Char,
+    lastChar: Char,
+): Int {
+    return when {
+        command != PathCommand.ArcTo -> -1
+        lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
+        position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
+            lastChar.isDigit() -> position + 1
+        lastChar.isWhitespace() && (current.isDigit() || current == '-') -> position + 1
+        else -> position
+    }
 }

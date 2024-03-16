@@ -37,15 +37,15 @@ import dev.tonholo.s2c.domain.PathNodes
 @PathNodesDsl
 internal class PathNodesBuilder(val command: PathCommand) {
     private val commandMap = mapOf(
-        PathNodes.MoveTo.COMMAND to PathNodes.MoveTo.COMMAND_SIZE,
-        PathNodes.ArcTo.COMMAND to PathNodes.ArcTo.COMMAND_SIZE,
-        PathNodes.VerticalLineTo.COMMAND to PathNodes.VerticalLineTo.COMMAND_SIZE,
-        PathNodes.HorizontalLineTo.COMMAND to PathNodes.HorizontalLineTo.COMMAND_SIZE,
-        PathNodes.LineTo.COMMAND to PathNodes.LineTo.COMMAND_SIZE,
-        PathNodes.CurveTo.COMMAND to PathNodes.CurveTo.COMMAND_SIZE,
-        PathNodes.ReflectiveCurveTo.COMMAND to PathNodes.ReflectiveCurveTo.COMMAND_SIZE,
-        PathNodes.QuadTo.COMMAND to PathNodes.QuadTo.COMMAND_SIZE,
-        PathNodes.ReflectiveQuadTo.COMMAND to PathNodes.ReflectiveQuadTo.COMMAND_SIZE,
+        PathCommand.MoveTo to PathCommand.MoveTo.size,
+        PathCommand.ArcTo to PathCommand.ArcTo.size,
+        PathCommand.VerticalLineTo to PathCommand.VerticalLineTo.size,
+        PathCommand.HorizontalLineTo to PathCommand.HorizontalLineTo.size,
+        PathCommand.LineTo to PathCommand.LineTo.size,
+        PathCommand.CurveTo to PathCommand.CurveTo.size,
+        PathCommand.ReflectiveCurveTo to PathCommand.ReflectiveCurveTo.size,
+        PathCommand.QuadTo to PathCommand.QuadTo.size,
+        PathCommand.ReflectiveQuadTo to PathCommand.ReflectiveQuadTo.size,
     )
 
     init {
@@ -80,8 +80,8 @@ internal class PathNodesBuilder(val command: PathCommand) {
         }
 
         return if (close) {
-            args.mapIndexed { index: Int, s: String ->
-                if (index == args.lastIndex) "${s}${PathNodes.CLOSE_COMMAND}" else s
+            args.mapIndexed { index: Int, arg: String ->
+                if (index == args.lastIndex) "${arg}${PathCommand.Close}" else arg
             }
         } else {
             args
@@ -94,55 +94,55 @@ internal class PathNodesBuilder(val command: PathCommand) {
         }
 
         return when (command) {
-            PathNodes.MoveTo.COMMAND -> PathNodes.MoveTo(
+            PathCommand.MoveTo -> PathNodes.MoveTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.ArcTo.COMMAND -> PathNodes.ArcTo(
+            PathCommand.ArcTo -> PathNodes.ArcTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.VerticalLineTo.COMMAND -> PathNodes.VerticalLineTo(
+            PathCommand.VerticalLineTo -> PathNodes.VerticalLineTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.HorizontalLineTo.COMMAND -> PathNodes.HorizontalLineTo(
+            PathCommand.HorizontalLineTo -> PathNodes.HorizontalLineTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.LineTo.COMMAND -> PathNodes.LineTo(
+            PathCommand.LineTo -> PathNodes.LineTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.CurveTo.COMMAND -> PathNodes.CurveTo(
+            PathCommand.CurveTo -> PathNodes.CurveTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.ReflectiveCurveTo.COMMAND -> PathNodes.ReflectiveCurveTo(
+            PathCommand.ReflectiveCurveTo -> PathNodes.ReflectiveCurveTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.QuadTo.COMMAND -> PathNodes.QuadTo(
+            PathCommand.QuadTo -> PathNodes.QuadTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
             )
 
-            PathNodes.ReflectiveQuadTo.COMMAND -> PathNodes.ReflectiveQuadTo(
+            PathCommand.ReflectiveQuadTo -> PathNodes.ReflectiveQuadTo(
                 values = enforceArgumentSize(args),
                 isRelative = isRelative,
                 minified = minified,
@@ -161,18 +161,18 @@ annotation class PathNodesDsl
  * which can construct `PathNodes` representations.
  *
  * USAGE:
- * Creates a relative and not minified [PathNodes.MoveTo] command
+ * Creates a relative and not minified [PathCommand.MoveTo] command
  * ```kotlin
- * pathNode(command = PathNodes.MoveTo.COMMAND) {
+ * pathNode(command = PathCommand.MoveTo) {
  *      args(x, y)
  *      isRelative = true
  *      minified = false
  *  }
  * ```
  *
- * Creates a non-relative and minified [PathNodes.ArcTo] command
+ * Creates a non-relative and minified [PathCommand.ArcTo] command
  * ```kotlin
- * pathNode(command = PathNodes.ArcTo.COMMAND) {
+ * pathNode(command = PathCommand.ArcTo) {
  *      args(
  *          horizontalEllipseRadius, \* Float *\
  *          verticalEllipseRadius, \* Float *\
@@ -187,9 +187,9 @@ annotation class PathNodesDsl
  *  }
  * ```
  *
- * Creates a non-relative and minified [PathNodes.ArcTo] command with a close command
+ * Creates a non-relative and minified [PathCommand.ArcTo] command with a close command
  * ```kotlin
- * pathNode(command = PathNodes.ArcTo.COMMAND) {
+ * pathNode(command = PathCommand.ArcTo) {
  *      args(
  *          a, \* Float *\
  *          b, \* Float *\

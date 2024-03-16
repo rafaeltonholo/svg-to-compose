@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.builder.pathNode
@@ -78,7 +79,7 @@ private fun SvgRectNode.createDashedRect(
     strokeDashArray: StrokeDashArray,
     x: Int,
     y: Int,
-    isMinified: Boolean
+    isMinified: Boolean,
 ): List<PathNodes> {
     warn(
         "Parsing a `stroke-dasharray` attribute is experimental and " +
@@ -97,23 +98,23 @@ private fun SvgRectNode.createDashedRect(
 private fun SvgRectNode.createRegularRect(
     x: Int,
     y: Int,
-    isMinified: Boolean
+    isMinified: Boolean,
 ) = listOf(
-    pathNode(command = PathNodes.MoveTo.COMMAND) {
+    pathNode(command = PathCommand.MoveTo) {
         args(x, y)
         minified = isMinified
     },
-    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+    pathNode(command = PathCommand.HorizontalLineTo) {
         args(width)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
+    pathNode(command = PathCommand.VerticalLineTo) {
         args(height)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+    pathNode(command = PathCommand.HorizontalLineTo) {
         args(x)
         close = true
         minified = isMinified
@@ -125,43 +126,43 @@ private fun SvgRectNode.createRoundedCornerRect(
     y: Int,
     yCornerSize: Int,
     isMinified: Boolean,
-    xCornerSize: Int
+    xCornerSize: Int,
 ) = listOf(
-    pathNode(command = PathNodes.MoveTo.COMMAND) {
+    pathNode(command = PathCommand.MoveTo) {
         args(x, y + yCornerSize)
         minified = isMinified
     },
-    pathNode(command = PathNodes.ArcTo.COMMAND) {
+    pathNode(command = PathCommand.ArcTo) {
         args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, -yCornerSize)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+    pathNode(command = PathCommand.HorizontalLineTo) {
         args(width - xCornerSize * 2)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.ArcTo.COMMAND) {
+    pathNode(command = PathCommand.ArcTo) {
         args(xCornerSize, yCornerSize, 0, false, true, xCornerSize, yCornerSize)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.VerticalLineTo.COMMAND) {
+    pathNode(command = PathCommand.VerticalLineTo) {
         args(height - yCornerSize * 2)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.ArcTo.COMMAND) {
+    pathNode(command = PathCommand.ArcTo) {
         args(xCornerSize, yCornerSize, 0, false, true, -xCornerSize, yCornerSize)
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.HorizontalLineTo.COMMAND) {
+    pathNode(command = PathCommand.HorizontalLineTo) {
         args(-(width - xCornerSize * 2))
         isRelative = true
         minified = isMinified
     },
-    pathNode(command = PathNodes.ArcTo.COMMAND) {
+    pathNode(command = PathCommand.ArcTo) {
         args(
             xCornerSize,
             yCornerSize,

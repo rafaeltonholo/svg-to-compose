@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.delegate.attribute
@@ -77,21 +78,21 @@ private fun SvgCircleNode.createSimpleRect(
     wrapper = ImageVectorNode.NodeWrapper(
         normalizedPath = buildNormalizedPath(),
         nodes = @Suppress("MagicNumber") listOf(
-            pathNode(command = PathNodes.MoveTo.COMMAND) {
+            pathNode(command = PathCommand.MoveTo) {
                 args(cx, cy)
                 this.minified = minified
             },
-            pathNode(command = PathNodes.MoveTo.COMMAND) {
+            pathNode(command = PathCommand.MoveTo) {
                 args(-radius, 0)
                 isRelative = true
                 this.minified = minified
             },
-            pathNode(command = PathNodes.ArcTo.COMMAND) {
+            pathNode(command = PathCommand.ArcTo) {
                 args(radius, radius, 0f, true, true, 2 * radius, 0)
                 isRelative = true
                 this.minified = minified
             },
-            pathNode(command = PathNodes.ArcTo.COMMAND) {
+            pathNode(command = PathCommand.ArcTo) {
                 args(radius, radius, 0f, true, true, -2 * radius, 0)
                 isRelative = true
                 this.minified = minified
@@ -238,7 +239,7 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // Move the pen to the initial position of the inner arc.
             // Initial Position -> Bottom-Left.
             add(
-                pathNode(command = PathNodes.MoveTo.COMMAND) {
+                pathNode(command = PathCommand.MoveTo) {
                     args(innerRadiusStartPoint.x, innerRadiusStartPoint.y)
                     minified = isMinified
                 },
@@ -247,7 +248,7 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // Draw a Line to the starting position of the outer arc.
             // Bottom-Left -> Top-Left
             add(
-                pathNode(command = PathNodes.LineTo.COMMAND) {
+                pathNode(command = PathCommand.LineTo) {
                     args(startPoint.x, startPoint.y)
                     minified = isMinified
                 },
@@ -257,13 +258,16 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // As this is an outer arc, the sweep flat should be set to `true`.
             // Top-Left -> Top-Right.
             add(
-                pathNode(command = PathNodes.ArcTo.COMMAND) {
+                pathNode(command = PathCommand.ArcTo) {
                     args(
                         radius,
                         radius,
-                        /* x-axis rotation */ 0,
-                        /* large arc flag */ false,
-                        /* sweep flag */ true,
+                        /* x-axis rotation */
+                        0,
+                        /* large arc flag */
+                        false,
+                        /* sweep flag */
+                        true,
                         endPoint.x,
                         endPoint.y
                     )
@@ -274,7 +278,7 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // Draw a line to the end of the inner arc.
             // Top-Right -> Bottom-Right.
             add(
-                pathNode(command = PathNodes.LineTo.COMMAND) {
+                pathNode(command = PathCommand.LineTo) {
                     args(innerRadiusEndPoint.x, innerRadiusEndPoint.y)
                     minified = isMinified
                 },
@@ -284,13 +288,16 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // As this is an inner arc, the sweep flat should be set to `false`.
             // Bottom-Right -> Bottom-Left.
             add(
-                pathNode(command = PathNodes.ArcTo.COMMAND) {
+                pathNode(command = PathCommand.ArcTo) {
                     args(
                         innerRadius,
                         innerRadius,
-                        /* x-axis rotation */ 0,
-                        /* large arc flag */ false,
-                        /* sweep flag */ false,
+                        /* x-axis rotation */
+                        0,
+                        /* large arc flag */
+                        false,
+                        /* sweep flag */
+                        false,
                         innerRadiusStartPoint.x,
                         innerRadiusStartPoint.y,
                     )
@@ -308,8 +315,8 @@ private data class Point(val x: Float, val y: Float)
  * Calculates the coordinates of a point on the circumference
  * of a circle based on a provided angle.
  *
- * @param centerX The x-coordinate of the center of the circle.
- * @param centerY The y-coordinate of the center of the circle.
+ * @param centerX The center x-coordinate of the circle.
+ * @param centerY The center y-coordinate of the circle.
  * @param radius The radius of the circle.
  * @param angle The angle (in radians) at which the point lies
  * on the circumference of the circle.

@@ -26,21 +26,20 @@ import dev.tonholo.s2c.extensions.toInt
  * @property values - The list of elements representing the parameters of the command.
  * @property isRelative - Boolean to determine if the command is relative or not.
  * @property command - An instance of PathCommand representing the type of the SVG/AVG command.
- * @property commandSize - An integer representing the size of the command (number of parameters).
  * @property minified - A Boolean value indicating if the output should be minified.
  */
 sealed class PathNodes(
     val values: List<String>,
     val isRelative: Boolean,
     val command: PathCommand,
-    val commandSize: Int,
     val minified: Boolean,
 ) {
-    companion object {
-        const val CLOSE_COMMAND = "z"
-    }
+    private val shouldClose = values[command.size - 1].last().lowercaseChar() == PathCommand.Close.value
 
-    private val shouldClose = values[commandSize - 1].last().lowercase() == CLOSE_COMMAND
+    /**
+     * Visible for Test only.
+     */
+    internal abstract fun buildParameters(): Set<String>
 
     abstract fun materialize(): String
 
@@ -62,7 +61,6 @@ sealed class PathNodes(
      * @param comment The comment text to be included with the SVG
      * command, in case of not minified.
      * @param fnName The function name to be used in the SVG/AVG command.
-     * @param parameters A Set of parameters to be used in the SVG/AVG command.
      * @param forceInline A flag indicating whether the command parameters
      * should be inlined or not. By default, it's set to `false.
      * @return The function representation of the SVG/AVG command.
@@ -70,11 +68,10 @@ sealed class PathNodes(
     protected fun materialize(
         comment: String,
         fnName: String,
-        parameters: Set<String>,
         forceInline: Boolean = false,
     ): String = """
         |${if (minified) "" else "${comment.removeTrailingZero()}${if (shouldClose) "z" else ""}"}
-        |$fnName${if (isRelative) "Relative" else ""}(${parameters.toParameters(forceInline)})
+        |$fnName${if (isRelative) "Relative" else ""}(${buildParameters().toParameters(forceInline)})
         |${closeCommand()}
     """.trimMargin().let {
         if (minified) it.trim() else it
@@ -120,11 +117,6 @@ sealed class PathNodes(
      * is relative.
      * @property minified A boolean value indicating whether the output of
      * [materialize] should be minified.
-     *
-     * @property MoveTo.COMMAND A [PathCommand] representing the SVG/AVG "move to"
-     * command (`m`/`M`).
-     * @property MoveTo.COMMAND_SIZE A constant representing the number of parameters in
-     * the "move to" command (2).
      */
     class MoveTo(
         values: List<String>,
@@ -133,31 +125,28 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.MoveTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('m')
-            const val COMMAND_SIZE = 2
-        }
-
         private val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y = values[1]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x = ${x}f",
+                "${relativePrefix}y = ${y}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x $y",
                 fnName = "moveTo",
-                parameters = setOf(
-                    "${relativePrefix}x = ${x}f",
-                    "${relativePrefix}y = ${y}f",
-                ),
                 forceInline = true,
             )
         }
@@ -184,10 +173,6 @@ sealed class PathNodes(
      * relative.
      * @property minified A boolean value indicating whether the output of [materialize]
      * should be minified.
-     *
-     * @property ArcTo.COMMAND A [PathCommand] representing the SVG/AVG "arc" command (`a`/`A`).
-     * @property ArcTo.COMMAND_SIZE A constant representing the number of parameters in the
-     * "arc" command (7).
      */
     class ArcTo(
         values: List<String>,
@@ -196,15 +181,9 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.ArcTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('a')
-            const val COMMAND_SIZE = 7
-        }
-
         private val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val b = values[1].toFloat()
         private val theta = values[2].toFloat()
@@ -213,27 +192,30 @@ sealed class PathNodes(
         private val x = values[5].toFloat()
         private val y = values[6]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
 
-        override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
+        override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a}f"
             val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b}f"
+            return setOf(
+                a,
+                b,
+                "theta = ${theta}f",
+                "isMoreThanHalf = $isMoreThanHalf",
+                "isPositiveArc = $isPositiveArc",
+                "${relativePrefix}x1 = ${x}f",
+                "${relativePrefix}y1 = ${y}f",
+            )
+        }
+
+        override fun materialize(): String {
+            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
                 comment =
                 "// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y",
                 fnName = "arcTo",
-                parameters = setOf(
-                    a,
-                    b,
-                    "theta = ${theta}f",
-                    "isMoreThanHalf = $isMoreThanHalf",
-                    "isPositiveArc = $isPositiveArc",
-                    "${relativePrefix}x1 = ${x}f",
-                    "${relativePrefix}y1 = ${y}f",
-                ),
             )
         }
     }
@@ -245,7 +227,7 @@ sealed class PathNodes(
      * A type of [PathNodes], it holds the given SVG/AVG command parameters.
      *
      * The vertical position where the pen should move to is denoted by [y], the
-     * first value stripped of the command prefix and the [CLOSE_COMMAND] suffix.
+     * first value stripped of the command prefix and the [PathCommand.Close] suffix.
      *
      * Depending on the [isRelative] flag, the [y] value is considered either as
      * an absolute coordinate (if false) or as a distance from the current
@@ -260,11 +242,6 @@ sealed class PathNodes(
      * @property minified A Boolean flag indicating whether the output of [materialize]
      * should be minified.
      * @property y The new y-coordinate to which the line extends.
-     *
-     * @property VerticalLineTo.COMMAND A [PathCommand] representing the SVG/AVG
-     * "vertical line to" command (`v`/`V`).
-     * @property VerticalLineTo.COMMAND_SIZE A constant representing the number of
-     * parameters in the "vertical line to" command (1).
      */
     class VerticalLineTo(
         values: List<String>,
@@ -273,29 +250,26 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.VerticalLineTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('v')
-            const val COMMAND_SIZE = 1
-        }
-
         private val y = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf("${relativePrefix}y = ${y}f")
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $y",
                 fnName = "verticalLineTo",
-                parameters = setOf("${relativePrefix}y = ${y}f"),
                 forceInline = true,
             )
         }
@@ -318,11 +292,6 @@ sealed class PathNodes(
      * @property minified A boolean value indicating whether the output of [materialize]
      * should be minified or not.
      * @property x The new x-coordinate to which the line extends.
-     *
-     * @property HorizontalLineTo.COMMAND A [PathCommand] representing the SVG/AVG
-     * "horizontal line to" command (`h`/`H`).
-     * @property HorizontalLineTo.COMMAND_SIZE A constant representing the number
-     * of parameters in the "horizontal line to" command (1).
      */
     class HorizontalLineTo(
         values: List<String>,
@@ -331,29 +300,26 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.HorizontalLineTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('h')
-            const val COMMAND_SIZE = 1
-        }
-
         private val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf("${relativePrefix}x = ${x}f")
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x",
                 fnName = "horizontalLineTo",
-                parameters = setOf("${relativePrefix}x = ${x}f"),
                 forceInline = true,
             )
         }
@@ -382,11 +348,6 @@ sealed class PathNodes(
      * [materialize] should be minified or not.
      * @property x The new x-coordinate to which the line extends.
      * @property y The new y-coordinate to which the line extends.
-     *
-     * @property LineTo.COMMAND A [PathCommand] representing the SVG/AVG "line to"
-     * command (`l`/`L`).
-     * @property LineTo.COMMAND_SIZE A constant representing the number of parameters
-     * in the "line to" command (2).
      */
     class LineTo(
         values: List<String>,
@@ -395,15 +356,9 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.LineTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('l')
-            const val COMMAND_SIZE = 2
-        }
-
         private val x = values
             .first()
             .lowercase()
@@ -411,19 +366,22 @@ sealed class PathNodes(
             .toFloat()
         private val y = values[1]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x = ${x}f",
+                "${relativePrefix}y = ${y}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x $y",
                 fnName = "lineTo",
-                parameters = setOf(
-                    "${relativePrefix}x = ${x}f",
-                    "${relativePrefix}y = ${y}f",
-                ),
                 forceInline = true,
             )
         }
@@ -450,11 +408,6 @@ sealed class PathNodes(
      * relative to the current position.
      * @property minified A boolean value indicating whether the output of [materialize]
      * should be minified or not.
-     *
-     * @property CurveTo.COMMAND A [PathCommand] representing the SVG/AVG "curve to"
-     * command (`c`/`C`).
-     * @property CurveTo.COMMAND_SIZE A constant representing the number of parameters
-     * in the "curve to" command (6).
      */
     class CurveTo(
         values: List<String>,
@@ -463,15 +416,9 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.CurveTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('c')
-            const val COMMAND_SIZE = 6
-        }
-
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y1 = values[1].toFloat()
         private val x2 = values[2].toFloat()
@@ -479,24 +426,27 @@ sealed class PathNodes(
         private val x3 = values[4].toFloat()
         private val y3 = values[5]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x1 = ${x1}f",
+                "${relativePrefix}y1 = ${y1}f",
+                "${relativePrefix}x2 = ${x2}f",
+                "${relativePrefix}y2 = ${y2}f",
+                "${relativePrefix}x3 = ${x3}f",
+                "${relativePrefix}y3 = ${y3}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
 
             return materialize(
                 comment = "// $command $x1 $y1 $x2 $y2 $x3 $y3",
                 fnName = "curveTo",
-                parameters = setOf(
-                    "${relativePrefix}x1 = ${x1}f",
-                    "${relativePrefix}y1 = ${y1}f",
-                    "${relativePrefix}x2 = ${x2}f",
-                    "${relativePrefix}y2 = ${y2}f",
-                    "${relativePrefix}x3 = ${x3}f",
-                    "${relativePrefix}y3 = ${y3}f",
-                ),
             )
         }
     }
@@ -525,11 +475,6 @@ sealed class PathNodes(
      * @property y1 The y-coordinate for the first control point.
      * @property x2 The x-coordinate for the second control point.
      * @property y2 The y-coordinate for the second control point.
-     *
-     * @property ReflectiveCurveTo.COMMAND A [PathCommand] representing the SVG/AVG
-     * "smooth cubic Bézier" command (`s`/`S`).
-     * @property ReflectiveCurveTo.COMMAND_SIZE A constant representing the number
-     * of parameters in the "smooth cubic Bézier" command (4).
      */
     class ReflectiveCurveTo(
         values: List<String>,
@@ -538,35 +483,32 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.ReflectiveCurveTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('s')
-            const val COMMAND_SIZE = 4
-        }
-
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y1 = values[1].toFloat()
         private val x2 = values[2].toFloat()
         private val y2 = values[3]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x1 = ${x1}f",
+                "${relativePrefix}y1 = ${y1}f",
+                "${relativePrefix}x2 = ${x2}f",
+                "${relativePrefix}y2 = ${y2}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x1 $y1 $x2 $y2",
                 fnName = "reflectiveCurveTo",
-                parameters = setOf(
-                    "${relativePrefix}x1 = ${x1}f",
-                    "${relativePrefix}y1 = ${y1}f",
-                    "${relativePrefix}x2 = ${x2}f",
-                    "${relativePrefix}y2 = ${y2}f",
-                ),
             )
         }
     }
@@ -593,11 +535,6 @@ sealed class PathNodes(
      * @property y1 The y-coordinate for the first control point.
      * @property x2 The x-coordinate for the second control point.
      * @property y2 The y-coordinate for the second control point.
-     *
-     * @property QuadTo.COMMAND A [PathCommand] representing the SVG/AVG
-     * "quadratic Bézier curve" command (`q`/`Q`).
-     * @property QuadTo.COMMAND_SIZE A constant representing the number of
-     * parameters in the "quadratic Bézier curve" command (4).
      */
     class QuadTo(
         values: List<String>,
@@ -606,35 +543,32 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.QuadTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('q')
-            const val COMMAND_SIZE = 4
-        }
-
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y1 = values[1].toFloat()
         private val x2 = values[2].toFloat()
         private val y2 = values[3]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x1 = ${x1}f",
+                "${relativePrefix}y1 = ${y1}f",
+                "${relativePrefix}x2 = ${x2}f",
+                "${relativePrefix}y2 = ${y2}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x1 $y1 $x2 $y2",
                 fnName = "quadTo",
-                parameters = setOf(
-                    "${relativePrefix}x1 = ${x1}f",
-                    "${relativePrefix}y1 = ${y1}f",
-                    "${relativePrefix}x2 = ${x2}f",
-                    "${relativePrefix}y2 = ${y2}f",
-                ),
             )
         }
     }
@@ -663,11 +597,6 @@ sealed class PathNodes(
      * [materialize] should be minified.
      * @property x1 represents the x-coordinate for the ending point of the curve
      * @property y1 signifies the y-coordinate for the ending point of the curve
-     *
-     * @property ReflectiveQuadTo.COMMAND A [PathCommand] representing the SVG/AVG
-     * "reflective quadratic Bézier curve to" command (`t`/`T`).
-     * @property ReflectiveQuadTo.COMMAND_SIZE A constant (2) representing the
-     * number of parameters in the "reflective quadratic Bézier curve to" command.
      */
     class ReflectiveQuadTo(
         values: List<String>,
@@ -676,31 +605,28 @@ sealed class PathNodes(
     ) : PathNodes(
         values = values,
         isRelative = isRelative,
-        command = COMMAND,
-        commandSize = COMMAND_SIZE,
+        command = PathCommand.ReflectiveQuadTo,
         minified = minified,
     ) {
-        companion object {
-            val COMMAND = PathCommand('t')
-            const val COMMAND_SIZE = 2
-        }
-
         private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         private val y1 = values[1]
             .lowercase()
-            .removeSuffix(CLOSE_COMMAND)
+            .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        override fun buildParameters(): Set<String> {
+            val relativePrefix = if (isRelative) "d" else ""
+            return setOf(
+                "${relativePrefix}x1 = ${x1}f",
+                "${relativePrefix}y1 = ${y1}f",
+            )
+        }
 
         override fun materialize(): String {
             val command = if (isRelative) this.command else this.command.uppercaseChar()
-            val relativePrefix = if (isRelative) "d" else ""
             return materialize(
                 comment = "// $command $x1 $y1",
                 fnName = "reflectiveQuadTo",
-                parameters = setOf(
-                    "${relativePrefix}x1 = ${x1}f",
-                    "${relativePrefix}y1 = ${y1}f",
-                ),
             )
         }
     }

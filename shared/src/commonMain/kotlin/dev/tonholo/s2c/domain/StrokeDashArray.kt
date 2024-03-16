@@ -16,10 +16,10 @@ private enum class StrokeDashDrawDirection(
     val command: PathCommand,
     val edgeCommand: PathCommand,
 ) {
-    RIGHT(command = PathNodes.HorizontalLineTo.COMMAND, edgeCommand = PathNodes.VerticalLineTo.COMMAND),
-    DOWN(command = PathNodes.VerticalLineTo.COMMAND, edgeCommand = RIGHT.command),
-    LEFT(command = PathNodes.HorizontalLineTo.COMMAND, edgeCommand = DOWN.command),
-    UP(command = PathNodes.VerticalLineTo.COMMAND, edgeCommand = LEFT.command),
+    RIGHT(command = PathCommand.HorizontalLineTo, edgeCommand = PathCommand.VerticalLineTo),
+    DOWN(command = PathCommand.VerticalLineTo, edgeCommand = RIGHT.command),
+    LEFT(command = PathCommand.HorizontalLineTo, edgeCommand = DOWN.command),
+    UP(command = PathCommand.VerticalLineTo, edgeCommand = LEFT.command),
     ;
 
     fun next(): StrokeDashDrawDirection =
@@ -48,7 +48,7 @@ fun StrokeDashArray.createDashedPathForRect(
     var direction = StrokeDashDrawDirection.RIGHT
     return buildList {
         // Move draw cursor to the translation position.
-        add(pathNode(PathNodes.MoveTo.COMMAND) { args(x, y) })
+        add(pathNode(PathCommand.MoveTo) { args(x, y) })
 
         while (drawLength < perimeter) {
             val dashOrGap = dashesAndGaps[i % dashesAndGaps.size].toFloat()
@@ -93,7 +93,7 @@ private fun MutableList<PathNodes>.addDash(
     direction: StrokeDashDrawDirection,
     dashOrGap: Float,
     isMinified: Boolean,
-    strokeWidth: Int
+    strokeWidth: Int,
 ) {
     if (atTheEdge) {
         addDashOnTheEdge(diff, direction, dashOrGap, isMinified, strokeWidth)
@@ -107,7 +107,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
     direction: StrokeDashDrawDirection,
     dashOrGap: Float,
     isMinified: Boolean,
-    strokeWidth: Int
+    strokeWidth: Int,
 ) {
     if (diff > 0) {
         val partialDash = when (direction) {
@@ -134,7 +134,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
 
         moveArg?.let {
             add(
-                pathNode(command = PathNodes.MoveTo.COMMAND) {
+                pathNode(command = PathCommand.MoveTo) {
                     args(it.toList())
                     isRelative = true
                     minified = isMinified
@@ -175,7 +175,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
 private fun MutableList<PathNodes>.addDashOutOfEdge(
     direction: StrokeDashDrawDirection,
     dashOrGap: Float,
-    isMinified: Boolean
+    isMinified: Boolean,
 ) {
     val drawArg = when (direction) {
         StrokeDashDrawDirection.RIGHT -> dashOrGap
@@ -197,7 +197,7 @@ private fun MutableList<PathNodes>.addGap(
     dashOrGap: Float,
     diff: Float,
     direction: StrokeDashDrawDirection,
-    isMinified: Boolean
+    isMinified: Boolean,
 ) {
     val moveArgs = if (atTheEdge) {
         val partialGap = dashOrGap - diff
@@ -217,7 +217,7 @@ private fun MutableList<PathNodes>.addGap(
         }
     }
     add(
-        pathNode(PathNodes.MoveTo.COMMAND) {
+        pathNode(PathCommand.MoveTo) {
             args(moveArgs.toList())
             isRelative = true
             minified = isMinified

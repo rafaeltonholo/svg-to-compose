@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 import kotlin.test.Test
@@ -47,6 +47,36 @@ class PathNodesArcToTests {
             assertIs<PathNodes.ArcTo>(this)
             assertTrue(isRelative)
         }
+    }
+
+    @Test
+    fun `ensure no space after flags doesn't break the logic`() {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "a20 60 45 0130 20 " +
+                    "a20 60 45 01-30 20 " +
+                    "a20 60 45 01-.30 20 " +
+                    "a20 60 45 10-.30 20 " +
+                    "a20 60 45 11-.30 20 " +
+                    "a20 60 45 01.3 20 " +
+                    "a20 60 45 01.0 20 " +
+                    "a20 60 45 11.0 20 " +
+                    "a20 60 45 0 1 30 20",
+            ),
+        )
+        // Act
+        val node = path.asNode(minified = true)
+        val nodes = node.wrapper.nodes
+        // Assert
+        assertEquals(expected = 9, actual = nodes.size)
+        assertEquals(expected = 9, actual = nodes.filterIsInstance<PathNodes.ArcTo>().size)
+
+        val commands = nodes.map {
+            it.buildParameters().apply { println(this) }.size
+        }.toSet()
+        assertEquals(expected = 1, actual = commands.size)
     }
 
     @Test
