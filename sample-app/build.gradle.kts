@@ -33,6 +33,13 @@ android {
     }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        // That is not a real app, so it won't hurt suppressing
+        // the Kotlin version compatibility check for Compose
+        // compiler.
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true",
+        )
     }
     buildFeatures {
         compose = true
