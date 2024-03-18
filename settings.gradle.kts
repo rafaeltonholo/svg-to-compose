@@ -34,13 +34,16 @@ dependencyResolutionManagement {
 
 include(":shared")
 
-val properties = Properties().apply {
-    load(file("local.properties").reader())
-}
+val localPropertiesFile = file("local.properties")
+if (localPropertiesFile.exists()) {
+    val properties = Properties().apply {
+        load(file("local.properties").reader())
+    }
 
 // Sample app is a development tool to understand if the changes
 // are not going to change the way end result of the icon in the
 // Jetpack Compose Preview.
-if (properties["enable_sample_app"]?.toString()?.toBoolean() == true) {
-    include(":sample-app")
+    if (properties["enable_sample_app"]?.toString()?.toBoolean() == true) {
+        include(":sample-app")
+    }
 }
