@@ -5,7 +5,7 @@ import dev.tonholo.s2c.domain.StrokeCap
 import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.StrokeJoin
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlChildNodeWithAttributes
+import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.toJsString
 import dev.tonholo.s2c.extensions.toLengthFloat
@@ -14,7 +14,7 @@ abstract class SvgGraphicNode(
     override val parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
     override val name: String,
-) : XmlChildNodeWithAttributes {
+) : XmlChildNode() {
     val fill: SvgColor? by attribute<String?, _> { it?.let { SvgColor(it) } }
 
     val opacity: Float? by attribute()

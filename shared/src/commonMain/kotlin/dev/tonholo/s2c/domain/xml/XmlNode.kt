@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.domain.xml
 
+import dev.tonholo.s2c.domain.delegate.attribute
+
 interface XmlNode {
     val name: String
 }
@@ -8,14 +10,30 @@ sealed interface XmlParentNode : XmlNode {
     val children: MutableSet<XmlNode>
 }
 
-sealed interface XmlChildNode : XmlNode {
-    val parent: XmlParentNode
-}
+abstract class XmlChildNode : XmlNode {
+    abstract val parent: XmlParentNode
+    abstract val attributes: MutableMap<String, String>
 
-interface XmlChildNodeWithAttributes : XmlChildNode {
-    val attributes: MutableMap<String, String>
+    val rootParent: XmlParentNode by lazy {
+        var current: XmlChildNode
+        var currentParent = parent
+        do {
+            current = currentParent as XmlChildNode
+            currentParent = when (currentParent) {
+                is XmlRootNode -> break
+                else -> current.parent
+            }
+        } while (currentParent !is XmlRootNode)
 
-    override fun toString(): String
+        // XmlRootNode is the Document itself and not an actual node.
+        // Because of that, we return the direct child that we use to
+        // access its parent to reach the XmlRootNode.
+        current as XmlParentNode
+    }
+
+    open val id: String? by attribute()
+
+    abstract override fun toString(): String
 
     fun toJsString(): String = buildString {
         append("{")
@@ -39,7 +57,7 @@ open class XmlElementNode(
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
     override val name: String,
-) : XmlChildNodeWithAttributes, XmlParentNode {
+) : XmlChildNode(), XmlParentNode {
     override fun toString(): String = buildString {
         append("{name:\"$name\",")
         append(" attributes: ${attributes.toJsString()}, ")

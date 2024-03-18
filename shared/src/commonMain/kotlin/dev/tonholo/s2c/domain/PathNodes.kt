@@ -34,7 +34,8 @@ sealed class PathNodes(
     val command: PathCommand,
     val minified: Boolean,
 ) {
-    private val shouldClose = values[command.size - 1].last().lowercaseChar() == PathCommand.Close.value
+    val shouldClose = values[command.size - 1].last().lowercaseChar() == PathCommand.Close.value
+    protected val realCommand = if (isRelative) command else command.uppercaseChar()
 
     /**
      * Visible for Test only.
@@ -52,25 +53,32 @@ sealed class PathNodes(
         ""
     }
 
+    override fun toString(): String = if (shouldClose) {
+        PathCommand.Close.value.toString()
+    } else {
+        ""
+    }
+
+    private fun String.removeTrailingZeroConsiderCloseCommand(): String =
+        this.removeTrailingZero()
+            .replace("\\.0z\\b".toRegex(), PathCommand.Close.value.toString())
+
     /**
      * Materializes the commands on the Compose path functions.`
-     * By default, it prints in pretty mode, adding a [comment] explaining
+     * By default, it prints in pretty mode, adding a comment explaining
      * the path command where the parameters were taken and in case of more
      * than two parameters, separate them on new line.
      *
-     * @param comment The comment text to be included with the SVG
-     * command, in case of not minified.
      * @param fnName The function name to be used in the SVG/AVG command.
      * @param forceInline A flag indicating whether the command parameters
      * should be inlined or not. By default, it's set to `false.
      * @return The function representation of the SVG/AVG command.
      */
     protected fun materialize(
-        comment: String,
         fnName: String,
         forceInline: Boolean = false,
     ): String = """
-        |${if (minified) "" else "${comment.removeTrailingZero()}${if (shouldClose) "z" else ""}"}
+        |${if (minified) "" else "// ${toString().removeTrailingZeroConsiderCloseCommand()}"}
         |$fnName${if (isRelative) "Relative" else ""}(${buildParameters().toParameters(forceInline)})
         |${closeCommand()}
     """.trimMargin().let {
@@ -78,7 +86,7 @@ sealed class PathNodes(
     }
 
     /**
-     * A helper function that assists in indenting parameters, adding
+     * A helper function that helps in indenting parameters, adding
      * separators, and wrapping without initial and end separators
      * if required as per minified or forceInline flags.
      *
@@ -128,8 +136,8 @@ sealed class PathNodes(
         command = PathCommand.MoveTo,
         minified = minified,
     ) {
-        private val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val y = values[1]
+        val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -143,13 +151,13 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x $y",
                 fnName = "moveTo",
                 forceInline = true,
             )
         }
+
+        override fun toString(): String = "$realCommand $x $y" + super.toString()
     }
 
     /**
@@ -184,13 +192,13 @@ sealed class PathNodes(
         command = PathCommand.ArcTo,
         minified = minified,
     ) {
-        private val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val b = values[1].toFloat()
-        private val theta = values[2].toFloat()
-        private val isMoreThanHalf = values[3] == "1"
-        private val isPositiveArc = values[4] == "1"
-        private val x = values[5].toFloat()
-        private val y = values[6]
+        val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val b = values[1].toFloat()
+        val theta = values[2].toFloat()
+        val isMoreThanHalf = values[3] == "1"
+        val isPositiveArc = values[4] == "1"
+        val x = values[5].toFloat()
+        val y = values[6]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -211,13 +219,14 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment =
-                "// $command ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y",
                 fnName = "arcTo",
             )
         }
+
+        override fun toString(): String =
+            "$realCommand ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y" +
+                super.toString()
     }
 
     /**
@@ -253,7 +262,7 @@ sealed class PathNodes(
         command = PathCommand.VerticalLineTo,
         minified = minified,
     ) {
-        private val y = values
+        val y = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
@@ -266,12 +275,14 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $y",
                 fnName = "verticalLineTo",
                 forceInline = true,
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $y" + super.toString()
         }
     }
 
@@ -303,7 +314,7 @@ sealed class PathNodes(
         command = PathCommand.HorizontalLineTo,
         minified = minified,
     ) {
-        private val x = values
+        val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
@@ -316,12 +327,14 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x",
                 fnName = "horizontalLineTo",
                 forceInline = true,
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x" + super.toString()
         }
     }
 
@@ -359,12 +372,12 @@ sealed class PathNodes(
         command = PathCommand.LineTo,
         minified = minified,
     ) {
-        private val x = values
+        val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
             .toFloat()
-        private val y = values[1]
+        val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -378,12 +391,14 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x $y",
                 fnName = "lineTo",
                 forceInline = true,
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x $y" + super.toString()
         }
     }
 
@@ -419,12 +434,12 @@ sealed class PathNodes(
         command = PathCommand.CurveTo,
         minified = minified,
     ) {
-        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val y1 = values[1].toFloat()
-        private val x2 = values[2].toFloat()
-        private val y2 = values[3].toFloat()
-        private val x3 = values[4].toFloat()
-        private val y3 = values[5]
+        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val y1 = values[1].toFloat()
+        val x2 = values[2].toFloat()
+        val y2 = values[3].toFloat()
+        val x3 = values[4].toFloat()
+        val y3 = values[5]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -442,12 +457,13 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
-
             return materialize(
-                comment = "// $command $x1 $y1 $x2 $y2 $x3 $y3",
                 fnName = "curveTo",
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x1 $y1 $x2 $y2 $x3 $y3" + super.toString()
         }
     }
 
@@ -486,10 +502,10 @@ sealed class PathNodes(
         command = PathCommand.ReflectiveCurveTo,
         minified = minified,
     ) {
-        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val y1 = values[1].toFloat()
-        private val x2 = values[2].toFloat()
-        private val y2 = values[3]
+        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val y1 = values[1].toFloat()
+        val x2 = values[2].toFloat()
+        val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -505,11 +521,13 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x1 $y1 $x2 $y2",
                 fnName = "reflectiveCurveTo",
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
         }
     }
 
@@ -546,10 +564,10 @@ sealed class PathNodes(
         command = PathCommand.QuadTo,
         minified = minified,
     ) {
-        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val y1 = values[1].toFloat()
-        private val x2 = values[2].toFloat()
-        private val y2 = values[3]
+        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val y1 = values[1].toFloat()
+        val x2 = values[2].toFloat()
+        val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -565,11 +583,13 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x1 $y1 $x2 $y2",
                 fnName = "quadTo",
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
         }
     }
 
@@ -608,8 +628,8 @@ sealed class PathNodes(
         command = PathCommand.ReflectiveQuadTo,
         minified = minified,
     ) {
-        private val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        private val y1 = values[1]
+        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val y1 = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -623,11 +643,13 @@ sealed class PathNodes(
         }
 
         override fun materialize(): String {
-            val command = if (isRelative) this.command else this.command.uppercaseChar()
             return materialize(
-                comment = "// $command $x1 $y1",
                 fnName = "reflectiveQuadTo",
             )
+        }
+
+        override fun toString(): String {
+            return "$realCommand $x1 $y1" + super.toString()
         }
     }
 }

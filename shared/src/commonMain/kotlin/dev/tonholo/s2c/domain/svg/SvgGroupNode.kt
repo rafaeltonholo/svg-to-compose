@@ -31,9 +31,7 @@ fun SvgGroupNode.asNode(
     // Currently, a group on ImageVector only receives a single PathData as a parameter.
     // Not sure if it would support multiple path tags inside a mask from a svg.
     val clipPath = masks
-        .firstOrNull {
-            it.id == maskId?.removePrefix("url(#")?.removeSuffix(")")
-        }
+        .firstOrNull { it.id == maskId?.normalizedId() }
         ?.path
         ?.d
         ?.asNodeWrapper(minified)

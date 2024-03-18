@@ -39,10 +39,19 @@ fun String.toLengthFloat(
     width: Float,
     height: Float,
 ): Float = if (this.contains("%")) {
-    max(width, height) * this.removeSuffix("%").toInt() / PERCENT
+    max(width, height) * this.removeSuffix("%").toFloat() / PERCENT
 } else {
     this.toFloat()
 }
+
+fun String.toLengthInt(
+    width: Int,
+    height: Int = width,
+): Int = toLengthFloat(width.toFloat(), height.toFloat()).roundToInt()
+
+fun String.toLengthInt(
+    height: Int,
+): Int = toLengthFloat(height.toFloat(), height.toFloat()).roundToInt()
 
 /**
  * Converts a hexadecimal color into a SolidColor brush

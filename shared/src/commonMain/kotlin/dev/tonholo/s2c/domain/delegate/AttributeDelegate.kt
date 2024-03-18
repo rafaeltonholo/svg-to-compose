@@ -2,7 +2,7 @@ package dev.tonholo.s2c.domain.delegate
 
 import dev.tonholo.s2c.domain.svg.SvgLength
 import dev.tonholo.s2c.domain.svg.toSvgLengthOrNull
-import dev.tonholo.s2c.domain.xml.XmlChildNodeWithAttributes
+import dev.tonholo.s2c.domain.xml.XmlChildNode
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -18,7 +18,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     private fun key(property: KProperty<*>): String =
         namespace?.let { "$it:" }.orEmpty() + (name ?: property.name)
 
-    operator fun getValue(element: XmlChildNodeWithAttributes, property: KProperty<*>): TTransform {
+    operator fun getValue(element: XmlChildNode, property: KProperty<*>): TTransform {
         val key = key(property)
         val value = element.attributes[key]
         if (isNullable.not() && value == null && defaultValue == null) {
@@ -41,7 +41,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         )
     }
 
-    operator fun setValue(element: XmlChildNodeWithAttributes, property: KProperty<*>, value: Any?) {
+    operator fun setValue(element: XmlChildNode, property: KProperty<*>, value: Any?) {
         val key = key(property)
         element.attributes[key] = value.toString()
     }

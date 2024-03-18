@@ -6,7 +6,10 @@ import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
-sealed interface SvgNode : XmlNode
+sealed interface SvgNode : XmlNode {
+    fun String.normalizedId(): String =
+        removePrefix("url(#").removeSuffix(")")
+}
 
 class SvgElementNode(
     parent: XmlParentNode,
@@ -28,10 +31,10 @@ class SvgElementNode(
     }
     var fill: String? by attribute()
 
-    private inline fun parseViewBox(viewBox: String?): FloatArray? =
+    inline fun parseViewBox(viewBox: String?): FloatArray? =
         viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()
 
-    private inline fun getDimensionFromViewBox(dimensionIndex: Int): Int? =
+    inline fun getDimensionFromViewBox(dimensionIndex: Int): Int? =
         parseViewBox(attributes["viewBox"])?.getOrNull(dimensionIndex)?.toInt()
 
     companion object {
@@ -52,8 +55,8 @@ class SvgElementNode(
          *     </a>
          */
         private const val SVG_DEFAULT_HEIGHT = 150
-        private const val SVG_VIEW_BOX_WIDTH_POSITION = 2
-        private const val SVG_VIEW_BOX_HEIGHT_POSITION = 3
+        const val SVG_VIEW_BOX_WIDTH_POSITION = 2
+        const val SVG_VIEW_BOX_HEIGHT_POSITION = 3
     }
 }
 

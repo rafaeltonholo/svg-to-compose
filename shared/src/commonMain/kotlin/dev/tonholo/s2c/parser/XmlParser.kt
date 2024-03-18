@@ -11,6 +11,7 @@ import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
 import dev.tonholo.s2c.domain.avg.AvgPathNode
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
+import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
@@ -84,7 +85,8 @@ private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode 
 
             // Ignored elements
             is TextNode,
-            is Comment -> null
+            is Comment,
+            -> null
 
             else -> {
                 warn("not supported node '${node.nodeName()}'.")
@@ -179,6 +181,12 @@ inline fun createSvgElement(
 
         SvgCircleNode.TAG_NAME -> SvgCircleNode(
             parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgClipPath.TAG_NAME -> SvgClipPath(
+            parent = parent,
+            children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
 

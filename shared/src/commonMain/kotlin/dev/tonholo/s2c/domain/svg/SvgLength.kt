@@ -8,8 +8,8 @@ private val possibleUnits = setOf("em", "ex", "px", "in", "cm", "mm", "pt", "pc"
  * SvgLength is a Kotlin inline value class useful for handling
  * SVG length specifications.
  *
- * @constructor takes a string parameter as the SVG length value
- * which could be a plain number or a number that includes length
+ * @constructor takes a string parameter as the SVG length value,
+ * which could be a plain number, or a number that includes length
  * units.
  *
  * See [possibleUnits] to understand all the supported units.
@@ -54,7 +54,7 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
  * The conversion procedure is as follows:
  * 1. If the string can be converted to an [Int] it's interpreted as an SVG
  * length value without any units.
- * 2. If the string ends with any of the possible SVG length units it's interpreted
+ * 2. If the string ends with any of the possible SVG length units, it's interpreted
  * as an SVG length value with units.
  *
  * In any other case, the conversion will fail and this function will return `null`.
