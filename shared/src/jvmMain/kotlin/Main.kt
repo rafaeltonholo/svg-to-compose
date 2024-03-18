@@ -1,3 +1,4 @@
+
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.IconWriter
@@ -16,9 +17,10 @@ import kotlin.system.exitProcess
  */
 fun main() {
     AppConfig.debug = false
-    val suffix = "Optimized"
-    val (pkg, path, output) = SampleFile.Directory(
+    val suffix = "v4"
+    val (pkg, path, output) = SampleFile.Svg.Brasil(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
+        suffix,
     )
     val config = ParserConfig(
         pkg = pkg.value,
@@ -26,7 +28,7 @@ fun main() {
         // When enabling the optimize flag,
         // make sure your default node has installed
         // svgo and avocado.
-        optimize = true,
+        optimize = false,
         receiverType = null,
         addToMaterial = false,
         noPreview = false,
@@ -88,6 +90,7 @@ private sealed class SampleFile(
 
     class Directory(
         sampleAppPackage: SampleAppPackage,
+        ignored: String,
     ) : SampleFile(
         sampleAppPackage = sampleAppPackage,
         input = "samples/",
@@ -105,6 +108,15 @@ private sealed class SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = BASE_PATH,
             output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+        )
+
+        class Brasil(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/brasil.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Brasil.$suffix.kt",
         )
 
         class ShieldSolid(

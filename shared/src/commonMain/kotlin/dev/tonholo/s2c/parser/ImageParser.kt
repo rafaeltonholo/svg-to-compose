@@ -14,6 +14,8 @@ import dev.tonholo.s2c.domain.svg.asNodes
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
+import dev.tonholo.s2c.geom.AffineTransformation
+import dev.tonholo.s2c.geom.applyTransformations
 import okio.FileSystem
 import okio.Path
 
@@ -130,7 +132,7 @@ sealed class ImageParser(
          * Parses an SVG file into an [IconFileContents] object.
          *
          * The parsing procedure can be summed up as follows:
-         * 1. Reads the content of SVG file.
+         * 1. Read the content of SVG file.
          * 2. Parses the content of file to a [SvgElementNode] object.
          * 3. Converts SVG element nodes to [ImageVectorNode] to get the list
          * of nodes.
@@ -156,8 +158,14 @@ sealed class ImageParser(
 
             val root = parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgElementNode } as SvgElementNode
-            val (_, _, viewportWidth, viewportHeight) = svg.viewBox
-            val nodes = svg.asNodes(minified = config.minified)
+            val (x, y, viewportWidth, viewportHeight) = svg.viewBox
+            val nodes = svg.asNodes(minified = config.minified).let { nodes ->
+                if (x != 0f || y != 0f) {
+                    nodes.applyViewBoxTranslation(x, y)
+                } else {
+                    nodes
+                }
+            }
 
             return IconFileContents(
                 pkg = config.pkg,
@@ -174,6 +182,37 @@ sealed class ImageParser(
                 makeInternal = config.makeInternal,
                 imports = createImports(nodes, config),
             )
+        }
+
+        private fun List<ImageVectorNode>.applyViewBoxTranslation(
+            x: Float,
+            y: Float,
+        ): List<ImageVectorNode> {
+            val translation = AffineTransformation.Translate(-x, -y)
+            return map { node ->
+                when (node) {
+                    is ImageVectorNode.Path -> node.copy(
+                        wrapper = node.wrapper.copy(
+                            nodes = node
+                                .wrapper
+                                .nodes
+                                .applyTransformations(translation)
+                                .toList(),
+                        )
+                    )
+
+                    is ImageVectorNode.Group -> node.copy(
+                        clipPath = node.clipPath?.copy(
+                            nodes = node
+                                .clipPath
+                                .nodes
+                                .applyTransformations(translation)
+                                .toList(),
+                        ),
+                        commands = node.commands.applyViewBoxTranslation(x, y),
+                    )
+                }
+            }
         }
     }
 
