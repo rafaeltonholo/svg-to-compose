@@ -1,8 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -21,7 +22,11 @@ class PathNodesReflectiveCurveToTests {
         override fun toString(): String = "$x1 $y1 $x2 $y2".removeTrailingZero()
     }
 
-    private val root = XmlRootNode(children = mutableSetOf())
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
 
     @Test
     fun `ensure a 's' command is parsed to ReflectiveCurveTo relative`() {
@@ -31,7 +36,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "s2,-2 4,5"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -49,7 +54,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "S2,-2 4,5"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -79,7 +84,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "S$nonRelative s$relative"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -133,7 +138,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "S${nonRelative}z s${relative}z"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -189,7 +194,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "S$nonRelative s$relative"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -241,7 +246,7 @@ class PathNodesReflectiveCurveToTests {
             attributes = mutableMapOf("d" to "S${nonRelative}z s${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

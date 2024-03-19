@@ -1,8 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -18,7 +19,11 @@ class PathNodesHorizontalLineToTests {
         override fun toString(): String = "$x".removeTrailingZero()
     }
 
-    private val root = XmlRootNode(children = mutableSetOf())
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
 
     @Test
     fun `ensure a 'h' command is parsed to HorizontalLineTo relative`() {
@@ -28,7 +33,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "h 8"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -46,7 +51,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "H 8"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -70,7 +75,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -108,7 +113,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -148,7 +153,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -180,7 +185,7 @@ class PathNodesHorizontalLineToTests {
             attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

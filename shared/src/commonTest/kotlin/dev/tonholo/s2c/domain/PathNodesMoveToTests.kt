@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
@@ -17,7 +18,11 @@ class PathNodesMoveToTests {
             "$x $y".removeTrailingZero()
     }
 
-    private val root = XmlRootNode(children = mutableSetOf())
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
 
     @Test
     fun `ensure a 'm' command is parsed to MoveTo relative`() {

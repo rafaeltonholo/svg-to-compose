@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
@@ -10,7 +11,11 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class ImageVectorNodeTest {
-    private val root = XmlRootNode(children = mutableSetOf())
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
 
     @Test
     fun `ensure for any subsequent coordinate pair after MoveTo is parsed to LineTo`() {
@@ -22,7 +27,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -42,7 +47,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert

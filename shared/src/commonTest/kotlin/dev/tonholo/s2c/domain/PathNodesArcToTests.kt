@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
@@ -27,7 +28,11 @@ class PathNodesArcToTests {
                 .removeTrailingZero()
     }
 
-    private val root = XmlRootNode(children = mutableSetOf())
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
 
     @Test
     fun `ensure a 'a' command is parsed to ArcTo relative`() {
@@ -39,7 +44,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -67,7 +72,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 9, actual = nodes.size)
@@ -89,7 +94,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -127,7 +132,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -195,7 +200,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -265,7 +270,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -331,7 +336,7 @@ class PathNodesArcToTests {
             ),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
