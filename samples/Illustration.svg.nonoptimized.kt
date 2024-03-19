@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 val IllustrationSvgNonOptimized: ImageVector
     get() {
-        val current = _illustrationNonOptimized
+        val current = _illustrationSvgNonOptimized
         if (current != null) return current
 
         return ImageVector.Builder(
