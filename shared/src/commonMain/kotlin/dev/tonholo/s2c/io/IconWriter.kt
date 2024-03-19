@@ -32,7 +32,7 @@ class IconWriter(
                     verbose("Checking if parent directory exists.")
                     if (fileSystem.exists(parent).not()) {
                         output("Output parent's directory doesn't exists. Creating.")
-                        fileSystem.createDirectory(parent, mustCreate = true)
+                        fileSystem.createDirectories(parent, mustCreate = true)
                     }
                 }
             }
