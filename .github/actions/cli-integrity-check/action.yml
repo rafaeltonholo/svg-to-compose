@@ -8,78 +8,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Verify simple ${{ inputs.type }} conversion without optimization
+    - name: Verify ${{ inputs.type }} conversion without optimization
       shell: bash
       run: |
-        ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.NonOptimized.kt \
-              -p dev.tonholo.composeicons.ui.icon \
-              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-              -opt=false \
-              samples/shield-halved-solid.${{ inputs.type }}
-    - name: Compare files with diff
+        ./.github/actions/cli-integrity-check/script.sh . ${{ inputs.type }}
+    - name: Verify ${{ inputs.type }} conversion with optimization
       shell: bash
       run: |
-        diff --strip-trailing-cr integrity-check/ShieldSolid.${{ inputs.type }}.NonOptimized.kt samples/ShieldSolid.${{ inputs.type }}.nonoptimized.kt
-        if [[ $? -eq 0 ]]; then
-          echo "✅ Integrity check pass"
-        else
-          echo "❌ Integrity check failed"
-          exit 1
-        fi
-
-    - name: Verify complex ${{ inputs.type }} conversion without optimization
-      shell: bash
-      run: |
-        ./s2c -o integrity-check/Illustration.${{ inputs.type }}.NonOptimized.kt \
-              -p dev.tonholo.composeicons.ui.icon \
-              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-              -opt=false \
-              samples/illustration.${{ inputs.type }}
-    - name: Compare files with diff
-      shell: bash
-      run: |
-        diff --strip-trailing-cr integrity-check/Illustration.${{ inputs.type }}.NonOptimized.kt samples/Illustration.${{ inputs.type }}.nonoptimized.kt
-        if [[ $? -eq 0 ]]; then
-          echo "✅ Integrity check pass"
-        else
-          echo "❌ Integrity check failed"
-          exit 1
-        fi
-
-    - name: Verify simple ${{ inputs.type }} conversion with optimization
-      shell: bash
-      run: |
-        ./s2c -o integrity-check/ShieldSolid.${{ inputs.type }}.Optimized.kt \
-              -p dev.tonholo.composeicons.ui.icon \
-              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-              -opt=true \
-              samples/shield-halved-solid.${{ inputs.type }}
-    - name: Compare files with diff
-      shell: bash
-      run: |
-        diff --strip-trailing-cr integrity-check/ShieldSolid.${{ inputs.type }}.Optimized.kt samples/ShieldSolid.${{ inputs.type }}.optimized.kt
-        if [[ $? -eq 0 ]]; then
-          echo "✅ Integrity check pass"
-        else
-          echo "❌ Integrity check failed"
-          exit 1
-        fi
-
-    - name: Verify complex ${{ inputs.type }} conversion with optimization
-      shell: bash
-      run: |
-        ./s2c -o integrity-check/Illustration.${{ inputs.type }}.Optimized.kt \
-              -p dev.tonholo.composeicons.ui.icon \
-              --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-              -opt=true \
-              samples/illustration.${{ inputs.type }}
-    - name: Compare files with diff
-      shell: bash
-      run: |
-        diff --strip-trailing-cr integrity-check/Illustration.${{ inputs.type }}.Optimized.kt samples/Illustration.${{ inputs.type }}.optimized.kt
-        if [[ $? -eq 0 ]]; then
-          echo "✅ Integrity check pass"
-        else
-          echo "❌ Integrity check failed"
-          exit 1
-        fi
+        ./.github/actions/cli-integrity-check/script.sh . ${{ inputs.type }} optimize
