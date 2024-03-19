@@ -15,4 +15,4 @@ runs:
     - name: Verify ${{ inputs.type }} conversion with optimization
       shell: bash
       run: |
-        ./.github/actions/cli-integrity-check/script.sh . ${{ inputs.type }} optimize
+        ./.github/actions/cli-integrity-check/script.sh ${GITHUB_WORKSPACE} ${{ inputs.type }} optimize
