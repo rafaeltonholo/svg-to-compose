@@ -43,7 +43,7 @@ for index in "${!files[@]}"; do
   output="$root_directory/integrity-check/${type}/$output_name.${suffix}.kt"
 
   echo "Parsing $filename to Jetpack Compose Icon"
-  if ! command ./"$root_directory/s2c" -o "$output" \
+  if ! command "$root_directory/s2c" -o "$output" \
         -p "$package" \
         --theme "$theme" \
         -opt=$optimize \
@@ -61,8 +61,10 @@ for index in "${!files[@]}"; do
 done
 
 echo
+echo
 if [ "${#errors[@]}" == 0 ]; then
   echo "✅ Integrity check pass"
+  exit 0
 else
   echo "❌ Integrity check failed"
   echo
