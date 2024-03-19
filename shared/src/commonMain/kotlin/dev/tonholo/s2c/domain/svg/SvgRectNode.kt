@@ -7,72 +7,35 @@ import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.createDashedPathForRect
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.svg.SvgElementNode.Companion.SVG_VIEW_BOX_HEIGHT_POSITION
-import dev.tonholo.s2c.domain.svg.SvgElementNode.Companion.SVG_VIEW_BOX_WIDTH_POSITION
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.extensions.toLengthFloat
-import dev.tonholo.s2c.extensions.toLengthInt
 import dev.tonholo.s2c.logger.warn
-import kotlin.math.max
 
 class SvgRectNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
 ) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
-    val width: Int by attribute<String, Int> { width ->
-        if (width.endsWith("%")) {
-            val root = rootParent as SvgElementNode
-            width.toLengthInt(
-                width = max(root.width, root.viewBox[2].toInt()),
-            )
-        } else {
-            width.toSvgLengthOrNull()?.toInt() ?: error("Invalid width '$width'")
-        }
+    val width: Int by attribute<SvgLength, Int> { width ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportWidth
+        width.toIntOrNull(baseDimension) ?: error("Invalid width '$width'")
     }
-    val height: Int by attribute<String, Int> { height ->
-        if (height.endsWith("%")) {
-            val root = rootParent as SvgElementNode
-            height.toLengthInt(
-                height = max(root.height, root.viewBox[3].toInt()),
-            )
-        } else {
-            height.toSvgLengthOrNull()?.toInt() ?: error("Invalid height '$height'")
-        }
+    val height: Int by attribute<SvgLength, Int> { height ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportHeight
+        height.toIntOrNull(baseDimension) ?: error("Invalid height '$height'")
     }
-    val x: Int? by attribute<String?, Int?> { x ->
-        x?.let {
-            if (x.endsWith("%")) {
-                val root = rootParent as SvgElementNode
-                x.toLengthInt(
-                    width = root.getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION)!!.toInt(),
-                )
-            } else {
-                x.toSvgLengthOrNull()?.toInt()
-            }
-        }
+    val x: Int? by attribute<SvgLength?, Int?> { x ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportWidth
+        x?.toIntOrNull(baseDimension)
     }
-    val y: Int? by attribute<String?, Int?> { y ->
-        y?.let {
-            if (y.endsWith("%")) {
-                val root = rootParent as SvgElementNode
-                y.toLengthInt(
-                    height = root.getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION)!!.toInt(),
-                )
-            } else {
-                y.toSvgLengthOrNull()?.toInt()
-            }
-        }
+    val y: Int? by attribute<SvgLength?, Int?> { y ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportHeight
+        y?.toIntOrNull(baseDimension)
     }
     val rx: Int? by attribute()
     val ry: Int? by attribute()
-
-    override val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
-        it?.toLengthFloat(width = width.toFloat(), height = height.toFloat())
-    } // <length | percentage>
-
-    override val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
-        it?.toLengthFloat(width = width.toFloat(), height = height.toFloat())
-    } // <0..1 | percentage>
 
     companion object {
         const val TAG_NAME = "rect"

@@ -16,26 +16,32 @@ class SvgElementNode(
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
 ) : XmlElementNode(parent, children, attributes, name = TAG_NAME), SvgNode {
-    val width: Int by attribute<SvgLength?, Int> { width ->
-        width?.toInt()
-            ?: getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION)
-            ?: SVG_DEFAULT_WIDTH
+    val width: Float by attribute<SvgLength?, Float> { width ->
+        width?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
+            ?: viewportWidth
     }
-    val height: Int by attribute<SvgLength?, Int> { height ->
-        height?.toInt()
-            ?: getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION)
-            ?: SVG_DEFAULT_HEIGHT
+    val height: Float by attribute<SvgLength?, Float> { height ->
+        height?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
+            ?: viewportHeight
     }
     var viewBox: FloatArray by attribute<String?, _> { viewBox ->
-        parseViewBox(viewBox) ?: floatArrayOf(0f, 0f, width.toFloat(), height.toFloat())
+        parseViewBox(viewBox) ?: floatArrayOf(0f, 0f, width, height)
     }
     var fill: String? by attribute()
 
-    inline fun parseViewBox(viewBox: String?): FloatArray? =
+    val viewportWidth: Float by lazy {
+        getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION) ?: SVG_DEFAULT_WIDTH
+    }
+
+    val viewportHeight: Float by lazy {
+        getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION) ?: SVG_DEFAULT_HEIGHT
+    }
+
+    private inline fun parseViewBox(viewBox: String?): FloatArray? =
         viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()
 
-    inline fun getDimensionFromViewBox(dimensionIndex: Int): Int? =
-        parseViewBox(attributes["viewBox"])?.getOrNull(dimensionIndex)?.toInt()
+    private inline fun getDimensionFromViewBox(dimensionIndex: Int): Float? =
+        parseViewBox(attributes["viewBox"])?.getOrNull(dimensionIndex)
 
     companion object {
         const val TAG_NAME = "svg"
@@ -46,7 +52,7 @@ class SvgElementNode(
          *          Width attribute on SVG
          *      </a>
          */
-        private const val SVG_DEFAULT_WIDTH = 300
+        private const val SVG_DEFAULT_WIDTH = 300f
 
         /**
          * The default value if both height and viewBox are omitted.
@@ -54,7 +60,7 @@ class SvgElementNode(
          *          Height attribute on SVG
          *     </a>
          */
-        private const val SVG_DEFAULT_HEIGHT = 150
+        private const val SVG_DEFAULT_HEIGHT = 150f
         const val SVG_VIEW_BOX_WIDTH_POSITION = 2
         const val SVG_VIEW_BOX_HEIGHT_POSITION = 3
     }

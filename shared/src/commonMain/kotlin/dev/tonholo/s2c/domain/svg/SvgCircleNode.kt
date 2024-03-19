@@ -6,6 +6,7 @@ import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.extensions.toLengthFloat
 import dev.tonholo.s2c.logger.warn
 import kotlin.math.PI
 import kotlin.math.cos
@@ -16,9 +17,20 @@ class SvgCircleNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
 ) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
-    val cx: Float by attribute(defaultValue = 0.0f)
-    val cy: Float by attribute(defaultValue = 0.0f)
-    val radius: Float by attribute(name = "r", defaultValue = 0.0f)
+    val cx: Float by attribute<SvgLength, Float>(defaultValue = 0.0f) { cx ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportWidth
+        cx.toFloat(baseDimension)
+    }
+    val cy: Float by attribute<SvgLength, Float>(defaultValue = 0.0f) { cy ->
+        val root = rootParent as SvgElementNode
+        val baseDimension = root.viewportHeight
+        cy.toFloat(baseDimension)
+    }
+    val radius: Float by attribute<String, Float>(name = "r", defaultValue = 0.0f) { radius ->
+        val root = rootParent as SvgElementNode
+        radius.toLengthFloat(width = root.viewportWidth, root.viewportHeight)
+    }
 
     companion object {
         const val TAG_NAME = "circle"

@@ -25,10 +25,9 @@ abstract class SvgGraphicNode(
 
     val stroke: SvgColor? by attribute<String?, _> { it?.let { SvgColor(it) } }
 
-    open val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
-        (parent as? SvgElementNode)?.let { parent ->
-            it?.toLengthFloat(width = parent.width.toFloat(), height = parent.height.toFloat())
-        }
+    val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
+        val root = rootParent as SvgElementNode
+        it?.toLengthFloat(width = root.viewportWidth, height = root.viewportHeight)
     } // <length | percentage>
 
     val strokeLineJoin: StrokeJoin? by attribute<String?, _>(name = "stroke-linejoin") {
@@ -43,10 +42,9 @@ abstract class SvgGraphicNode(
         it?.let { PathFillType(it) }
     } // <nonzero | evenodd>
 
-    open val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
-        (parent as? SvgElementNode)?.let { parent ->
-            it?.toLengthFloat(width = parent.width.toFloat(), height = parent.height.toFloat())
-        }
+    val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
+        val root = rootParent as SvgElementNode
+        it?.toLengthFloat(width = root.viewportWidth, height = root.viewportHeight)
     } // <0..1 | percentage>
 
     val strokeMiterLimit: Float? by attribute(name = "stroke-miterlimit")

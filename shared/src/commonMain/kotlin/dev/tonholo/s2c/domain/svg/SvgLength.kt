@@ -1,8 +1,10 @@
 package dev.tonholo.s2c.domain.svg
 
 import kotlin.jvm.JvmInline
+import kotlin.math.roundToInt
 
 private val possibleUnits = setOf("em", "ex", "px", "in", "cm", "mm", "pt", "pc")
+private const val PERCENT = "%"
 
 /**
  * SvgLength is a Kotlin inline value class useful for handling
@@ -36,15 +38,31 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
      *
      * @return The [Int] representation of this [SvgLength] object.
      */
-    fun toInt(): Int = possibleUnits
-        .fold(value) { value, unit ->
-            if (value.endsWith(unit)) {
-                value.replace(unit, "")
-            } else {
-                value
+    fun toInt(baseDimension: Float): Int = toFloat(baseDimension).roundToInt()
+    fun toIntOrNull(baseDimension: Float?): Int? = toFloatOrNull(baseDimension)?.roundToInt()
+
+    fun toInt(baseDimension: Int): Int = toInt(baseDimension.toFloat())
+    fun toIntOrNull(baseDimension: Int?): Int? = toIntOrNull(baseDimension?.toFloat())
+
+    fun toFloat(baseDimension: Float): Float = toFloatOrNull(baseDimension)
+        ?: throw NumberFormatException("$value is not a Number")
+
+    fun toFloatOrNull(baseDimension: Float?): Float? {
+        val directParse = value.toFloatOrNull()
+        return when {
+            directParse != null -> directParse
+            value.length > 1 && value.endsWith(PERCENT) && baseDimension != null -> {
+                val value = value.removeSuffix(PERCENT)
+                @Suppress("MagicNumber")
+                (value.toFloat() / 100f * baseDimension)
             }
+
+            value.length > 2 && value.substring(value.length - 2) in possibleUnits ->
+                value.substring(value.length - 2).toFloat()
+
+            else -> null
         }
-        .toInt()
+    }
 }
 
 /**
@@ -64,6 +82,7 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
  */
 internal fun String.toSvgLengthOrNull(): SvgLength? = when {
     toIntOrNull() != null -> this
+    length > 1 && endsWith(PERCENT) -> this
     length > 2 && substring(length - 2) in possibleUnits -> this
     else -> null
 }?.let(::SvgLength)
