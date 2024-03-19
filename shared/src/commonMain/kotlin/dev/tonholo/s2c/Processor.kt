@@ -98,34 +98,15 @@ class Processor(
         val optimizers = createOptimizers(files, config)
 
         val errors = mutableListOf<Pair<Path, Exception>>()
-        for (file in files) {
-            try {
-                processFile(
-                    file = file,
-                    optimizers = optimizers,
-                    output = outputPath,
-                    config = config,
-                    recursive = runRecursively,
-                    basePath = filePath,
-                )
-                printEmpty()
-            } catch (e: ExitProgramException) {
-                throw e
-            } catch (
-                e:
-                @Suppress("TooGenericExceptionCaught")
-                Exception
-            ) {
-                printEmpty()
-                // the generic exception is expected since we are going to exit the program with a failure later.
-                output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
-                if (AppConfig.debug) {
-                    e.printStackTrace()
-                }
-                printEmpty()
-                errors.add(file to e)
-            }
-        }
+        processFiles(
+            files = files,
+            optimizers = optimizers,
+            outputPath = outputPath,
+            config = config,
+            runRecursively = runRecursively,
+            filePath = filePath,
+            errors = errors,
+        )
 
         if (errors.isEmpty()) {
             output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
@@ -246,7 +227,58 @@ class Processor(
     }
 
     /**
-     * This function processes files to convert SVG or Android Vector Drawable to
+     * This function processes multiple files to convert SVG or Android Vector Drawable to
+     * Jetpack Compose icons.
+     *
+     * @param files The list of files to process.
+     * @param optimizers The optimizer factory.
+     * @param outputPath The output path.
+     * @param config The parser configuration.
+     * @param runRecursively Whether to run recursively.
+     * @param filePath The file path.
+     * @param errors The list of errors.
+     */
+    private fun processFiles(
+        files: List<Path>,
+        optimizers: Optimizer.Factory?,
+        outputPath: Path,
+        config: ParserConfig,
+        runRecursively: Boolean,
+        filePath: Path,
+        errors: MutableList<Pair<Path, Exception>>,
+    ) {
+        for (file in files) {
+            try {
+                processFile(
+                    file = file,
+                    optimizers = optimizers,
+                    output = outputPath,
+                    config = config,
+                    recursive = runRecursively,
+                    basePath = filePath,
+                )
+                printEmpty()
+            } catch (e: ExitProgramException) {
+                throw e
+            } catch (
+                e:
+                @Suppress("TooGenericExceptionCaught")
+                Exception,
+            ) {
+                printEmpty()
+                // the generic exception is expected since we are going to exit the program with a failure later.
+                output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
+                if (AppConfig.debug) {
+                    e.printStackTrace()
+                }
+                printEmpty()
+                errors.add(file to e)
+            }
+        }
+    }
+
+    /**
+     * This function processes one file to convert SVG or Android Vector Drawable to
      * Jetpack Compose icons.
      *
      * @param file The path of the file that this function is processing.
@@ -276,28 +308,18 @@ class Processor(
         } else {
             file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
         }
-        val parent = file.parent
         val targetFile = tempFileWriter.create(
             file = file,
         )
 
         val finalFile = optimizers?.optimize(targetFile) ?: targetFile
 
-        val relativePackage = if (recursive.not() || file == basePath) {
-            ""
-        } else {
-            buildString {
-                val stack = mutableListOf<String>()
-                var currentParent = parent
-                while (currentParent != null && currentParent != basePath) {
-                    stack += currentParent.name
-                    currentParent = currentParent.parent
-                }
-                while (stack.isNotEmpty()) {
-                    append(".${stack.removeLast()}")
-                }
-            }
-        }
+        val relativePackage = buildRelativePackage(
+            recursive = recursive,
+            file = file,
+            basePath = basePath,
+            parent = file.parent,
+        )
 
         val pkg = "${config.pkg}$relativePackage"
 
@@ -324,5 +346,26 @@ class Processor(
         )
 
         tempFileWriter.clear()
+    }
+
+    private fun buildRelativePackage(
+        recursive: Boolean,
+        file: Path,
+        basePath: Path,
+        parent: Path?,
+    ) = if (recursive.not() || file == basePath) {
+        ""
+    } else {
+        buildString {
+            val stack = mutableListOf<String>()
+            var currentParent = parent
+            while (currentParent != null && currentParent != basePath) {
+                stack += currentParent.name
+                currentParent = currentParent.parent
+            }
+            while (stack.isNotEmpty()) {
+                append(".${stack.removeLast()}")
+            }
+        }
     }
 }
