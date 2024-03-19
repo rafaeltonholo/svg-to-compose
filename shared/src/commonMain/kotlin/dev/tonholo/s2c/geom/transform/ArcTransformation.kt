@@ -108,9 +108,9 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
                 /*isPositiveArc =*/
                 sweepFlag,
                 /*x =*/
-                x,
+                this.x,
                 /*y =*/
-                y,
+                this.y,
             ),
         ) as PathNodes.ArcTo
     }
