@@ -43,7 +43,7 @@ for index in "${!files[@]}"; do
   output="$root_directory/integrity-check/${type}/$output_name.${suffix}.kt"
 
   echo "Parsing $filename to Jetpack Compose Icon"
-  if ! sh "$root_directory/s2c" -o "$output" \
+  if ! command ./"$root_directory/s2c" -o "$output" \
         -p "$package" \
         --theme "$theme" \
         -opt=$optimize \
