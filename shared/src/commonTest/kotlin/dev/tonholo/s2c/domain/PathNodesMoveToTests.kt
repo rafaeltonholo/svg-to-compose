@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -27,7 +27,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "m85.122 64.795"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -45,7 +45,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "M85.122 64.795"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -65,7 +65,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -105,7 +105,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -147,7 +147,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -179,7 +179,7 @@ class PathNodesMoveToTests {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
-        val node = path.asNode(minified = true)
+        val node = path.asNode(minified = true) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

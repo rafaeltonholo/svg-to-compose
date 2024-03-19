@@ -41,6 +41,10 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         )
     }
 
+    /**
+     * Sets the value of the attribute represented by this delegate on the given XML element.
+     * The value is converted to a string and stored in the element's attributes' map.
+     */
     operator fun setValue(element: XmlChildNode, property: KProperty<*>, value: Any?) {
         val key = key(property)
         element.attributes[key] = value.toString()

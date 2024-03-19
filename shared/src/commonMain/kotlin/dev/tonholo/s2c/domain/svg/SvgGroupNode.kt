@@ -30,11 +30,7 @@ fun SvgGroupNode.asNode(
     // Can a svg mask have more than one path?
     // Currently, a group on ImageVector only receives a single PathData as a parameter.
     // Not sure if it would support multiple path tags inside a mask from a svg.
-    val clipPath = masks
-        .firstOrNull { it.id == maskId?.normalizedId() }
-        ?.path
-        ?.d
-        ?.asNodeWrapper(minified)
+    val clipPath = createGroupClipPath(masks, minified)
 
     return ImageVectorNode.Group(
         clipPath = clipPath,
@@ -42,3 +38,19 @@ fun SvgGroupNode.asNode(
         minified = minified,
     )
 }
+
+/**
+ * Creates a group clip path from the given masks.
+ *
+ * @param masks The list of masks.
+ * @param minified Whether to minify the output.
+ * @return The group clip path, or null if no mask with the given ID is found.
+ */
+private fun SvgGroupNode.createGroupClipPath(
+    masks: List<SvgMaskNode>,
+    minified: Boolean,
+): ImageVectorNode.NodeWrapper? = masks
+    .firstOrNull { it.id == maskId?.normalizedId() }
+    ?.path
+    ?.d
+    ?.asNodeWrapper(minified)
