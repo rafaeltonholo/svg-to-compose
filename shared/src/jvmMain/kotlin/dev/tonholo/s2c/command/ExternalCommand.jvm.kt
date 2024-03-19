@@ -11,12 +11,14 @@ actual fun executeCommand(command: Command): CommandResult {
     val process = processBuilder.start()
     val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
     val output = buildString {
-        bufferedReader.use {
-            var line: String?
-            do {
-                line = it.readLine()
-                line?.let { append(line) }
-            } while (line != null)
+        bufferedReader.useLines { lines ->
+            lines.forEach { appendLine(it) }
+        }
+    }
+
+    val errorOutput = buildString {
+        BufferedReader(InputStreamReader(process.errorStream)).useLines { lines ->
+            lines.forEach { appendLine(it) }
         }
     }
 
@@ -29,6 +31,7 @@ actual fun executeCommand(command: Command): CommandResult {
         exitCode = exitCode,
         output = CommandOutput(
             stdout = if (command.trim) output.trim() else output,
+            stderr = if (command.trim) errorOutput.trim() else errorOutput,
         )
     )
 }
