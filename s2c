@@ -36,7 +36,10 @@ fn_print_verbose() {
 }
 
 fn_print_error() {
-  echo "E: $1"
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!"
+  echo "! CRITICAL FAILURE: $1"
+  echo "!!!!!!!!!!!!!!!!!!!"
 }
 
 fn_print_info() {
@@ -127,11 +130,17 @@ fn_main() {
 
     download_url="https://github.com/rafaeltonholo/svg-to-compose/releases/download/$VERSION/$binary_filename"
     fn_print_debug "Downloading from $download_url"
-    command curl -L "$download_url" \
-                 --output "$bin_folder/$binary_filename"
+    if ! command curl -L "$download_url" \
+                 --output "$bin_folder/$binary_filename"; then
+      fn_print_error "Error downloading binaries."
+      exit 1
+    fi
 
     fn_print_info "🔓 Unzipping binaries"
-    command unzip -qq "$bin_folder/$binary_filename" -d $bin_folder
+    if ! command unzip -qq "$bin_folder/$binary_filename" -d $bin_folder; then
+      fn_print_error "Error unzipping binaries."
+      exit 1
+    fi
 
     fn_print_info "🧹 Cleaning up zip files"
     cp -vr $bin_folder/$binary_base_filename/* $bin_folder/
