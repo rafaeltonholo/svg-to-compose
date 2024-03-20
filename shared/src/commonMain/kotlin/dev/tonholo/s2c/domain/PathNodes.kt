@@ -59,7 +59,7 @@ sealed class PathNodes(
         ""
     }
 
-    private fun String.removeTrailingZeroConsiderCloseCommand(): String =
+    fun String.removeTrailingZeroConsiderCloseCommand(): String =
         this.removeTrailingZero()
             .replace("\\.0z\\b".toRegex(), PathCommand.Close.value.toString())
 

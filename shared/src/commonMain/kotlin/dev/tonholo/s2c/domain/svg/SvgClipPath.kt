@@ -4,7 +4,6 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.extensions.removeTrailingZero
 
 class SvgClipPath(
     parent: XmlParentNode,
@@ -33,7 +32,9 @@ fun SvgClipPath.asNodeWrapper(
         ""
     } else {
         nodes.joinToString(" ") {
-            it.toString().removeTrailingZero()
+            with(it) {
+                toString().removeTrailingZeroConsiderCloseCommand()
+            }
         }
     }
     return ImageVectorNode.NodeWrapper(
