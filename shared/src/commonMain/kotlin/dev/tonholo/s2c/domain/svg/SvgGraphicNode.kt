@@ -5,10 +5,12 @@ import dev.tonholo.s2c.domain.StrokeCap
 import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.StrokeJoin
 import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.domain.lowercase
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.toJsString
-import dev.tonholo.s2c.extensions.toLengthFloat
+import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toLengthFloatOrNull
 
 abstract class SvgGraphicNode(
     override val parent: XmlParentNode,
@@ -27,7 +29,7 @@ abstract class SvgGraphicNode(
 
     val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
         val root = rootParent as SvgElementNode
-        it?.toLengthFloat(width = root.viewportWidth, height = root.viewportHeight)
+        it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <length | percentage>
 
     val strokeLineJoin: StrokeJoin? by attribute<String?, _>(name = "stroke-linejoin") {
@@ -44,7 +46,7 @@ abstract class SvgGraphicNode(
 
     val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
         val root = rootParent as SvgElementNode
-        it?.toLengthFloat(width = root.viewportWidth, height = root.viewportHeight)
+        it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <0..1 | percentage>
 
     val strokeMiterLimit: Float? by attribute(name = "stroke-miterlimit")
@@ -59,12 +61,12 @@ abstract class SvgGraphicNode(
         fillOpacity?.let { append("fill-opacity=\"$it\" ") }
         style?.let { append("style=\"$it\" ") }
         stroke?.let { append("stroke=\"${it.value}\" ") }
-        strokeWidth?.let { append("stroke-width=\"${it.toString().removeSuffix(".0")}\" ") }
-        strokeLineJoin?.let { append("stroke-line-join=\"$it\" ") }
-        strokeLineCap?.let { append("stroke-line-cap=\"$it\" ") }
-        fillRule?.let { append("fill-rule=\"$it\" ") }
+        strokeWidth?.let { append("stroke-width=\"${it.toString().removeTrailingZero()}\" ") }
+        strokeLineJoin?.let { append("stroke-line-join=\"${it.lowercase()}\" ") }
+        strokeLineCap?.let { append("stroke-line-cap=\"${it.lowercase()}\" ") }
+        fillRule?.let { append("fill-rule=\"${it.lowercase()}\" ") }
         strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
-        strokeMiterLimit?.let { append("stroke-miter-limit=\"$it\" ") }
+        strokeMiterLimit?.let { append("stroke-miter-limit=\"${it.toString().removeTrailingZero()}\" ") }
         strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
     }
 

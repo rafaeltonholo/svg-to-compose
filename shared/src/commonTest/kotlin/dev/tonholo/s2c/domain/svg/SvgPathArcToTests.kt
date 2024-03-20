@@ -1,9 +1,7 @@
-package dev.tonholo.s2c.domain
+package dev.tonholo.s2c.domain.svg
 
-import dev.tonholo.s2c.domain.svg.SvgElementNode
-import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.svg.asNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 import kotlin.test.Test
@@ -13,7 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class PathNodesArcToTests {
+class SvgPathArcToTests : BaseSvgTest() {
     data class ArcParams(
         val a: Float,
         val b: Float,
@@ -27,12 +25,6 @@ class PathNodesArcToTests {
             "${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y"
                 .removeTrailingZero()
     }
-
-    private val root = SvgElementNode(
-        parent = XmlRootNode(children = mutableSetOf()),
-        children = mutableSetOf(),
-        attributes = mutableMapOf(),
-    )
 
     @Test
     fun `ensure a 'a' command is parsed to ArcTo relative`() {

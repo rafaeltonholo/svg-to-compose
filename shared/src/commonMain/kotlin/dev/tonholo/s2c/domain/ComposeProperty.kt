@@ -11,21 +11,22 @@ import dev.tonholo.s2c.domain.StrokeJoin.Companion.Round
 import kotlin.jvm.JvmInline
 
 /**
- * Represents a property that can be included translated to a compose
+ * Represents a property that can be included translated to a Compose
  * declaration.
  *
- * All classes or objects which represent a compose-declarable property
+ * All classes or objects that represent a compose-declarable property
  * should implement this interface.
  *
  * Example implementing classes in the LinkedList module include
  * [PathFillType], [StrokeCap], [StrokeJoin] etc.
  */
 interface ComposeProperty {
+    val value: String
     /**
      * Provides a way to get the canonical string representation of the
      * [ComposeProperty] implementation.
      *
-     * In case the conversion is not feasible or does not make sense, the
+     * In case the conversion is not possible or does not make sense, the
      * function should return a `null` value.
      *
      * This can be used when generating the compose code using
@@ -36,6 +37,8 @@ interface ComposeProperty {
      */
     fun toCompose(): String?
 }
+
+fun ComposeProperty.lowercase(): String = value.lowercase()
 
 /**
  * This is a wrapper class for the [PathFillType] property of the
@@ -53,7 +56,7 @@ interface ComposeProperty {
  * string value.
  */
 @JvmInline
-value class PathFillType private constructor(private val value: String) : ComposeProperty {
+value class PathFillType private constructor(override val value: String) : ComposeProperty {
     override fun toString(): String = value
 
     companion object {
@@ -75,13 +78,16 @@ value class PathFillType private constructor(private val value: String) : Compos
          * @return A new [PathFillType] object, or `null` if the input string was `null`.
          */
         operator fun invoke(value: String?): PathFillType? = value?.let {
-            return PathFillType(value.replaceFirstChar { it.uppercaseChar() })
+            val pathFillType = PathFillType(value.replaceFirstChar { it.uppercaseChar() })
+            // ensure a valid path fill type
+            return pathFillType.toCompose()?.let { pathFillType }
         }
     }
 
     override fun toCompose(): String? = when (this.value) {
         EvenOdd.value, NonZero.value,
-        EvenOdd.value.lowercase(), NonZero.value.lowercase() ->
+        EvenOdd.value.lowercase(), NonZero.value.lowercase(),
+        ->
             "PathFillType.$value"
 
         else -> null
@@ -96,7 +102,7 @@ value class PathFillType private constructor(private val value: String) : Compos
  * cap as a string, providing utility methods for conversion and
  * string representation.
  *
- * The class is defined as an inline class to minimise memory overhead.
+ * The class is defined as an inline class to minimize memory overhead.
  *
  * The class comes with three predefined instances: [Butt], [Round] and
  * [Square], representing the three supported fill types in Android Compose.
@@ -105,7 +111,7 @@ value class PathFillType private constructor(private val value: String) : Compos
  * string value.
  */
 @JvmInline
-value class StrokeCap private constructor(private val value: String) : ComposeProperty {
+value class StrokeCap private constructor(override val value: String) : ComposeProperty {
     override fun toString(): String = value
 
     companion object {
@@ -128,7 +134,9 @@ value class StrokeCap private constructor(private val value: String) : ComposePr
          * @return A new [StrokeCap] object, or `null` if the input string was `null`.
          */
         operator fun invoke(value: String?): StrokeCap? = value?.let {
-            return StrokeCap(value.replaceFirstChar { it.uppercaseChar() })
+            val strokeCap = StrokeCap(value.replaceFirstChar { it.uppercaseChar() })
+            // Ensure a valid stroke cap
+            return strokeCap.toCompose()?.let { strokeCap }
         }
     }
 
@@ -146,7 +154,7 @@ value class StrokeCap private constructor(private val value: String) : ComposePr
  * line join as a string, providing utility methods for conversion and
  * string representation.
  *
- * The class is defined as an inline class to minimise memory overhead.
+ * The class is defined as an inline class to minimize memory overhead.
  *
  * The class comes with three predefined instances: [Miter], [Round], and
  * [Bevel], representing the three supported fill types in Android Compose.
@@ -155,7 +163,7 @@ value class StrokeCap private constructor(private val value: String) : ComposePr
  * string value.
  */
 @JvmInline
-value class StrokeJoin private constructor(private val value: String) : ComposeProperty {
+value class StrokeJoin private constructor(override val value: String) : ComposeProperty {
     override fun toString(): String = value
 
     companion object {
@@ -178,7 +186,9 @@ value class StrokeJoin private constructor(private val value: String) : ComposeP
          * @return A new [StrokeJoin] object, or `null` if the input string was `null`.
          */
         operator fun invoke(value: String?): StrokeJoin? = value?.let {
-            return StrokeJoin(value.replaceFirstChar { it.uppercaseChar() })
+            val strokeJoin = StrokeJoin(value.replaceFirstChar { it.uppercaseChar() })
+            // Ensure a valid stroke join
+            return strokeJoin.toCompose()?.let { strokeJoin }
         }
     }
 

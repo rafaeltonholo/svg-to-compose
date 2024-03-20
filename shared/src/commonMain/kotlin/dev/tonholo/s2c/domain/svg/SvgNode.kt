@@ -30,12 +30,36 @@ class SvgElementNode(
     var fill: String? by attribute()
 
     val viewportWidth: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION) ?: SVG_DEFAULT_WIDTH
+        getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION) ?: safeWidth ?: SVG_DEFAULT_WIDTH
     }
 
     val viewportHeight: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION) ?: SVG_DEFAULT_HEIGHT
+        getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION) ?: safeHeight ?: SVG_DEFAULT_HEIGHT
     }
+
+    /**
+     * Checks if width is present in the attribute map.
+     * If it is the case, return the [width] property which
+     * calculates the correct width based on a [SvgLength],
+     * otherwise null.
+     *
+     * This is required since both width and viewBox attributes
+     * can be omitted.
+     */
+    private val safeWidth: Float?
+        get() = if (attributes.contains("width")) width else null
+
+    /**
+     * Checks if width is present in the attribute map.
+     * If it is the case, return the [height] property which
+     * calculates the correct height based on a [SvgLength],
+     * otherwise null.
+     *
+     * This is required since both height and viewBox attributes
+     * can be omitted.
+     */
+    private val safeHeight: Float?
+        get() = if (attributes.contains("height")) height else null
 
     private inline fun parseViewBox(viewBox: String?): FloatArray? =
         viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()

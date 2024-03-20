@@ -1,9 +1,7 @@
-package dev.tonholo.s2c.domain
+package dev.tonholo.s2c.domain.svg
 
-import dev.tonholo.s2c.domain.svg.SvgElementNode
-import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.svg.asNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -12,26 +10,22 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class PathNodesReflectiveQuadToTests {
-    data class ReflectiveQuadToParams(
+class SvgPathQuadToTests : BaseSvgTest() {
+    data class QuadToParams(
         val x1: Float,
         val y1: Float,
+        val x2: Float,
+        val y2: Float,
     ) {
-        override fun toString(): String = "$x1 $y1".removeTrailingZero()
+        override fun toString(): String = "$x1 $y1 $x2 $y2".removeTrailingZero()
     }
 
-    private val root = SvgElementNode(
-        parent = XmlRootNode(children = mutableSetOf()),
-        children = mutableSetOf(),
-        attributes = mutableMapOf(),
-    )
-
     @Test
-    fun `ensure a 't' command is parsed to ReflectiveQuadTo relative`() {
+    fun `ensure a 'q' command is parsed to QuadTo relative`() {
         // Arrange
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "t8.5.2"), // should parse to t8.5 .2
+            attributes = mutableMapOf("d" to "q8,2 8,8"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -39,17 +33,17 @@ class PathNodesReflectiveQuadToTests {
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
         with(nodes.first()) {
-            assertIs<PathNodes.ReflectiveQuadTo>(this)
+            assertIs<PathNodes.QuadTo>(this)
             assertTrue(isRelative)
         }
     }
 
     @Test
-    fun `ensure a 'T' command is parsed to ReflectiveQuadTo`() {
+    fun `ensure a 'S' command is parsed to QuadTo`() {
         // Arrange
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "T -2.5-6.5"), // should parse to T-2.5 -6.5
+            attributes = mutableMapOf("d" to "Q2,-2 4,5"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -57,25 +51,29 @@ class PathNodesReflectiveQuadToTests {
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
         with(nodes.first()) {
-            assertIs<PathNodes.ReflectiveQuadTo>(this)
+            assertIs<PathNodes.QuadTo>(this)
             assertFalse(isRelative)
         }
     }
 
     @Test
-    fun `ensure materialize generates reflectiveQuadTo instruction properly`() {
+    fun `ensure materialize generates quadTo instruction properly`() {
         // Arrange
-        val nonRelative = ReflectiveQuadToParams(
+        val nonRelative = QuadToParams(
             x1 = 15f,
             y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
         )
-        val relative = ReflectiveQuadToParams(
+        val relative = QuadToParams(
             x1 = 321f,
             y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "T$nonRelative t$relative"),
+            attributes = mutableMapOf("d" to "Q$nonRelative q$relative"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -86,10 +84,12 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// T $this
-                |reflectiveQuadTo(
+                |// Q $this
+                |quadTo(
                 |    x1 = ${x1}f,
                 |    y1 = ${y1}f,
+                |    x2 = ${x2}f,
+                |    y2 = ${y2}f,
                 |)
                 |""".trimMargin()
             )
@@ -98,10 +98,12 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// t $this
-                |reflectiveQuadToRelative(
+                |// q $this
+                |quadToRelative(
                 |    dx1 = ${x1}f,
                 |    dy1 = ${y1}f,
+                |    dx2 = ${x2}f,
+                |    dy2 = ${y2}f,
                 |)
                 |""".trimMargin()
             )
@@ -109,19 +111,23 @@ class PathNodesReflectiveQuadToTests {
     }
 
     @Test
-    fun `ensure materialize generates reflectiveQuadTo with a close instruction properly`() {
+    fun `ensure materialize generates quadTo with a close instruction properly`() {
         // Arrange
-        val nonRelative = ReflectiveQuadToParams(
+        val nonRelative = QuadToParams(
             x1 = 15f,
             y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
         )
-        val relative = ReflectiveQuadToParams(
+        val relative = QuadToParams(
             x1 = 321f,
             y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "T${nonRelative}z t${relative}z"),
+            attributes = mutableMapOf("d" to "Q${nonRelative}z q${relative}z"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -132,10 +138,12 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// T ${this}z
-                |reflectiveQuadTo(
+                |// Q ${this}z
+                |quadTo(
                 |    x1 = ${x1}f,
                 |    y1 = ${y1}f,
+                |    x2 = ${x2}f,
+                |    y2 = ${y2}f,
                 |)
                 |close()
                 |""".trimMargin()
@@ -145,10 +153,12 @@ class PathNodesReflectiveQuadToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// t ${this}z
-                |reflectiveQuadToRelative(
+                |// q ${this}z
+                |quadToRelative(
                 |    dx1 = ${x1}f,
                 |    dy1 = ${y1}f,
+                |    dx2 = ${x2}f,
+                |    dy2 = ${y2}f,
                 |)
                 |close()
                 |""".trimMargin()
@@ -157,19 +167,23 @@ class PathNodesReflectiveQuadToTests {
     }
 
     @Test
-    fun `ensure materialize generates reflectiveQuadTo with inlined parameters and no comment when minified`() {
+    fun `ensure materialize generates quadTo with inlined parameters and no comment`() {
         // Arrange
-        val nonRelative = ReflectiveQuadToParams(
+        val nonRelative = QuadToParams(
             x1 = 15f,
             y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
         )
-        val relative = ReflectiveQuadToParams(
+        val relative = QuadToParams(
             x1 = 321f,
             y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "T$nonRelative t$relative"),
+            attributes = mutableMapOf("d" to "Q$nonRelative q$relative"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path
@@ -179,31 +193,49 @@ class PathNodesReflectiveQuadToTests {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "reflectiveQuadTo(x1 = ${x1}f, y1 = ${y1}f)",
+                element = buildString {
+                    append("quadTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f")
+                    append(")")
+                },
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "reflectiveQuadToRelative(dx1 = ${x1}f, dy1 = ${y1}f)",
+                element = buildString {
+                    append("quadToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f")
+                    append(")")
+                },
             )
         }
     }
 
     @Test
-    fun `ensure materialize generates reflectiveQuadTo with inlined parameters and no comment and close instruction when minified`() {
+    fun `ensure materialize generates quadTo with inlined parameters and no comment with close instruction when minified`() {
         // Arrange
-        val nonRelative = ReflectiveQuadToParams(
+        val nonRelative = QuadToParams(
             x1 = 15f,
             y1 = 12f,
+            x2 = 10f,
+            y2 = 5f,
         )
-        val relative = ReflectiveQuadToParams(
+        val relative = QuadToParams(
             x1 = 321f,
             y1 = 125f,
+            x2 = 510f,
+            y2 = 51f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "T${nonRelative}z t${relative}z"),
+            attributes = mutableMapOf("d" to "Q${nonRelative}z q${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path
@@ -213,19 +245,31 @@ class PathNodesReflectiveQuadToTests {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = """
-                    |reflectiveQuadTo(x1 = ${x1}f, y1 = ${y1}f)
-                    |close()
-                """.trimMargin(),
+                element = buildString {
+                    append("quadTo(")
+                    append("x1 = ${x1}f,")
+                    append(" y1 = ${y1}f,")
+                    append(" x2 = ${x2}f,")
+                    append(" y2 = ${y2}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                },
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = """
-                    |reflectiveQuadToRelative(dx1 = ${x1}f, dy1 = ${y1}f)
-                    |close()
-                """.trimMargin(),
+                element = buildString {
+                    append("quadToRelative(")
+                    append("dx1 = ${x1}f,")
+                    append(" dy1 = ${y1}f,")
+                    append(" dx2 = ${x2}f,")
+                    append(" dy2 = ${y2}f")
+                    append(")")
+                    appendLine()
+                    append("close()")
+                },
             )
         }
     }

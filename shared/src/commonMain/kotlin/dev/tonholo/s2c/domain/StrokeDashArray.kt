@@ -3,13 +3,13 @@ package dev.tonholo.s2c.domain
 import dev.tonholo.s2c.domain.builder.pathNode
 import kotlin.math.abs
 
-class StrokeDashArray(value: String) {
+class StrokeDashArray(private val value: String) {
     val dashesAndGaps = value
-        .split(" ")
+        .split(", ", ",", " ")
         .map { it.toInt() }
         .toIntArray()
 
-    override fun toString(): String = dashesAndGaps.joinToString(" ")
+    override fun toString(): String = value
 }
 
 private enum class StrokeDashDrawDirection(

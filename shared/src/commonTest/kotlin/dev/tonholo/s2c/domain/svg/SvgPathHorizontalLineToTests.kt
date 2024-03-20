@@ -1,9 +1,7 @@
-package dev.tonholo.s2c.domain
+package dev.tonholo.s2c.domain.svg
 
-import dev.tonholo.s2c.domain.svg.SvgElementNode
-import dev.tonholo.s2c.domain.svg.SvgPathNode
-import dev.tonholo.s2c.domain.svg.asNode
-import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -12,25 +10,19 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class PathNodesVerticalLineToTests {
-    data class VerticalLineParams(
-        val y: Float,
+class SvgPathHorizontalLineToTests : BaseSvgTest() {
+    data class HorizontalLineParams(
+        val x: Float,
     ) {
-        override fun toString(): String = "$y".removeTrailingZero()
+        override fun toString(): String = "$x".removeTrailingZero()
     }
 
-    private val root = SvgElementNode(
-        parent = XmlRootNode(children = mutableSetOf()),
-        children = mutableSetOf(),
-        attributes = mutableMapOf(),
-    )
-
     @Test
-    fun `ensure a 'v' command is parsed to VerticalLineTo relative`() {
+    fun `ensure a 'h' command is parsed to HorizontalLineTo relative`() {
         // Arrange
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "v 8"),
+            attributes = mutableMapOf("d" to "h 8"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -38,17 +30,17 @@ class PathNodesVerticalLineToTests {
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
         with(nodes.first()) {
-            assertIs<PathNodes.VerticalLineTo>(this)
+            assertIs<PathNodes.HorizontalLineTo>(this)
             assertTrue(isRelative)
         }
     }
 
     @Test
-    fun `ensure a 'V' command is parsed to VerticalLineTo`() {
+    fun `ensure a 'H' command is parsed to HorizontalLineTo`() {
         // Arrange
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "V 8"),
+            attributes = mutableMapOf("d" to "H 8"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -56,23 +48,23 @@ class PathNodesVerticalLineToTests {
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
         with(nodes.first()) {
-            assertIs<PathNodes.VerticalLineTo>(this)
+            assertIs<PathNodes.HorizontalLineTo>(this)
             assertFalse(isRelative)
         }
     }
 
     @Test
-    fun `ensure materialize generates verticalLineTo instruction properly`() {
+    fun `ensure materialize generates horizontalLineTo instruction properly`() {
         // Arrange
-        val nonRelative = VerticalLineParams(
-            y = 8f,
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
         )
-        val relative = VerticalLineParams(
-            y = 80f,
+        val relative = HorizontalLineParams(
+            x = 80f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "V$nonRelative v$relative"),
+            attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -83,8 +75,8 @@ class PathNodesVerticalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// V $this
-                |verticalLineTo(y = ${y}f)
+                |// H $this
+                |horizontalLineTo(x = ${x}f)
                 |""".trimMargin()
             )
         }
@@ -92,25 +84,25 @@ class PathNodesVerticalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// v $this
-                |verticalLineToRelative(dy = ${y}f)
+                |// h $this
+                |horizontalLineToRelative(dx = ${x}f)
                 |""".trimMargin()
             )
         }
     }
 
     @Test
-    fun `ensure materialize generates verticalLineTo with a close instruction properly`() {
+    fun `ensure materialize generates horizontalLineTo with a close instruction properly`() {
         // Arrange
-        val nonRelative = VerticalLineParams(
-            y = 8f,
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
         )
-        val relative = VerticalLineParams(
-            y = 80f,
+        val relative = HorizontalLineParams(
+            x = 80f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "V${nonRelative}z v${relative}z"),
+            attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
         val node = path.asNode() as ImageVectorNode.Path
@@ -121,8 +113,8 @@ class PathNodesVerticalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// V ${this}z
-                |verticalLineTo(y = ${y}f)
+                |// H ${this}z
+                |horizontalLineTo(x = ${x}f)
                 |close()
                 |""".trimMargin()
             )
@@ -131,8 +123,8 @@ class PathNodesVerticalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |// v ${this}z
-                |verticalLineToRelative(dy = ${y}f)
+                |// h ${this}z
+                |horizontalLineToRelative(dx = ${x}f)
                 |close()
                 |""".trimMargin()
             )
@@ -140,17 +132,17 @@ class PathNodesVerticalLineToTests {
     }
 
     @Test
-    fun `ensure materialize generates verticalLineTo with inlined parameters and no comment when minified`() {
+    fun `ensure materialize generates horizontalLineTo with no comment when minified`() {
         // Arrange
-        val nonRelative = VerticalLineParams(
-            y = 8f,
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
         )
-        val relative = VerticalLineParams(
-            y = 80f,
+        val relative = HorizontalLineParams(
+            x = 80f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "V$nonRelative v$relative"),
+            attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path
@@ -160,29 +152,29 @@ class PathNodesVerticalLineToTests {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "verticalLineTo(y = ${y}f)",
+                element = "horizontalLineTo(x = ${x}f)",
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "verticalLineToRelative(dy = ${y}f)",
+                element = "horizontalLineToRelative(dx = ${x}f)",
             )
         }
     }
 
     @Test
-    fun `ensure materialize generates verticalLineTo with inlined parameters and no comment and close instruction when minified`() {
+    fun `ensure materialize generates horizontalLineTo with no comment with close instruction when minified`() {
         // Arrange
-        val nonRelative = VerticalLineParams(
-            y = 8f,
+        val nonRelative = HorizontalLineParams(
+            x = 8f,
         )
-        val relative = VerticalLineParams(
-            y = 80f,
+        val relative = HorizontalLineParams(
+            x = 80f,
         )
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf("d" to "V${nonRelative}z v${relative}z"),
+            attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path
@@ -193,18 +185,16 @@ class PathNodesVerticalLineToTests {
             assertContains(
                 array = materialized,
                 element = """
-                |verticalLineTo(y = ${y}f)
-                |close()
-                """.trimMargin(),
+                |horizontalLineTo(x = ${x}f)
+                |close()""".trimMargin()
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
                 element = """
-                |verticalLineToRelative(dy = ${y}f)
-                |close()
-                """.trimMargin(),
+                |horizontalLineToRelative(dx = ${x}f)
+                |close()""".trimMargin()
             )
         }
     }

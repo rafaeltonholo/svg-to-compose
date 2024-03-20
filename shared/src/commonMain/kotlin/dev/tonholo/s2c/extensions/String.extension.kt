@@ -38,10 +38,15 @@ fun String.indented(indentSize: Int) = " ".repeat(indentSize) + this
 fun String.toLengthFloat(
     width: Float,
     height: Float,
-): Float = if (this.contains("%")) {
+): Float = toLengthFloatOrNull(width, height) ?: throw NumberFormatException("Can't parse '$this' to Float")
+
+fun String.toLengthFloatOrNull(
+    width: Float,
+    height: Float,
+): Float? = if (this.contains("%")) {
     max(width, height) * this.removeSuffix("%").toFloat() / PERCENT
 } else {
-    this.toFloat()
+    this.toFloatOrNull()
 }
 
 fun String.toLengthInt(
