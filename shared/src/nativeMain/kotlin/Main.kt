@@ -38,7 +38,7 @@ class Client : CliktCommand() {
 
     private val pkg by option(
         names = arrayOf("-p", "--package"),
-        help = "Specify icons's package. This will replace package at the top of the icon file",
+        help = "Specify icons' package. This will replace package at the top of the icon file",
     ).required()
 
     private val theme by option(
@@ -55,8 +55,8 @@ class Client : CliktCommand() {
 
     private val optimize by option(
         names = arrayOf("-opt", "--optimize"),
-        help = "Enable svg optimization before parsing to Jetpack Compose icon. The optimization process uses the " +
-            "following programs: svgo, svg2vectordrawable, avocado from NPM Registry",
+        help = "Enable SVG/AVG optimization before parsing to Jetpack Compose icon. The optimization process uses " +
+            "the following programs: svgo, avocado from NPM Registry",
     ).boolean().default(true)
 
     @Deprecated("Context provider is a wrong naming for what this is supposed to do.")

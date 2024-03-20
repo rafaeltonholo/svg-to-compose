@@ -40,7 +40,7 @@ sealed class Optimizer {
 
     /**
      * Represents the version flag argument used to verify
-     * the installation of the optimizer's software dependency
+     * the installation of the optimizers' software dependency
      * by running the command with this flag.
      *
      * By default, this flag is set to "--version".

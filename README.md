@@ -1,5 +1,5 @@
 # SVG to Compose
-A command-line tool for convert SVG or an Android Vector Drawable (AVD) to Android Jetpack Compose Icons.
+A command-line tool to convert SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.
 
 ## Table of content
 - [Why?](#why)

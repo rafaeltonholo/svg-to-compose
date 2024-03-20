@@ -117,13 +117,13 @@ sealed class ImageParser(
     /**
      * [SvgParser] is a subclass of [ImageParser].
      *
-     * This class is responsible for parsing SVG file type and creates
+     * This class is responsible for parsing an SVG file type and creates
      * all the required information to generate a Jetpack Compose Icon.
      *
      * @constructor Takes a FileSystem parameter.
      *
-     * @param fileSystem Main tool that helps to manage files and allows
-     * to read data from the file system.
+     * @param fileSystem The Main tool that helps to manage files and allows
+     *  reading data from the file system.
      */
     class SvgParser(
         fileSystem: FileSystem,
@@ -234,7 +234,7 @@ sealed class ImageParser(
          * Parses an AVG file into an [IconFileContents] object.
          *
          * The parsing procedure can be summed up as follows:
-         * 1. Reads the content of the file.
+         * 1. Read the content of the file.
          * 2. Parses the file content into a [AvgElementNode] object.
          * 3. Converts the parsed AVG element nodes into [ImageVectorNode] to obtain
          * a list of nodes.
@@ -332,7 +332,7 @@ sealed class ImageParser(
         ): String {
             if (::parsers.isInitialized.not()) {
                 error(
-                    "Parsers not initialized. Call ImageParser(fileSystem) before calling ImageParser.parser()",
+                    "Parsers not initialized. Call ImageParser(fileSystem) before calling ImageParser.parse()",
                 )
             }
 
