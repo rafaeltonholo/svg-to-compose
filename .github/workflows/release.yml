@@ -1,13 +1,16 @@
 name: Release
 on:
-  push:
-    tags:
-      - v*.*.*
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
 env:
   file-name: s2c
 
 jobs:
   create-release-binaries:
+    if: github.event.pull_request.merged == true
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
@@ -112,6 +115,7 @@ jobs:
           if-no-files-found: error
 
   upload-to-release:
+    if: github.event.pull_request.merged == true
     permissions:
       contents: write
       deployments: write
@@ -147,8 +151,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: v${{ steps.getversion.outputs.version }}
-          draft: true # For test purposes. Should be false
-          prerelease: true # For test purposes. Should be false
+          draft: true
           files: |
             artifacts/s2c-linuxX64-binaries.zip
             artifacts/s2c-macosArm64-binaries.zip
