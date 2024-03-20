@@ -177,9 +177,12 @@ class Processor(
             printEmpty()
             throw ExitProgramException(
                 errorCode = ErrorCode.OutputNotDirectoryError,
-                message = """❌ ERROR: when the input is a directory, the output MUST be directory too.
-                            |If you pointed to a directory path, make sure the output directory already exists.
-                            |
+                message = """
+                    |❌ ERROR: The specified output path is not a directory. 
+                    |When the input is a directory, the output MUST also be a directory.
+                    |
+                    |If you pointed to a directory path, make sure the output directory already exists.
+                    |
                 """.trimMargin(),
             )
         }
