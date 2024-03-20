@@ -104,9 +104,13 @@ sealed class Optimizer {
             command(program = command) {
                 args(*args)
                 trim = true
-            }.also { (exitCode, _) ->
+            }.also { (exitCode, output) ->
                 if (exitCode != 0) {
-                    throw OptimizationException(errorCode)
+                    throw OptimizationException(
+                        errorCode,
+                        message = "Optimization failed with exit code $exitCode: " +
+                            (output.stdout ?: output.stderr ?: "No error message provided"),
+                    )
                 }
             }
         } catch (e: IllegalStateException) {
