@@ -303,7 +303,7 @@ sealed class ImageParser(
                 ANDROID_VECTOR_EXTENSION to AndroidVectorParser(fileSystem),
             )
 
-            return ImageParser // returning Companion to enable chain call.
+            return this // returning Companion to enable chain call.
         }
 
         /**

@@ -141,7 +141,7 @@ class Processor(
      * @return The validated output path with a guaranteed Kotlin file extension (.kt).
      */
     private fun ensureKotlinFileExtension(outputPath: Path): Path {
-        return if (outputPath.extension.isEmpty() || outputPath.extension != ".kt") {
+        return if (outputPath.extension.isEmpty() || outputPath.extension.lowercase() != ".kt") {
             output("Output path is missing kotlin file extension. Appending it to the output.")
             "$outputPath.kt".toPath()
         } else {
