@@ -1,5 +1,9 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.svg.SvgElementNode
+import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.svg.asNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.error.ExitProgramException
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -7,18 +11,23 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class ImageVectorNodeTest {
+    private val root = SvgElementNode(
+        parent = XmlRootNode(children = mutableSetOf()),
+        children = mutableSetOf(),
+        attributes = mutableMapOf(),
+    )
+
     @Test
     fun `ensure for any subsequent coordinate pair after MoveTo is parsed to LineTo`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "M85.122 64.795 -12.34 88.6",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M85.122 64.795 -12.34 88.6",
+            ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -30,16 +39,15 @@ class ImageVectorNodeTest {
     @Test
     fun `ensure repeat last command when no command letter was found`() {
         // Arrange
-        val path = SvgNode.Path(
-            d = "M85.122 64.795 -12.34 88.6 -32.34 53.6A 5 3 20 0 1 8 8 5 3 20 0 1 8 8 " +
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M85.122 64.795 -12.34 88.6 -32.34 53.6A 5 3 20 0 1 8 8 5 3 20 0 1 8 8 " +
                     "c 0,0 143,3 185,-181 2,-11 -1,-20 1,-33",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+            ),
         )
         // Act
-        val node = path.asNode()
+        val node = path.asNode() as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -57,12 +65,11 @@ class ImageVectorNodeTest {
     fun `should throw ExitProgramException when a not supported command is found on SVG path`() {
         // Arrange
         val command = "X"
-        val path = SvgNode.Path(
-            d = "${command}85.122 64.795 -12.34 88.6",
-            fill = null,
-            opacity = null,
-            fillOpacity = null,
-            style = null,
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "${command}85.122 64.795 -12.34 88.6",
+            ),
         )
         // Act
         val exception = assertFailsWith<ExitProgramException> {

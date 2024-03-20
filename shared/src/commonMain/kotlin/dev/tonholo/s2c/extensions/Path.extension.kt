@@ -3,9 +3,11 @@ package dev.tonholo.s2c.extensions
 import okio.FileSystem
 import okio.Path
 
+expect val Path.fileSystem: FileSystem
+
 val Path.isDirectory: Boolean
     get() {
-        val metadata = FileSystem.SYSTEM.metadataOrNull(this)
+        val metadata = fileSystem.metadataOrNull(this)
         return metadata != null && metadata.isDirectory ||
             name.matches(".*\\.[a-zA-Z0-9]*$".toRegex()).not()
     }

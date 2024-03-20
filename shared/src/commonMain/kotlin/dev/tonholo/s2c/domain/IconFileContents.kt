@@ -2,9 +2,9 @@ package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
-import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugEndSection
-import dev.tonholo.s2c.logger.debugSection
+import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.logger.verboseSection
+import kotlin.math.max
 
 val defaultImports = setOf(
     "androidx.compose.ui.graphics.Color",
@@ -18,7 +18,8 @@ val previewImports = setOf(
     "androidx.compose.foundation.Image",
     "androidx.compose.foundation.layout.Arrangement",
     "androidx.compose.foundation.layout.Column",
-    "androidx.compose.foundation.layout.size",
+    "androidx.compose.foundation.layout.height",
+    "androidx.compose.foundation.layout.width",
     "androidx.compose.runtime.Composable",
     "androidx.compose.ui.Alignment",
     "androidx.compose.ui.Modifier",
@@ -30,7 +31,7 @@ val groupImports = setOf(
     "androidx.compose.ui.graphics.vector.group",
 )
 
-val materialContextProviderImport = setOf(
+val materialReceiverTypeImport = setOf(
     "androidx.compose.material.icons.Icons"
 )
 
@@ -43,36 +44,35 @@ data class IconFileContents(
     val viewportWidth: Float = width,
     val viewportHeight: Float = height,
     val nodes: List<ImageVectorNode>,
-    val contextProvider: String? = null,
+    val receiverType: String? = null,
     val addToMaterial: Boolean = false,
     val noPreview: Boolean = false,
     val makeInternal: Boolean = false,
     val imports: Set<String> = defaultImports,
 ) {
-    fun materialize(): String {
-        debugSection("Generating file")
-        debug(
+    fun materialize(): String = verboseSection("Generating file") {
+        verbose(
             """Parameters:
-                   |    package=$pkg
-                   |    icon_name=$iconName
-                   |    theme=$theme
-                   |    width=$width
-                   |    height=$height
-                   |    viewport_width=$viewportWidth
-                   |    viewport_height=$viewportHeight
-                   |    nodes=${nodes.map { it.materialize() }}
-                   |    context_provider=$contextProvider
-                   |    imports=$imports
-                   |    
+           |    package=$pkg
+           |    icon_name=$iconName
+           |    theme=$theme
+           |    width=$width
+           |    height=$height
+           |    viewport_width=$viewportWidth
+           |    viewport_height=$viewportHeight
+           |    nodes=${nodes.map { it.materialize() }}
+           |    receiver_type=$receiverType
+           |    imports=$imports
+           |
             """.trimMargin()
         )
 
         val iconPropertyName = when {
-            contextProvider?.isNotEmpty() == true -> {
+            receiverType?.isNotEmpty() == true -> {
                 // as we add the dot in the next line, remove it in case the user adds a leftover dot
                 // to avoid compile issues.
-                contextProvider.removeSuffix(".")
-                "$contextProvider.${iconName.pascalCase()}"
+                receiverType.removeSuffix(".")
+                "$receiverType.${iconName.pascalCase()}"
             }
 
             addToMaterial -> "Icons.Filled.${iconName.pascalCase()}"
@@ -101,7 +101,9 @@ data class IconFileContents(
             |            Image(
             |                imageVector = $iconPropertyName,
             |                contentDescription = null,
-            |                modifier = Modifier.size(100.dp),
+            |                modifier = Modifier
+            |                    .width((${max(width, viewportWidth)}).dp)
+            |                    .height((${max(height, viewportHeight)}).dp),
             |            )
             |        }
             |    }
@@ -112,7 +114,7 @@ data class IconFileContents(
 
         val visibilityModifier = if (makeInternal) "internal " else ""
 
-        return """
+        return@verboseSection """
             |package $pkg
             |
             |${imports.sorted().joinToString("\n") { "import $it" }}
@@ -136,8 +138,6 @@ data class IconFileContents(
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |
-        """.trimMargin().also {
-            debugEndSection()
-        }
+        """.trimMargin()
     }
 }

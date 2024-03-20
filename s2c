@@ -36,7 +36,10 @@ fn_print_verbose() {
 }
 
 fn_print_error() {
-  echo "E: $1"
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!"
+  echo "! CRITICAL FAILURE: $1"
+  echo "!!!!!!!!!!!!!!!!!!!"
 }
 
 fn_print_info() {
@@ -120,24 +123,30 @@ fn_main() {
     bin_folder=$original_bin_folder
     fn_print_info "⬇️ Downloading binaries from Github"
     fn_fetch_latest_version
-    mkdir bin
+    mkdir -p $bin_folder
     binary_base_filename="s2c-${PLATFORM}-binaries"
     binary_filename="${binary_base_filename}.zip"
     fn_print_verbose "Binary name=$binary_filename"
 
     download_url="https://github.com/rafaeltonholo/svg-to-compose/releases/download/$VERSION/$binary_filename"
     fn_print_debug "Downloading from $download_url"
-    command curl -L "$download_url" \
-                 --output "bin/$binary_filename"
+    if ! command curl -L "$download_url" \
+                 --output "$bin_folder/$binary_filename"; then
+      fn_print_error "Error downloading binaries."
+      exit 1
+    fi
 
     fn_print_info "🔓 Unzipping binaries"
-    command unzip -qq "bin/$binary_filename" -d "bin"
+    if ! command unzip -qq "$bin_folder/$binary_filename" -d $bin_folder; then
+      fn_print_error "Error unzipping binaries."
+      exit 1
+    fi
 
     fn_print_info "🧹 Cleaning up zip files"
-    cp -vr bin/$binary_base_filename/* bin/
-    rm -r "bin/$binary_base_filename" "bin/$binary_filename"
+    cp -vr $bin_folder/$binary_base_filename/* $bin_folder/
+    rm -r "${bin_folder:?}/${binary_base_filename}" "${bin_folder:?}/${binary_filename}"
     fn_print_debug "Giving execution permission to binaries"
-    chmod +x "bin/s2c.$program_ext"
+    chmod +x "$bin_folder/s2c.$program_ext"
 
     fn_print_info "✅ Binaries download completed."
   elif [[ $must_build == true ]]; then
@@ -155,11 +164,20 @@ fn_main() {
     command ./gradlew "$build_command"
   fi
 
+  args=("$@")
   if [[ $MUST_UPGRADE == true ]]; then
-    exit 0
+    upgrade_flag="--upgrade"
+    # Iterate through the array and remove matching elements, preserving indices:
+    for i in "${!args[@]}"; do
+        if [[ "${args[i]}" = "$upgrade_flag" ]]; then
+            unset 'args[i]'
+            # Shift remaining elements to fill the gap:
+            args=("${args[@]}")
+        fi
+    done
   fi
 
-  command "$bin_folder"/s2c.$program_ext "$@"
+  command "$bin_folder"/s2c.$program_ext "${args[@]}"
 }
 
 fn_main "$@"

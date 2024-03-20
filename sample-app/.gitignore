@@ -1,0 +1,6 @@
+/build
+.idea
+# Ignore the icon path since this project is intended
+# just for checking if all icons are correctly rendered
+# on Preview tab.
+/src/main/kotlin/dev/tonholo/sampleApp/ui/icon

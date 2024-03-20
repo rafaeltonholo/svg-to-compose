@@ -1,10 +1,11 @@
-
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 
 plugins {
@@ -76,11 +77,19 @@ kotlin {
         }
     }
 
+    // Enabled only for debugging purposes.
+    // Not meant to be a target.
+    jvm()
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.com.squareup.okio)
-            implementation(libs.xmlutil.core)
-            implementation(libs.xmlutil.serialization)
+            implementation(libs.com.fleeksoft.ksoup)
+            implementation(kotlin("reflect"))
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
 
         nativeMain.dependencies {
@@ -125,7 +134,11 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<Detekt>().configureEach {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
     exclude {
-        it.file.absolutePath.contains("build")
+        with(it.file.absolutePath) {
+            contains("build") ||
+                contains("sampleApp") ||
+                contains("jvm") // JVM is not officially supported. It is only added to enable debugging.
+        }
     }
 }
 tasks.withType<DetektCreateBaselineTask>().configureEach {
@@ -145,4 +158,9 @@ tasks.withType<KotlinTest>().configureEach {
         showStackTraces = false
         showStandardStreams = true
     }
+}
+
+@OptIn(InternalKotlinGradlePluginApi::class)
+tasks.withType<KotlinJvmRun> {
+    isIgnoreExitValue = true
 }

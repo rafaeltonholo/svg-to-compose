@@ -2,6 +2,7 @@ package dev.tonholo.s2c.optimizer
 
 import AppConfig.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.command.command
+import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
@@ -9,29 +10,85 @@ import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.optimizer.svgo.SvgoConfigContent
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 
-sealed interface Optimizer {
-    val command: String
-    val installCommand: String
-        get() = command
-    val allowedExtension: String
-    val errorMessage: String
-        get() = "⚠️ $command is required. Use npm -g install $installCommand to install."
+sealed class Optimizer {
+    /**
+     * Represents the external command that will be used
+     * for optimization.
+     */
+    abstract val command: String
 
+    /**
+     * Represents the extension of file types that the
+     * optimizer can process.
+     */
+    abstract val allowedExtension: String
+
+    /**
+     * Dynamically generates an error message in the case
+     * that a required command is not installed.
+     *
+     * The error message instructs the user on how to install
+     * the missing command.
+     */
+    private val errorMessage: String
+        get() = "⚠️ $command is required. Use npm -g install $command to install."
+
+    /**
+     * Represents the version flag argument used to verify
+     * the installation of the optimizers' software dependency
+     * by running the command with this flag.
+     *
+     * By default, this flag is set to "--version".
+     */
+    protected open val versionFlag: String = "--version"
+
+    /**
+     * Checks if the required software for this optimizer is
+     * installed on the current system.
+     *
+     * It runs the command for the optimizer with the [versionFlag]
+     * as a argument and checks the exit code of the process.
+     *
+     * An exit code of `0` means that the command is available and
+     * thus, the dependency is verified.
+     *
+     * @return A [Boolean], `true` if the required command is available
+     * and `false` if it's not.
+     */
     fun verifyDependency() =
         command(program = command) {
-            args("--version")
+            args(versionFlag)
             showStdout = false
             showStderr = false
         }.also { (code, _) ->
             verbose("exit code = $code")
         }.exitCode == 0
 
-    fun run(file: Path)
-    fun runOptimization(
+    /**
+     * Runs the optimization process on the given [file],
+     * and returns a new [Path] of the optimized file.
+     *
+     * @param file The file to be optimized.
+     * @return The path of the newly optimized file.
+     */
+    abstract fun run(file: Path): Path
+
+    /**
+     * Execute the optimization process by using external
+     * software dependency.
+     *
+     * @param errorCode The error code used to identify
+     * which optimizer failed to run.
+     * @param args The optimizer arguments.
+     * @throws OptimizationException when the optimization
+     * fails to run.
+     */
+    protected fun runOptimization(
         errorCode: ErrorCode,
         vararg args: String,
     ) {
@@ -47,9 +104,13 @@ sealed interface Optimizer {
             command(program = command) {
                 args(*args)
                 trim = true
-            }.also { (exitCode, _) ->
+            }.also { (exitCode, output) ->
                 if (exitCode != 0) {
-                    throw OptimizationException(errorCode)
+                    throw OptimizationException(
+                        errorCode,
+                        message = "Optimization failed with exit code $exitCode: " +
+                            (output.stdout ?: output.stderr ?: "No error message provided"),
+                    )
                 }
             }
         } catch (e: IllegalStateException) {
@@ -58,13 +119,19 @@ sealed interface Optimizer {
         output("✅ Finished $command")
     }
 
+    /**
+     * Optimize SVG files by using an external CLI tool called SVGO.
+     *
+     * @see <a href="https://svgo.dev/">SVGO documentation</a>
+     */
     data class SvgoOptimizer(
         val fileSystem: FileSystem,
-    ) : Optimizer {
+    ) : Optimizer() {
         override val command: String = "svgo"
-        override val allowedExtension: String = ".svg"
-        override fun run(file: Path) {
-            val svgoConfigFilename = "svgo-config.js"
+        override val allowedExtension: String = FileType.Svg.extension
+
+        override fun run(file: Path): Path {
+            val svgoConfigFilename = "svgo-config.mjs"
             val tempFolder = S2C_TEMP_FOLDER.toPath()
             val svgoConfigFile = tempFolder / svgoConfigFilename
 
@@ -73,76 +140,71 @@ sealed interface Optimizer {
 
             if (!fileSystem.exists(svgoConfigFile)) {
                 output("⚙️ writing svgo config file")
-                val svgoConfig = """
-                    |module.exports = {
-                    |  plugins: [
-                    |      {
-                    |          name: "convertPathData",
-                    |          params: {
-                    |              leadingZero: false,
-                    |              floatPrecision: 2,
-                    |          }
-                    |      }
-                    |  ]
-                    |}
-                """.trimMargin()
                 fileSystem.write(svgoConfigFile) {
-                    writeUtf8(svgoConfig)
+                    writeUtf8(SvgoConfigContent)
                 }
             }
 
+            val optimizedFile = "$S2C_TEMP_FOLDER/target.optimized.svg".toPath()
+
             runOptimization(
                 errorCode = ErrorCode.SvgoOptimizationError,
-                "$S2C_TEMP_FOLDER/target.svg",
+                file.toString(),
                 "--config=$S2C_TEMP_FOLDER/$svgoConfigFilename",
                 "-o",
-                "$S2C_TEMP_FOLDER/target.optimized.svg",
+                optimizedFile.toString(),
             )
+
+            return optimizedFile
         }
     }
 
-    data object S2vOptimizer : Optimizer {
-        override val command: String = "s2v"
-        override val installCommand: String = "svg2vectordrawable"
-        override val allowedExtension: String = ".svg"
-
-        override fun run(file: Path) {
-            runOptimization(
-                errorCode = ErrorCode.S2vOptimizationError,
-                "-p",
-                "2",
-                "-i",
-                "$S2C_TEMP_FOLDER/target.optimized.svg",
-                "-o",
-                "$S2C_TEMP_FOLDER/target.xml",
-            )
-        }
-    }
-
-    data object AvocadoOptimizer : Optimizer {
+    /**
+     * Optimize AVG files by using an external CLI tool called Avocado.
+     * Similar to SVGO, but for Android Vector Graphics files.
+     *
+     * @see <a href="https://github.com/alexjlockwood/avocado">Avocado documentation</a>
+     */
+    data object AvocadoOptimizer : Optimizer() {
         override val command: String = "avocado"
-        override val allowedExtension: String = ".xml"
+        override val allowedExtension: String = FileType.Avg.extension
 
-        override fun run(file: Path) {
+        override fun run(file: Path): Path {
             runOptimization(
                 errorCode = ErrorCode.AvocadoOptimizationError,
-                "$S2C_TEMP_FOLDER/target.xml"
+                file.toString(),
             )
+            return file
         }
     }
 
     class Factory(
         fileSystem: FileSystem,
     ) {
-        private val svgOptimizers = setOf(
+        /**
+         * Set of optimizers that will be used specifically for SVG files.
+         */
+        private val svgOptimizers: Set<Optimizer> = setOf(
             SvgoOptimizer(fileSystem),
-            S2vOptimizer,
         )
-        private val xmlOptimizers = setOf(
+
+        /**
+         * Set of optimizers that will be used specifically for AVG files.
+         */
+        private val avgOptimizers: Set<Optimizer> = setOf(
             AvocadoOptimizer,
         )
 
-        fun verifyDependency() {
+        /**
+         * Verify the availability of dependencies required by the optimizers.
+         *
+         * @param hasSvg [Boolean] flag indicating whether to check for SVG-related
+         * dependencies.
+         * @param hasAvg [Boolean] flag indicating whether to check for AVG-related
+         * dependencies.
+         * @throws MissingDependencyException when an optimizer dependency is missing
+         */
+        fun verifyDependency(hasSvg: Boolean, hasAvg: Boolean) {
             var hasMissingDependency = false
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
@@ -152,16 +214,21 @@ sealed interface Optimizer {
                 }
             }
 
-            svgOptimizers.forEach {
-                verbose("Verifying $it")
-                it.verifyDependency().also { hasDependency ->
-                    showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
+            if (hasSvg) {
+                svgOptimizers.forEach {
+                    verbose("Verifying $it")
+                    it.verifyDependency().also { hasDependency ->
+                        showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
+                    }
                 }
             }
-            xmlOptimizers.forEach {
-                verbose("Verifying $it")
-                it.verifyDependency().also { hasDependency ->
-                    showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
+
+            if (hasAvg) {
+                avgOptimizers.forEach {
+                    verbose("Verifying $it")
+                    it.verifyDependency().also { hasDependency ->
+                        showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
+                    }
                 }
             }
 
@@ -174,22 +241,26 @@ sealed interface Optimizer {
             }
         }
 
-        fun optimize(file: Path) {
-            if (file.extension == ".svg") {
-                output("🏎️  Optimizing SVG")
-                printEmpty()
-                svgOptimizers.forEach {
-                    it.run(file)
-                    printEmpty()
+        /**
+         * Checks the type of file (SVG or AVG) and invokes the correct
+         * optimization process using the appropriate optimization tools.
+         *
+         * @param file A [Path] object that represents the file which
+         * optimization process is to be performed upon.
+         * @return The [Path] object of the optimized file.
+         */
+        fun optimize(file: Path): Path {
+            output("🏎️  Optimizing ${file.extension}")
+            printEmpty()
+            return if (file.extension == FileType.Svg.extension) {
+                svgOptimizers.fold(file) { currentFile, optimizer ->
+                    optimizer.run(currentFile)
                 }
             } else {
-                output("⚠️ XML detected, skipping SVG optimization")
-            }
-
-            output("🏎️  Optimizing XML")
-            xmlOptimizers.forEach {
-                printEmpty()
-                it.run(file)
+                avgOptimizers.fold(file) { currentFile, optimizer ->
+                    optimizer.run(currentFile)
+                }
+            }.also {
                 printEmpty()
             }
         }

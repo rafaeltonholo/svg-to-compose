@@ -1,18 +1,17 @@
 [versions]
 kotlin = "1.9.23"
 clikt = "4.2.2"
-xmlutil = "0.86.3"
 okio = "3.9.0"
 detekt = "1.23.5"
 build-konfig = "0.15.1"
+ksoup = "0.1.2"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
-xmlutil-core = { group = "io.github.pdvrieze.xmlutil", name = "core", version.ref = "xmlutil" }
-xmlutil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlutil" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 com-codingfeline-buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "build-konfig" }
+com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
