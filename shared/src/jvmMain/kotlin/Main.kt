@@ -18,7 +18,7 @@ import kotlin.system.exitProcess
 fun main() {
     AppConfig.debug = false
     val suffix = "v4"
-    val (pkg, path, output) = SampleFile.Svg.Brasil(
+    val (pkg, path, output) = SampleFile.Svg.DashArrayRect(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
         suffix,
     )
@@ -144,6 +144,14 @@ private sealed class SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/rects.svg",
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
+        )
+        class DashArrayRect(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/rects/dash-array-rect.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayRect.$suffix.kt",
         )
 
         class ComplexRects(

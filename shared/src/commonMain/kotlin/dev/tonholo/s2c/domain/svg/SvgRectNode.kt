@@ -175,7 +175,7 @@ private fun SvgRectNode.createRoundedCornerRect(
             xCornerSize,
             yCornerSize,
             0,
-            0,
+            false,
             true,
             -xCornerSize,
             -yCornerSize,

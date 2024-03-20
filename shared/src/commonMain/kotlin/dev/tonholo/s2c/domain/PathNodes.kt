@@ -192,10 +192,29 @@ sealed class PathNodes(
         command = PathCommand.ArcTo,
         minified = minified,
     ) {
+        /**
+         * rx
+         */
         val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
+
+        /**
+         * ry
+         */
         val b = values[1].toFloat()
+
+        /**
+         * x-axis-rotation
+         */
         val theta = values[2].toFloat()
+
+        /**
+         * large-arc-flag
+         */
         val isMoreThanHalf = values[3] == "1"
+
+        /**
+         * sweep flag
+         */
         val isPositiveArc = values[4] == "1"
         val x = values[5].toFloat()
         val y = values[6]

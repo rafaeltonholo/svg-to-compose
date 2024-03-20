@@ -98,7 +98,7 @@ private fun MutableList<PathNodes>.addDash(
     if (atTheEdge) {
         addDashOnTheEdge(diff, direction, dashOrGap, isMinified, strokeWidth)
     } else {
-        addDashOutOfEdge(direction, dashOrGap, isMinified)
+        addDashWithinEdges(direction, dashOrGap, isMinified)
     }
 }
 
@@ -114,7 +114,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
             StrokeDashDrawDirection.DOWN -> dashOrGap - diff
             StrokeDashDrawDirection.LEFT -> dashOrGap - diff
             StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
-            else -> 0f
+            else -> -(dashOrGap - diff)
         }
         add(
             pathNode(command = direction.edgeCommand) {
@@ -146,15 +146,17 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
             StrokeDashDrawDirection.DOWN -> rest + strokeWidth / 2f
             StrokeDashDrawDirection.LEFT -> -(rest + strokeWidth / 2f)
             StrokeDashDrawDirection.UP -> -(rest + strokeWidth / 2f)
-            else -> "unknown"
+            else -> null
         }
-        add(
-            pathNode(command = direction.command) {
-                args(drawArg)
-                isRelative = true
-                minified = isMinified
-            }
-        )
+        drawArg?.let {
+            add(
+                pathNode(command = direction.command) {
+                    args(it)
+                    isRelative = true
+                    minified = isMinified
+                }
+            )
+        }
     } else {
         val drawArg = when (direction) {
             StrokeDashDrawDirection.RIGHT -> -(dashOrGap + strokeWidth / 2f)
@@ -172,7 +174,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
     }
 }
 
-private fun MutableList<PathNodes>.addDashOutOfEdge(
+private fun MutableList<PathNodes>.addDashWithinEdges(
     direction: StrokeDashDrawDirection,
     dashOrGap: Float,
     isMinified: Boolean,
