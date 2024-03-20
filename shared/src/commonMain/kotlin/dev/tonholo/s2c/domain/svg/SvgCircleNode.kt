@@ -134,18 +134,18 @@ private fun SvgCircleNode.createSimpleRect(
  * The returned group includes a list of commands to draw the dashed circle
  * and its fill if any.
  */
-fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = ImageVectorNode.Group(
+private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = ImageVectorNode.Group(
     clipPath = null,
     commands = buildList {
         val strokeDashArray = strokeDashArray ?: error("stroke-dasharray should not be null in this case.")
         val fill = fill
-        // dashed circle is not supported and because of that we create two paths for each dashed circle.
-        // 1st path is for the filling, in case it has one.
+        // dashed circle is not supported, and because of that, we create two paths for each dashed circle.
+        // the 1st path is for the filling, in case it has one.
         if (fill != null) {
             add(
                 createSimpleRect(
                     minified,
-                    // The radius is overridden taking in consideration the size of the stroke width
+                    // The radius is overridden, taking in consideration the size of the stroke width
                     radius = radius - ((strokeWidth ?: 1f) / 2f),
                     override = ImageVectorNode.Path.Params(
                         fill = fill.value,
@@ -155,7 +155,7 @@ fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = Image
                 ),
             )
         }
-        // 2nd path are the dashes.
+        // 2nd path is the dashes.
         add(
             ImageVectorNode.Path(
                 params = ImageVectorNode.Path.Params(
@@ -187,11 +187,11 @@ fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = Image
  * nodes, removing the comments and inlining the path parameters.
  * @return A list of [PathNodes] representing the dashed circle.
  */
-fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean): List<PathNodes> {
+private fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean): List<PathNodes> {
     val radius = radius
     val circumference = 2 * PI.toFloat() * radius
     val dashSum = dashes.sum()
-    // Calculate number of segments required to cover the circumference with the given dashes
+    // Calculate the number of segments required to cover the circumference with the given dashes
     val segments = (circumference / dashSum).roundToInt() * dashes.size
     val ratios = dashes.map { it / circumference }
     val strokeWidth = strokeWidth ?: 1f
@@ -229,7 +229,7 @@ fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean):
             // The inner arc should take in consideration the `stroke-width`
             // property to draw, so the radius removes it.
             // These are the points on the circumference, taking in consideration the
-            // `stroke-width`, that the inner arc starts and ends.
+            // `stroke-width` that the inner arc starts and ends.
             val innerRadiusStartPoint = circumferencePointFromAngle(
                 cx,
                 cy,
