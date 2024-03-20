@@ -36,7 +36,11 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
                 String::class -> value
                 Float::class -> value?.toFloatOrNull()
                 Double::class -> value?.toDoubleOrNull()
-                else -> null // throw an unsupported type?
+                else -> if (isNullable) {
+                    null
+                } else {
+                    error("Required attribute '$key' on tag '${element.name}' has an invalid value '$value'")
+                }
             } as TAttribute,
         )
     }
