@@ -8,7 +8,9 @@ reviews:
   collapse_walkthrough: false
   path_filters:
     - "!**/sample/**"
+    - "!**/samples/**"
     - "!**/sampleApp/**"
+    - "!**/sample-app/**"
   auto_review:
     enabled: true
     ignore_title_keywords:
