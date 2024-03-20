@@ -22,6 +22,7 @@ import kotlin.jvm.JvmInline
  */
 interface ComposeProperty {
     val value: String
+
     /**
      * Provides a way to get the canonical string representation of the
      * [ComposeProperty] implementation.

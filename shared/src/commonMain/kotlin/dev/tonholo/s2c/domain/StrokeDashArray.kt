@@ -110,12 +110,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
     strokeWidth: Int,
 ) {
     if (diff > 0) {
-        val partialDash = when (direction) {
-            StrokeDashDrawDirection.DOWN -> dashOrGap - diff
-            StrokeDashDrawDirection.LEFT -> dashOrGap - diff
-            StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
-            else -> -(dashOrGap - diff)
-        }
+        val partialDash = calculatePartialDashLength(direction, dashOrGap, diff)
         add(
             pathNode(command = direction.edgeCommand) {
                 args(partialDash)
@@ -172,6 +167,17 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
             }
         )
     }
+}
+
+private fun calculatePartialDashLength(
+    direction: StrokeDashDrawDirection,
+    dashOrGap: Float,
+    diff: Float,
+) = when (direction) {
+    StrokeDashDrawDirection.DOWN -> dashOrGap - diff
+    StrokeDashDrawDirection.LEFT -> dashOrGap - diff
+    StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
+    else -> -(dashOrGap - diff)
 }
 
 private fun MutableList<PathNodes>.addDashWithinEdges(
