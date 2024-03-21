@@ -6,10 +6,13 @@ import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
 import com.fleeksoft.ksoup.parser.Parser
 import dev.tonholo.s2c.domain.FileType
+import dev.tonholo.s2c.domain.avg.AvgAttrNode
 import dev.tonholo.s2c.domain.avg.AvgClipPath
 import dev.tonholo.s2c.domain.avg.AvgElementNode
+import dev.tonholo.s2c.domain.avg.AvgGradientItemNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
 import dev.tonholo.s2c.domain.avg.AvgPathNode
+import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgElementNode
@@ -138,6 +141,23 @@ inline fun createAvgElement(
         AvgGroupNode.TAG_NAME -> AvgGroupNode(
             parent = parent,
             children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        AvgAttrNode.TAG_NAME -> AvgAttrNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        AvgGradient.TAG_NAME -> AvgGroupNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        AvgGradientItemNode.TAG_NAME -> AvgGradientItemNode(
+            parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
 

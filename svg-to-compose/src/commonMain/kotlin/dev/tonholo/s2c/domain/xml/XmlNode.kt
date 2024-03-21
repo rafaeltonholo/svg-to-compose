@@ -35,10 +35,14 @@ abstract class XmlChildNode : XmlNode {
 
     abstract override fun toString(): String
 
-    fun toJsString(): String = buildString {
+    open fun toJsString(extra: (StringBuilder.() -> Unit)? = null): String = buildString {
         append("{")
         append("\"name\":\"$tagName\", ")
-        append("\"attributes\":$attributes.toJsString()")
+        append("\"attributes\":${attributes.toJsString()}")
+        if (extra != null) {
+            append(", ")
+            extra()
+        }
         append("}")
     }
 }
@@ -58,14 +62,18 @@ open class XmlElementNode(
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
 ) : XmlChildNode(), XmlParentNode {
-    override fun toString(): String = buildString {
-        append("{name:\"$tagName\",")
-        append(" attributes: ${attributes.toJsString()}, ")
-        append("children: ${children.toJsString()}, ")
-        // Swallow parent toString to avoid infinity toString loop.
-        append("parent:\"${parent.tagName}\"")
-        append("}")
-    }
+    override fun toString(): String = toJsString()
+
+    override fun toJsString(extra: (StringBuilder.() -> Unit)?): String =
+        super.toJsString {
+            append("children: ${children.toJsString()}, ")
+            // Swallow parent toString to avoid infinity toString loop.
+            append("parent:\"${parent.tagName}\"")
+            if (extra != null) {
+                append(", ")
+                extra()
+            }
+        }
 }
 
 fun Map<String, String>.toJsString() =
