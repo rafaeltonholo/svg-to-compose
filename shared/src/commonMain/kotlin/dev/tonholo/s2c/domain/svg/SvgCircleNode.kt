@@ -4,6 +4,7 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
+import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
@@ -77,10 +78,10 @@ private fun SvgCircleNode.createSimpleRect(
     override: ImageVectorNode.Path.Params? = null,
 ) = ImageVectorNode.Path(
     params = override ?: ImageVectorNode.Path.Params(
-        fill = fill.orDefault().value, // Circle has a filling by default.
+        fill = fill.orDefault().value.toBrush(), // Circle has a filling by default.
         fillAlpha = fillOpacity,
         pathFillType = fillRule,
-        stroke = stroke?.value,
+        stroke = stroke?.value?.toBrush(),
         strokeAlpha = strokeOpacity,
         strokeLineCap = strokeLineCap,
         strokeLineJoin = strokeLineJoin,
@@ -148,7 +149,7 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
                     // The radius is overridden, taking in consideration the size of the stroke width
                     radius = radius - ((strokeWidth ?: 1f) / 2f),
                     override = ImageVectorNode.Path.Params(
-                        fill = fill.value,
+                        fill = fill.value.toBrush(),
                         fillAlpha = fillOpacity,
                         pathFillType = fillRule,
                     )
@@ -161,7 +162,7 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
                 params = ImageVectorNode.Path.Params(
                     // as the dash is a path now, all the stroke parameters
                     // are used inside the fill parameters instead.
-                    fill = stroke.orDefault().value,
+                    fill = stroke.orDefault().value.toBrush(),
                     fillAlpha = strokeOpacity,
                 ),
                 wrapper = ImageVectorNode.NodeWrapper(

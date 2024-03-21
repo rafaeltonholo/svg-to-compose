@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
+import dev.tonholo.s2c.domain.compose.toBrush
 import kotlin.math.PI
 import kotlin.math.roundToInt
 import kotlin.test.Test
@@ -95,12 +96,12 @@ class SvgCircleNodeTests : BaseSvgTest() {
         assertEquals(expected = 2, actual = group.commands.size)
         val fill = group.commands[0]
         assertIs<ImageVectorNode.Path>(fill)
-        assertEquals(expected = "#0000FF", actual = fill.params.fill)
+        assertEquals(expected = "#0000FF".toBrush(), actual = fill.params.fill)
         assertNull(fill.params.stroke)
 
         val dashes = group.commands[1]
         assertIs<ImageVectorNode.Path>(dashes)
-        assertEquals(expected = "#FFFFFF", actual = dashes.params.fill)
+        assertEquals(expected = "#FFFFFF".toBrush(), actual = dashes.params.fill)
         assertNull(dashes.params.stroke)
     }
 
@@ -121,7 +122,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
         assertEquals(expected = 1, actual = group.commands.size)
         val dashes = group.commands[0]
         assertIs<ImageVectorNode.Path>(dashes)
-        assertEquals(expected = "#FF0000", actual = dashes.params.fill)
+        assertEquals(expected = "#FF0000".toBrush(), actual = dashes.params.fill)
         assertNull(dashes.params.stroke)
     }
 
