@@ -34,7 +34,7 @@ sealed interface ComposeBrush : ComposeType<String> {
                     ComposeColor.IMPORT,
                     "androidx.compose.ui.graphics.$NAME",
                 )
-            private const val INDENT_SIZE = 4
+            private const val INDENT_SIZE = 8
         }
 
         val colors: List<ComposeColor>
@@ -48,60 +48,88 @@ sealed interface ComposeBrush : ComposeType<String> {
         data class Linear(
             val start: ComposeOffset,
             val end: ComposeOffset,
-            val tileMode: GradientTileMode,
+            val tileMode: GradientTileMode?,
             override val colors: List<ComposeColor>,
             override val stops: List<Float>? = null,
         ) : Gradient {
             override val value: String = toCompose()
+            override val imports: Set<String> = buildSet {
+                addAll(super.imports)
+                // Don't need to add from the end property since both
+                // are from the same type.
+                addAll(start.imports)
+            }
 
             override fun toCompose(): String = buildString {
                 append(name)
                 appendLine(".linearGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
-                appendLine("start = $start,".indented(INDENT_SIZE))
-                appendLine("end = $end,".indented(INDENT_SIZE))
-                if (tileMode != GradientTileMode.Clamp) {
+                appendLine("start = ${start.toCompose()},".indented(INDENT_SIZE))
+                appendLine("end = ${end.toCompose()},".indented(INDENT_SIZE))
+                if (tileMode != null && tileMode != GradientTileMode.Clamp) {
                     appendLine("tileMode = $tileMode,".indented(INDENT_SIZE))
                 }
-                appendLine(")")
+                append(")".indented(INDENT_SIZE / 2))
             }
         }
 
         data class Radial(
-            val radius: Float,
-            val center: ComposeOffset,
-            val tileMode: GradientTileMode,
+            val radius: Float?,
+            val center: ComposeOffset?,
+            val tileMode: GradientTileMode?,
             override val colors: List<ComposeColor>,
             override val stops: List<Float>? = null,
         ) : Gradient {
             override val value: String = toCompose()
+            override val imports: Set<String> = if (center == null) {
+                super.imports
+            } else {
+                buildSet {
+                    addAll(super.imports)
+                    addAll(center.imports)
+                }
+            }
 
             override fun toCompose(): String = buildString {
                 append(name)
                 appendLine(".radialGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
-                appendLine("center = $center,".indented(INDENT_SIZE))
-                appendLine("radius = $radius,".indented(INDENT_SIZE))
-                if (tileMode != GradientTileMode.Clamp) {
+                if (center != null) {
+                    appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
+                }
+                if (radius != null) {
+                    appendLine("radius = ${radius}f,".indented(INDENT_SIZE))
+                }
+                if (tileMode != null && tileMode != GradientTileMode.Clamp) {
                     appendLine("tileMode = $tileMode,".indented(INDENT_SIZE))
                 }
-                appendLine(")")
+                append(")".indented(INDENT_SIZE / 2))
             }
         }
 
         data class Sweep(
-            val center: ComposeOffset,
+            val center: ComposeOffset?,
             override val colors: List<ComposeColor>,
             override val stops: List<Float>? = null,
         ) : Gradient {
             override val value: String = toCompose()
+            override val imports: Set<String> = if (center == null) {
+                super.imports
+            } else {
+                buildSet {
+                    addAll(super.imports)
+                    addAll(center.imports)
+                }
+            }
 
             override fun toCompose(): String = buildString {
                 append(name)
                 appendLine(".radialGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
-                appendLine("center = $center,".indented(INDENT_SIZE))
-                appendLine(")")
+                if (center != null) {
+                    appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
+                }
+                append(")".indented(INDENT_SIZE / 2))
             }
         }
     }
@@ -112,7 +140,17 @@ private fun StringBuilder.appendColors(
     colors: List<ComposeColor>,
     indent: Int,
 ) {
-    if (stops != null) {
+    if (stops.isNullOrEmpty()) {
+        appendLine("colors = listOf(".indented(indent))
+        colors
+            .asSequence()
+            // filter not valid Compose colors
+            .mapNotNull { it.toCompose() }
+            // add indentation
+            .map { "$it,".indented(indent * 2) }
+            .forEach(::appendLine)
+        appendLine("),".indented(indent))
+    } else {
         stops
             .zip(colors)
             .asSequence()
@@ -124,17 +162,7 @@ private fun StringBuilder.appendColors(
                 // map to vararg arguments
                 "${stop}f to $color,".indented(indent)
             }
-            .forEach(::append)
-    } else {
-        appendLine("colors = listOf(".indented(indent))
-        colors
-            .asSequence()
-            // filter not valid Compose colors
-            .mapNotNull { it.toCompose() }
-            // add indentation
-            .map { "$it,".indented(indent * 2) }
-            .forEach(::append)
-        appendLine("),".indented(indent))
+            .forEach(::appendLine)
     }
 }
 

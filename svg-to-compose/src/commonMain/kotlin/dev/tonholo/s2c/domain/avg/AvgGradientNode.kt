@@ -6,6 +6,9 @@ import dev.tonholo.s2c.domain.avg.gradient.AvgGradientType
 import dev.tonholo.s2c.domain.avg.gradient.AvgLinearGradient
 import dev.tonholo.s2c.domain.avg.gradient.AvgRadianGradient
 import dev.tonholo.s2c.domain.avg.gradient.AvgSweepGradient
+import dev.tonholo.s2c.domain.compose.ComposeBrush
+import dev.tonholo.s2c.domain.compose.ComposeOffset
+import dev.tonholo.s2c.domain.compose.GradientTileMode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
@@ -50,4 +53,79 @@ class AvgGradientNode(
     }
 }
 
+fun AvgGradientNode.toBrush(): ComposeBrush.Gradient? = when (type) {
+    AvgGradientType.Linear -> buildLinearGradient()
+    AvgGradientType.Radial -> buildRadialGradient()
+    AvgGradientType.Sweep -> buildSweepGradient()
+    null -> null
+}
 
+fun AvgGradientNode.buildLinearGradient(): ComposeBrush.Gradient.Linear {
+    val startX = startX ?: 0f
+    val startY = startY ?: 0f
+    val (colors, stops) = getColorStops()
+
+    if (colors.isEmpty()) {
+        error("Missing gradient colors.")
+    }
+    val startOffset = ComposeOffset(x = startX, y = startY)
+    val endOffset = ComposeOffset(x = endX, y = endY)
+
+    return ComposeBrush.Gradient.Linear(
+        start = startOffset,
+        end = endOffset,
+        tileMode = GradientTileMode(tileMode?.name),
+        colors = colors.map { it.toComposeColor() },
+        stops = stops,
+    )
+}
+
+fun AvgGradientNode.buildRadialGradient(): ComposeBrush.Gradient.Radial {
+    val (colors, stops) = getColorStops()
+
+    if (colors.isEmpty()) {
+        error("Missing gradient colors.")
+    }
+    val centerOffset = ComposeOffset(x = centerX, y = centerY)
+
+    return ComposeBrush.Gradient.Radial(
+        center = centerOffset,
+        tileMode = GradientTileMode(tileMode?.name),
+        colors = colors.map { it.toComposeColor() },
+        stops = stops,
+        radius = gradientRadius,
+    )
+}
+
+fun AvgGradientNode.buildSweepGradient(): ComposeBrush.Gradient.Sweep {
+    val (colors, stops) = getColorStops()
+
+    if (colors.isEmpty()) {
+        error("Missing gradient colors.")
+    }
+    val centerOffset = ComposeOffset(x = centerX, y = centerY)
+
+    return ComposeBrush.Gradient.Sweep(
+        center = centerOffset,
+        colors = colors.map { it.toComposeColor() },
+        stops = stops,
+    )
+}
+
+private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
+    val gradientItems = children
+        .asSequence()
+        .filterIsInstance<AvgGradientItemNode>()
+
+    val colors = if (children.isEmpty()) {
+        listOf(startColor, endColor).mapNotNull { it }
+    } else {
+        gradientItems
+            .mapNotNull { it.color }
+            .toList()
+    }
+    val stops = gradientItems
+        .mapNotNull { it.offset }
+        .toList()
+    return Pair(colors, stops)
+}
