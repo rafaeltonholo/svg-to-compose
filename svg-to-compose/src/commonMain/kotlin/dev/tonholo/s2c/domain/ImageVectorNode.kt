@@ -70,8 +70,8 @@ sealed interface ImageVectorNode {
 
         private fun buildParameterList(): List<Pair<String, String>> = buildList {
             with(params) {
-                if (params.fill != null) {
-                    params.fill.toCompose()?.let { add("fill" to it) }
+                params.fill?.let { brush ->
+                    brush.toCompose()?.let { add("fill" to it) }
                 }
                 fillAlpha?.let {
                     add("fillAlpha" to "${it}f")

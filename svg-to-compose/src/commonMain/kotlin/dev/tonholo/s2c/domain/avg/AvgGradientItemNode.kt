@@ -10,7 +10,9 @@ class AvgGradientItemNode(
 ) : XmlChildNode(), AvgNode {
     override val tagName: String = TAG_NAME
     val offset: Float? by attribute(namespace = AvgNode.NAMESPACE)
-    val color: String? by attribute(namespace = AvgNode.NAMESPACE)
+    val color: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
+        it?.let(::AvgColor)
+    }
 
     override fun toString(): String = toJsString {
         append("\"offset\": $offset, ")
