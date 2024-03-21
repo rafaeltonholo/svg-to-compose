@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.asNodeWrapper
+import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
@@ -22,10 +23,10 @@ fun SvgPathNode.asNode(
 ): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
-            fill = fill?.value.orEmpty(),
+            fill = fill?.value?.toBrush(),
             fillAlpha = fillOpacity,
             pathFillType = fillRule,
-            stroke = stroke?.value,
+            stroke = stroke?.value?.toBrush(),
             strokeAlpha = strokeOpacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,

@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.builder.pathNode
+import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.xml.XmlNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,7 +38,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
         val minified = false
         val expectedNodes = listOf(
             ImageVectorNode.Path(
-                params = ImageVectorNode.Path.Params(fill = "#FFFFFF"),
+                params = ImageVectorNode.Path.Params(fill = "#FFFFFF".toBrush()),
                 wrapper = ImageVectorNode.NodeWrapper(
                     normalizedPath = "M10 10  L20 20",
                     nodes = listOf(
@@ -52,7 +53,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
                 minified = minified,
             ),
             ImageVectorNode.Path(
-                params = ImageVectorNode.Path.Params(fill = "#000000"),
+                params = ImageVectorNode.Path.Params(fill = "#000000".toBrush()),
                 wrapper = ImageVectorNode.NodeWrapper(
                     normalizedPath = "M30 30  L40 40",
                     nodes = listOf(
@@ -146,7 +147,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
 
         val expectedNodes = listOf(
             ImageVectorNode.Path(
-                params = ImageVectorNode.Path.Params(fill = "#FFFFFF"),
+                params = ImageVectorNode.Path.Params(fill = "#FFFFFF".toBrush()),
                 wrapper = ImageVectorNode.NodeWrapper(
                     normalizedPath = "M10 10  L20 20",
                     nodes = listOf(
@@ -161,7 +162,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
                 minified = false,
             ),
             ImageVectorNode.Path(
-                params = ImageVectorNode.Path.Params(fill = "#000000"),
+                params = ImageVectorNode.Path.Params(fill = "#000000".toBrush()),
                 wrapper = ImageVectorNode.NodeWrapper(
                     normalizedPath = "M30 30  L40 40",
                     nodes = listOf(

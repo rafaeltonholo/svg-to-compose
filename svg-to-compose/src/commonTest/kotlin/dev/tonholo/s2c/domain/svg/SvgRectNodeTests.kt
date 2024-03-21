@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.domain.compose.toBrush
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -204,7 +205,7 @@ class SvgRectNodeTests : BaseSvgTest() {
             val rectNode = rect.asNode(minified = false)
             assertIs<ImageVectorNode.Path>(rectNode)
 
-            assertEquals(expected = "#FF0000", actual = rectNode.params.stroke)
+            assertEquals(expected = "#FF0000".toBrush(), actual = rectNode.params.stroke)
             var expectedNodeSize = 1 // always start with MoveTo.
             var drawLength = 0
             var i = 0
@@ -221,6 +222,7 @@ class SvgRectNodeTests : BaseSvgTest() {
                     isDash && atTheEdge && diff > 0 && direction < 4 -> { // draw at the edge
                         expectedNodeSize + 3
                     }
+
                     else -> { // draw within the edges or gap
                         expectedNodeSize + 1
                     }
