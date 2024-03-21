@@ -16,7 +16,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
         val attributes = mutableMapOf("cx" to "10", "cy" to "20", "r" to "30")
         val circle = SvgCircleNode(root, attributes)
 
-        assertEquals("circle", circle.name)
+        assertEquals("circle", circle.tagName)
         assertEquals(10f, circle.cx)
         assertEquals(20f, circle.cy)
         assertEquals(30f, circle.radius)

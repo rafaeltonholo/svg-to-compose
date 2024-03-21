@@ -11,7 +11,7 @@ class SvgPathNodeTests : BaseSvgTest() {
         val attributes = mutableMapOf("d" to "M10 10 L20 20")
         val svgPathNode = SvgPathNode(root, attributes)
 
-        assertEquals("path", svgPathNode.name)
+        assertEquals("path", svgPathNode.tagName)
         assertEquals("M10 10 L20 20", svgPathNode.d)
         assertNull(svgPathNode.clipPath)
     }

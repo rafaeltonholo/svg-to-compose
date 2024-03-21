@@ -9,7 +9,7 @@ class SvgMaskNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, name = TAG_NAME), SvgNode {
+) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
     override val id: String by attribute()
     val style: String? by attribute()
     val maskContentUnits: String? by attribute() // <userSpaceOnUse | objectBoundingBox>; default: userSpaceOnUse

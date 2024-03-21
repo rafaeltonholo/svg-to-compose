@@ -15,7 +15,7 @@ class SvgClipPathTests : BaseSvgTest() {
         val attributes = mutableMapOf<String, String>()
         val clipPath = SvgClipPath(root, children, attributes)
 
-        assertEquals("clipPath", clipPath.name)
+        assertEquals("clipPath", clipPath.tagName)
         assertEquals(root, clipPath.parent)
         assertEquals(children, clipPath.children)
         assertEquals(attributes, clipPath.attributes)

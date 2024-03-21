@@ -15,7 +15,7 @@ class SvgElementNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, name = TAG_NAME), SvgNode {
+) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
     val width: Float by attribute<SvgLength?, Float> { width ->
         width?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
             ?: viewportWidth

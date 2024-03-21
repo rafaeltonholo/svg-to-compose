@@ -22,7 +22,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         val key = key(property)
         val value = element.attributes[key]
         if (isNullable.not() && value == null && defaultValue == null) {
-            error("Required attribute '$key' on tag '${element.name}' was not found")
+            error("Required attribute '$key' on tag '${element.tagName}' was not found")
         }
 
         if (isNullable.not() && value == null && defaultValue != null) {
@@ -39,7 +39,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
                 else -> if (isNullable) {
                     null
                 } else {
-                    error("Required attribute '$key' on tag '${element.name}' has an invalid value '$value'")
+                    error("Required attribute '$key' on tag '${element.tagName}' has an invalid value '$value'")
                 }
             } as TAttribute,
         )

@@ -63,7 +63,7 @@ private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode 
     rootNode.traverse { node, depth ->
         if (currentDepth > depth) {
             repeat(currentDepth - depth) {
-                stack.removeLast().also { verbose("removed ${it.name} from stack") }
+                stack.removeLast().also { verbose("removed ${it.tagName} from stack") }
             }
             stack.lastOrNull()?.let { current = it }
         }
@@ -202,5 +202,5 @@ inline fun createDefaultElement(
     parent = parent,
     children = mutableSetOf(),
     attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-    name = nodeName,
+    tagName = nodeName,
 )
