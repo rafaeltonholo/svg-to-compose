@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.PathFillType
 import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
@@ -7,7 +8,6 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.extensions.indented
-import dev.tonholo.s2c.extensions.toComposeColor
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.verbose
@@ -22,10 +22,10 @@ sealed interface ImageVectorNode {
         val minified: Boolean,
     ) : ImageVectorNode {
         data class Params(
-            val fill: String,
+            val fill: ComposeBrush?,
             val fillAlpha: Float? = null,
             val pathFillType: PathFillType? = null,
-            val stroke: String? = null,
+            val stroke: ComposeBrush? = null,
             val strokeAlpha: Float? = null,
             val strokeLineCap: StrokeCap? = null,
             val strokeLineJoin: StrokeJoin? = null,
@@ -37,6 +37,8 @@ sealed interface ImageVectorNode {
             params.pathFillType?.let { addAll(it.imports) }
             params.strokeLineCap?.let { addAll(it.imports) }
             params.strokeLineJoin?.let { addAll(it.imports) }
+            params.fill?.let { addAll(it.imports) }
+            params.stroke?.let { addAll(it.imports) }
         }
 
         override fun materialize(): String {
@@ -68,8 +70,8 @@ sealed interface ImageVectorNode {
 
         private fun buildParameterList(): List<Pair<String, String>> = buildList {
             with(params) {
-                if (params.fill.isNotEmpty()) {
-                    params.fill.toComposeColor()?.let { add("fill" to it) }
+                if (params.fill != null) {
+                    params.fill.toCompose()?.let { add("fill" to it) }
                 }
                 fillAlpha?.let {
                     add("fillAlpha" to "${it}f")
@@ -78,7 +80,7 @@ sealed interface ImageVectorNode {
                     add("pathFillType" to "${it.toCompose()}")
                 }
                 stroke?.let { stroke ->
-                    stroke.toComposeColor()?.let { add("stroke" to it) }
+                    stroke.toCompose()?.let { add("stroke" to it) }
                 }
                 strokeAlpha?.let {
                     add("strokeAlpha" to "${it}f")
@@ -334,6 +336,7 @@ private fun calculateArcCommandPosition(
         lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
         position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
             lastChar.isDigit() -> position + 1
+
         lastChar.isWhitespace() && (current.isDigit() || current == '-') -> position + 1
         else -> position
     }

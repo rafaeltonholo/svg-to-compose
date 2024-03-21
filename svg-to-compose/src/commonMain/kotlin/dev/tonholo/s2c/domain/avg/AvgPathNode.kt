@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.compose.PathFillType
 import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
+import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
@@ -59,10 +60,10 @@ fun AvgPathNode.asNode(
     minified: Boolean,
 ): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
-        fill = fillColor.orEmpty(),
+        fill = fillColor.orEmpty().toBrush(),
         fillAlpha = fillAlpha,
         pathFillType = fillType,
-        stroke = strokeColor,
+        stroke = strokeColor?.toBrush(),
         strokeAlpha = strokeAlpha,
         strokeLineCap = strokeLineCap,
         strokeLineJoin = strokeLineJoin,
