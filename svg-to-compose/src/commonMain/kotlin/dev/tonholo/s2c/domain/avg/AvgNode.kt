@@ -16,7 +16,7 @@ class AvgElementNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, name = TAG_NAME), AvgNode {
+) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), AvgNode {
     val width: Float by attribute<String, _>(namespace = AvgNode.NAMESPACE) {
         it.removeSuffix("dp").toFloat()
     }
