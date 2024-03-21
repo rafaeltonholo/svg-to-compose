@@ -10,6 +10,7 @@ import dev.tonholo.s2c.domain.avg.AvgAttrNode
 import dev.tonholo.s2c.domain.avg.AvgClipPath
 import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.AvgGradientItemNode
+import dev.tonholo.s2c.domain.avg.AvgGradientNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
 import dev.tonholo.s2c.domain.avg.AvgPathNode
 import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
@@ -150,7 +151,7 @@ inline fun createAvgElement(
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
 
-        AvgGradient.TAG_NAME -> AvgGroupNode(
+        AvgGradient.TAG_NAME -> AvgGradientNode(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
