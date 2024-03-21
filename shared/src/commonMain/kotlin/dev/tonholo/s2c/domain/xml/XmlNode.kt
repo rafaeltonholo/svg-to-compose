@@ -3,7 +3,7 @@ package dev.tonholo.s2c.domain.xml
 import dev.tonholo.s2c.domain.delegate.attribute
 
 interface XmlNode {
-    val name: String
+    val tagName: String
 }
 
 sealed interface XmlParentNode : XmlNode {
@@ -37,18 +37,18 @@ abstract class XmlChildNode : XmlNode {
 
     fun toJsString(): String = buildString {
         append("{")
-        append("\"name\":\"$name\", ")
+        append("\"name\":\"$tagName\", ")
         append("\"attributes\":$attributes.toJsString()")
         append("}")
     }
 }
 
 data class XmlRootNode(
-    override val name: String = "#root",
+    override val tagName: String = "#root",
     override val children: MutableSet<XmlNode>,
 ) : XmlParentNode {
     override fun toString(): String {
-        return "{\"name\":\"$name\", children:${children.toJsString()}}"
+        return "{\"name\":\"$tagName\", children:${children.toJsString()}}"
     }
 }
 
@@ -56,14 +56,14 @@ open class XmlElementNode(
     override val parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
-    override val name: String,
+    override val tagName: String,
 ) : XmlChildNode(), XmlParentNode {
     override fun toString(): String = buildString {
-        append("{name:\"$name\",")
+        append("{name:\"$tagName\",")
         append(" attributes: ${attributes.toJsString()}, ")
         append("children: ${children.toJsString()}, ")
         // Swallow parent toString to avoid infinity toString loop.
-        append("parent:\"${parent.name}\"")
+        append("parent:\"${parent.tagName}\"")
         append("}")
     }
 }

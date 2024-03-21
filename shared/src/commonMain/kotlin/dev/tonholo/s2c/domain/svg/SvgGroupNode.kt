@@ -11,7 +11,7 @@ class SvgGroupNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, name = TAG_NAME), SvgNode {
+) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
     val maskId: String? by attribute("mask")
     val filterId: String? by attribute("filter")
     val opacity: Float? by attribute()

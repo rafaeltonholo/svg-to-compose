@@ -8,7 +8,7 @@ class AvgClipPath(
     override val parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
 ) : XmlChildNode(), AvgNode {
-    override val name: String = TAG_NAME
+    override val tagName: String = TAG_NAME
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
 
     companion object {

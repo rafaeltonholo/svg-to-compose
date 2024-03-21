@@ -10,7 +10,7 @@ class AvgGroupNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, name = TAG_NAME), AvgNode {
+) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), AvgNode {
     val clipPath: AvgClipPath?
         get() = children.firstOrNull { it is AvgClipPath } as? AvgClipPath
 

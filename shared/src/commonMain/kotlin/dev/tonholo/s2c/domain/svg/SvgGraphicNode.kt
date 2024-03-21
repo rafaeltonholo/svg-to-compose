@@ -15,7 +15,7 @@ import dev.tonholo.s2c.extensions.toLengthFloatOrNull
 abstract class SvgGraphicNode(
     override val parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
-    override val name: String,
+    override val tagName: String,
 ) : XmlChildNode(), SvgNode {
     val fill: SvgColor? by attribute<String?, _> { it?.let { SvgColor(it) } }
 
@@ -72,6 +72,6 @@ abstract class SvgGraphicNode(
 
     override fun toString(): String {
         // Swallow parent toString to avoid infinity toString loop.
-        return "{name:\"$name\", attributes:${attributes.toJsString()}, parent:\"${parent.name}\"}"
+        return "{name:\"$tagName\", attributes:${attributes.toJsString()}, parent:\"${parent.tagName}\"}"
     }
 }
