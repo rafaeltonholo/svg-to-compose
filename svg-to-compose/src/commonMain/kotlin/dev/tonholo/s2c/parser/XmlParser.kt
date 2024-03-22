@@ -16,6 +16,7 @@ import dev.tonholo.s2c.domain.avg.AvgPathNode
 import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
+import dev.tonholo.s2c.domain.svg.SvgDefsNode
 import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
@@ -206,6 +207,12 @@ inline fun createSvgElement(
         )
 
         SvgClipPath.TAG_NAME -> SvgClipPath(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgDefsNode.TAG_NAME -> SvgDefsNode(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
