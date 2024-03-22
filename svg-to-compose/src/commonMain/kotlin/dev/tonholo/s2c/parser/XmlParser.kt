@@ -19,9 +19,13 @@ import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgDefsNode
 import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
+import dev.tonholo.s2c.domain.svg.SvgLinearGradientNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
+import dev.tonholo.s2c.domain.svg.SvgRadialGradientNode
 import dev.tonholo.s2c.domain.svg.SvgRectNode
+import dev.tonholo.s2c.domain.svg.gradient.SvgLinearGradient
+import dev.tonholo.s2c.domain.svg.gradient.SvgRadialGradient
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
@@ -213,6 +217,18 @@ inline fun createSvgElement(
         )
 
         SvgDefsNode.TAG_NAME -> SvgDefsNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgLinearGradient.TAG_NAME -> SvgLinearGradientNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgRadialGradient.TAG_NAME -> SvgRadialGradientNode(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),

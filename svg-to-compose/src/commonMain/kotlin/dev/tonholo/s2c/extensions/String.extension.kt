@@ -58,4 +58,13 @@ fun String.toLengthInt(
     height: Int,
 ): Int = toLengthFloat(height.toFloat(), height.toFloat()).roundToInt()
 
+fun String.toPercentage(): Float {
+    val value = this.toFloatOrNull()
+    return when {
+        value == null && this.endsWith("%") -> this.removeSuffix("%").toInt() / PERCENT
+        value != null -> value
+        else -> error("Invalid percentage value '$this'")
+    }.coerceIn(range = 0f..1f)
+}
+
 inline fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
