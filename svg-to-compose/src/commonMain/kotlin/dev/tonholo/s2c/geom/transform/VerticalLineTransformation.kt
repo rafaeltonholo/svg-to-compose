@@ -9,16 +9,24 @@ internal data object VerticalLineTransformation : PathTransformation<PathNodes.V
         cursor: FloatArray,
         start: FloatArray,
         transformation: AffineTransformation,
-    ): PathNodes = if (isRelative) {
-        new(args = listOf(y))
-    } else {
+    ): PathNodes {
         // convert to lineTo to handle two-dimensional transforms
-        new(
-            args = listOf(
-                cursor[0],
-                y,
-            ),
-            command = PathCommand.LineTo,
-        )
+        return if (isRelative) {
+            new(
+                args = listOf(
+                    0f,
+                    y,
+                ),
+                command = PathCommand.LineTo,
+            )
+        } else {
+            new(
+                args = listOf(
+                    cursor[0],
+                    y,
+                ),
+                command = PathCommand.LineTo,
+            )
+        }
     }
 }

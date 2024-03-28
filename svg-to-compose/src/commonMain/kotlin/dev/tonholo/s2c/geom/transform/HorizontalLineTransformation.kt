@@ -10,10 +10,16 @@ internal data object HorizontalLineTransformation : PathTransformation<PathNodes
         start: FloatArray,
         transformation: AffineTransformation,
     ): PathNodes {
+        // convert to lineTo to handle two-dimensional transforms
         return if (isRelative) {
-            new(args = listOf(x))
+            new(
+                args = listOf(
+                    x,
+                    0f,
+                ),
+                command = PathCommand.LineTo,
+            )
         } else {
-            // convert to lineTo to handle two-dimensional transforms
             new(
                 args = listOf(
                     x,

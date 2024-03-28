@@ -115,17 +115,24 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
         ) as PathNodes.ArcTo
     }
 
-    private fun decomposeEllipseMatrix(m: Array<out FloatArray>): FloatArray {
+    private fun decomposeEllipseMatrix(matrix: Array<out FloatArray>): FloatArray {
+        // TODO: consider using DoubleArray instead of FloatArray.
+        // While using Float, we are loosing precision on decimals and the calculation of
+        // majorAxisSqr - lastColumn is getting different then the expected.
+        // Should consider using Double for all transformations instead.
+        val m = matrix.map { row ->
+            row.map { it.toDouble() }
+        }
         val lastColumn = m[0][1] * m[0][1] + m[1][1] * m[1][1]
         val squareSum = m[0][0] * m[0][0] + m[1][0] * m[1][0] + lastColumn
         val root =
             hypot(m[0][0] - m[1][1], m[1][0] + m[0][1]) * hypot(m[0][0] + m[1][1], m[1][0] - m[0][1])
 
-        return if (root == 0f) {
+        return if (root == 0.0) {
             // circle
             floatArrayOf(
-                sqrt(squareSum / 2),
-                sqrt(squareSum / 2),
+                sqrt(squareSum / 2).toFloat(),
+                sqrt(squareSum / 2).toFloat(),
                 0f
             )
         } else {
@@ -140,9 +147,9 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
             val negativeMultiplier = if (isNegative) -1 else 1
 
             floatArrayOf(
-                sqrt(majorAxisSqr),
-                sqrt(minorAxisSqr),
-                (negativeMultiplier * acos((if (major) term1 else term2) / hypot(term1, term2)) * 180) / PI.toFloat()
+                sqrt(majorAxisSqr).toFloat(),
+                sqrt(minorAxisSqr).toFloat(),
+                ((negativeMultiplier * acos((if (major) term1 else term2) / hypot(term1, term2)) * 180) / PI).toFloat()
             )
         }
     }

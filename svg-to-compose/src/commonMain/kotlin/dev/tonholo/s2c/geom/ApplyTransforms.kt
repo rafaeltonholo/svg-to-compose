@@ -10,6 +10,7 @@ import dev.tonholo.s2c.geom.transform.QuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveCurveTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveQuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.VerticalLineTransformation.applyTransformation
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
@@ -58,10 +59,13 @@ sealed class AffineTransformation(
         )
     }
 
-    @Suppress("SpreadOperator")
+    companion object {
+        private inline val Float.rad: Float get() = this * PI.toFloat() / 180f
+    }
+
     class Matrix(
         vararg matrix: FloatArray,
-    ) : AffineTransformation(*matrix)
+    ) : AffineTransformation(matrix = matrix)
 
     data object Identity : AffineTransformation(
         floatArrayOf(1f, 0f, 0f),
@@ -80,26 +84,32 @@ sealed class AffineTransformation(
         val centerX: Float = 0f,
         val centerY: Float = 0f,
     ) : AffineTransformation(
-        floatArrayOf(cos(angle), -sin(angle), centerX),
-        floatArrayOf(sin(angle), cos(angle), centerX),
-        floatArrayOf(0f, 0f, 1f),
+        matrix = run {
+            val cos = cos(angle.rad)
+            val sin = sin(angle.rad)
+            arrayOf(
+                floatArrayOf(cos, -sin, (1 - cos) * centerX + sin * centerY),
+                floatArrayOf(sin, cos, (1 - cos) * centerY - sin * centerX),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        },
     )
 
-    data class Scale(val sx: Float, val sy: Float) : AffineTransformation(
+    data class Scale(val sx: Float, val sy: Float = sx) : AffineTransformation(
         floatArrayOf(sx, 0f, 0f),
         floatArrayOf(0f, sy, 0f),
         floatArrayOf(0f, 0f, 1f),
     )
 
     data class SkewX(val angle: Float) : AffineTransformation(
-        floatArrayOf(1f, tan(angle), 0f),
+        floatArrayOf(1f, tan(angle.rad), 0f),
         floatArrayOf(0f, 1f, 0f),
         floatArrayOf(0f, 0f, 1f),
     )
 
     data class SkewY(val angle: Float) : AffineTransformation(
         floatArrayOf(1f, 0f, 0f),
-        floatArrayOf(tan(angle), 1f, 0f),
+        floatArrayOf(tan(angle.rad), 1f, 0f),
         floatArrayOf(0f, 0f, 1f),
     )
 }
@@ -116,16 +126,14 @@ fun List<PathNodes>.applyTransformation(
     val cursor = floatArrayOf(0f, 0f)
 
     for (node in this@applyTransformation) {
-        val newNode = when (node) {
-            is PathNodes.MoveTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.HorizontalLineTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.VerticalLineTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.LineTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.CurveTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.ReflectiveCurveTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.QuadTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.ReflectiveQuadTo -> node.applyTransformation(cursor, start, transformation)
-            is PathNodes.ArcTo -> node.applyTransformation(cursor, start, transformation)
+        val newNode = node.transform(cursor, start, transformation).let { transformed ->
+            // As some transformation changes the type of the node,
+            // we need to run the transformation again for the new type.
+            if (node::class != transformed::class) {
+                transformed.transform(cursor, start, transformation)
+            } else {
+                transformed
+            }
         }
 
         if (newNode.shouldClose) {
@@ -135,4 +143,20 @@ fun List<PathNodes>.applyTransformation(
 
         yield(newNode)
     }
+}
+
+private fun PathNodes.transform(
+    cursor: FloatArray,
+    start: FloatArray,
+    transformation: AffineTransformation,
+) = when (this) {
+    is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.HorizontalLineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.VerticalLineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.LineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.CurveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ReflectiveCurveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.QuadTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ReflectiveQuadTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ArcTo -> applyTransformation(cursor, start, transformation)
 }
