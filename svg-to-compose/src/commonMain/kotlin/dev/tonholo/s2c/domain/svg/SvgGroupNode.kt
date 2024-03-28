@@ -34,7 +34,9 @@ fun SvgGroupNode.asNode(
     val clipPath = createGroupClipPath(masks, minified)
 
     return ImageVectorNode.Group(
-        clipPath = clipPath,
+        params = ImageVectorNode.Group.Params(
+            clipPath = clipPath,
+        ),
         commands = children.mapNotNull { (it as? SvgNode)?.asNode(masks, minified) },
         minified = minified,
     )

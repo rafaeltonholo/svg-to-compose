@@ -44,7 +44,9 @@ fun SvgPathNode.asNode(
             .find { it is SvgClipPath && it.id == clipPathId } as? SvgClipPath
         clipPath?.let {
             ImageVectorNode.Group(
-                clipPath = it.asNodeWrapper(minified),
+                params = ImageVectorNode.Group.Params(
+                    clipPath = it.asNodeWrapper(minified),
+                ),
                 commands = listOf(path),
                 minified = minified,
             )
