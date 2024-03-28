@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 
 class SvgGroupNode(
     parent: XmlParentNode,
@@ -17,6 +18,9 @@ class SvgGroupNode(
     val opacity: Float? by attribute()
     val fillOpacity: Float? by attribute("fill-opacity")
     val style: String? by attribute()
+    val clipPath: SvgClipPath? by lazy {
+        children.firstInstanceOfOrNull()
+    }
 
     companion object {
         const val TAG_NAME = "g"
@@ -71,3 +75,4 @@ private fun SvgGroupNode.createGroupClipPath(
     ?.path
     ?.d
     ?.asNodeWrapper(minified)
+    ?: clipPath?.asNodeWrapper(minified = true)
