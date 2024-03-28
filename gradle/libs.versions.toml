@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.23"
-clikt = "4.2.2"
+clikt = "4.3.0"
 okio = "3.9.0"
 detekt = "1.23.6"
 build-konfig = "0.15.1"
