@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
@@ -9,7 +8,8 @@ class SvgMaskNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgMaskNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+    override val constructor = ::SvgMaskNode
     override val id: String by attribute()
     val style: String? by attribute()
     val maskContentUnits: String? by attribute() // <userSpaceOnUse | objectBoundingBox>; default: userSpaceOnUse
@@ -18,7 +18,6 @@ class SvgMaskNode(
     val y: Int? by attribute()
     val width: Int? by attribute()
     val height: Int? by attribute()
-
     private var _path: SvgPathNode? = null
 
     // Can a svg mask have more than one path?

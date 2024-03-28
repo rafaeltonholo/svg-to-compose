@@ -10,8 +10,11 @@ sealed interface XmlParentNode : XmlNode {
     val children: MutableSet<XmlNode>
 }
 
-abstract class XmlChildNode : XmlNode {
-    abstract val parent: XmlParentNode
+abstract class XmlChildNode(
+    parent: XmlParentNode,
+) : XmlNode {
+    var parent: XmlParentNode = parent
+        private set
     abstract val attributes: MutableMap<String, String>
 
     val rootParent: XmlParentNode by lazy {
@@ -57,11 +60,11 @@ data class XmlRootNode(
 }
 
 open class XmlElementNode(
-    override val parent: XmlParentNode,
+    parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
-) : XmlChildNode(), XmlParentNode {
+) : XmlChildNode(parent), XmlParentNode {
     override fun toString(): String = toJsString()
 
     override fun toJsString(extra: (StringBuilder.() -> Unit)?): String =
