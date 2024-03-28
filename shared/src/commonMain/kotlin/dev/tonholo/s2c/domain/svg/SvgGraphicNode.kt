@@ -17,7 +17,7 @@ abstract class SvgGraphicNode(
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
 ) : XmlChildNode(), SvgNode {
-    val fill: SvgColor? by attribute<String?, _> { it?.let { SvgColor(it) } }
+    val fill: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
     val opacity: Float? by attribute()
 
