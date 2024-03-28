@@ -6,7 +6,6 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.avg.AvgRootNode
 import dev.tonholo.s2c.domain.avg.asNodes
 import dev.tonholo.s2c.domain.defaultImports
-import dev.tonholo.s2c.domain.groupImports
 import dev.tonholo.s2c.domain.materialReceiverTypeImport
 import dev.tonholo.s2c.domain.previewImports
 import dev.tonholo.s2c.domain.svg.SvgRootNode
@@ -99,30 +98,21 @@ sealed class ImageParser(
         if (config.noPreview.not()) {
             addAll(previewImports)
         }
-        if (nodes.any { it is ImageVectorNode.Group }) {
-            addAll(groupImports)
-        }
         if (config.addToMaterial) {
             addAll(materialReceiverTypeImport)
         }
-        val pathImports = nodes
+        val nodeImports = nodes
             .asSequence()
             .flatMap { node ->
-                when (node) {
-                    is ImageVectorNode.Group -> {
-                        node.commands
-                            .filterIsInstance<ImageVectorNode.Path>()
-                            .flatMap { it.pathImports() }
-                    }
-
-                    is ImageVectorNode.Path -> {
-                        node.pathImports()
-                    }
+                if (node is ImageVectorNode.Group) {
+                    node.imports + node.commands.flatMap { node.imports }
+                } else {
+                    node.imports
                 }
-            }
+            } // consider group
             .toSet()
 
-        addAll(pathImports)
+        addAll(nodeImports)
     }
 
     /**

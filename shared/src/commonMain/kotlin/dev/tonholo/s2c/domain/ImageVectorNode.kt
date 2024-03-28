@@ -14,6 +14,8 @@ import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
 
 sealed interface ImageVectorNode {
+    val imports: Set<String>
+
     fun materialize(): String
 
     data class Path(
@@ -33,7 +35,8 @@ sealed interface ImageVectorNode {
             val strokeLineWidth: Float? = null,
         )
 
-        fun pathImports(): Set<String> = buildSet {
+        override val imports: Set<String> = buildSet {
+            add("androidx.compose.ui.graphics.vector.path")
             params.pathFillType?.let { addAll(it.imports) }
             params.strokeLineCap?.let { addAll(it.imports) }
             params.strokeLineJoin?.let { addAll(it.imports) }
@@ -137,7 +140,7 @@ sealed interface ImageVectorNode {
                 translationY == null
         }
 
-        val imports: Set<String> = with(params) {
+        override val imports: Set<String> = with(params) {
             buildSet {
                 add("androidx.compose.ui.graphics.vector.group")
                 clipPath?.let { add("androidx.compose.ui.graphics.vector.PathData") }
