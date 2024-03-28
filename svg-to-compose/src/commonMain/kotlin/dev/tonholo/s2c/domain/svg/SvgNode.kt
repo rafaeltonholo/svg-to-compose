@@ -2,10 +2,14 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.domain.svg.transform.SvgTransform
+import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 
 sealed interface SvgNode : XmlNode {
+    val transform: SvgTransform?
     fun String.normalizedId(): String = with(SvgNode) {
         normalizedId()
     }
@@ -23,6 +27,31 @@ sealed interface SvgNode : XmlNode {
         fun String.normalizedId(): String =
             removePrefix("#").removePrefix("url(#").removeSuffix(")")
     }
+}
+
+fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
+    var stacked = attributes["transform"]
+    if (parent !is SvgDefsNode) {
+        var currentParent: XmlParentNode? = parent
+
+        while (currentParent !is XmlRootNode && currentParent != null) {
+            val transform = if (currentParent is SvgRootNode) {
+                currentParent.transform?.value
+            } else {
+                currentParent.attributes["transform"]
+            }
+
+            transform?.let { value ->
+                stacked = value + stacked?.let { " $it" }.orEmpty()
+            }
+            currentParent = (currentParent as? XmlChildNode)?.parent
+            if (currentParent is SvgDefsNode) {
+                stacked = attributes["transform"]
+                break
+            }
+        }
+    }
+    return stacked?.let(::SvgTransform)
 }
 
 class SvgRootNode(
@@ -61,6 +90,16 @@ class SvgRootNode(
     }
 
     val defs: HashMap<String, SvgUseNode> = hashMapOf()
+
+    override val transform: SvgTransform? by attribute<String?, SvgTransform?> {
+        var transform = it
+        if (viewportX != 0f || viewportY != 0f) {
+            transform = "translate(${-viewportX}, ${-viewportY})"
+            attributes["transform"] = transform
+        }
+        transform?.let(::SvgTransform)
+    }
+
 
     /**
      * Checks if width is present in the attribute map.

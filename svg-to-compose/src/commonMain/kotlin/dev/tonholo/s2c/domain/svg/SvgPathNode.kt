@@ -36,6 +36,7 @@ fun SvgPathNode.asNode(
         ),
         wrapper = d.asNodeWrapper(minified),
         minified = minified,
+        transformations = transform?.toTransformations(),
     )
 
     return clipPath?.normalizedId()?.let { clipPathId ->
@@ -49,6 +50,7 @@ fun SvgPathNode.asNode(
                 ),
                 commands = listOf(path),
                 minified = minified,
+                transformations = transform?.toTransformations(),
             )
         }
     } ?: path

@@ -115,6 +115,7 @@ private fun SvgCircleNode.createSimpleRect(
         )
     ),
     minified = minified,
+    transformations = transform?.toTransformations(),
 )
 
 /**
@@ -178,6 +179,7 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
         )
     },
     minified = minified,
+    transformations = transform?.toTransformations(),
 )
 
 /**
