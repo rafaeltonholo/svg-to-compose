@@ -22,7 +22,8 @@ fun SvgClipPath.asNodeWrapper(
     val nodes = children
         .asSequence()
         .filterNot { it is SvgGroupNode }
-        .mapNotNull { (it as? SvgNode)?.asNode(masks = listOf(), minified) }
+        .mapNotNull { (it as? SvgNode)?.asNodes(masks = listOf(), minified) }
+        .flatten()
         .filterIsInstance<ImageVectorNode.Path>()
         .flatMap { it.wrapper.nodes }
         .toList()
