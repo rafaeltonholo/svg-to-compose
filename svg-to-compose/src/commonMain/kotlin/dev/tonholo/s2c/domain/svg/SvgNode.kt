@@ -117,20 +117,14 @@ class SvgRootNode(
     }
 }
 
-inline fun SvgRootNode.asNodes(
-    minified: Boolean,
-): List<ImageVectorNode> {
-    val masks = children.filterIsInstance<SvgMaskNode>()
-    return children.mapNotNull { node -> (node as? SvgNode)?.asNode(masks, minified) }
-}
-
-inline fun SvgNode.asNode(
+inline fun SvgNode.asNodes(
     masks: List<SvgMaskNode>,
     minified: Boolean,
-): ImageVectorNode? = when (this) {
-    is SvgGroupNode -> asNode(masks, minified)
-    is SvgPathNode -> asNode(minified)
-    is SvgRectNode -> asNode(minified)
-    is SvgCircleNode -> asNode(minified)
+): List<ImageVectorNode>? = when (this) {
+    is SvgRootNode -> asNodes(minified = minified)
+    is SvgGroupNode -> flatNode(masks, minified)
+    is SvgCircleNode -> listOf(asNode())
+    is SvgPathNode -> listOf(asNode())
+    is SvgRectNode -> listOf(asNode())
     else -> null
 }

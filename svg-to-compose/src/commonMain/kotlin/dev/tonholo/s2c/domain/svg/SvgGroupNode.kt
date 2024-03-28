@@ -3,7 +3,6 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
@@ -24,7 +23,7 @@ class SvgGroupNode(
     }
 }
 
-fun SvgGroupNode.asNode(
+private fun SvgGroupNode.asNode(
     masks: List<SvgMaskNode>,
     minified: Boolean = false,
 ): ImageVectorNode.Group {
@@ -37,9 +36,23 @@ fun SvgGroupNode.asNode(
         params = ImageVectorNode.Group.Params(
             clipPath = clipPath,
         ),
-        commands = children.mapNotNull { (it as? SvgNode)?.asNode(masks, minified) },
+        commands = children
+            .mapNotNull { (it as? SvgNode)?.asNodes(masks, minified) }
+            .flatten(),
         minified = minified,
     )
+}
+
+fun SvgGroupNode.flatNode(
+    masks: List<SvgMaskNode>,
+    minified: Boolean,
+): List<ImageVectorNode> {
+    val node = asNode(masks, minified)
+    return if (node.params.isEmpty()) {
+        node.commands
+    } else {
+        listOf(node)
+    }
 }
 
 /**
