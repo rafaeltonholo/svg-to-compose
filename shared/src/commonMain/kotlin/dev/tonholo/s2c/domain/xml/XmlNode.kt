@@ -1,13 +1,26 @@
 package dev.tonholo.s2c.domain.xml
 
+import AppConfig
 import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.logger.warn
 
 interface XmlNode {
     val tagName: String
+    val id: String?
+    val attributes: MutableMap<String, String>
+
+    override fun toString(): String
 }
 
 sealed interface XmlParentNode : XmlNode {
     val children: MutableSet<XmlNode>
+}
+
+data object XmlPendingParentElement : XmlParentNode {
+    override val tagName: String = "pending-parent"
+    override val id: String? = null
+    override val attributes: MutableMap<String, String> = mutableMapOf()
+    override val children: MutableSet<XmlNode> = mutableSetOf()
 }
 
 abstract class XmlChildNode(
@@ -15,7 +28,6 @@ abstract class XmlChildNode(
 ) : XmlNode {
     var parent: XmlParentNode = parent
         private set
-    abstract val attributes: MutableMap<String, String>
 
     val rootParent: XmlParentNode by lazy {
         var current: XmlChildNode
@@ -34,19 +46,48 @@ abstract class XmlChildNode(
         current as XmlParentNode
     }
 
-    open val id: String? by attribute()
-
-    abstract override fun toString(): String
+    override val id: String? by attribute()
 
     open fun toJsString(extra: (StringBuilder.() -> Unit)? = null): String = buildString {
         append("{")
         append("\"name\":\"$tagName\", ")
-        append("\"attributes\":${attributes.toJsString()}")
+        append("\"attributes\":${attributes.toJsString()}, ")
+        // Swallow parent toString to avoid infinity toString loop.
+        append("\"parent\": \"${buildParentName()}\"")
         if (extra != null) {
             append(", ")
             extra()
         }
         append("}")
+    }
+
+    private fun buildParentName(): String {
+        return if (AppConfig.debug) {
+            var parentTag = parent.tagName
+            var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
+            var deep = 0
+            while (currentParent != null && currentParent !is XmlRootNode && deep++ < 5) {
+                parentTag = "${currentParent.tagName}.$parentTag"
+                currentParent = (currentParent as? XmlChildNode)?.parent
+            }
+            parentTag
+        } else {
+            parent.tagName
+        }
+    }
+
+    fun attachParentIfNeeded(parent: XmlParentNode) {
+        check(parent != XmlPendingParentElement) {
+            "${::attachParentIfNeeded.name}() is supposed to be called with a real ${XmlParentNode::class.simpleName}."
+        }
+
+        if (this.parent == XmlPendingParentElement) {
+            this.parent = parent
+        } else {
+            warn(
+                "Trying to attach $parent to a node that already has a parent. Current parent: ${this.parent}",
+            )
+        }
     }
 }
 
@@ -54,8 +95,10 @@ data class XmlRootNode(
     override val tagName: String = "#root",
     override val children: MutableSet<XmlNode>,
 ) : XmlParentNode {
+    override val id: String? = null
+    override val attributes: MutableMap<String, String> = mutableMapOf()
     override fun toString(): String {
-        return "{\"name\":\"$tagName\", children:${children.toJsString()}}"
+        return "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
     }
 }
 
@@ -69,9 +112,7 @@ open class XmlElementNode(
 
     override fun toJsString(extra: (StringBuilder.() -> Unit)?): String =
         super.toJsString {
-            append("children: ${children.toJsString()}, ")
-            // Swallow parent toString to avoid infinity toString loop.
-            append("parent:\"${parent.tagName}\"")
+            append("\"children\": ${children.toJsString()}")
             if (extra != null) {
                 append(", ")
                 extra()

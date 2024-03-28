@@ -169,6 +169,7 @@ sealed class ImageParser(
 
             val root = parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgRootNode } as SvgRootNode
+            svg.resolveUseNodes()
             val (x, y, viewportWidth, viewportHeight) = svg.viewBox
             val nodes = svg.asNodes(minified = config.minified).let { nodes ->
                 if (x != 0f || y != 0f) {
