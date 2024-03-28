@@ -214,12 +214,15 @@ sealed class ImageParser(
                     )
 
                     is ImageVectorNode.Group -> node.copy(
-                        clipPath = node.clipPath?.copy(
-                            nodes = node
-                                .clipPath
-                                .nodes
-                                .applyTransformations(translation)
-                                .toList(),
+                        params = ImageVectorNode.Group.Params(
+                            clipPath = node.params.clipPath?.copy(
+                                nodes = node
+                                    .params
+                                    .clipPath
+                                    .nodes
+                                    .applyTransformations(translation)
+                                    .toList(),
+                            ),
                         ),
                         commands = node.commands.applyViewBoxTranslation(x, y),
                     )

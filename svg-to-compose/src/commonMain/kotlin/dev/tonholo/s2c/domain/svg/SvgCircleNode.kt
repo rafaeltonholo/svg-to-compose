@@ -120,13 +120,14 @@ private fun SvgCircleNode.createSimpleRect(
 /**
  * Create a dashed circle from a given circle SVG node.
  *
- * Dashed circles in SVG are not supported nativaly on Android. Instead,
- * two paths are created for each dashed circle.
+ * Dashed circles in SVG are not supported natively on Android.
+ * Instead, two paths are created for each dashed circle.
  *
  * The first path corresponds to the filling of the circle, in case it
  * has a fill.
  *
- * The second path corresponds to the dashes of the circle. Stroke parameters
+ * The second path corresponds to the dashes of the circle.
+ * Stroke parameters
  * are repurposed as fill parameters, as the "dash" is treated as a path.
  *
  * @param minified A [Boolean] parameter that specifies whether the output
@@ -137,7 +138,6 @@ private fun SvgCircleNode.createSimpleRect(
  * and its fill if any.
  */
 private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = ImageVectorNode.Group(
-    clipPath = null,
     commands = buildList {
         val strokeDashArray = strokeDashArray ?: error("stroke-dasharray should not be null in this case.")
         val fill = fill
