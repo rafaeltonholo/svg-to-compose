@@ -41,4 +41,34 @@ abstract class SvgElementNode<out T>(
             )
         }
     }
+
+    fun resolveUseNodes() {
+        val children = mutableSetOf<XmlNode>().apply {
+            addAll(children)
+        }
+        val resolvedChildren = buildSet {
+            for (child in children) {
+                when (child) {
+                    is SvgDefsNode -> Unit // remove Defs from the tree since there is no utility anymore.
+
+                    is SvgUseNode -> {
+                        val replacement = child.resolve()
+                        replacement.resolveUseNodes()
+                        add(replacement)
+                    }
+
+                    is SvgElementNode<*> -> {
+                        child.resolveUseNodes()
+                        add(child)
+                    }
+
+                    else -> add(child)
+                }
+            }
+        }
+        this.children.apply {
+            clear()
+            addAll(resolvedChildren)
+        }
+    }
 }
