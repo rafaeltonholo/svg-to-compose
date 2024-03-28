@@ -72,3 +72,15 @@ abstract class SvgElementNode<out T>(
         }
     }
 }
+
+fun <T> SvgElementNode<T>.asNodes(
+    minified: Boolean,
+): List<ImageVectorNode>
+    where T : SvgNode, T : XmlParentNode {
+    val masks = children.filterIsInstance<SvgMaskNode>()
+    return children
+        .asSequence()
+        .mapNotNull { node -> (node as? SvgNode)?.asNodes(masks, minified) }
+        .flatten()
+        .toList()
+}
