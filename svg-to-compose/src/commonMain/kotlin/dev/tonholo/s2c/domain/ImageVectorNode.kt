@@ -8,20 +8,56 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.geom.AffineTransformation
+import dev.tonholo.s2c.geom.applyTransformations
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
 
 sealed interface ImageVectorNode {
+    val transformations: List<AffineTransformation>?
     val imports: Set<String>
 
     fun materialize(): String
+
+    fun applyTransformation(): ImageVectorNode {
+        return transformations?.let { transformations ->
+            when (this) {
+                is Group -> copy(
+                    params = params.copy(
+                        clipPath = params.clipPath?.copy(
+                            nodes = params
+                                .clipPath
+                                .nodes
+                                .applyTransformations(transformations = transformations.toTypedArray())
+                                .toList(),
+                        )
+                    ),
+                    commands = commands.map { it.applyTransformation() },
+                )
+
+                is Path -> copy(
+                    wrapper = wrapper.copy(
+                        nodes = wrapper
+                            .nodes
+                            .applyTransformations(transformations = transformations.toTypedArray())
+                            .toList(),
+                    )
+                )
+
+                is HelperFunction -> copy(
+                    node = node.applyTransformation()
+                )
+            }
+        } ?: this
+    }
 
     data class Path(
         val params: Params,
         val wrapper: NodeWrapper,
         val minified: Boolean,
+        override val transformations: List<AffineTransformation>? = null,
     ) : ImageVectorNode {
         data class Params(
             val fill: ComposeBrush?,
@@ -108,6 +144,7 @@ sealed interface ImageVectorNode {
         val commands: List<ImageVectorNode>,
         val minified: Boolean,
         val params: Params = Params(),
+        override val transformations: List<AffineTransformation>? = null,
     ) : ImageVectorNode {
         companion object {
             private const val CLIP_PATH_PARAM_NAME = "clipPathData"

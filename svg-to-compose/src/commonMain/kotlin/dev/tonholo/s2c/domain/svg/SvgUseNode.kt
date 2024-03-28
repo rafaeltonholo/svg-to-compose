@@ -35,7 +35,7 @@ class SvgUseNode(
         height.toFloatOrNull(baseDimension) ?: error("Invalid height '$height'")
     }
     val href: String by attribute(namespace = SvgNode.XLINK_NS)
-    val transform: SvgTransform? by attribute<String?, SvgTransform?> {
+    override val transform: SvgTransform? by attribute<String?, SvgTransform?> {
         it?.let(::SvgTransform)
     }
 
