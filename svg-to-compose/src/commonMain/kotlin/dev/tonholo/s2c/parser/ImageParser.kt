@@ -3,7 +3,7 @@ package dev.tonholo.s2c.parser
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.avg.AvgElementNode
+import dev.tonholo.s2c.domain.avg.AvgRootNode
 import dev.tonholo.s2c.domain.avg.asNodes
 import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.groupImports
@@ -246,7 +246,7 @@ sealed class ImageParser(
          *
          * The parsing procedure can be summed up as follows:
          * 1. Read the content of the file.
-         * 2. Parses the file content into a [AvgElementNode] object.
+         * 2. Parses the file content into a [AvgRootNode] object.
          * 3. Converts the parsed AVG element nodes into [ImageVectorNode] to obtain
          * a list of nodes.
          * 4. Lastly, an [IconFileContents] instance is assembled with the necessary
@@ -268,7 +268,7 @@ sealed class ImageParser(
             val content = readContent(file)
 
             val root = parse(content = content, fileType = FileType.Avg)
-            val avg = root.children.single { it is AvgElementNode } as AvgElementNode
+            val avg = root.children.single { it is AvgRootNode } as AvgRootNode
             val nodes = avg.asNodes(minified = config.minified)
 
             return IconFileContents(

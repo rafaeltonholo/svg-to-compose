@@ -8,7 +8,6 @@ import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
 import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
@@ -16,9 +15,9 @@ import dev.tonholo.s2c.extensions.toLengthFloat
 
 class AvgPathNode(
     parent: XmlParentNode,
-    override val children: MutableSet<XmlNode>,
+    children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, TAG_NAME), AvgNode {
+) : AvgElementNode(parent, children, attributes, TAG_NAME), AvgNode {
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
 
     private val fillColor: String? by attribute(namespace = AvgNode.NAMESPACE)
@@ -34,7 +33,7 @@ class AvgPathNode(
     // Although Android Vector only accepts Float, Svg accepts %.
     // As we still parse the SVG to XML after optimizing, we need to deal with % here too.
     val strokeAlpha: Float? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
-        (parent as? AvgElementNode)?.let { parent -> it?.toLengthFloat(parent.width, parent.height) }
+        (parent as? AvgRootNode)?.let { parent -> it?.toLengthFloat(parent.width, parent.height) }
     }
 
     val strokeLineCap: StrokeCap? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
@@ -50,7 +49,7 @@ class AvgPathNode(
     // Although Android Vector only accepts Float, Svg accepts %.
     // As we still parse the SVG to XML after optimizing, we need to deal with % here too.
     val strokeWidth: Float? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
-        (parent as? AvgElementNode)?.let { parent -> it?.toLengthFloat(parent.width, parent.height) }
+        (parent as? AvgRootNode)?.let { parent -> it?.toLengthFloat(parent.width, parent.height) }
     }
 
     val fillBrush: ComposeBrush? by lazy {
