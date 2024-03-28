@@ -6,8 +6,23 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
 sealed interface SvgNode : XmlNode {
-    fun String.normalizedId(): String =
-        removePrefix("url(#").removeSuffix(")")
+    fun String.normalizedId(): String = with(SvgNode) {
+        normalizedId()
+    }
+
+    companion object {
+        const val XLINK_NS = "xlink"
+        const val ATTR_X = "x"
+        const val ATTR_Y = "y"
+        const val ATTR_WIDTH = "width"
+        const val ATTR_HEIGHT = "height"
+        const val ATTR_TRANSFORM = "transform"
+
+        // Wouldn't need to set this as a function of the companion
+        // object if context receiver works on KMP.
+        fun String.normalizedId(): String =
+            removePrefix("#").removePrefix("url(#").removeSuffix(")")
+    }
 }
 
 class SvgRootNode(
@@ -29,6 +44,14 @@ class SvgRootNode(
     }
     var fill: String? by attribute()
 
+    private val viewportX: Float by lazy {
+        getDimensionFromViewBox(SVG_VIEW_BOX_X_POSITION) ?: 0f
+    }
+
+    private val viewportY: Float by lazy {
+        getDimensionFromViewBox(SVG_VIEW_BOX_Y_POSITION) ?: 0f
+    }
+
     val viewportWidth: Float by lazy {
         getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION) ?: safeWidth ?: SVG_DEFAULT_WIDTH
     }
@@ -36,6 +59,8 @@ class SvgRootNode(
     val viewportHeight: Float by lazy {
         getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION) ?: safeHeight ?: SVG_DEFAULT_HEIGHT
     }
+
+    val defs: HashMap<String, SvgUseNode> = hashMapOf()
 
     /**
      * Checks if width is present in the attribute map.
@@ -85,6 +110,8 @@ class SvgRootNode(
          *     </a>
          */
         private const val SVG_DEFAULT_HEIGHT = 150f
+        const val SVG_VIEW_BOX_X_POSITION = 0
+        const val SVG_VIEW_BOX_Y_POSITION = 1
         const val SVG_VIEW_BOX_WIDTH_POSITION = 2
         const val SVG_VIEW_BOX_HEIGHT_POSITION = 3
     }
