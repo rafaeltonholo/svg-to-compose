@@ -3,6 +3,9 @@ package dev.tonholo.s2c.domain.delegate
 import dev.tonholo.s2c.domain.svg.SvgLength
 import dev.tonholo.s2c.domain.svg.toSvgLengthOrNull
 import dev.tonholo.s2c.domain.xml.XmlChildNode
+import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.logger.debug
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -10,6 +13,7 @@ import kotlin.reflect.KProperty
 class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     private val kClass: KClass<*>,
     private val isNullable: Boolean,
+    private val inherited: Boolean,
     private val name: String? = null,
     private val namespace: String? = null,
     private val defaultValue: TTransform? = null,
@@ -20,7 +24,13 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
 
     operator fun getValue(element: XmlChildNode, property: KProperty<*>): TTransform {
         val key = key(property)
-        val value = element.attributes[key]
+        val elementValue = element.attributes[key]
+        val value = elementValue ?: if (inherited) {
+            findInheritedValue(element, key)
+        } else {
+            null
+        }
+
         if (isNullable.not() && value == null && defaultValue == null) {
             error("Required attribute '$key' on tag '${element.tagName}' was not found")
         }
@@ -53,6 +63,20 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         val key = key(property)
         element.attributes[key] = value.toString()
     }
+
+    private fun findInheritedValue(element: XmlChildNode, key: String): String? {
+        debug(
+            "The current element '${element.tagName}' doesn't have the attribute '$key'. Looking for inherited value.",
+        )
+        var parent: XmlParentNode? = element.parent
+        var attr: String?
+        do {
+            attr = parent?.attributes?.get(key)
+            parent = (parent as? XmlChildNode)?.parent
+        } while (attr == null && parent != null && parent !is XmlRootNode)
+
+        return attr
+    }
 }
 
 /**
@@ -73,6 +97,7 @@ inline fun <reified TAttribute : Any?> attribute(
     name: String? = null,
     namespace: String? = null,
     defaultValue: TAttribute? = null,
+    inherited: Boolean = false,
 ): AttributeDelegate<TAttribute, TAttribute> =
     AttributeDelegate(
         kClass = TAttribute::class,
@@ -80,6 +105,7 @@ inline fun <reified TAttribute : Any?> attribute(
         name = name,
         namespace = namespace,
         defaultValue = defaultValue,
+        inherited = inherited,
     )
 
 /**
@@ -101,6 +127,7 @@ inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
     name: String? = null,
     namespace: String? = null,
     defaultValue: TTransform? = null,
+    inherited: Boolean = false,
     noinline transform: (TAttribute) -> TTransform,
 ): AttributeDelegate<TAttribute, TTransform> {
     return AttributeDelegate(
@@ -110,5 +137,6 @@ inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
         namespace = namespace,
         defaultValue = defaultValue,
         transform = transform,
+        inherited = inherited,
     )
 }
