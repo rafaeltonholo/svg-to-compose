@@ -40,6 +40,7 @@ private fun SvgGroupNode.asNode(
             .mapNotNull { (it as? SvgNode)?.asNodes(masks, minified) }
             .flatten(),
         minified = minified,
+        transformations = transform?.toTransformations(),
     )
 }
 

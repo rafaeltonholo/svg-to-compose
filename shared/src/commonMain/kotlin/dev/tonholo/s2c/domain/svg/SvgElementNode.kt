@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
@@ -18,6 +20,9 @@ abstract class SvgElementNode<out T>(
 ) : XmlElementNode(parent, children, attributes, tagName), SvgNode
     where T : SvgNode, T : XmlParentNode {
     protected abstract val constructor: SvgElementNodeConstructorFn<out T>
+    override val transform: SvgTransform? by lazy {
+        stackedTransform(parent)
+    }
 
     open fun copy(
         parent: XmlParentNode? = null,

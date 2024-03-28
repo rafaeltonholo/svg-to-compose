@@ -60,6 +60,7 @@ fun SvgRectNode.asNode(
     ),
     wrapper = createPath(minified),
     minified = minified,
+    transformations = transform?.toTransformations(),
 )
 
 private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
