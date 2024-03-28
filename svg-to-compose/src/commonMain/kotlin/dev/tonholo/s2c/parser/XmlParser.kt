@@ -17,13 +17,13 @@ import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgDefsNode
-import dev.tonholo.s2c.domain.svg.SvgElementNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgLinearGradientNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.SvgRadialGradientNode
 import dev.tonholo.s2c.domain.svg.SvgRectNode
+import dev.tonholo.s2c.domain.svg.SvgRootNode
 import dev.tonholo.s2c.domain.svg.gradient.SvgLinearGradient
 import dev.tonholo.s2c.domain.svg.gradient.SvgRadialGradient
 import dev.tonholo.s2c.domain.xml.XmlElementNode
@@ -177,7 +177,7 @@ inline fun createSvgElement(
     parent: XmlParentNode,
 ): XmlNode {
     return when (nodeName) {
-        SvgElementNode.TAG_NAME -> SvgElementNode(
+        SvgRootNode.TAG_NAME -> SvgRootNode(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),

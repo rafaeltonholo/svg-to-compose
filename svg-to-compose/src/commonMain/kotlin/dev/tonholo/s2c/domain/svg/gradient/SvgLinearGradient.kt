@@ -2,14 +2,16 @@ package dev.tonholo.s2c.domain.svg.gradient
 
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.svg.SvgLength
+import dev.tonholo.s2c.domain.svg.SvgNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
-abstract class SvgLinearGradient(
+abstract class SvgLinearGradient<out T>(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgGradient(parent, children, attributes, tagName = TAG_NAME) {
+) : SvgGradient<T>(parent, children, attributes, tagName = TAG_NAME)
+    where T : SvgNode, T : XmlParentNode {
     /**
      * [X1Attribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-LinearGradientElementX1Attribute)
      */

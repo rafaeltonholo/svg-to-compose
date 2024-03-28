@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
@@ -9,7 +8,9 @@ class SvgClipPath(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgClipPath>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+    override val constructor = ::SvgClipPath
+
     companion object {
         const val TAG_NAME = "clipPath"
     }

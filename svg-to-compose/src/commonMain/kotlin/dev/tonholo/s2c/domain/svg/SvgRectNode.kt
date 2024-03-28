@@ -14,24 +14,25 @@ import dev.tonholo.s2c.logger.warn
 class SvgRectNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
-) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
+) : SvgGraphicNode<SvgRectNode>(parent, attributes, TAG_NAME), SvgNode {
+    override val constructor = ::SvgRectNode
     val width: Int by attribute<SvgLength, Int> { width ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportWidth
         width.toIntOrNull(baseDimension) ?: error("Invalid width '$width'")
     }
     val height: Int by attribute<SvgLength, Int> { height ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportHeight
         height.toIntOrNull(baseDimension) ?: error("Invalid height '$height'")
     }
     val x: Int? by attribute<SvgLength?, Int?> { x ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportWidth
         x?.toIntOrNull(baseDimension)
     }
     val y: Int? by attribute<SvgLength?, Int?> { y ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportHeight
         y?.toIntOrNull(baseDimension)
     }

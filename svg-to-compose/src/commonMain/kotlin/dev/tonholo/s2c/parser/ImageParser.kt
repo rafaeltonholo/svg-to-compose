@@ -9,7 +9,7 @@ import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.groupImports
 import dev.tonholo.s2c.domain.materialReceiverTypeImport
 import dev.tonholo.s2c.domain.previewImports
-import dev.tonholo.s2c.domain.svg.SvgElementNode
+import dev.tonholo.s2c.domain.svg.SvgRootNode
 import dev.tonholo.s2c.domain.svg.asNodes
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
@@ -144,7 +144,7 @@ sealed class ImageParser(
          *
          * The parsing procedure can be summed up as follows:
          * 1. Read the content of SVG file.
-         * 2. Parses the content of file to a [SvgElementNode] object.
+         * 2. Parses the content of file to a [SvgRootNode] object.
          * 3. Converts SVG element nodes to [ImageVectorNode] to get the list
          * of nodes.
          * 4. Lastly, an [IconFileContents] instance is assembled with the necessary
@@ -168,7 +168,7 @@ sealed class ImageParser(
             val content = readContent(file)
 
             val root = parse(content = content, fileType = FileType.Svg)
-            val svg = root.children.single { it is SvgElementNode } as SvgElementNode
+            val svg = root.children.single { it is SvgRootNode } as SvgRootNode
             val (x, y, viewportWidth, viewportHeight) = svg.viewBox
             val nodes = svg.asNodes(minified = config.minified).let { nodes ->
                 if (x != 0f || y != 0f) {

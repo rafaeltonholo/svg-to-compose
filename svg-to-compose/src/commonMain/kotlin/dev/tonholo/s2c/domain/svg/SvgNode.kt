@@ -2,7 +2,6 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
@@ -11,11 +10,12 @@ sealed interface SvgNode : XmlNode {
         removePrefix("url(#").removeSuffix(")")
 }
 
-class SvgElementNode(
+class SvgRootNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgRootNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+    override val constructor = ::SvgRootNode
     val width: Float by attribute<SvgLength?, Float> { width ->
         width?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
             ?: viewportWidth
@@ -90,7 +90,7 @@ class SvgElementNode(
     }
 }
 
-inline fun SvgElementNode.asNodes(
+inline fun SvgRootNode.asNodes(
     minified: Boolean,
 ): List<ImageVectorNode> {
     val masks = children.filterIsInstance<SvgMaskNode>()

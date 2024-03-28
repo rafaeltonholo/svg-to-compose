@@ -1,14 +1,15 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toPercentage
 
 class SvgGradientStopNode(
-    override val parent: XmlParentNode,
+    parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
-) : XmlChildNode(), SvgNode {
+) : SvgChildNode<SvgGradientStopNode>(parent), SvgNode {
+    override val constructor = ::SvgGradientStopNode
+
     /**
      * [StopElementOffsetAttribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-StopElementOffsetAttribute)
      */

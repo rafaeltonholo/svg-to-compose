@@ -8,15 +8,15 @@ import dev.tonholo.s2c.domain.compose.lowercase
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.domain.xml.toJsString
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toLengthFloatOrNull
 
-abstract class SvgGraphicNode(
-    override val parent: XmlParentNode,
+abstract class SvgGraphicNode<out T>(
+    parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
-) : XmlChildNode(), SvgNode {
+) : SvgChildNode<T>(parent), SvgNode
+    where T : SvgNode, T : XmlChildNode {
     val fill: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
     val opacity: Float? by attribute()
@@ -25,10 +25,10 @@ abstract class SvgGraphicNode(
 
     val style: String? by attribute()
 
-    val stroke: SvgColor? by attribute<String?, _> { it?.let { SvgColor(it) } }
+    val stroke: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
     val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <length | percentage>
 
@@ -45,7 +45,7 @@ abstract class SvgGraphicNode(
     } // <nonzero | evenodd>
 
     val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <0..1 | percentage>
 
@@ -70,8 +70,5 @@ abstract class SvgGraphicNode(
         strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
     }
 
-    override fun toString(): String {
-        // Swallow parent toString to avoid infinity toString loop.
-        return "{name:\"$tagName\", attributes:${attributes.toJsString()}, parent:\"${parent.tagName}\"}"
-    }
+    override fun toString(): String = toJsString()
 }
