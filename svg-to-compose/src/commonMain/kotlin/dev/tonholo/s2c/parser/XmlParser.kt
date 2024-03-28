@@ -8,11 +8,11 @@ import com.fleeksoft.ksoup.parser.Parser
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.avg.AvgAttrNode
 import dev.tonholo.s2c.domain.avg.AvgClipPath
-import dev.tonholo.s2c.domain.avg.AvgElementNode
 import dev.tonholo.s2c.domain.avg.AvgGradientItemNode
 import dev.tonholo.s2c.domain.avg.AvgGradientNode
 import dev.tonholo.s2c.domain.avg.AvgGroupNode
 import dev.tonholo.s2c.domain.avg.AvgPathNode
+import dev.tonholo.s2c.domain.avg.AvgRootNode
 import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
@@ -127,7 +127,7 @@ inline fun createAvgElement(
     parent: XmlParentNode,
 ): XmlNode {
     return when (nodeName) {
-        AvgElementNode.TAG_NAME -> AvgElementNode(
+        AvgRootNode.TAG_NAME -> AvgRootNode(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
