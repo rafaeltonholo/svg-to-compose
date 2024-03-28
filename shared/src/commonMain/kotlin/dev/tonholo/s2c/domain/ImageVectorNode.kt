@@ -102,10 +102,74 @@ sealed interface ImageVectorNode {
     }
 
     data class Group(
-        val clipPath: NodeWrapper?,
         val commands: List<ImageVectorNode>,
         val minified: Boolean,
+        val params: Params = Params(),
     ) : ImageVectorNode {
+        companion object {
+            private const val CLIP_PATH_PARAM_NAME = "clipPathData"
+            private const val ROTATE_PARAM_NAME = "rotate"
+            private const val PIVOT_X_PARAM_NAME = "pivotX"
+            private const val PIVOT_Y_PARAM_NAME = "pivotY"
+            private const val SCALE_X_PARAM_NAME = "scaleX"
+            private const val SCALE_Y_PARAM_NAME = "scaleY"
+            private const val TRANSLATION_X_PARAM_NAME = "translationX"
+            private const val TRANSLATION_Y_PARAM_NAME = "translationY"
+        }
+
+        data class Params(
+            val clipPath: NodeWrapper? = null,
+            val rotate: Float? = null,
+            val pivotX: Float? = null,
+            val pivotY: Float? = null,
+            val scaleX: Float? = null,
+            val scaleY: Float? = null,
+            val translationX: Float? = null,
+            val translationY: Float? = null,
+        ) {
+            fun isEmpty(): Boolean = clipPath == null &&
+                rotate == null &&
+                pivotX == null &&
+                pivotY == null &&
+                scaleX == null &&
+                scaleY == null &&
+                translationX == null &&
+                translationY == null
+        }
+
+        val imports: Set<String> = with(params) {
+            buildSet {
+                add("androidx.compose.ui.graphics.vector.group")
+                clipPath?.let { add("androidx.compose.ui.graphics.vector.PathData") }
+            }
+        }
+
+        private fun buildParameters(indentSize: Int): Set<Pair<String, String>> = with(params) {
+            buildSet {
+                clipPath?.let {
+                    val clipPathData = clipPath.nodes
+                        .joinToString("\n${" ".repeat(indentSize * 2)}") {
+                            it.materialize()
+                                .replace("\n", "\n${" ".repeat(indentSize * 2)}")
+                                .trimEnd()
+                        }
+                    val value = """
+                        |PathData {
+                        |    ${clipPathData.indented(indentSize = 4)}
+                        |${"}".indented(indentSize)}"""
+                        .trimMargin()
+                    add(CLIP_PATH_PARAM_NAME to value)
+                }
+                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
+                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
+                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
+                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
+                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
+                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
+                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
+            }
+        }
+
         override fun materialize(): String {
             val indentSize = 4
             val groupPaths = commands
@@ -114,30 +178,26 @@ sealed interface ImageVectorNode {
                         .replace("\n", "\n${" ".repeat(indentSize)}")
                         .trimEnd()
                 }
-            val groupParams = if (clipPath != null) {
-                val clipPathData = clipPath.nodes
-                    .joinToString("\n${" ".repeat(indentSize * 2)}") {
-                        it.materialize()
-                            .replace("\n", "\n${" ".repeat(indentSize * 2)}")
-                            .trimEnd()
-                    }
 
-                val clipPathComment = if (minified) {
-                    ""
-                } else {
-                    "\n|${"// ${clipPath.normalizedPath}".indented(4)}"
+            val groupParams = buildParameters(indentSize)
+
+            val groupParamsString = if (groupParams.isNotEmpty()) {
+                val params = groupParams.joinToString("\n") { (param, value) ->
+                    if (param == CLIP_PATH_PARAM_NAME && minified.not() && params.clipPath != null) {
+                        "${"// ${params.clipPath.normalizedPath}".indented(4)}\n"
+                    } else {
+                        ""
+                    } + "$param = $value,".indented(indentSize)
                 }
-                """($clipPathComment
-                |    clipPathData = PathData {
-                |        $clipPathData
-                |    },
+                """(
+                |$params
                 |)"""
             } else {
                 ""
             }
 
             return """
-                |group$groupParams {
+                |group$groupParamsString {
                 |    $groupPaths
                 |}
             """.trimMargin()
