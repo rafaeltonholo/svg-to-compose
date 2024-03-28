@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.domain
 
-import dev.tonholo.s2c.domain.svg.SvgElementNode
+import dev.tonholo.s2c.domain.svg.SvgRootNode
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
@@ -11,7 +11,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class ImageVectorNodeTest {
-    private val root = SvgElementNode(
+    private val root = SvgRootNode(
         parent = XmlRootNode(children = mutableSetOf()),
         children = mutableSetOf(),
         attributes = mutableMapOf(),

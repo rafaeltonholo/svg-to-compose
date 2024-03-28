@@ -17,19 +17,20 @@ import kotlin.math.sin
 class SvgCircleNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
-) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
+) : SvgGraphicNode<SvgCircleNode>(parent, attributes, TAG_NAME), SvgNode {
+    override val constructor = ::SvgCircleNode
     val cx: Float by attribute<SvgLength, Float>(defaultValue = 0.0f) { cx ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportWidth
         cx.toFloat(baseDimension)
     }
     val cy: Float by attribute<SvgLength, Float>(defaultValue = 0.0f) { cy ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         val baseDimension = root.viewportHeight
         cy.toFloat(baseDimension)
     }
     val radius: Float by attribute<String, Float>(name = "r", defaultValue = 0.0f) { radius ->
-        val root = rootParent as SvgElementNode
+        val root = rootParent as SvgRootNode
         radius.toLengthFloat(width = root.viewportWidth, root.viewportHeight)
     }
 

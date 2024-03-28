@@ -8,4 +8,6 @@ class SvgLinearGradientNode(
     parent: XmlParentNode,
     children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgLinearGradient(parent, children, attributes), SvgNode
+) : SvgLinearGradient<SvgLinearGradientNode>(parent, children, attributes), SvgNode {
+    override val constructor = ::SvgLinearGradientNode
+}

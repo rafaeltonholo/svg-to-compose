@@ -9,7 +9,8 @@ import dev.tonholo.s2c.domain.xml.XmlParentNode
 class SvgPathNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
-) : SvgGraphicNode(parent, attributes, TAG_NAME), SvgNode {
+) : SvgGraphicNode<SvgPathNode>(parent, attributes, TAG_NAME), SvgNode {
+    override val constructor = ::SvgPathNode
     val d: String by attribute()
     val clipPath: String? by attribute(name = "clip-path")
 
