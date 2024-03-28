@@ -7,10 +7,7 @@ import dev.tonholo.s2c.logger.verboseSection
 import kotlin.math.max
 
 val defaultImports = setOf(
-    "androidx.compose.ui.graphics.Color",
-    "androidx.compose.ui.graphics.SolidColor",
     "androidx.compose.ui.graphics.vector.ImageVector",
-    "androidx.compose.ui.graphics.vector.path",
     "androidx.compose.ui.unit.dp",
 )
 
@@ -24,11 +21,6 @@ val previewImports = setOf(
     "androidx.compose.ui.Alignment",
     "androidx.compose.ui.Modifier",
     "androidx.compose.ui.tooling.preview.Preview",
-)
-
-val groupImports = setOf(
-    "androidx.compose.ui.graphics.vector.PathData",
-    "androidx.compose.ui.graphics.vector.group",
 )
 
 val materialReceiverTypeImport = setOf(
