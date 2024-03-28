@@ -10,15 +10,14 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import dev.tonholo.s2c.domain.compose.GradientTileMode
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
 class AvgGradientNode(
     parent: XmlParentNode,
-    override val children: MutableSet<XmlNode>,
+    children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : XmlElementNode(parent, children, attributes, tagName = AvgGradient.TAG_NAME),
+) : AvgElementNode(parent, children, attributes, tagName = AvgGradient.TAG_NAME),
     AvgNode,
     AvgLinearGradient,
     AvgRadianGradient,

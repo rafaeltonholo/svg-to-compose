@@ -1,13 +1,12 @@
 package dev.tonholo.s2c.domain.avg
 
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
 class AvgGradientItemNode(
-    override val parent: XmlParentNode,
+    parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
-) : XmlChildNode(), AvgNode {
+) : AvgChildNode(parent), AvgNode {
     override val tagName: String = TAG_NAME
     val offset: Float? by attribute(namespace = AvgNode.NAMESPACE)
     val color: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
