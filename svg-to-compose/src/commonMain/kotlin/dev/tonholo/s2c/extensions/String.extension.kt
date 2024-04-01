@@ -3,14 +3,7 @@ package dev.tonholo.s2c.extensions
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private const val FULL_HEXADECIMAL_COLOR_SIZE = 6
-private const val HALF_HEXADECIMAL_COLOR_SIZE = 3
 private const val PERCENT = 100f
-private const val RGBA_PREFIX = "RGBA"
-private const val RGBA_SIZE = 4
-private const val RGB_PREFIX = "RGB"
-private const val RGB_SIZE = 3
-private const val RGB_MAX_VALUE = 255
 
 private fun String.replaceDividers(): String {
     val pattern = "([_\\-. ])[a-zA-Z0-9]".toRegex()

@@ -3,13 +3,13 @@ package dev.tonholo.s2c.logger
 import AppConfig
 
 fun debug(message: Any) {
-    if (AppConfig.debug) {
+    if (!AppConfig.silent && AppConfig.debug) {
         println("D: $message")
     }
 }
 
 fun <T> debugSection(title: String, block: () -> T): T =
-    if (AppConfig.debug) {
+    if (!AppConfig.silent && AppConfig.debug) {
         startSection(title)
         block().also { endSection() }
     } else {
@@ -17,7 +17,7 @@ fun <T> debugSection(title: String, block: () -> T): T =
     }
 
 fun <T> verboseSection(title: String, block: () -> T) =
-    if (AppConfig.verbose) {
+    if (!AppConfig.silent && AppConfig.verbose) {
         startSection(title)
         block().also { endSection() }
     } else {
@@ -38,18 +38,26 @@ private fun endSection() {
 }
 
 fun verbose(message: String) {
-    if (AppConfig.verbose) {
+    if (!AppConfig.silent && AppConfig.verbose) {
         println("V: $message")
     }
 }
 
 @Suppress("ForbiddenComment")
 inline fun warn(message: String) {
-    println("WARNING ⚠️: $message") // TODO: add color to output.
+    if (!AppConfig.silent) {
+        println("WARNING ⚠️: $message") // TODO: add color to output.
+    }
 }
 
 inline fun output(message: String) {
-    println(message)
+    if (!AppConfig.silent) {
+        println(message)
+    }
 }
 
-inline fun printEmpty() = println()
+inline fun printEmpty() {
+    if (!AppConfig.silent) {
+        println()
+    }
+}
