@@ -1,4 +1,3 @@
-
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.IconWriter
@@ -17,6 +16,7 @@ import kotlin.system.exitProcess
  */
 fun main() {
     AppConfig.debug = false
+    AppConfig.silent = false
     val suffix = "v4"
     val (pkg, path, output) = SampleFile.Directory(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),

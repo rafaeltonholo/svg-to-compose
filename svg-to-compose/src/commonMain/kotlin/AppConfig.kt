@@ -3,4 +3,5 @@ object AppConfig {
     const val MAX_RECURSIVE_DEPTH = 10
     var debug = false
     var verbose = false
+    var silent = false
 }

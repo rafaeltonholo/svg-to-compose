@@ -122,6 +122,11 @@ class Client : CliktCommand() {
             "The default value is ${AppConfig.MAX_RECURSIVE_DEPTH}."
     ).int().default(AppConfig.MAX_RECURSIVE_DEPTH)
 
+    private val silent by option(
+        names = arrayOf("--silent"),
+        help = "Enable silent run mode. This will suppress all the output logs this CLI provides.",
+    ).flag()
+
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
@@ -138,9 +143,11 @@ class Client : CliktCommand() {
         verbose("   minified = $minified")
         verbose("   recursive = $recursive")
         verbose("   recursiveDepth = $recursiveDepth")
+        verbose("   silent = $silent")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
+        AppConfig.silent = silent
 
         try {
             val fileSystem = FileSystem.SYSTEM
