@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.parser
 
 import dev.tonholo.s2c.domain.FileType
-import dev.tonholo.s2c.domain.IconDefinition
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.avg.AvgRootNode
@@ -85,7 +84,6 @@ sealed class ImageParser(
      *
      * @see defaultImports
      * @see previewImports
-     * @see groupImports
      * @see materialReceiverTypeImport
      * @see ImageVectorNode.Path.pathImports
      */
@@ -102,6 +100,13 @@ sealed class ImageParser(
         }
         val nodeImports = nodes
             .asSequence()
+            .flatMap {
+                if (it is ImageVectorNode.ChunkFunction) {
+                    it.nodes
+                } else {
+                    listOf(it)
+                }
+            }
             .flatMap { node ->
                 if (node is ImageVectorNode.Group) {
                     node.imports + node.commands.flatMap { node.imports }

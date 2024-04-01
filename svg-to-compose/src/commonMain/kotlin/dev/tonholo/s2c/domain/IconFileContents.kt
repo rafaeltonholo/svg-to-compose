@@ -4,7 +4,14 @@ import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
+import dev.tonholo.s2c.logger.warn
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.roundToInt
+
+private const val ICON_BASE_STRUCTURE_BYTE_SIZE = 73
+private const val EXTRA_CONTENT_PLACEHOLDER = "[EXTRA_CONTENT_PLACEHOLDER]"
 
 val defaultImports = setOf(
     "androidx.compose.ui.graphics.vector.ImageVector",
@@ -71,14 +78,25 @@ data class IconFileContents(
             else -> iconName.pascalCase()
         }
 
-        val indentSize = 12
-        val pathNodes = nodes.joinToString("\n${" ".repeat(indentSize)}") {
-            it.materialize()
-                .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
+        val (nodes, chunkFunctions) = chunkNodesIfNeeded()
+
+        val chunkFunctionsStr = if (!chunkFunctions.isNullOrEmpty()) {
+            """|
+               |${chunkFunctions.joinToString("\n\n") { it.createChunkFunction() }}
+               """
+        } else {
+            ""
         }
 
+        val indentSize = 12
+        val pathNodes = nodes
+            .joinToString("\n${" ".repeat(indentSize)}") {
+                it.materialize()
+                    .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
+            }
+
         val preview = if (noPreview) {
-            "|"
+            ""
         } else {
             """
             |
@@ -100,8 +118,16 @@ data class IconFileContents(
             |        }
             |    }
             |}
-            |
             """
+        }
+
+        val extraContent = buildString {
+            if (chunkFunctionsStr.isNotEmpty()) {
+                appendLine(chunkFunctionsStr.trimMargin())
+            }
+            if (preview.isNotEmpty()) {
+                appendLine(preview.trimMargin())
+            }
         }
 
         val visibilityModifier = if (makeInternal) "internal " else ""
@@ -126,10 +152,44 @@ data class IconFileContents(
             |            $pathNodes
             |        }.build().also { _${iconName.camelCase()} = it }
             |    }
-            ${preview.trim()}
+            |$EXTRA_CONTENT_PLACEHOLDER
             |@Suppress("ObjectPropertyName")
             |private var _${iconName.camelCase()}: ImageVector? = null
             |
-        """.trimMargin()
+        """.replace(EXTRA_CONTENT_PLACEHOLDER, extraContent)
+            .trimMargin()
+    }
+
+    private fun chunkNodesIfNeeded(): Pair<List<ImageVectorNode>, List<ImageVectorNode.ChunkFunction>?> {
+        val byteSize = ICON_BASE_STRUCTURE_BYTE_SIZE + nodes
+            .sumOf { it.approximateByteSize }
+        val shouldChunkNodes = byteSize > MethodSizeAccountable.METHOD_SIZE_THRESHOLD
+
+        val nodes = if (shouldChunkNodes) {
+            var i = 1
+            val chunks = ceil(byteSize.toFloat() / MethodSizeAccountable.METHOD_SIZE_THRESHOLD)
+                .roundToInt()
+            val chunkSize = nodes.size / chunks
+            warn(
+                "Potential large icon detected. Splitting icon's content in $chunks chunks to avoid " +
+                    "compilation issues. However, that won't affect the performance of displaying this icon."
+            )
+            nodes.chunked(chunkSize) { chunk ->
+                val snapshot = chunk.toList()
+                ImageVectorNode.ChunkFunction(
+                    functionName = "${iconName.camelCase()}Chunk${i++}",
+                    nodes = snapshot,
+                )
+            }
+        } else {
+            nodes
+        }
+        val chunkFunctions = if (shouldChunkNodes) {
+            nodes.filterIsInstance<ImageVectorNode.ChunkFunction>()
+        } else {
+            null
+        }
+
+        return nodes to chunkFunctions
     }
 }
