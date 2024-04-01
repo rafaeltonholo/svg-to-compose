@@ -8,6 +8,7 @@ import dev.tonholo.s2c.domain.compose.StrokeCap.Companion.Square
 import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Bevel
 import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Miter
 import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Round
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import kotlin.jvm.JvmInline
 
 /**
@@ -59,10 +60,12 @@ fun <T> ComposeType<T>.lowercase(): String = value.toString().lowercase()
  * string value.
  */
 @JvmInline
-value class PathFillType private constructor(override val value: String) : ComposeType<String> {
+value class PathFillType private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
     companion object {
         private const val NAME = "PathFillType"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+        // Each PathFillType contributes approximately 4 bytes.
+        private const val BYTECODE_SIZE = 4
         val EvenOdd = PathFillType("EvenOdd")
         val NonZero = PathFillType("NonZero")
 
@@ -91,6 +94,9 @@ value class PathFillType private constructor(override val value: String) : Compo
     override val imports: Set<String>
         get() = IMPORT
 
+    override val approximateByteSize: Int
+        get() = BYTECODE_SIZE
+
     override fun toString(): String = value
 
     override fun toCompose(): String? = when (this.value.lowercase()) {
@@ -118,10 +124,12 @@ value class PathFillType private constructor(override val value: String) : Compo
  * string value.
  */
 @JvmInline
-value class StrokeCap private constructor(override val value: String) : ComposeType<String> {
+value class StrokeCap private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
     companion object {
         private const val NAME = "StrokeCap"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+        // Each StrokeCap contributes approximately 4 bytes.
+        private const val BYTECODE_SIZE = 4
         val Butt = StrokeCap("Butt")
         val Round = StrokeCap("Round")
         val Square = StrokeCap("Square")
@@ -151,6 +159,9 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
     override val imports: Set<String>
         get() = IMPORT
 
+    override val approximateByteSize: Int
+        get() = BYTECODE_SIZE
+
     override fun toString(): String = value
 
     override fun toCompose(): String? = when (this.lowercase()) {
@@ -179,10 +190,12 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
  * string value.
  */
 @JvmInline
-value class StrokeJoin private constructor(override val value: String) : ComposeType<String> {
+value class StrokeJoin private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
     companion object {
         private const val NAME = "StrokeJoin"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+        // Each StrokeJoin contributes approximately 4 bytes.
+        private const val BYTECODE_SIZE = 4
         val Miter = StrokeJoin("Miter")
         val Round = StrokeJoin("Round")
         val Bevel = StrokeJoin("Bevel")
@@ -212,6 +225,9 @@ value class StrokeJoin private constructor(override val value: String) : Compose
 
     override val imports: Set<String>
         get() = IMPORT
+
+    override val approximateByteSize: Int
+        get() = BYTECODE_SIZE
 
     override fun toString(): String = value
 

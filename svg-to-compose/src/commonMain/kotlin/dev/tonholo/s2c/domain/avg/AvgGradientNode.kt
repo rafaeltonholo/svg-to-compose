@@ -30,7 +30,7 @@ class AvgGradientNode(
     override val endX: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val endY: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val tileMode: AvgGradientTileMode? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
-        tileMode?.let { AvgGradientTileMode(it) }
+        tileMode?.let(AvgGradientTileMode::invoke)
     }
     override val startColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
         it?.let(::AvgColor)

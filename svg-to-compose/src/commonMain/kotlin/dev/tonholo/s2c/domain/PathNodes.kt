@@ -16,6 +16,9 @@ import dev.tonholo.s2c.domain.PathNodes.VerticalLineTo
 import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.BOOLEAN_APPROXIMATE_BYTE_SIZE
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
 
 /**
  * PathNodes is a sealed class that contains multiple classes to represent
@@ -33,9 +36,25 @@ sealed class PathNodes(
     val isRelative: Boolean,
     val command: PathCommand,
     val minified: Boolean,
-) {
+) : MethodSizeAccountable {
+    companion object {
+        /**
+         * The approximate bytecode size of invoking the method.
+         */
+        private const val METHOD_INVOKE_BYTE_SIZE = 6
+    }
     val shouldClose = values[command.size - 1].last().lowercaseChar() == PathCommand.Close.value
     protected val realCommand = if (isRelative) command else command.uppercaseChar()
+
+    /**
+     * Calculates the approximate bytecode size of the path nodes.
+     * Accounts for method invocation byte size, float byte sizes,
+     * and additional byte size if the path should be closed.
+     */
+    override val approximateByteSize: Int
+        get() = METHOD_INVOKE_BYTE_SIZE +
+            FLOAT_APPROXIMATE_BYTE_SIZE * command.size +
+            if (shouldClose) METHOD_INVOKE_BYTE_SIZE else 0
 
     /**
      * Visible for Test only.
@@ -221,6 +240,20 @@ sealed class PathNodes(
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
+
+        /**
+         * Calculates the approximate bytecode size of the path nodes.
+         * Accounts for method invocation byte size, float byte sizes,
+         * and additional byte size if the path should be closed.
+         *
+         * [ArcTo] differs from the others since it deals with [Boolean]
+         * parameters as well.
+         */
+        override val approximateByteSize: Int
+            get() = METHOD_INVOKE_BYTE_SIZE +
+                ((command.size - 2) * FLOAT_APPROXIMATE_BYTE_SIZE) +
+                (2 * BOOLEAN_APPROXIMATE_BYTE_SIZE) +
+                if (shouldClose) METHOD_INVOKE_BYTE_SIZE else 0
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -672,3 +705,8 @@ sealed class PathNodes(
         }
     }
 }
+
+val List<PathNodes>.approximateByteSize
+    get() = sumOf {
+        it.approximateByteSize
+    }

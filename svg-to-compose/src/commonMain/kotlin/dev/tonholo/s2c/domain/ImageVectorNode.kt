@@ -14,8 +14,10 @@ import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
 
-sealed interface ImageVectorNode {
+sealed interface ImageVectorNode : MethodSizeAccountable {
     val transformations: List<AffineTransformation>?
     val imports: Set<String>
 
@@ -46,9 +48,7 @@ sealed interface ImageVectorNode {
                     )
                 )
 
-                is HelperFunction -> copy(
-                    node = node.applyTransformation()
-                )
+                is ChunkFunction -> error("Transformation should be applied before creating helper functions.")
             }
         } ?: this
     }
@@ -58,7 +58,16 @@ sealed interface ImageVectorNode {
         val wrapper: NodeWrapper,
         val minified: Boolean,
         override val transformations: List<AffineTransformation>? = null,
-    ) : ImageVectorNode {
+    ) : ImageVectorNode, MethodSizeAccountable {
+        companion object {
+            const val PATH_IMPORT = "androidx.compose.ui.graphics.vector.path"
+
+            /**
+             * The approximate byte size of the `Path` class itself.
+             */
+            private const val PATH_APPROXIMATE_BYTE_SIZE = 133
+        }
+
         data class Params(
             val fill: ComposeBrush?,
             val fillAlpha: Float? = null,
@@ -69,16 +78,38 @@ sealed interface ImageVectorNode {
             val strokeLineJoin: StrokeJoin? = null,
             val strokeMiterLimit: Float? = null,
             val strokeLineWidth: Float? = null,
-        )
+        ) : MethodSizeAccountable {
+            /**
+             * The approximate bytecode size accounted of the path parameters.
+             */
+            override val approximateByteSize: Int = (fill?.approximateByteSize ?: 0) +
+                (fillAlpha?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                (pathFillType?.approximateByteSize ?: 0) +
+                (stroke?.approximateByteSize ?: 0) +
+                (strokeAlpha?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                (strokeLineCap?.approximateByteSize ?: 0) +
+                (strokeLineJoin?.approximateByteSize ?: 0) +
+                (strokeMiterLimit?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                (strokeLineWidth?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0)
+        }
 
         override val imports: Set<String> = buildSet {
-            add("androidx.compose.ui.graphics.vector.path")
+            add(PATH_IMPORT)
             params.pathFillType?.let { addAll(it.imports) }
             params.strokeLineCap?.let { addAll(it.imports) }
             params.strokeLineJoin?.let { addAll(it.imports) }
             params.fill?.let { addAll(it.imports) }
             params.stroke?.let { addAll(it.imports) }
         }
+
+        /**
+         * The approximate bytecode size of the `path` instruction,
+         * accounting for its components.
+         */
+        override val approximateByteSize: Int
+            get() = PATH_APPROXIMATE_BYTE_SIZE +
+                params.approximateByteSize +
+                wrapper.nodes.approximateByteSize
 
         override fun materialize(): String {
             val indentSize = 4
@@ -145,8 +176,10 @@ sealed interface ImageVectorNode {
         val minified: Boolean,
         val params: Params = Params(),
         override val transformations: List<AffineTransformation>? = null,
-    ) : ImageVectorNode {
+    ) : ImageVectorNode, MethodSizeAccountable {
         companion object {
+            private const val GROUP_APPROXIMATE_BYTE_SIZE = 90
+            private const val CLIP_PATH_APPROXIMATE_BYTE_SIZE = 30
             private const val CLIP_PATH_PARAM_NAME = "clipPathData"
             private const val ROTATE_PARAM_NAME = "rotate"
             private const val PIVOT_X_PARAM_NAME = "pivotX"
@@ -166,7 +199,20 @@ sealed interface ImageVectorNode {
             val scaleY: Float? = null,
             val translationX: Float? = null,
             val translationY: Float? = null,
-        ) {
+        ) : MethodSizeAccountable {
+            /**
+             * The approximate bytecode size accounted of the group parameters.
+             */
+            override val approximateByteSize: Int
+                get() = (rotate?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (pivotX?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (pivotY?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (scaleX?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (scaleY?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (translationX?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (translationY?.let { FLOAT_APPROXIMATE_BYTE_SIZE } ?: 0) +
+                    (clipPath?.nodes?.approximateByteSize?.let(CLIP_PATH_APPROXIMATE_BYTE_SIZE::plus) ?: 0)
+
             fun isEmpty(): Boolean = clipPath == null &&
                 rotate == null &&
                 pivotX == null &&
@@ -181,8 +227,18 @@ sealed interface ImageVectorNode {
             buildSet {
                 add("androidx.compose.ui.graphics.vector.group")
                 clipPath?.let { add("androidx.compose.ui.graphics.vector.PathData") }
+                addAll(commands.flatMap { it.imports })
             }
         }
+
+        /**
+         * The approximate bytecode size of the `group` instruction,
+         * accounting for its components.
+         */
+        override val approximateByteSize: Int
+            get() = GROUP_APPROXIMATE_BYTE_SIZE +
+                params.approximateByteSize +
+                commands.sumOf { it.approximateByteSize + 1 }
 
         private fun buildParameters(indentSize: Int): Set<Pair<String, String>> = with(params) {
             buildSet {
@@ -242,6 +298,44 @@ sealed interface ImageVectorNode {
                 |}
             """.trimMargin()
         }
+    }
+
+    /**
+     * A Chunk function wrapper to separate the icon instructions in smaller pieces.
+     */
+    data class ChunkFunction(
+        val functionName: String,
+        val nodes: List<ImageVectorNode>,
+    ) : ImageVectorNode {
+        override val transformations: List<AffineTransformation>
+            get() = error("Transformation should be applied before creating chunk functions.")
+        override val imports: Set<String> = emptySet()
+        override val approximateByteSize: Int
+            get() = error("A chunk function should not compute its byte size")
+
+        init {
+            check(nodes.none { it is ChunkFunction })
+        }
+
+        /**
+         * Create the chunk function wrapping the `path`/`group` instructions
+         * within a smaller method.
+         */
+        fun createChunkFunction(): String {
+            val indentSize = 4
+            val bodyFunction = nodes.joinToString("\n${" ".repeat(indentSize)}") {
+                it.materialize()
+                    .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
+            }
+
+            return """
+                    |private fun ImageVector.Builder.$functionName() {
+                    |    $bodyFunction
+                    |}
+                    """.trimMargin()
+        }
+
+        override fun materialize(): String = "$functionName()"
     }
 
     data class NodeWrapper(
