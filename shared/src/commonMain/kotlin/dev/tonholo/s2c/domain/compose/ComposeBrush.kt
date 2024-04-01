@@ -1,12 +1,16 @@
 package dev.tonholo.s2c.domain.compose
 
 import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import kotlin.jvm.JvmInline
 
-sealed interface ComposeBrush : ComposeType<String> {
+sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
     @JvmInline
     value class SolidColor(override val value: String) : ComposeBrush {
         companion object {
+            // By instantiating SolidColor, Color and an Integer (0xFF<color value>),
+            // SolidColor brush accounts with 18 bytes approximately.
+            private const val BYTECODE_SIZE = 18
             private const val NAME = "SolidColor"
             private val IMPORT = setOf(
                 ComposeColor.IMPORT,
@@ -18,6 +22,8 @@ sealed interface ComposeBrush : ComposeType<String> {
             get() = NAME
         override val imports: Set<String>
             get() = IMPORT
+
+        override val approximateByteSize: Int get() = BYTECODE_SIZE
 
         override fun toCompose(): String? = ComposeColor(value).toCompose()?.let { color ->
             "$name($color)"
@@ -35,6 +41,10 @@ sealed interface ComposeBrush : ComposeType<String> {
                     "androidx.compose.ui.graphics.$NAME",
                 )
             private const val INDENT_SIZE = 8
+
+            // By calling Brush.linearGradient, Brush.radialGradient or Brush.sweepGradient
+            // with no parameters, we add 16 bytes, approximately, to the method size.
+            private const val BRUSH_GRADIENT_METHOD_BYTECODE_SIZE = 16
         }
 
         val colors: List<ComposeColor>
@@ -44,6 +54,29 @@ sealed interface ComposeBrush : ComposeType<String> {
             get() = NAME
         override val imports: Set<String>
             get() = IMPORT
+
+        // Base calculation for all gradients.
+        // The end value will differ when specific parameters get im place.
+        override val approximateByteSize: Int
+            get() = BRUSH_GRADIENT_METHOD_BYTECODE_SIZE +
+                calculateColorBytes()
+
+        fun calculateColorBytes(): Int {
+            val stops = stops
+            return if (stops.isNullOrEmpty()) {
+                val size = colors.size
+                val baseColorByteSize = 13
+                if (size > 1) {
+                    25 + (baseColorByteSize * (size - 1))
+                } else {
+                    8
+                }
+            } else {
+                val size = stops.size
+                val baseColorByteSize = 22
+                25 + (baseColorByteSize * (size - 1))
+            }
+        }
 
         data class Linear(
             val start: ComposeOffset,
@@ -55,19 +88,37 @@ sealed interface ComposeBrush : ComposeType<String> {
             override val value: String = toCompose()
             override val imports: Set<String> = buildSet {
                 addAll(super.imports)
-                // Don't need to add from the end property since both
-                // are from the same type.
-                addAll(start.imports)
+                if (start != ComposeOffset.Zero) {
+                    addAll(start.imports)
+                }
+                if (end != ComposeOffset.Infinite) {
+                    addAll(end.imports)
+                }
+                tileMode?.imports?.let(::addAll)
             }
+
+            override val approximateByteSize: Int
+                get() = super.approximateByteSize +
+                    (if (start != ComposeOffset.Zero) start.approximateByteSize else 0) +
+                    (if (end != ComposeOffset.Infinite) end.approximateByteSize else 0) +
+                    (tileMode?.approximateByteSize ?: 0)
 
             override fun toCompose(): String = buildString {
                 append(name)
                 appendLine(".linearGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
-                appendLine("start = ${start.toCompose()},".indented(INDENT_SIZE))
-                appendLine("end = ${end.toCompose()},".indented(INDENT_SIZE))
+                start.toCompose().let {
+                    if (it != ComposeOffset.ZERO) {
+                        appendLine("start = $it,".indented(INDENT_SIZE))
+                    }
+                }
+                end.toCompose().let {
+                    if (it != ComposeOffset.INFINITE) {
+                        appendLine("end = $it,".indented(INDENT_SIZE))
+                    }
+                }
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
-                    appendLine("tileMode = $tileMode,".indented(INDENT_SIZE))
+                    appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
                 }
                 append(")".indented(INDENT_SIZE / 2))
             }
@@ -81,27 +132,32 @@ sealed interface ComposeBrush : ComposeType<String> {
             override val stops: List<Float>? = null,
         ) : Gradient {
             override val value: String = toCompose()
-            override val imports: Set<String> = if (center == null) {
-                super.imports
-            } else {
-                buildSet {
-                    addAll(super.imports)
+            override val imports: Set<String> = buildSet {
+                addAll(super.imports)
+                if (center != null && center != ComposeOffset.Infinite) {
                     addAll(center.imports)
                 }
+                tileMode?.imports?.let(::addAll)
             }
+
+            override val approximateByteSize: Int
+                get() = super.approximateByteSize +
+                    (if (radius != null) 1 else 0) +
+                    (if (center != null && center != ComposeOffset.Infinite) center.approximateByteSize else 0) +
+                    (tileMode?.approximateByteSize ?: 0)
 
             override fun toCompose(): String = buildString {
                 append(name)
                 appendLine(".radialGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
-                if (center != null) {
+                if (center != null && center != ComposeOffset.Infinite) {
                     appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
                 }
                 if (radius != null) {
                     appendLine("radius = ${radius}f,".indented(INDENT_SIZE))
                 }
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
-                    appendLine("tileMode = $tileMode,".indented(INDENT_SIZE))
+                    appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
                 }
                 append(")".indented(INDENT_SIZE / 2))
             }
@@ -122,9 +178,13 @@ sealed interface ComposeBrush : ComposeType<String> {
                 }
             }
 
+            override val approximateByteSize: Int
+                get() = super.approximateByteSize +
+                    (if (center != null && center != ComposeOffset.Infinite) center.approximateByteSize else 0)
+
             override fun toCompose(): String = buildString {
                 append(name)
-                appendLine(".radialGradient(")
+                appendLine(".sweepGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
                 if (center != null) {
                     appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
