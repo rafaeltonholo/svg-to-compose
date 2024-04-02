@@ -7,12 +7,12 @@ import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.xml.XmlNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class SvgGroupNodeTests : BaseSvgTest() {
     @Test
-    fun `ensure asNode function returns ImageVectorNode Group`() {
+    fun `ensure flatNode function returns list of ImageVectorNode Paths when no attribute on group`() {
         // Arrange
         val svgGroupNode = SvgGroupNode(
             parent = root,
@@ -70,19 +70,17 @@ class SvgGroupNodeTests : BaseSvgTest() {
         )
 
         // Act
-        val group = svgGroupNode.asNode(
+        val groupNodes = svgGroupNode.flatNode(
             masks = emptyList(),
             minified = minified,
         )
 
         // Assert
-        assertEquals(2, group.commands.size)
-        assertNull(group.clipPath)
-        val actualNodes = group.commands.filterIsInstance<ImageVectorNode.Path>()
-        assertEquals(2, actualNodes.size)
+        assertIs<List<ImageVectorNode.Path>>(groupNodes)
+        assertEquals(2, groupNodes.size)
         for (i in expectedNodes.indices) {
             val expected = expectedNodes[i]
-            val actual = actualNodes[i]
+            val actual = groupNodes[i]
             assertEquals(expected = expected.params.fill, actual = actual.params.fill)
             assertEquals(expected = expected.wrapper.normalizedPath, actual = actual.wrapper.normalizedPath)
             assertEquals(expected = expected.wrapper.nodes.size, actual = actual.wrapper.nodes.size)
@@ -93,7 +91,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
     }
 
     @Test
-    fun `ensure asNode function returns ImageVectorNode Group with clipPath`() {
+    fun `ensure flatNode function returns ImageVectorNode Group with clipPath`() {
         val maskId = "id_of_mask"
         // Prepare test data
         val groupChildren = mutableSetOf<XmlNode>()
@@ -179,11 +177,12 @@ class SvgGroupNodeTests : BaseSvgTest() {
         )
 
         // Act
-        val groupNode = group.asNode(masks = listOf(mask), minified = false)
+        val groupNode = group.flatNode(masks = listOf(mask), minified = false).single()
 
         // Assert
+        assertIs<ImageVectorNode.Group>(groupNode)
         assertEquals(2, groupNode.commands.size)
-        val actualClipPath = groupNode.clipPath
+        val actualClipPath = groupNode.params.clipPath
         assertNotNull(actualClipPath)
         assertEquals(expected = expectedClipPath.normalizedPath, actual = actualClipPath.normalizedPath)
         val expectedClipPathParams = expectedClipPath.nodes.map { it.buildParameters() }
