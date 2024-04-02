@@ -96,7 +96,7 @@ private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode 
                 }
             }
 
-        val element = (preProcessedElement ?: when (node) {
+        val element = preProcessedElement ?: when (node) {
             is Element -> {
                 createElement(
                     node = node,
@@ -118,17 +118,17 @@ private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode 
                 warn("not supported node '${node.nodeName()}'.")
                 null
             }
-        })?.also {
-            if (it is XmlElementNode && node is Element && node.childrenSize() > 0) {
-                current = it
-                stack.addLast(it)
-                if (depth == 0 && it is SvgRootNode) {
-                    root = it
-                }
+        }
+
+        if (element != null && element is XmlElementNode && node is Element && node.hasChildNodes()) {
+            current = element
+            stack.addLast(element)
+            if (depth == 0 && (element is SvgRootNode || element is AvgRootNode)) {
+                root = element
             }
-            if (it is XmlChildNode && !it.id.isNullOrEmpty()) {
-                elementsWithId.add(it)
-            }
+        }
+        if (element != null && element is XmlChildNode && !element.id.isNullOrEmpty()) {
+            elementsWithId.add(element)
         }
 
         element?.let {

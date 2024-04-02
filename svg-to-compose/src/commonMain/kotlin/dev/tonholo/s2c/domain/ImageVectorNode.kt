@@ -332,7 +332,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                     |private fun ImageVector.Builder.$functionName() {
                     |    $bodyFunction
                     |}
-                    """.trimMargin()
+            """.trimMargin()
         }
 
         override fun materialize(): String = "$functionName()"

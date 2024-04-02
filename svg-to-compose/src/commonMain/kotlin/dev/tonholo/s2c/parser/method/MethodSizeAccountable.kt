@@ -33,6 +33,7 @@ interface MethodSizeAccountable {
          * in Android Studio or IntelliJ, although they can compile and render on Android.
          */
         const val METHOD_SIZE_THRESHOLD = 32767
+
         /**
          * Represents the approximate byte size accounted for by a floating-point number instruction.
          */

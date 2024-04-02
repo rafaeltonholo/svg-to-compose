@@ -9,6 +9,7 @@ value class GradientTileMode private constructor(override val value: String) :
     companion object {
         private const val NAME = "TileMode"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+
         // Each GradientTileMode contributes approximately 4 bytes.
         private const val BYTECODE_SIZE = 5
         val Clamp = GradientTileMode("Clamp")

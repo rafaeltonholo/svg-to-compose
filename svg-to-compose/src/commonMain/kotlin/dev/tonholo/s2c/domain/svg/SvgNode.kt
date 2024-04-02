@@ -100,7 +100,6 @@ class SvgRootNode(
         transform?.let(::SvgTransform)
     }
 
-
     /**
      * Checks if width is present in the attribute map.
      * If it is the case, return the [width] property which

@@ -103,7 +103,6 @@ class SvgUseNode(
                 .associate { it.key to it.value }
                 .toMutableMap()
 
-
             when (childReplacement) {
                 // When the 'use' element is a 'symbol', convert it to
                 // an 'svg' element and set 'width' and 'height' attributes
