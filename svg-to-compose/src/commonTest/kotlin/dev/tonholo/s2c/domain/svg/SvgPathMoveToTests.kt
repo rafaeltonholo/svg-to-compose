@@ -24,7 +24,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "m85.122 64.795"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -42,7 +42,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "M85.122 64.795"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -62,7 +62,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -102,7 +102,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

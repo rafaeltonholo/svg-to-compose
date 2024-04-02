@@ -26,7 +26,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "t8.5.2"), // should parse to t8.5 .2
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -44,7 +44,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "T -2.5-6.5"), // should parse to T-2.5 -6.5
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -70,7 +70,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "T$nonRelative t$relative"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -116,7 +116,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "T${nonRelative}z t${relative}z"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

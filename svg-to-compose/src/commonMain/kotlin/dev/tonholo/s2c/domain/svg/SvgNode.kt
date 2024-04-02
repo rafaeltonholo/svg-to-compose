@@ -162,8 +162,8 @@ inline fun SvgNode.asNodes(
 ): List<ImageVectorNode>? = when (this) {
     is SvgRootNode -> asNodes(minified = minified)
     is SvgGroupNode -> flatNode(masks, minified)
-    is SvgCircleNode -> listOf(asNode())
-    is SvgPathNode -> listOf(asNode())
-    is SvgRectNode -> listOf(asNode())
+    is SvgCircleNode -> listOf(asNode(minified = minified))
+    is SvgPathNode -> listOf(asNode(minified = minified))
+    is SvgRectNode -> listOf(asNode(minified = minified))
     else -> null
 }

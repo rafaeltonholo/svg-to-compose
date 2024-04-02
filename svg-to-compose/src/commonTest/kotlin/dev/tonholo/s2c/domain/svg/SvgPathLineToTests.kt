@@ -26,7 +26,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "l 8 10"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -44,7 +44,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "L 8 10"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -70,7 +70,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "L$nonRelative l$relative"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -110,7 +110,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "L${nonRelative}z l${relative}z"),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
