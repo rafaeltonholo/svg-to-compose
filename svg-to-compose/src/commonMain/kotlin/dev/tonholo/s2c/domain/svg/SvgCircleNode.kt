@@ -40,7 +40,7 @@ class SvgCircleNode(
 }
 
 fun SvgCircleNode.asNode(
-    minified: Boolean = false,
+    minified: Boolean,
 ): ImageVectorNode = when {
     strokeDashArray != null -> {
         warn(

@@ -45,7 +45,7 @@ class SvgRectNode(
 }
 
 fun SvgRectNode.asNode(
-    minified: Boolean = false,
+    minified: Boolean,
 ): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
         fill = fill.orDefault().value.toBrush(), // Rect has a filling by default.

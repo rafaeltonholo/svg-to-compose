@@ -157,7 +157,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
 
             val circle = SvgCircleNode(root, attributes)
 
-            val group = circle.asNode()
+            val group = circle.asNode(minified = false)
             assertIs<ImageVectorNode.Group>(group)
             assertEquals(expected = 1, group.commands.size)
             val path = group.commands.first()

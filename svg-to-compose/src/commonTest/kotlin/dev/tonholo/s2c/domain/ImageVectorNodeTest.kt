@@ -27,7 +27,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -47,7 +47,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode() as ImageVectorNode.Path
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -73,7 +73,7 @@ class ImageVectorNodeTest {
         )
         // Act
         val exception = assertFailsWith<ExitProgramException> {
-            path.asNode()
+            path.asNode(minified = false)
         }
         // Assert
         assertEquals(
