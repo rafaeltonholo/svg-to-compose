@@ -64,6 +64,7 @@ value class PathFillType private constructor(override val value: String) : Compo
     companion object {
         private const val NAME = "PathFillType"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+
         // Each PathFillType contributes approximately 4 bytes.
         private const val BYTECODE_SIZE = 4
         val EvenOdd = PathFillType("EvenOdd")
@@ -128,6 +129,7 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
     companion object {
         private const val NAME = "StrokeCap"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+
         // Each StrokeCap contributes approximately 4 bytes.
         private const val BYTECODE_SIZE = 4
         val Butt = StrokeCap("Butt")
@@ -194,6 +196,7 @@ value class StrokeJoin private constructor(override val value: String) : Compose
     companion object {
         private const val NAME = "StrokeJoin"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
+
         // Each StrokeJoin contributes approximately 4 bytes.
         private const val BYTECODE_SIZE = 4
         val Miter = StrokeJoin("Miter")

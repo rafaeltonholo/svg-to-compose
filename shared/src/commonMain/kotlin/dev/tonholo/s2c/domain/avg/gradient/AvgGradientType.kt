@@ -18,7 +18,7 @@ enum class AvgGradientType {
             else -> {
                 warn(
                     "'$value' is an unsupported type of type for ${AvgGradient.TAG_NAME} tag. " +
-                        "Using default to '${Linear}",
+                        "Using default to '$Linear",
                 )
                 Linear
             }
