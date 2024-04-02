@@ -20,7 +20,7 @@ enum class AvgGradientTileMode {
             else -> {
                 warn(
                     "'$value' is an unsupported type of tileMode for ${AvgGradient.TAG_NAME} tag. " +
-                        "Using default to '${Clamp}",
+                        "Using default to '$Clamp",
                 )
                 Clamp
             }

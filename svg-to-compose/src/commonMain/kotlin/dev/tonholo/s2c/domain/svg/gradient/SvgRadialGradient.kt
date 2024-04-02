@@ -31,6 +31,7 @@ abstract class SvgRadialGradient<out T>(
             calculateGradientCoordinate(length, defaultLength = SvgLength("50%"))
         }
     )
+
     /**
      * [FXAttribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-RadialGradientElementFXAttribute)
      */

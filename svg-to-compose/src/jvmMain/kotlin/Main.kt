@@ -71,6 +71,7 @@ private fun SampleAppPackage.svg(): SampleAppPackage = this + ".svg"
 private fun SampleAppPackage.avg(): SampleAppPackage = this + ".avg"
 
 
+@Suppress("UNUSED_PARAMETER", "unused")
 private sealed class SampleFile(
     val sampleAppPackage: SampleAppPackage,
     input: String,
@@ -104,6 +105,7 @@ private sealed class SampleFile(
 
         class All(
             sampleAppPackage: SampleAppPackage,
+            ignored: String,
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = BASE_PATH,
@@ -145,6 +147,7 @@ private sealed class SampleFile(
             input = "$BASE_PATH/rects/rects.svg",
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
         )
+
         class DashArrayRect(
             sampleAppPackage: SampleAppPackage,
             suffix: String,
@@ -198,6 +201,15 @@ private sealed class SampleFile(
             input = "$BASE_PATH/android-developers.svg",
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
         )
+
+        class RectTransform(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/transform/rect-transform.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
+        )
     }
 
     sealed interface Avg {
@@ -207,6 +219,7 @@ private sealed class SampleFile(
 
         class All(
             sampleAppPackage: SampleAppPackage,
+            ignored: String,
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.avg(),
             input = BASE_PATH,

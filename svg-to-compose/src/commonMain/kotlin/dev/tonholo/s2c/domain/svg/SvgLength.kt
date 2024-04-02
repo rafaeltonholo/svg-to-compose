@@ -58,7 +58,7 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
             }
 
             value.length > 2 && value.substring(value.length - 2) in possibleUnits ->
-                value.substring(value.length - 2).toFloat()
+                value.substring(0, value.length - 2).toFloat()
 
             else -> null
         }
