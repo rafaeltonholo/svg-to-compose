@@ -20,7 +20,7 @@ class SvgPathNode(
 }
 
 fun SvgPathNode.asNode(
-    minified: Boolean = false,
+    minified: Boolean,
 ): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
