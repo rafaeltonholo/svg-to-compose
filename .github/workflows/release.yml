@@ -10,7 +10,7 @@ env:
 
 jobs:
   create-release-binaries:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && !startsWith(github.actor, 'renovate')
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
@@ -115,7 +115,7 @@ jobs:
           if-no-files-found: error
 
   upload-to-release:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && !startsWith(github.actor, 'renovate')
     permissions:
       contents: write
       deployments: write
