@@ -1,10 +1,10 @@
 package dev.tonholo.s2c.domain.avg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.PathFillType
-import dev.tonholo.s2c.domain.StrokeCap
-import dev.tonholo.s2c.domain.StrokeJoin
 import dev.tonholo.s2c.domain.asNodeWrapper
+import dev.tonholo.s2c.domain.compose.PathFillType
+import dev.tonholo.s2c.domain.compose.StrokeCap
+import dev.tonholo.s2c.domain.compose.StrokeJoin
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode

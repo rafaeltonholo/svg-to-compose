@@ -1,5 +1,8 @@
 package dev.tonholo.s2c.domain
 
+import dev.tonholo.s2c.domain.compose.PathFillType
+import dev.tonholo.s2c.domain.compose.StrokeCap
+import dev.tonholo.s2c.domain.compose.StrokeJoin
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
@@ -31,15 +34,9 @@ sealed interface ImageVectorNode {
         )
 
         fun pathImports(): Set<String> = buildSet {
-            if (params.pathFillType != null) {
-                add(PathFillType.IMPORT)
-            }
-            if (params.strokeLineCap != null) {
-                add(StrokeCap.IMPORT)
-            }
-            if (params.strokeLineJoin != null) {
-                add(StrokeJoin.IMPORT)
-            }
+            params.pathFillType?.let { addAll(it.imports) }
+            params.strokeLineCap?.let { addAll(it.imports) }
+            params.strokeLineJoin?.let { addAll(it.imports) }
         }
 
         override fun materialize(): String {

@@ -107,8 +107,19 @@ sealed class ImageParser(
         }
         val pathImports = nodes
             .asSequence()
-            .filterIsInstance<ImageVectorNode.Path>()
-            .flatMap { it.pathImports() }
+            .flatMap { node ->
+                when (node) {
+                    is ImageVectorNode.Group -> {
+                        node.commands
+                            .filterIsInstance<ImageVectorNode.Path>()
+                            .flatMap { it.pathImports() }
+                    }
+
+                    is ImageVectorNode.Path -> {
+                        node.pathImports()
+                    }
+                }
+            }
             .toSet()
 
         addAll(pathImports)
