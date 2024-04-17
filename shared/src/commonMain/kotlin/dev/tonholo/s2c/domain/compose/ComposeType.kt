@@ -1,13 +1,13 @@
-package dev.tonholo.s2c.domain
+package dev.tonholo.s2c.domain.compose
 
-import dev.tonholo.s2c.domain.PathFillType.Companion.EvenOdd
-import dev.tonholo.s2c.domain.PathFillType.Companion.NonZero
-import dev.tonholo.s2c.domain.StrokeCap.Companion.Butt
-import dev.tonholo.s2c.domain.StrokeCap.Companion.Round
-import dev.tonholo.s2c.domain.StrokeCap.Companion.Square
-import dev.tonholo.s2c.domain.StrokeJoin.Companion.Bevel
-import dev.tonholo.s2c.domain.StrokeJoin.Companion.Miter
-import dev.tonholo.s2c.domain.StrokeJoin.Companion.Round
+import dev.tonholo.s2c.domain.compose.PathFillType.Companion.EvenOdd
+import dev.tonholo.s2c.domain.compose.PathFillType.Companion.NonZero
+import dev.tonholo.s2c.domain.compose.StrokeCap.Companion.Butt
+import dev.tonholo.s2c.domain.compose.StrokeCap.Companion.Round
+import dev.tonholo.s2c.domain.compose.StrokeCap.Companion.Square
+import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Bevel
+import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Miter
+import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Round
 import kotlin.jvm.JvmInline
 
 /**
@@ -20,12 +20,14 @@ import kotlin.jvm.JvmInline
  * Example implementing classes in the LinkedList module include
  * [PathFillType], [StrokeCap], [StrokeJoin] etc.
  */
-interface ComposeProperty {
-    val value: String
+interface ComposeType<T> {
+    val name: String
+    val imports: Set<String>
+    val value: T
 
     /**
      * Provides a way to get the canonical string representation of the
-     * [ComposeProperty] implementation.
+     * [ComposeType] implementation.
      *
      * In case the conversion is not possible or does not make sense, the
      * function should return a `null` value.
@@ -39,7 +41,7 @@ interface ComposeProperty {
     fun toCompose(): String?
 }
 
-fun ComposeProperty.lowercase(): String = value.lowercase()
+fun <T> ComposeType<T>.lowercase(): String = value.toString().lowercase()
 
 /**
  * This is a wrapper class for the [PathFillType] property of the
@@ -57,11 +59,10 @@ fun ComposeProperty.lowercase(): String = value.lowercase()
  * string value.
  */
 @JvmInline
-value class PathFillType private constructor(override val value: String) : ComposeProperty {
-    override fun toString(): String = value
-
+value class PathFillType private constructor(override val value: String) : ComposeType<String> {
     companion object {
-        const val IMPORT = "androidx.compose.ui.graphics.PathFillType"
+        private const val NAME = "PathFillType"
+        private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
         val EvenOdd = PathFillType("EvenOdd")
         val NonZero = PathFillType("NonZero")
 
@@ -85,11 +86,16 @@ value class PathFillType private constructor(override val value: String) : Compo
         }
     }
 
-    override fun toCompose(): String? = when (this.value) {
-        EvenOdd.value, NonZero.value,
-        EvenOdd.value.lowercase(), NonZero.value.lowercase(),
-        ->
-            "PathFillType.$value"
+    override val name: String
+        get() = NAME
+    override val imports: Set<String>
+        get() = IMPORT
+
+    override fun toString(): String = value
+
+    override fun toCompose(): String? = when (this.value.lowercase()) {
+        EvenOdd.value.lowercase() -> "$name.$EvenOdd"
+        NonZero.value.lowercase() -> "$name.$NonZero"
 
         else -> null
     }
@@ -112,11 +118,10 @@ value class PathFillType private constructor(override val value: String) : Compo
  * string value.
  */
 @JvmInline
-value class StrokeCap private constructor(override val value: String) : ComposeProperty {
-    override fun toString(): String = value
-
+value class StrokeCap private constructor(override val value: String) : ComposeType<String> {
     companion object {
-        const val IMPORT = "androidx.compose.ui.graphics.StrokeCap"
+        private const val NAME = "StrokeCap"
+        private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
         val Butt = StrokeCap("Butt")
         val Round = StrokeCap("Round")
         val Square = StrokeCap("Square")
@@ -141,8 +146,18 @@ value class StrokeCap private constructor(override val value: String) : ComposeP
         }
     }
 
-    override fun toCompose(): String? = when (this) {
-        Butt, Round, Square -> "StrokeCap.$value"
+    override val name: String
+        get() = NAME
+    override val imports: Set<String>
+        get() = IMPORT
+
+    override fun toString(): String = value
+
+    override fun toCompose(): String? = when (this.lowercase()) {
+        Butt.value.lowercase() -> "$name.$Butt"
+        Round.value.lowercase() -> "$name.$Round"
+        Square.value.lowercase() -> "$name.$Square"
+
         else -> null // Unsupported by Compose
     }
 }
@@ -164,11 +179,10 @@ value class StrokeCap private constructor(override val value: String) : ComposeP
  * string value.
  */
 @JvmInline
-value class StrokeJoin private constructor(override val value: String) : ComposeProperty {
-    override fun toString(): String = value
-
+value class StrokeJoin private constructor(override val value: String) : ComposeType<String> {
     companion object {
-        const val IMPORT = "androidx.compose.ui.graphics.StrokeJoin"
+        private const val NAME = "StrokeJoin"
+        private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
         val Miter = StrokeJoin("Miter")
         val Round = StrokeJoin("Round")
         val Bevel = StrokeJoin("Bevel")
@@ -193,8 +207,19 @@ value class StrokeJoin private constructor(override val value: String) : Compose
         }
     }
 
-    override fun toCompose(): String? = when (this) {
-        Miter, Round, Bevel -> "StrokeJoin.$value"
+    override val name: String
+        get() = NAME
+
+    override val imports: Set<String>
+        get() = IMPORT
+
+    override fun toString(): String = value
+
+    override fun toCompose(): String? = when (this.lowercase()) {
+        Miter.value.lowercase() -> "$name.$Miter"
+        Round.value.lowercase() -> "$name.$Round"
+        Bevel.value.lowercase() -> "$name.$Bevel"
+
         else -> null
     }
 }

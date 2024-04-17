@@ -1,11 +1,11 @@
 package dev.tonholo.s2c.domain.svg
 
-import dev.tonholo.s2c.domain.PathFillType
-import dev.tonholo.s2c.domain.StrokeCap
 import dev.tonholo.s2c.domain.StrokeDashArray
-import dev.tonholo.s2c.domain.StrokeJoin
+import dev.tonholo.s2c.domain.compose.PathFillType
+import dev.tonholo.s2c.domain.compose.StrokeCap
+import dev.tonholo.s2c.domain.compose.StrokeJoin
+import dev.tonholo.s2c.domain.compose.lowercase
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.lowercase
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.toJsString
