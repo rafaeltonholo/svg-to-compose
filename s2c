@@ -105,10 +105,10 @@ fn_main() {
     fn_print_verbose "Bin folder not present. Checking if it is the project folder..."
 
     fn_print_verbose "Checking release version for $PLATFORM"
-    bin_folder="shared/build/bin/$PLATFORM/releaseExecutable"
+    bin_folder="svg-to-compose/build/bin/$PLATFORM/releaseExecutable"
     if [[ ! -d "$bin_folder" ]]; then
       fn_print_verbose "Checking debug version for $PLATFORM"
-      bin_folder="shared/build/bin/$PLATFORM/debugExecutable"
+      bin_folder="svg-to-compose/build/bin/$PLATFORM/debugExecutable"
       if [[ ! -d "$bin_folder" ]]; then
         if [[ ! -d "gradle" ]]; then
           must_download=true
@@ -160,7 +160,7 @@ fn_main() {
     build_platform="$(tr '[:lower:]' '[:upper:]' <<< ${PLATFORM:0:1})${PLATFORM:1}"
     build_command="build$build_type$build_platform"
     build_type_folder="$(tr '[:upper]' '[:lower]' <<< ${build_type:0:1})${build_type:1}"
-    bin_folder="shared/build/bin/$PLATFORM/${build_type_folder}Executable"
+    bin_folder="svg-to-compose/build/bin/$PLATFORM/${build_type_folder}Executable"
     command ./gradlew "$build_command"
   fi
 

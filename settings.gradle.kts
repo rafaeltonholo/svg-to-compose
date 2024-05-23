@@ -1,6 +1,6 @@
 import java.util.*
 
-rootProject.name = "SVG-to-Compose"
+rootProject.name = "SVG-to-Compose-parent"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":shared")
+include(":svg-to-compose")
 
 val localPropertiesFile = file("local.properties")
 if (localPropertiesFile.exists()) {

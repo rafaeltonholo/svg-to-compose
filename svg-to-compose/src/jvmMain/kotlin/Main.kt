@@ -18,7 +18,7 @@ import kotlin.system.exitProcess
 fun main() {
     AppConfig.debug = false
     val suffix = "v4"
-    val (pkg, path, output) = SampleFile.Svg.DashArrayRect(
+    val (pkg, path, output) = SampleFile.Directory(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
         suffix,
     )

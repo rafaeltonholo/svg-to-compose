@@ -13,6 +13,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# K2
+.kotlin
+
 ### IntelliJ IDEA ###
 .idea/*
 *.iws
