@@ -11,7 +11,7 @@ typealias SvgChildNodeConstructorFn<T> = (
 
 abstract class SvgChildNode<out T>(parent: XmlParentNode) : XmlChildNode(parent), SvgNode
     where T : SvgNode, T : XmlChildNode {
-    protected abstract val constructor: SvgChildNodeConstructorFn<out T>
+    protected abstract val constructor: SvgChildNodeConstructorFn<T>
     override val transform: SvgTransform? by lazy {
         stackedTransform(parent)
     }

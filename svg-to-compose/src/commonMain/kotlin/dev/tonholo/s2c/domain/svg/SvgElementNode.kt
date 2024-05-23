@@ -19,7 +19,7 @@ abstract class SvgElementNode<out T>(
     override val tagName: String,
 ) : XmlElementNode(parent, children, attributes, tagName), SvgNode
     where T : SvgNode, T : XmlParentNode {
-    protected abstract val constructor: SvgElementNodeConstructorFn<out T>
+    protected abstract val constructor: SvgElementNodeConstructorFn<T>
     override val transform: SvgTransform? by lazy {
         stackedTransform(parent)
     }
