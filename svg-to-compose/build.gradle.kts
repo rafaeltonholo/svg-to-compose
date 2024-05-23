@@ -21,7 +21,7 @@ kotlin {
     fun createReleaseTask(name: String, targets: List<KotlinNativeTargetWithHostTests>) {
         task("release$name") {
             dependsOn(targets.map { target ->
-                ":shared:linkReleaseExecutable${target.name.replaceFirstChar { it.uppercaseChar() }}"
+                ":svg-to-compose:linkReleaseExecutable${target.name.replaceFirstChar { it.uppercaseChar() }}"
             })
             description = "Build release binaries for all $name targets"
             group = "release"
@@ -60,8 +60,8 @@ kotlin {
         val targetName = target.name.replaceFirstChar { it.uppercaseChar() }
         task("buildDebug$targetName") {
             dependsOn(
-                ":shared:compileKotlin$targetName",
-                ":shared:linkDebugExecutable$targetName"
+                ":svg-to-compose:compileKotlin$targetName",
+                ":svg-to-compose:linkDebugExecutable$targetName"
             )
             group = "build"
             description = "Build debug binary for ${target.name}"
@@ -69,8 +69,8 @@ kotlin {
 
         task("buildRelease$targetName") {
             dependsOn(
-                ":shared:compileKotlin$targetName",
-                ":shared:linkReleaseExecutable$targetName"
+                ":svg-to-compose:compileKotlin$targetName",
+                ":svg-to-compose:linkReleaseExecutable$targetName"
             )
             group = "build"
             description = "Build release binary for ${target.name}"
