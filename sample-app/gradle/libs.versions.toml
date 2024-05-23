@@ -5,7 +5,7 @@ androidxComposeCompiler = "1.5.10"
 compose-bom = "2024.05.00"
 core-ktx = "1.13.1"
 googleMaterial = "1.12.0"
-kotlin = "1.9.23"
+kotlin = "2.0.0"
 lifecycle-runtime-ktx = "2.8.0"
 
 [libraries]
@@ -24,6 +24,7 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [bundles]
 androidx-compose-ui-debug = ["ui-tooling", "ui-tooling-preview", "ui-test-manifest"]
