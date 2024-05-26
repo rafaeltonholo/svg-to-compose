@@ -43,6 +43,7 @@ sealed class PathNodes(
          */
         private const val METHOD_INVOKE_BYTE_SIZE = 6
     }
+
     val shouldClose = values[command.size - 1].last().lowercaseChar() == PathCommand.Close.value
     protected val realCommand = if (isRelative) command else command.uppercaseChar()
 
@@ -154,9 +155,9 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.MoveTo,
         minified = minified,
-    ) {
-        val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        val y = values[1]
+    ), CoordinatePoint {
+        override val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -177,6 +178,36 @@ sealed class PathNodes(
         }
 
         override fun toString(): String = "$realCommand $x $y" + super.toString()
+
+        /**
+         * Creates a copy of this [MoveTo] with the given properties.
+         *
+         * @param x The new x-coordinate for the move command.
+         * @param y The new y-coordinate for the move command.
+         * @param isRelative Whether the move command is relative or absolute.
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose Whether the move command should close the path.
+         *
+         * @return A new [MoveTo] instance with the updated properties.
+         */
+        fun copy(
+            x: Float = this.x,
+            y: Float = this.y,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): MoveTo = MoveTo(
+            values = listOf(
+                x.toString(),
+                y.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -210,7 +241,7 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ArcTo,
         minified = minified,
-    ) {
+    ), CoordinatePoint {
         /**
          * rx
          */
@@ -235,8 +266,8 @@ sealed class PathNodes(
          * sweep flag
          */
         val isPositiveArc = values[4] == "1"
-        val x = values[5].toFloat()
-        val y = values[6]
+        override val x = values[5].toFloat()
+        override val y = values[6]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -279,6 +310,55 @@ sealed class PathNodes(
         override fun toString(): String =
             "$realCommand ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y" +
                 super.toString()
+
+        /**
+         * Creates a copy of this [ArcTo] instance with the specified values.
+         *
+         * @param a (rx) The horizontal radius of the ellipse.
+         * @param b (ry) The vertical radius of the ellipse.
+         * @param theta (x-axis-rotation) The angle from the x-axis of the
+         * current point to the start of the arc.
+         * @param isMoreThanHalf (large-arc-flag) Whether the arc is more
+         * than half a circle.
+         * @param isPositiveArc (sweep flag) Whether the arc is drawn in a
+         * positive or negative direction.
+         * @param x The x-coordinate of the end point of the arc.
+         * @param y The y-coordinate of the end point of the arc.
+         * @param isRelative Whether the coordinates are relative to the
+         * current point.
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose Whether the arc should be closed.
+         *
+         * @return A new [ArcTo] instance with the specified values.
+         */
+        fun copy(
+            a: Float = this.a,
+            b: Float = this.b,
+            theta: Float = this.theta,
+            isMoreThanHalf: Boolean = this.isMoreThanHalf,
+            isPositiveArc: Boolean = this.isPositiveArc,
+            x: Float = this.x,
+            y: Float = this.y,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): ArcTo = ArcTo(
+            values = listOf(
+                a.toString(),
+                b.toString(),
+                theta.toString(),
+                isMoreThanHalf.toString(),
+                isPositiveArc.toString(),
+                x.toString(),
+                y.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -313,8 +393,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.VerticalLineTo,
         minified = minified,
-    ) {
-        val y = values
+    ), CoordinateY {
+        override val y = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
@@ -336,6 +416,33 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $y" + super.toString()
         }
+
+        /**
+         * Creates a copy of the current [VerticalLineTo] command with the given parameters.
+         *
+         * @param y the y-coordinate of the end point of the line.
+         * @param isRelative whether the command is relative.
+         * @param minified Whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose whether the command should be closed.
+         *
+         * @return a new [VerticalLineTo] command with the updated parameters.
+         */
+        fun copy(
+            y: Float = this.y,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): VerticalLineTo = VerticalLineTo(
+            values = listOf(
+                y.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -365,8 +472,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.HorizontalLineTo,
         minified = minified,
-    ) {
-        val x = values
+    ), CoordinateX {
+        override val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
@@ -388,6 +495,33 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x" + super.toString()
         }
+
+        /**
+         * Creates a copy of this [HorizontalLineTo] command.
+         *
+         * @param x the horizontal coordinate for the end point of this line
+         * @param isRelative whether this is a relative command or not
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose whether the path should be closed after this command
+         *
+         * @return a copy of the current [HorizontalLineTo] command
+         */
+        fun copy(
+            x: Float = this.x,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): HorizontalLineTo = HorizontalLineTo(
+            values = listOf(
+                x.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -423,13 +557,13 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.LineTo,
         minified = minified,
-    ) {
-        val x = values
+    ), CoordinatePoint {
+        override val x = values
             .first()
             .lowercase()
             .removePrefix(command.toString())
             .toFloat()
-        val y = values[1]
+        override val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -452,6 +586,35 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x $y" + super.toString()
         }
+
+        /**
+         * Creates a copy of the [LineTo] command with the specified changes.
+         *
+         * @param x the new value for the x coordinate
+         * @param y the new value for the y coordinate
+         * @param isRelative whether the command is relative or absolute
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose whether the command should close the current path
+         * @return a new [LineTo] command with the specified changes
+         */
+        fun copy(
+            x: Float = this.x,
+            y: Float = this.y,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): LineTo = LineTo(
+            values = listOf(
+                x.toString(),
+                y.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -485,13 +648,13 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.CurveTo,
         minified = minified,
-    ) {
-        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        val y1 = values[1].toFloat()
-        val x2 = values[2].toFloat()
-        val y2 = values[3].toFloat()
-        val x3 = values[4].toFloat()
-        val y3 = values[5]
+    ), ControlPoint1, ControlPoint2, ControlPoint3 {
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val y1 = values[1].toFloat()
+        override val x2 = values[2].toFloat()
+        override val y2 = values[3].toFloat()
+        override val x3 = values[4].toFloat()
+        override val y3 = values[5]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -517,6 +680,48 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x1 $y1 $x2 $y2 $x3 $y3" + super.toString()
         }
+
+        /**
+         * Creates a copy of the [CurveTo] command with the specified values.
+         *
+         * @param x1 The x-coordinate of the first control point.
+         * @param y1 The y-coordinate of the first control point.
+         * @param x2 The x-coordinate of the second control point.
+         * @param y2 The y-coordinate of the second control point.
+         * @param x3 The x-coordinate of the end point.
+         * @param y3 The y-coordinate of the end point.
+         * @param isRelative Whether the command is relative.
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose Whether the command should be closed.
+         *
+         * @return A new [CurveTo] command.
+         */
+        fun copy(
+            x1: Float = this.x1,
+            y1: Float = this.y1,
+            x2: Float = this.x2,
+            y2: Float = this.y2,
+            x3: Float = this.x3,
+            y3: Float = this.y3,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): CurveTo = CurveTo(
+            values = listOf(
+                x1.toString(),
+                y1.toString(),
+                x2.toString(),
+                y2.toString(),
+                x3.toString(),
+                y3.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -553,11 +758,11 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ReflectiveCurveTo,
         minified = minified,
-    ) {
-        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        val y1 = values[1].toFloat()
-        val x2 = values[2].toFloat()
-        val y2 = values[3]
+    ), ControlPoint1, ControlPoint2 {
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val y1 = values[1].toFloat()
+        override val x2 = values[2].toFloat()
+        override val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -581,6 +786,41 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
         }
+
+        /**
+         * Creates a copy of the [ReflectiveCurveTo] command with the specified values.
+         *
+         * @param x1 the x-coordinate of the first control point
+         * @param y1 the y-coordinate of the first control point
+         * @param x2 the x-coordinate of the second control point
+         * @param y2 the y-coordinate of the second control point
+         * @param isRelative whether the coordinates are relative
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose whether the path should be closed
+         * @return a new [ReflectiveCurveTo] object
+         */
+        fun copy(
+            x1: Float = this.x1,
+            y1: Float = this.y1,
+            x2: Float = this.x2,
+            y2: Float = this.y2,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): ReflectiveCurveTo = ReflectiveCurveTo(
+            values = listOf(
+                x1.toString(),
+                y1.toString(),
+                x2.toString(),
+                y2.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -615,11 +855,11 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.QuadTo,
         minified = minified,
-    ) {
-        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        val y1 = values[1].toFloat()
-        val x2 = values[2].toFloat()
-        val y2 = values[3]
+    ), ControlPoint1, ControlPoint2 {
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val y1 = values[1].toFloat()
+        override val x2 = values[2].toFloat()
+        override val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -643,6 +883,42 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
         }
+
+        /**
+         * Creates a copy of the [QuadTo] command with the given parameters.
+         *
+         * @param x1 the x-coordinate of the first control point.
+         * @param y1 the y-coordinate of the first control point.
+         * @param x2 the x-coordinate of the end point.
+         * @param y2 the y-coordinate of the end point.
+         * @param isRelative whether the command is relative.
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose whether the command should be closed.
+         *
+         * @return a copy of the [QuadTo] command.
+         */
+        fun copy(
+            x1: Float = this.x1,
+            y1: Float = this.y1,
+            x2: Float = this.x2,
+            y2: Float = this.y2,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): QuadTo = QuadTo(
+            values = listOf(
+                x1.toString(),
+                y1.toString(),
+                x2.toString(),
+                y2.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 
     /**
@@ -679,9 +955,9 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ReflectiveQuadTo,
         minified = minified,
-    ) {
-        val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        val y1 = values[1]
+    ), ControlPoint1 {
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val y1 = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
             .toFloat()
@@ -703,6 +979,37 @@ sealed class PathNodes(
         override fun toString(): String {
             return "$realCommand $x1 $y1" + super.toString()
         }
+
+        /**
+         * Creates a copy of the [ReflectiveQuadTo] command with the
+         * given parameters.
+         *
+         * @param x1 The x-coordinate of the first control point.
+         * @param y1 The y-coordinate of the first control point.
+         * @param isRelative Whether the coordinates are relative.
+         * @param minified whether the output of [materialize] should be
+         * minified or not.
+         * @param shouldClose Whether the path should be closed.
+         *
+         * @return A new [ReflectiveQuadTo] with the updated values.
+         */
+        fun copy(
+            x1: Float = this.x1,
+            y1: Float = this.y1,
+            isRelative: Boolean = this.isRelative,
+            minified: Boolean = this.minified,
+            shouldClose: Boolean = this.shouldClose,
+        ): ReflectiveQuadTo = ReflectiveQuadTo(
+            values = listOf(
+                x1.toString(),
+                y1.toString().let {
+                    if (shouldClose) it + PathCommand.Close.value
+                    else it
+                },
+            ),
+            isRelative = isRelative,
+            minified = minified,
+        )
     }
 }
 
@@ -710,3 +1017,143 @@ val List<PathNodes>.approximateByteSize
     get() = sumOf {
         it.approximateByteSize
     }
+
+/**
+ * Interface representing an X-coordinate.
+ */
+internal interface CoordinateX {
+    /**
+     * The x-coordinate value.
+     */
+    val x: Float
+}
+
+/**
+ * Interface representing a Y-coordinate.
+ */
+internal interface CoordinateY {
+    /**
+     * The y-coordinate value.
+     */
+    val y: Float
+}
+
+/**
+ * Interface representing a point in a 2D space with both X and Y coordinates.
+ */
+internal interface CoordinatePoint : CoordinateX, CoordinateY
+
+/**
+ * Interface representing the X-coordinate of the first control point.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * first control point helps define the initial slope of the curve.
+ */
+internal interface ControlPointX1 {
+    /**
+     * The x-coordinate value of the first control point.
+     */
+    val x1: Float
+}
+
+/**
+ * Interface representing the Y-coordinate of the first control point.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * first control point helps define the initial slope of the curve.
+ */
+internal interface ControlPointY1 {
+    /**
+     * The y-coordinate value of the first control point.
+     */
+    val y1: Float
+}
+
+/**
+ * Interface representing the first control point with both X and Y coordinates.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * first control point helps define the initial slope of the curve.
+ */
+internal interface ControlPoint1 : ControlPointX1, ControlPointY1
+
+/**
+ * Interface representing the X-coordinate of the second control point.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * second control point helps define the curvature towards the end point.
+ */
+internal interface ControlPointX2 {
+    /**
+     * The x-coordinate value of the second control point.
+     */
+    val x2: Float
+}
+
+/**
+ * Interface representing the Y-coordinate of the second control point.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * second control point helps define the curvature towards the end point.
+ */
+internal interface ControlPointY2 {
+    /**
+     * The y-coordinate value of the second control point.
+     */
+    val y2: Float
+}
+
+/**
+ * Interface representing the second control point with both X and Y coordinates.
+ *
+ * In the context of Bézier curves in vector graphics (such as SVG paths),
+ * a control point determines the direction and length of the curve. The
+ * second control point helps define the curvature towards the end point.
+ */
+internal interface ControlPoint2 : ControlPointX2, ControlPointY2
+
+/**
+ * Interface representing the X-coordinate of the third control point.
+ *
+ * In some advanced vector graphics or complex paths, a third control
+ * point may be used to further influence the shape and direction of a
+ * curve. This is less common in basic Bézier curves but can be applicable
+ * in more intricate path definitions.
+ */
+internal interface ControlPointX3 {
+    /**
+     * The x-coordinate value of the third control point.
+     */
+    val x3: Float
+}
+
+/**
+ * Interface representing the Y-coordinate of the third control point.
+ *
+ * In some advanced vector graphics or complex paths, a third control
+ * point may be used to further influence the shape and direction of a
+ * curve. This is less common in basic Bézier curves but can be applicable
+ * in more intricate path definitions.
+ */
+internal interface ControlPointY3 {
+    /**
+     * The y-coordinate value of the third control point.
+     */
+    val y3: Float
+}
+
+/**
+ * Interface representing the third control point with both X and Y coordinates.
+ *
+ * In some advanced vector graphics or complex paths, a third control
+ * point may be used to further influence the shape and direction of a
+ * curve. This is less common in basic Bézier curves but can be applicable
+ * in more intricate path definitions.
+ */
+internal interface ControlPoint3 : ControlPointX3, ControlPointY3
+
