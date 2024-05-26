@@ -65,7 +65,9 @@ sealed class AffineTransformation(
 
     class Matrix(
         vararg matrix: FloatArray,
-    ) : AffineTransformation(matrix = matrix)
+    ) : AffineTransformation(matrix = matrix) {
+        operator fun get(index: Int): FloatArray = matrix[index]
+    }
 
     data object Identity : AffineTransformation(
         floatArrayOf(1f, 0f, 0f),
