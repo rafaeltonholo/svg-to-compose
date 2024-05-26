@@ -3,6 +3,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun
@@ -13,6 +14,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.io.gitlab.arturbosch.detekt)
     id(libs.plugins.com.codingfeline.buildkonfig.get().pluginId)
+    alias(libs.plugins.org.jetbrains.kotlin.plugin.powerAssert)
 }
 
 val rootBuildDir = File(project.rootDir.absolutePath, "build")
@@ -121,6 +123,17 @@ detekt {
     config.setFrom("${rootProject.rootDir}/config/detekt.yml")
 }
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
+powerAssert {
+    functions = listOf("kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull")
+}
+
+dependencies {
+    detektPlugins(libs.detekt.formatting)
+    commonTestImplementation(kotlin("test"))
+    commonTestImplementation(kotlin("stdlib"))
+}
+
 tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -143,10 +156,6 @@ tasks.withType<Detekt>().configureEach {
 }
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
-}
-
-dependencies {
-    detektPlugins(libs.detekt.formatting)
 }
 
 tasks.withType<KotlinTest>().configureEach {

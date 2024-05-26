@@ -193,6 +193,15 @@ private sealed class SampleFile(
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
         )
 
+        class Android(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/android.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
+        )
+
         class AndroidDevelopers(
             sampleAppPackage: SampleAppPackage,
             suffix: String,
