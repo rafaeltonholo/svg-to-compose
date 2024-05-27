@@ -17,6 +17,7 @@ import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgDefsNode
+import dev.tonholo.s2c.domain.svg.SvgGradientStopNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgLinearGradientNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
@@ -48,25 +49,27 @@ import kotlin.time.measureTimedValue
  * @param fileType The root tag from the XML file
  * @return The XML as an object
  */
-fun parse(content: String, fileType: FileType): XmlRootNode = verboseSection("Parsing $fileType file") {
-    val strippedXml = content
-        .replace("\\r?\\n".toRegex(), "")
-        .replace("\\s{2,}".toRegex(), " ")
-        .replace("> <", "><")
-    val (node, duration) = measureTimedValue {
-        val xmlParser = Parser.xmlParser()
-        val doc = xmlParser.parseInput(html = strippedXml, baseUri = "")
-        val node = doc.getElementsByTag(tagName = fileType.tag)
-        if (node.size != 1) {
-            error("Not a proper ${fileType.extension.uppercase()} file.")
-        }
+fun parse(content: String, fileType: FileType): XmlRootNode =
+    verboseSection("Parsing $fileType file") {
+        val strippedXml = content
+            .replace("\\r?\\n".toRegex(), "")
+            .replace("\\s{2,}".toRegex(), " ")
+            .replace("> <", "><")
 
-        val rootNode = node.single()
-        traverseSvgTree(rootNode, fileType)
+        val (node, duration) = measureTimedValue {
+            val xmlParser = Parser.xmlParser()
+            val doc = xmlParser.parseInput(html = strippedXml, baseUri = "")
+            val node = doc.getElementsByTag(tagName = fileType.tag)
+            if (node.size != 1) {
+                error("Not a proper ${fileType.extension.uppercase()} file.")
+            }
+
+            val rootNode = node.single()
+            traverseSvgTree(rootNode, fileType)
+        }
+        verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
+        node
     }
-    verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
-    node
-}
 
 private fun traverseSvgTree(rootNode: Element, fileType: FileType): XmlRootNode {
     val document = XmlRootNode(children = mutableSetOf())
@@ -271,11 +274,16 @@ inline fun createSvgElement(
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-        )
+        ).also { it.id?.let { id -> root?.gradients?.put(id, it) } }
 
         SvgRadialGradient.TAG_NAME -> SvgRadialGradientNode(
             parent = parent,
             children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        ).also { it.id?.let { id -> root?.gradients?.put(id, it) } }
+
+        SvgGradientStopNode.TAG_NAME -> SvgGradientStopNode(
+            parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
 

@@ -4,7 +4,6 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
-import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
@@ -50,7 +49,7 @@ fun SvgCircleNode.asNode(
         createDashedCircle(minified)
     }
 
-    else -> createSimpleRect(minified)
+    else -> createSimpleCircle(minified)
 }
 
 private fun SvgCircleNode.buildNormalizedPath(): String = buildString {
@@ -73,49 +72,58 @@ private fun SvgCircleNode.buildNormalizedPath(): String = buildString {
  * If not provided, default parameters are considered.
  * @return An [ImageVectorNode.Path] which represents the SVG circle.
  */
-private fun SvgCircleNode.createSimpleRect(
+private fun SvgCircleNode.createSimpleCircle(
     minified: Boolean,
     radius: Float = this.radius,
     override: ImageVectorNode.Path.Params? = null,
-) = ImageVectorNode.Path(
-    params = override ?: ImageVectorNode.Path.Params(
-        fill = fill.orDefault().value.toBrush(), // Circle has a filling by default.
-        fillAlpha = fillOpacity,
-        pathFillType = fillRule,
-        stroke = stroke?.value?.toBrush(),
-        strokeAlpha = strokeOpacity,
-        strokeLineCap = strokeLineCap,
-        strokeLineJoin = strokeLineJoin,
-        strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
-    ),
-    wrapper = ImageVectorNode.NodeWrapper(
+): ImageVectorNode.Path {
+    val wrapper = ImageVectorNode.NodeWrapper(
         normalizedPath = buildNormalizedPath(),
-        nodes = @Suppress("MagicNumber") listOf(
-            pathNode(command = PathCommand.MoveTo) {
-                args(cx, cy)
-                this.minified = minified
-            },
-            pathNode(command = PathCommand.MoveTo) {
-                args(-radius, 0)
-                isRelative = true
-                this.minified = minified
-            },
-            pathNode(command = PathCommand.ArcTo) {
-                args(radius, radius, 0f, true, true, 2 * radius, 0)
-                isRelative = true
-                this.minified = minified
-            },
-            pathNode(command = PathCommand.ArcTo) {
-                args(radius, radius, 0f, true, true, -2 * radius, 0)
-                isRelative = true
-                this.minified = minified
-                close = true
-            },
-        )
-    ),
-    minified = minified,
-    transformations = transform?.toTransformations(),
+        nodes = createSimpleCircleNodes(minified, radius),
+    )
+    return ImageVectorNode.Path(
+        params = override ?: ImageVectorNode.Path.Params(
+            fill = fillBrush(wrapper.nodes),
+            fillAlpha = fillOpacity,
+            pathFillType = fillRule,
+            stroke = strokeBrush(wrapper.nodes),
+            strokeAlpha = strokeOpacity,
+            strokeLineCap = strokeLineCap,
+            strokeLineJoin = strokeLineJoin,
+            strokeMiterLimit = strokeMiterLimit,
+            strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
+        ),
+        wrapper = wrapper,
+        minified = minified,
+        transformations = transform?.toTransformations(),
+    )
+}
+
+@Suppress("MagicNumber")
+private fun SvgCircleNode.createSimpleCircleNodes(
+    minified: Boolean,
+    radius: Float
+) = listOf(
+    pathNode(command = PathCommand.MoveTo) {
+        args(cx, cy)
+        this.minified = minified
+    },
+    pathNode(command = PathCommand.MoveTo) {
+        args(-radius, 0)
+        isRelative = true
+        this.minified = minified
+    },
+    pathNode(command = PathCommand.ArcTo) {
+        args(radius, radius, 0f, true, true, 2 * radius, 0)
+        isRelative = true
+        this.minified = minified
+    },
+    pathNode(command = PathCommand.ArcTo) {
+        args(radius, radius, 0f, true, true, -2 * radius, 0)
+        isRelative = true
+        this.minified = minified
+        close = true
+    },
 )
 
 /**
@@ -138,49 +146,57 @@ private fun SvgCircleNode.createSimpleRect(
  * The returned group includes a list of commands to draw the dashed circle
  * and its fill if any.
  */
-private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode = ImageVectorNode.Group(
-    commands = buildList {
-        val strokeDashArray = strokeDashArray ?: error("stroke-dasharray should not be null in this case.")
-        val fill = fill
-        // dashed circle is not supported, and because of that, we create two paths for each dashed circle.
-        // the 1st path is for the filling, in case it has one.
-        if (fill != null) {
+private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode =
+    ImageVectorNode.Group(
+        commands = buildList {
+            val strokeDashArray =
+                strokeDashArray ?: error("stroke-dasharray should not be null in this case.")
+            val fill = fill
+            // dashed circle is not supported, and because of that, we create two paths for each
+            // dashed circle.
+            // the 1st path is for the filling, in case it has one.
+            if (fill != null) {
+                // The radius is overridden, taking in consideration the size of the
+                // stroke width
+                val innerRadius = radius - ((strokeWidth ?: 1f) / 2f)
+                val nodes = createSimpleCircleNodes(minified, innerRadius)
+                add(
+                    // TODO: accept nodes as parameters.
+                    createSimpleCircle(
+                        minified,
+                        radius = innerRadius,
+                        override = ImageVectorNode.Path.Params(
+                            fill = fillBrush(nodes),
+                            fillAlpha = fillOpacity,
+                            pathFillType = fillRule,
+                        )
+                    ),
+                )
+            }
+            // 2nd path is the dashes.
+            val dashedCircleNodes = createDashedCirclePath(
+                dashes = strokeDashArray.dashesAndGaps,
+                isMinified = minified,
+            )
             add(
-                createSimpleRect(
-                    minified,
-                    // The radius is overridden, taking in consideration the size of the stroke width
-                    radius = radius - ((strokeWidth ?: 1f) / 2f),
-                    override = ImageVectorNode.Path.Params(
-                        fill = fill.value.toBrush(),
-                        fillAlpha = fillOpacity,
-                        pathFillType = fillRule,
-                    )
+                ImageVectorNode.Path(
+                    params = ImageVectorNode.Path.Params(
+                        // as the dash is a path now, all the stroke parameters
+                        // are used inside the fill parameters instead.
+                        fill = strokeBrush(dashedCircleNodes),
+                        fillAlpha = strokeOpacity,
+                    ),
+                    wrapper = ImageVectorNode.NodeWrapper(
+                        normalizedPath = buildNormalizedPath(),
+                        nodes = dashedCircleNodes,
+                    ),
+                    minified = minified,
                 ),
             )
-        }
-        // 2nd path is the dashes.
-        add(
-            ImageVectorNode.Path(
-                params = ImageVectorNode.Path.Params(
-                    // as the dash is a path now, all the stroke parameters
-                    // are used inside the fill parameters instead.
-                    fill = stroke.orDefault().value.toBrush(),
-                    fillAlpha = strokeOpacity,
-                ),
-                wrapper = ImageVectorNode.NodeWrapper(
-                    normalizedPath = buildNormalizedPath(),
-                    nodes = createDashedCirclePath(
-                        dashes = strokeDashArray.dashesAndGaps,
-                        isMinified = minified,
-                    ),
-                ),
-                minified = minified,
-            ),
-        )
-    },
-    minified = minified,
-    transformations = transform?.toTransformations(),
-)
+        },
+        minified = minified,
+        transformations = transform?.toTransformations(),
+    )
 
 /**
  * Creates a list of PathNodes representing a dashed circle.
@@ -191,7 +207,10 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
  * nodes, removing the comments and inlining the path parameters.
  * @return A list of [PathNodes] representing the dashed circle.
  */
-private fun SvgCircleNode.createDashedCirclePath(dashes: IntArray, isMinified: Boolean): List<PathNodes> {
+private fun SvgCircleNode.createDashedCirclePath(
+    dashes: IntArray,
+    isMinified: Boolean
+): List<PathNodes> {
     val radius = radius
     val circumference = 2 * PI.toFloat() * radius
     val dashSum = dashes.sum()

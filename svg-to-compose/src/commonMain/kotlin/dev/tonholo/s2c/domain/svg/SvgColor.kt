@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.compose.ComposeColor
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -15,6 +16,8 @@ value class SvgColor private constructor(val value: String) {
  * @return black color when [SvgColor] is `null`.
  */
 fun SvgColor?.orDefault(): SvgColor = this ?: SvgColor("black")
+
+fun SvgColor.toComposeColor(): ComposeColor = ComposeColor(value)
 
 /**
  * @see <a href="http://www.w3.org/TR/SVG11/single-page.html#types-ColorKeywords">W3 Color Keywords</a>

@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.domain.svg.gradient.SvgGradient
 import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
@@ -90,6 +91,7 @@ class SvgRootNode(
     }
 
     val defs: HashMap<String, SvgUseNode> = hashMapOf()
+    val gradients: HashMap<String, SvgGradient<*>> = hashMapOf()
 
     override val transform: SvgTransform? by attribute<String?, SvgTransform?> {
         var transform = it
