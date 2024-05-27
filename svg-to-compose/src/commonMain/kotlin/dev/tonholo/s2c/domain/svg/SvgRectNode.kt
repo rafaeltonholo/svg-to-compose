@@ -5,7 +5,6 @@ import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.StrokeDashArray
 import dev.tonholo.s2c.domain.builder.pathNode
-import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.createDashedPathForRect
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
@@ -46,22 +45,25 @@ class SvgRectNode(
 
 fun SvgRectNode.asNode(
     minified: Boolean,
-): ImageVectorNode.Path = ImageVectorNode.Path(
-    params = ImageVectorNode.Path.Params(
-        fill = fill.orDefault().value.toBrush(), // Rect has a filling by default.
-        fillAlpha = fillOpacity,
-        pathFillType = fillRule,
-        stroke = stroke?.value?.toBrush(),
-        strokeAlpha = strokeOpacity,
-        strokeLineCap = strokeLineCap,
-        strokeLineJoin = strokeLineJoin,
-        strokeMiterLimit = strokeMiterLimit,
-        strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
-    ),
-    wrapper = createPath(minified),
-    minified = minified,
-    transformations = transform?.toTransformations(),
-)
+): ImageVectorNode.Path {
+    val wrapper = createPath(minified)
+    return ImageVectorNode.Path(
+        params = ImageVectorNode.Path.Params(
+            fill = fillBrush(wrapper.nodes),
+            fillAlpha = fillOpacity,
+            pathFillType = fillRule,
+            stroke = strokeBrush(wrapper.nodes),
+            strokeAlpha = strokeOpacity,
+            strokeLineCap = strokeLineCap,
+            strokeLineJoin = strokeLineJoin,
+            strokeMiterLimit = strokeMiterLimit,
+            strokeLineWidth = strokeWidth ?: stroke?.let { 1f },
+        ),
+        wrapper = wrapper,
+        minified = minified,
+        transformations = transform?.toTransformations(),
+    )
+}
 
 private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val xCornerSize = rx ?: ry ?: 0

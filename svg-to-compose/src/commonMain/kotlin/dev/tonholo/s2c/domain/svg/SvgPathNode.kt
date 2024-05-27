@@ -1,7 +1,9 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.asNodeWrapper
+import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
@@ -14,6 +16,39 @@ class SvgPathNode(
     val d: String by attribute()
     val clipPath: String? by attribute(name = "clip-path")
 
+    val fillBrush: ComposeBrush? by lazy {
+        val fill = fill?.value ?: return@lazy null
+        if (fill.startsWith("url(")) {
+            getGradient(fill)
+        } else {
+            fill.toBrush()
+        }
+    }
+
+    val strokeBrush: ComposeBrush? by lazy {
+        val stroke = stroke?.value ?: return@lazy null
+        if (stroke.startsWith("url(")) {
+            getGradient(stroke)
+        } else {
+            stroke.toBrush()
+        }
+    }
+
+    override fun fillBrush(nodes: List<PathNodes>): ComposeBrush? {
+        error("use fillBrush property instead")
+    }
+
+    override fun strokeBrush(nodes: List<PathNodes>): ComposeBrush? {
+        error("use strokeBrush property instead")
+    }
+
+    private fun getGradient(fillColor: String): ComposeBrush.Gradient? {
+        return getGradient(
+            fillColor = fillColor,
+            nodes = d.asNodeWrapper(minified = false).nodes,
+        )
+    }
+
     companion object {
         const val TAG_NAME = "path"
     }
@@ -24,10 +59,10 @@ fun SvgPathNode.asNode(
 ): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
-            fill = fill?.value?.toBrush(),
+            fill = fillBrush,
             fillAlpha = fillOpacity,
             pathFillType = fillRule,
-            stroke = stroke?.value?.toBrush(),
+            stroke = strokeBrush,
             strokeAlpha = strokeOpacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,

@@ -116,7 +116,10 @@ sealed class AffineTransformation(
     )
 }
 
-fun List<PathNodes>.applyTransformations(vararg transformations: AffineTransformation): Sequence<PathNodes> {
+fun List<PathNodes>.applyTransformations(
+    vararg transformations: AffineTransformation,
+): Sequence<PathNodes> {
+    if (transformations.isEmpty()) return asSequence()
     val combinedMatrix = transformations.reduce { acc, current -> (acc * current) }
     return applyTransformation(combinedMatrix)
 }

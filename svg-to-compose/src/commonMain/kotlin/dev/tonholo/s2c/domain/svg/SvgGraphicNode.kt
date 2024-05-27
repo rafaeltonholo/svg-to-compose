@@ -1,15 +1,21 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.StrokeDashArray
+import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.PathFillType
 import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
 import dev.tonholo.s2c.domain.compose.lowercase
+import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toLengthFloatOrNull
+import dev.tonholo.s2c.geom.applyTransformations
+import dev.tonholo.s2c.geom.path.removeShorthandNodes
+import dev.tonholo.s2c.geom.path.toAbsolute
 
 abstract class SvgGraphicNode<out T>(
     parent: XmlParentNode,
@@ -66,8 +72,50 @@ abstract class SvgGraphicNode<out T>(
         strokeLineCap?.let { append("stroke-line-cap=\"${it.lowercase()}\" ") }
         fillRule?.let { append("fill-rule=\"${it.lowercase()}\" ") }
         strokeOpacity?.let { append("stroke-opacity=\"$it\" ") }
-        strokeMiterLimit?.let { append("stroke-miter-limit=\"${it.toString().removeTrailingZero()}\" ") }
+        strokeMiterLimit?.let {
+            append(
+                "stroke-miter-limit=\"${
+                    it.toString().removeTrailingZero()
+                }\" ",
+            )
+        }
         strokeDashArray?.let { append("stroke-dasharray=\"${it}\" ") }
+    }
+
+    open fun fillBrush(nodes: List<PathNodes>): ComposeBrush? {
+        val fill = fill.orDefault().value
+        return if (fill.startsWith("url(")) {
+            getGradient(fill, nodes)
+        } else {
+            fill.toBrush()
+        }
+    }
+
+    open fun strokeBrush(nodes: List<PathNodes>): ComposeBrush? {
+        val stroke = stroke?.value ?: return null
+        return if (stroke.startsWith("url(")) {
+            getGradient(stroke, nodes)
+        } else {
+            stroke.toBrush()
+        }
+    }
+
+    protected fun getGradient(fillColor: String, nodes: List<PathNodes>): ComposeBrush.Gradient? {
+        val root = rootParent as SvgRootNode
+        val gradientId = fillColor.normalizedId()
+        val gradient = root.gradients[gradientId] ?: return null
+        val transformations = transform?.toTransformations()
+            ?.plus(gradient.gradientTransform?.toTransformations() ?: emptyList())
+            ?.toTypedArray()
+            ?: emptyArray()
+
+        return root.gradients[gradientId]?.toBrush(
+            target = nodes
+                .applyTransformations(transformations = transformations)
+                .toList()
+                .toAbsolute()
+                .removeShorthandNodes(),
+        )
     }
 
     override fun toString(): String = toJsString()

@@ -1,3 +1,4 @@
+
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.IconWriter
@@ -5,9 +6,9 @@ import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.parser.ParserConfig
+import okio.FileSystem
 import java.nio.file.Path
 import java.nio.file.Paths
-import okio.FileSystem
 import kotlin.system.exitProcess
 
 /**
@@ -22,6 +23,7 @@ fun main() {
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
         suffix,
     )
+
     val config = ParserConfig(
         pkg = pkg.value,
         theme = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme",
@@ -199,7 +201,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/android.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Android.$suffix.kt",
         )
 
         class AndroidDevelopers(

@@ -82,6 +82,7 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
  */
 internal fun String.toSvgLengthOrNull(): SvgLength? = when {
     toIntOrNull() != null -> this
+    toFloatOrNull() != null -> this
     length > 1 && endsWith(PERCENT) -> this
     length > 2 && substring(length - 2) in possibleUnits -> this
     else -> null

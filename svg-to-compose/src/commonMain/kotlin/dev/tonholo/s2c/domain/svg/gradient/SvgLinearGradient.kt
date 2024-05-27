@@ -15,22 +15,22 @@ abstract class SvgLinearGradient<out T>(
     /**
      * [X1Attribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-LinearGradientElementX1Attribute)
      */
-    val x1: Float by attribute<SvgLength, Float>(defaultValue = 0f, transform = ::calculateGradientCoordinate)
+    internal val x1: SvgLength by attribute(defaultValue = SvgLength("0%"))
 
     /**
      * [Y1Attribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-LinearGradientElementY1Attribute)
      */
-    val y1: Float by attribute<SvgLength, Float>(defaultValue = 0f, transform = ::calculateGradientCoordinate)
+    internal val y1: SvgLength by attribute(defaultValue = SvgLength("0%"))
 
     /**
      * [X2Attribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-LinearGradientElementX2Attribute)
      */
-    val x2: Float by attribute<SvgLength, Float>(defaultValue = 1f, transform = ::calculateGradientCoordinate)
+    internal val x2: SvgLength by attribute(defaultValue = SvgLength("100%"))
 
     /**
      * [Y2Attribute](https://www.w3.org/TR/SVG11/single-page.html#pservers-LinearGradientElementY2Attribute)
      */
-    val y2: Float by attribute<SvgLength, Float>(defaultValue = 0f, transform = ::calculateGradientCoordinate)
+    internal val y2: SvgLength by attribute(defaultValue = SvgLength("100%"))
 
     companion object {
         const val TAG_NAME = "linearGradient"
