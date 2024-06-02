@@ -160,6 +160,8 @@ internal class BezierBoundingBoxCalculator(
         return Pair(s1, s2)
     }
 
+    /** @suppress the `MagicNumber` in this case as it is part of a formula that has no name */
+    @Suppress("MagicNumber")
     private fun pointAt(
         t: Double,
         start: Double,
@@ -167,9 +169,9 @@ internal class BezierBoundingBoxCalculator(
         control2: Double,
         end: Double,
     ): Double = (1 - t).let { oneMinusT ->
-        (oneMinusT.pow(3) * start) +
-            (3 * oneMinusT.pow(2) * t * control1) +
-            (3 * oneMinusT * t.pow(2) * control2) +
-            (t.pow(3) * end)
+        (oneMinusT.pow(n = 3) * start) +
+            (3 * oneMinusT.pow(n = 2) * t * control1) +
+            (3 * oneMinusT * t.pow(n = 2) * control2) +
+            (t.pow(n = 3) * end)
     }
 }

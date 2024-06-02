@@ -2,7 +2,6 @@ package dev.tonholo.s2c.geom.path
 
 import dev.tonholo.s2c.domain.PathNodes
 
-
 /**
  * Converts all relative nodes in the list to absolute nodes.
  *

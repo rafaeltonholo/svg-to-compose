@@ -81,7 +81,7 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
 
         val dividend = this dot point
 
-        return sign * acos(round((dividend / (norm() * point.norm())) * 1_000_000) / 1_000_000)
+        return sign * acos(x = round(x = (dividend / (norm() * point.norm())) * 1_000_000) / 1_000_000)
     }
 
     /**

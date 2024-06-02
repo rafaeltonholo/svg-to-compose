@@ -5,6 +5,7 @@ import kotlin.jvm.JvmInline
 
 private val transformsMap = mapOf(
     "matrix" to { args: List<Float> ->
+        @Suppress("MagicNumber")
         AffineTransformation.Matrix(
             floatArrayOf(args[0], args[2], args[4]),
             floatArrayOf(args[1], args[3], args[5]),

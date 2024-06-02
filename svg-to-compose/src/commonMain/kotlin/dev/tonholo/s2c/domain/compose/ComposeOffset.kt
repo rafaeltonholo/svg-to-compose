@@ -23,7 +23,8 @@ data class ComposeOffset(val x: Float?, val y: Float?) : ComposeType<Pair<Float?
     override fun toCompose(): String = when {
         this == Infinite -> "$name.Infinite" // should it be Unspecified instead?
         this == Zero -> "$name.Zero"
-        x != null && y == null || x == null && y != null -> "$name.Unspecified" // Should be Offset(x, 0) and Offset(0, y) instead?
+        // Should it be Offset(x, 0) and Offset(0, y) instead?
+        x != null && y == null || x == null && y != null -> "$name.Unspecified"
         else -> "$name(x = ${x}f, y = ${y}f)"
     }
 }

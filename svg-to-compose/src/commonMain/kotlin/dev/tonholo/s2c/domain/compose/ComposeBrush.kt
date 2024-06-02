@@ -45,6 +45,8 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
             // By calling Brush.linearGradient, Brush.radialGradient or Brush.sweepGradient
             // with no parameters, we add 16 bytes, approximately, to the method size.
             private const val BRUSH_GRADIENT_METHOD_BYTECODE_SIZE = 16
+            private const val COLLECTION_BYTECODE_SIZE = 25
+            private const val SINGLE_COLOR_BYTECODE_SIZE = 8
         }
 
         val colors: List<ComposeColor>
@@ -67,14 +69,14 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
                 val size = colors.size
                 val baseColorByteSize = 13
                 if (size > 1) {
-                    25 + (baseColorByteSize * (size - 1))
+                    COLLECTION_BYTECODE_SIZE + (baseColorByteSize * (size - 1))
                 } else {
-                    8
+                    SINGLE_COLOR_BYTECODE_SIZE
                 }
             } else {
                 val size = stops.size
                 val baseColorByteSize = 22
-                25 + (baseColorByteSize * (size - 1))
+                COLLECTION_BYTECODE_SIZE + (baseColorByteSize * (size - 1))
             }
         }
 

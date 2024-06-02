@@ -14,6 +14,12 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
+private const val DOUBLE_ZERO_TOLERANCE = 1e-15
+private const val ANGLE_90 = 90
+private const val ANGLE_180 = 180
+private const val ANGLE_270 = 270
+private const val ANGLE_360 = 360
+
 /**
  * Calculates the bounding box of an elliptical arc.
  *
@@ -45,8 +51,8 @@ internal class ArcBoundingBoxCalculator(
     private val sweepFlag: Boolean,
 ) {
     // pre-calculate cos of phi to avoid recalculating it every time
-    private val cosPhi = cos(phi / 180 * PI)
-    private val sinPhi = sin(phi / 180 * PI)
+    private val cosPhi = cos(x = phi / ANGLE_180 * PI)
+    private val sinPhi = sin(x = phi / ANGLE_180 * PI)
 
     // (eq. 5.1)
     private val primedCoordinates = PrecisePoint2D(
@@ -92,8 +98,8 @@ internal class ArcBoundingBoxCalculator(
             .filter { angle -> angle > theta && angle < theta2 }
             .map { angle ->
                 var currentAngle = angle
-                while (theta < currentAngle) currentAngle -= 360
-                pointAt(((angle - theta) % 360) / (delta))
+                while (theta < currentAngle) currentAngle -= ANGLE_360
+                pointAt(((angle - theta) % ANGLE_360) / (delta))
             }
             .plus(
                 listOf(
@@ -122,8 +128,8 @@ internal class ArcBoundingBoxCalculator(
 
         // (eq. 6.2)
         // Make sure the radius fit with the arc and correct if necessary
-        val ratio = (primedCoordinates.x.pow(2) / rx.pow(2)) +
-            (primedCoordinates.y.pow(2) / ry.pow(2))
+        val ratio = (primedCoordinates.x.pow(n = 2) / rx.pow(n = 2)) +
+            (primedCoordinates.y.pow(n = 2) / ry.pow(n = 2))
 
         // (eq. 6.3)
         if (ratio > 1) {
@@ -134,15 +140,15 @@ internal class ArcBoundingBoxCalculator(
 
     private fun computeCenterCoordinates() {
         // (eq. 5.2)
-        val rxQuad = rx.pow(2)
-        val ryQuad = ry.pow(2)
+        val rxQuad = rx.pow(n = 2)
+        val ryQuad = ry.pow(n = 2)
 
-        val divisor1 = rxQuad * primedCoordinates.y.pow(2)
-        val divisor2 = ryQuad * primedCoordinates.x.pow(2)
+        val divisor1 = rxQuad * primedCoordinates.y.pow(n = 2)
+        val divisor2 = ryQuad * primedCoordinates.x.pow(n = 2)
         val dividend = (rxQuad * ryQuad - divisor1 - divisor2)
         val multiplier = if (largeArcFlag == sweepFlag) -1 else 1
 
-        primedCenter = if (abs(dividend) < 1e-15) {
+        primedCenter = if (abs(dividend) < DOUBLE_ZERO_TOLERANCE) {
             PrecisePoint2D(x = 0.0, y = 0.0)
         } else {
             val sqrt = sqrt(
@@ -195,45 +201,45 @@ internal class ArcBoundingBoxCalculator(
         } else if (sweepFlag && deltaTheta < 0) {
             deltaTheta += 2 * PI
         }
-        theta = thetaAngle * 180 / PI
-        theta2 = (thetaAngle + deltaTheta) * 180 / PI
-        delta = deltaTheta * 180 / PI
+        theta = thetaAngle * ANGLE_180 / PI
+        theta2 = (thetaAngle + deltaTheta) * ANGLE_180 / PI
+        delta = deltaTheta * ANGLE_180 / PI
     }
 
     private fun computeArcRotation(): DoubleArray {
         // arc could be rotated. the min and max values then don't lie on multiples of
         // 90 degrees but are shifted by the rotation angle so we first calculate our
         // 0/90 degree angle
-        var theta01 = atan(-sinPhi / cosPhi * ry / rx) * 180 / PI
-        var theta02 = atan(cosPhi / sinPhi * ry / rx) * 180 / PI
+        var theta01 = atan(-sinPhi / cosPhi * ry / rx) * ANGLE_180 / PI
+        var theta02 = atan(cosPhi / sinPhi * ry / rx) * ANGLE_180 / PI
         if (theta < 0 || theta2 < 0) {
-            theta += 360
-            theta2 += 360
+            theta += ANGLE_360
+            theta2 += ANGLE_360
         }
         if (theta2 < theta) {
             val temp = theta
             theta = theta2
             theta2 = temp
         }
-        while (theta01 - 90 > theta01) theta01 -= 90
-        while (theta01 < theta) theta01 += 90
-        while (theta02 - 90 > theta02) theta02 -= 90
-        while (theta02 < theta) theta02 += 90
+        while (theta01 - ANGLE_90 > theta01) theta01 -= ANGLE_90
+        while (theta01 < theta) theta01 += ANGLE_90
+        while (theta02 - ANGLE_90 > theta02) theta02 -= ANGLE_90
+        while (theta02 < theta) theta02 += ANGLE_90
         return doubleArrayOf(
             theta01,
             theta02,
-            (theta01 + 90),
-            (theta02 + 90),
-            (theta01 + 180),
-            (theta02 + 180),
-            (theta01 + 270),
-            (theta02 + 270),
+            (theta01 + ANGLE_90),
+            (theta02 + ANGLE_90),
+            (theta01 + ANGLE_180),
+            (theta02 + ANGLE_180),
+            (theta01 + ANGLE_270),
+            (theta02 + ANGLE_270),
         )
     }
 
     private fun pointAt(t: Double): PrecisePoint2D {
         if (currentX == x && currentY == y) return PrecisePoint2D(x = x, y = y)
-        val tInAngle = (theta + t * delta) / 180 * PI
+        val tInAngle = (theta + t * delta) / ANGLE_180 * PI
         val sinTheta = sin(tInAngle)
         val cosTheta = cos(tInAngle)
         return PrecisePoint2D(

@@ -24,7 +24,7 @@ enum class SvgGradientSpreadMethod {
             Repeat.toString() -> Repeat
             else -> {
                 warn(
-                    "'$value' is an unsupported type of spreadMethod. Using default to '${Pad}'",
+                    "'$value' is an unsupported type of spreadMethod. Using default to '$Pad'",
                 )
                 Pad
             }
