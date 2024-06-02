@@ -33,31 +33,34 @@ abstract class SvgGraphicNode<out T>(
 
     val stroke: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
-    val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width") {
+    val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width", inherited = true) {
         val root = rootParent as SvgRootNode
         it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <length | percentage>
 
-    val strokeLineJoin: StrokeJoin? by attribute<String?, _>(name = "stroke-linejoin") {
+    val strokeLineJoin: StrokeJoin? by attribute<String?, _>(name = "stroke-linejoin", inherited = true) {
         it?.let { StrokeJoin(it) }
     } // <arcs | bevel |miter | miter-clip | round>
 
-    val strokeLineCap: StrokeCap? by attribute<String?, _>(name = "stroke-linecap") {
+    val strokeLineCap: StrokeCap? by attribute<String?, _>(name = "stroke-linecap", inherited = true) {
         it?.let { StrokeCap(it) }
     }
 
-    val fillRule: PathFillType? by attribute<String?, _>(name = "fill-rule") {
+    val fillRule: PathFillType? by attribute<String?, _>(name = "fill-rule", inherited = true) {
         it?.let { PathFillType(it) }
     } // <nonzero | evenodd>
 
-    val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity") {
+    val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity", inherited = true) {
         val root = rootParent as SvgRootNode
         it?.toLengthFloatOrNull(width = root.viewportWidth, height = root.viewportHeight)
     } // <0..1 | percentage>
 
-    val strokeMiterLimit: Float? by attribute(name = "stroke-miterlimit")
+    val strokeMiterLimit: Float? by attribute(name = "stroke-miterlimit", inherited = true)
 
-    val strokeDashArray: StrokeDashArray? by attribute<String?, _>(name = "stroke-dasharray") { strokeDashArray ->
+    val strokeDashArray: StrokeDashArray? by attribute<String?, _>(
+        name = "stroke-dasharray",
+        inherited = true,
+    ) { strokeDashArray ->
         strokeDashArray?.let(::StrokeDashArray)
     }
 
