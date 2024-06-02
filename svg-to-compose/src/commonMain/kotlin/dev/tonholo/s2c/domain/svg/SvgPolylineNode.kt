@@ -4,48 +4,23 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
-import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.geom.Point2D
 
-abstract class SvgGraphicNodeWithListOfPoints<T>(
+class SvgPolylineNode(
     parent: XmlParentNode,
     attributes: MutableMap<String, String>,
-    tagName: String,
-) : SvgGraphicNode<T>(parent, attributes, tagName)
-    where T : SvgNode, T : XmlChildNode {
-    private val listOfPointsRegex = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?")
-
-    val points by attribute<String?, List<Point2D>> { points ->
-        if (points.isNullOrBlank()) {
-            emptyList()
-        } else {
-            listOfPointsRegex
-                .findAll(points)
-                .map { it.value }
-                .windowed(size = 2, step = 2)
-                .map { (x, y) -> Point2D(x.toFloat(), y.toFloat()) }
-                .toList()
-        }
-    }
-}
-
-class SvgPolygonNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNodeWithListOfPoints<SvgPolygonNode>(parent, attributes, TAG_NAME) {
-    override val constructor: SvgChildNodeConstructorFn<SvgPolygonNode> = ::SvgPolygonNode
+) : SvgGraphicNodeWithListOfPoints<SvgPolylineNode>(parent, attributes, TAG_NAME) {
+    override val constructor: SvgChildNodeConstructorFn<SvgPolylineNode> = ::SvgPolylineNode
 
     companion object {
-        const val TAG_NAME = "polygon"
+        const val TAG_NAME = "polyline"
     }
 }
 
-fun SvgPolygonNode.asNode(
+fun SvgPolylineNode.asNode(
     minified: Boolean,
 ): ImageVectorNode.Path {
-    val nodes = createSimplePolygonNodes(minified)
+    val nodes = createSimplePolylineNodes(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush(nodes),
@@ -67,14 +42,14 @@ fun SvgPolygonNode.asNode(
     )
 }
 
-private fun SvgPolygonNode.buildNormalizedPath(): String = buildString {
-    append("<polygon ")
+private fun SvgPolylineNode.buildNormalizedPath(): String = buildString {
+    append("<polyline ")
     append("points=\"${points.joinToString(" ") { "${it.x} ${it.y}" }}\" ")
     append(graphicNodeParams())
     append("/>")
 }
 
-private fun SvgPolygonNode.createSimplePolygonNodes(
+private fun SvgPolylineNode.createSimplePolylineNodes(
     minified: Boolean,
 ): List<PathNodes> = buildList {
     val points = points.toMutableList()
@@ -85,12 +60,11 @@ private fun SvgPolygonNode.createSimplePolygonNodes(
             this.minified = minified
         },
     )
-    points.forEachIndexed { index, (x, y) ->
+    points.forEach { (x, y) ->
         add(
             pathNode(command = PathCommand.LineTo) {
                 args(x, y)
                 this.minified = minified
-                close = index == points.lastIndex
             },
         )
     }

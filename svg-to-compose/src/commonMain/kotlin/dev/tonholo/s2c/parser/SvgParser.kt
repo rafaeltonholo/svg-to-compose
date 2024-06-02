@@ -15,6 +15,7 @@ import dev.tonholo.s2c.domain.svg.SvgNode
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.normalizedId
 import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.SvgPolygonNode
+import dev.tonholo.s2c.domain.svg.SvgPolylineNode
 import dev.tonholo.s2c.domain.svg.SvgRadialGradientNode
 import dev.tonholo.s2c.domain.svg.SvgRectNode
 import dev.tonholo.s2c.domain.svg.SvgRootNode
@@ -166,6 +167,11 @@ class SvgParser : XmlParser() {
         )
 
         SvgPolygonNode.TAG_NAME -> SvgPolygonNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgPolylineNode.TAG_NAME -> SvgPolylineNode(
             parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )

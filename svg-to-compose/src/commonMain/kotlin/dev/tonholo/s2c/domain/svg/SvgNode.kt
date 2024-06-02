@@ -167,5 +167,6 @@ inline fun SvgNode.asNodes(
     is SvgPathNode -> listOf(asNode(minified = minified))
     is SvgRectNode -> listOf(asNode(minified = minified))
     is SvgPolygonNode -> listOf(asNode(minified = minified))
+    is SvgPolylineNode -> listOf(asNode(minified = minified))
     else -> null
 }
