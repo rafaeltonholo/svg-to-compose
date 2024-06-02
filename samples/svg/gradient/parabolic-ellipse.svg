@@ -1,0 +1,37 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 2000 1500' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#000000' height='1500' width='2000' />
+  <defs>
+    <ellipse fill='none' id='a' rx='600' ry='450' stroke-opacity='0.29' stroke-width='94' />
+  </defs>
+  <g transform='translate(725, 1100) scale(0.397)'>
+    <g transform='rotate(-89.6 0 0)'>
+      <g transform='translate(1000 750)'>
+        <use href='#a' stroke='#27002B' transform='rotate(-33.6 0 0) scale(0.664)' />
+        <use href='#a' stroke='#340331' transform='rotate(-28 0 0) scale(0.72)' />
+        <use href='#a' stroke='#420436' transform='rotate(-22.4 0 0) scale(0.776)' />
+        <use href='#a' stroke='#51063b' transform='rotate(-16.8 0 0) scale(0.832)' />
+        <use href='#a' stroke='#5f093f' transform='rotate(-11.2 0 0) scale(0.888)' />
+        <use href='#a' stroke='#6e0d42' transform='rotate(-5.6 0 0) scale(0.944)' />
+        <use href='#a' stroke='#7c1244' transform='' />
+        <use href='#a' stroke='#8b1945' transform='rotate(5.6 0 0) scale(1.056)' />
+        <use href='#a' stroke='#992045' transform='rotate(11.2 0 0) scale(1.112)' />
+        <use href='#a' stroke='#a62945' transform='rotate(16.8 0 0) scale(1.168)' />
+        <use href='#a' stroke='#b33244' transform='rotate(22.4 0 0) scale(1.224)' />
+        <use href='#a' stroke='#c03c42' transform='rotate(28 0 0) scale(1.28)' />
+        <use href='#a' stroke='#cb4740' transform='rotate(33.6 0 0) scale(1.336)' />
+        <use href='#a' stroke='#d5523c' transform='rotate(39.2 0 0) scale(1.392)' />
+        <use href='#a' stroke='#df5f39' transform='rotate(44.8 0 0) scale(1.448)' />
+        <use href='#a' stroke='#e76b34' transform='rotate(50.4 0 0) scale(1.504)' />
+        <use href='#a' stroke='#ef792f' transform='rotate(56 0 0) scale(1.56)' />
+        <use href='#a' stroke='#f58729' transform='rotate(61.6 0 0) scale(1.616)' />
+        <use href='#a' stroke='#fa9522' transform='rotate(67.2 0 0) scale(1.672)' />
+        <use href='#a' stroke='#fda31a' transform='rotate(72.8 0 0) scale(1.728)' />
+        <use href='#a' stroke='#ffb210' transform='rotate(78.4 0 0) scale(1.784)' />
+        <use href='#a' stroke='#ffc106' transform='rotate(84 0 0) scale(1.84)' />
+        <use href='#a' stroke='#FFD000' transform='rotate(89.6 0 0) scale(1.896)' />
+      </g>
+    </g>
+  </g>
+</svg>

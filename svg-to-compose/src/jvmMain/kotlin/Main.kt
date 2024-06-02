@@ -16,7 +16,7 @@ import kotlin.system.exitProcess
  * Should never be used in production.
  */
 fun main() {
-    AppConfig.debug = false
+    AppConfig.debug = true
     AppConfig.silent = false
     val suffix = "v4"
     val (pkg, path, output) = SampleFile.Directory(

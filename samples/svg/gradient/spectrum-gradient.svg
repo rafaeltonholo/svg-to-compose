@@ -1,0 +1,37 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg height='100%' viewBox='0 0 1200 800' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#ffff00' height='800' width='1200' />
+  <defs>
+    <radialGradient cx='0' cy='800' gradientUnits='userSpaceOnUse' id='a' r='800'>
+      <stop offset='0' stop-color='#ff8000' />
+      <stop offset='1' stop-color='#ff8000' stop-opacity='0' />
+    </radialGradient>
+    <radialGradient cx='1200' cy='800' gradientUnits='userSpaceOnUse' id='b' r='800'>
+      <stop offset='0' stop-color='#00ff19' />
+      <stop offset='1' stop-color='#00ff19' stop-opacity='0' />
+    </radialGradient>
+    <radialGradient cx='600' cy='0' gradientUnits='userSpaceOnUse' id='c' r='600'>
+      <stop offset='0' stop-color='#9900ff' />
+      <stop offset='1' stop-color='#9900ff' stop-opacity='0' />
+    </radialGradient>
+    <radialGradient cx='600' cy='800' gradientUnits='userSpaceOnUse' id='d' r='600'>
+      <stop offset='0' stop-color='#ffff00' />
+      <stop offset='1' stop-color='#ffff00' stop-opacity='0' />
+    </radialGradient>
+    <radialGradient cx='0' cy='0' gradientUnits='userSpaceOnUse' id='e' r='800'>
+      <stop offset='0' stop-color='#FF0000' />
+      <stop offset='1' stop-color='#FF0000' stop-opacity='0' />
+    </radialGradient>
+    <radialGradient cx='1200' cy='0' gradientUnits='userSpaceOnUse' id='f' r='800'>
+      <stop offset='0' stop-color='#0CF' />
+      <stop offset='1' stop-color='#0CF' stop-opacity='0' />
+    </radialGradient>
+  </defs>
+  <rect fill='url(#a)' height='800' width='1200' />
+  <rect fill='url(#b)' height='800' width='1200' />
+  <rect fill='url(#c)' height='800' width='1200' />
+  <rect fill='url(#d)' height='800' width='1200' />
+  <rect fill='url(#e)' height='800' width='1200' />
+  <rect fill='url(#f)' height='800' width='1200' />
+</svg>

@@ -1,0 +1,30 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 2000 1500' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#000000' height='1500' width='2000' />
+  <defs>
+    <rect fill='none' height='600' id='a' stroke-opacity='0.5' stroke-width='100' width='800' x='-400' y='-300' />
+  </defs>
+  <g transform='translate(725, 1100) scale(0.397)'>
+    <g transform='rotate(-89.6 0 0)'>
+      <g transform='translate(1000 750)'>
+        <use href='#a' stroke='#000' transform='rotate(5.3 0 0) scale(1.053)' />
+        <use href='#a' stroke='#000011' transform='rotate(10.6 0 0) scale(1.106)' />
+        <use href='#a' stroke='#000022' transform='rotate(15.9 0 0) scale(1.159)' />
+        <use href='#a' stroke='#000033' transform='rotate(21.2 0 0) scale(1.212)' />
+        <use href='#a' stroke='#000044' transform='rotate(26.5 0 0) scale(1.265)' />
+        <use href='#a' stroke='#000055' transform='rotate(31.8 0 0) scale(1.318)' />
+        <use href='#a' stroke='#000066' transform='rotate(37.1 0 0) scale(1.371)' />
+        <use href='#a' stroke='#000077' transform='rotate(42.4 0 0) scale(1.424)' />
+        <use href='#a' stroke='#000088' transform='rotate(47.7 0 0) scale(1.477)' />
+        <use href='#a' stroke='#000099' transform='rotate(53 0 0) scale(1.53)' />
+        <use href='#a' stroke='#0000aa' transform='rotate(58.3 0 0) scale(1.583)' />
+        <use href='#a' stroke='#0000bb' transform='rotate(63.6 0 0) scale(1.636)' />
+        <use href='#a' stroke='#0000cc' transform='rotate(68.9 0 0) scale(1.689)' />
+        <use href='#a' stroke='#0000dd' transform='rotate(74.2 0 0) scale(1.742)' />
+        <use href='#a' stroke='#0000ee' transform='rotate(79.5 0 0) scale(1.795)' />
+        <use href='#a' stroke='#00F' transform='rotate(84.8 0 0) scale(1.848)' />
+      </g>
+    </g>
+  </g>
+</svg>

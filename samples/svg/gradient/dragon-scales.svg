@@ -1,0 +1,58 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 100 1000' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#330055' height='1000' width='100' />
+  <g fill-opacity='1'>
+    <circle cx='50' cy='0' fill='#330055' r='50' />
+    <g fill='#3a015d'>
+      <circle cx='0' cy='50' r='50' />
+      <circle cx='100' cy='50' r='50' />
+    </g>
+    <circle cx='50' cy='100' fill='#410165' r='50' />
+    <g fill='#48026e'>
+      <circle cx='0' cy='150' r='50' />
+      <circle cx='100' cy='150' r='50' />
+    </g>
+    <circle cx='50' cy='200' fill='#500376' r='50' />
+    <g fill='#57047e'>
+      <circle cx='0' cy='250' r='50' />
+      <circle cx='100' cy='250' r='50' />
+    </g>
+    <circle cx='50' cy='300' fill='#5f0587' r='50' />
+    <g fill='#67068f'>
+      <circle cx='0' cy='350' r='50' />
+      <circle cx='100' cy='350' r='50' />
+    </g>
+    <circle cx='50' cy='400' fill='#6f0798' r='50' />
+    <g fill='#7707a0'>
+      <circle cx='0' cy='450' r='50' />
+      <circle cx='100' cy='450' r='50' />
+    </g>
+    <circle cx='50' cy='500' fill='#8008a9' r='50' />
+    <g fill='#8909b1'>
+      <circle cx='0' cy='550' r='50' />
+      <circle cx='100' cy='550' r='50' />
+    </g>
+    <circle cx='50' cy='600' fill='#9109ba' r='50' />
+    <g fill='#9a09c3'>
+      <circle cx='0' cy='650' r='50' />
+      <circle cx='100' cy='650' r='50' />
+    </g>
+    <circle cx='50' cy='700' fill='#a309cb' r='50' />
+    <g fill='#ad09d4'>
+      <circle cx='0' cy='750' r='50' />
+      <circle cx='100' cy='750' r='50' />
+    </g>
+    <circle cx='50' cy='800' fill='#b608dc' r='50' />
+    <g fill='#c007e5'>
+      <circle cx='0' cy='850' r='50' />
+      <circle cx='100' cy='850' r='50' />
+    </g>
+    <circle cx='50' cy='900' fill='#c905ee' r='50' />
+    <g fill='#d303f6'>
+      <circle cx='0' cy='950' r='50' />
+      <circle cx='100' cy='950' r='50' />
+    </g>
+    <circle cx='50' cy='1000' fill='#D0F' r='50' />
+  </g>
+</svg>

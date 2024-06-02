@@ -1,0 +1,58 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#dd33bb' height='1000' width='1000' />
+  <defs>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='a' r='50%'>
+      <stop offset='0' stop-color='#dd33bb' />
+      <stop offset='1' stop-color='#404' />
+    </radialGradient>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='b' r='60%'>
+      <stop offset='0' stop-color='#F70' stop-opacity='1' />
+      <stop offset='1' stop-color='#F70' stop-opacity='0' />
+    </radialGradient>
+  </defs>
+  <rect fill='url(#a)' height='1000' width='1000' />
+  <g fill='none' stroke='#F6B' stroke-miterlimit='10' stroke-opacity='.3' stroke-width='1'>
+    <rect height='975' width='975' x='12.5' y='12.5' />
+    <rect height='950' width='950' x='25' y='25' />
+    <rect height='925' width='925' x='37.5' y='37.5' />
+    <rect height='900' width='900' x='50' y='50' />
+    <rect height='875' width='875' x='62.5' y='62.5' />
+    <rect height='850' width='850' x='75' y='75' />
+    <rect height='825' width='825' x='87.5' y='87.5' />
+    <rect height='800' width='800' x='100' y='100' />
+    <rect height='775' width='775' x='112.5' y='112.5' />
+    <rect height='750' width='750' x='125' y='125' />
+    <rect height='725' width='725' x='137.5' y='137.5' />
+    <rect height='700' width='700' x='150' y='150' />
+    <rect height='675' width='675' x='162.5' y='162.5' />
+    <rect height='650' width='650' x='175' y='175' />
+    <rect height='625' width='625' x='187.5' y='187.5' />
+    <rect height='600' width='600' x='200' y='200' />
+    <rect height='575' width='575' x='212.5' y='212.5' />
+    <rect height='550' width='550' x='225' y='225' />
+    <rect height='525' width='525' x='237.5' y='237.5' />
+    <rect height='500' width='500' x='250' y='250' />
+    <rect height='475' width='475' x='262.5' y='262.5' />
+    <rect height='450' width='450' x='275' y='275' />
+    <rect height='425' width='425' x='287.5' y='287.5' />
+    <rect height='400' width='400' x='300' y='300' />
+    <rect height='375' width='375' x='312.5' y='312.5' />
+    <rect height='350' width='350' x='325' y='325' />
+    <rect height='325' width='325' x='337.5' y='337.5' />
+    <rect height='300' width='300' x='350' y='350' />
+    <rect height='275' width='275' x='362.5' y='362.5' />
+    <rect height='250' width='250' x='375' y='375' />
+    <rect height='225' width='225' x='387.5' y='387.5' />
+    <rect height='200' width='200' x='400' y='400' />
+    <rect height='175' width='175' x='412.5' y='412.5' />
+    <rect height='150' width='150' x='425' y='425' />
+    <rect height='125' width='125' x='437.5' y='437.5' />
+    <rect height='100' width='100' x='450' y='450' />
+    <rect height='75' width='75' x='462.5' y='462.5' />
+    <rect height='50' width='50' x='475' y='475' />
+    <rect height='25' width='25' x='487.5' y='487.5' />
+  </g>
+  <rect fill='url(#b)' fill-opacity='.3' height='1000' width='1000' />
+</svg>

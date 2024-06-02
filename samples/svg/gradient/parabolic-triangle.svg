@@ -1,0 +1,40 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 2000 1500' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#000000' height='1500' width='2000' />
+  <defs>
+    <path d='M0-478l-413.96 717h827.92L0-478l-413.96 717h827.92z' fill='none' id='a' stroke-opacity='0.24'
+        stroke-width='107.4' />
+  </defs>
+  <g transform='scale(0.424)'>
+    <g transform='rotate(-160 0 0)'>
+      <g transform='translate(-2900 -900)'>
+        <use href='#a' stroke='#FF0' transform='rotate(-80 0 0) scale(0.2)' />
+        <use href='#a' stroke='#fffa00' transform='rotate(-70 0 0) scale(0.3)' />
+        <use href='#a' stroke='#fff400' transform='rotate(-60 0 0) scale(0.4)' />
+        <use href='#a' stroke='#ffef00' transform='rotate(-50 0 0) scale(0.5)' />
+        <use href='#a' stroke='#ffe900' transform='rotate(-40 0 0) scale(0.6)' />
+        <use href='#a' stroke='#ffe300' transform='rotate(-30 0 0) scale(0.7)' />
+        <use href='#a' stroke='#ffdd00' transform='rotate(-20 0 0) scale(0.8)' />
+        <use href='#a' stroke='#ffd700' transform='rotate(-10 0 0) scale(0.9)' />
+        <use href='#a' stroke='#ffd000' transform='' />
+        <use href='#a' stroke='#ffca00' transform='rotate(10 0 0) scale(1.1)' />
+        <use href='#a' stroke='#ffc300' transform='rotate(20 0 0) scale(1.2)' />
+        <use href='#a' stroke='#ffbc00' transform='rotate(30 0 0) scale(1.3)' />
+        <use href='#a' stroke='#ffb400' transform='rotate(40 0 0) scale(1.4)' />
+        <use href='#a' stroke='#ffad00' transform='rotate(50 0 0) scale(1.5)' />
+        <use href='#a' stroke='#ffa500' transform='rotate(60 0 0) scale(1.6)' />
+        <use href='#a' stroke='#ff9c00' transform='rotate(70 0 0) scale(1.7)' />
+        <use href='#a' stroke='#ff9300' transform='rotate(80 0 0) scale(1.8)' />
+        <use href='#a' stroke='#ff8a00' transform='rotate(90 0 0) scale(1.9)' />
+        <use href='#a' stroke='#ff8000' transform='rotate(100 0 0) scale(2)' />
+        <use href='#a' stroke='#ff7400' transform='rotate(110 0 0) scale(2.1)' />
+        <use href='#a' stroke='#ff6800' transform='rotate(120 0 0) scale(2.2)' />
+        <use href='#a' stroke='#ff5a00' transform='rotate(130 0 0) scale(2.3)' />
+        <use href='#a' stroke='#ff4a00' transform='rotate(140 0 0) scale(2.4)' />
+        <use href='#a' stroke='#ff3400' transform='rotate(150 0 0) scale(2.5)' />
+        <use href='#a' stroke='#F00' transform='rotate(160 0 0) scale(2.6)' />
+      </g>
+    </g>
+  </g>
+</svg>

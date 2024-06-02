@@ -1,0 +1,59 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#66ff77' height='1000' width='1000' />
+  <defs>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='a' r='975'>
+      <stop offset='0' stop-color='#66ff77' />
+      <stop offset='1' stop-color='#240' />
+    </radialGradient>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='b' r='975'>
+      <stop offset='0' stop-color='#EF5' stop-opacity='1' />
+      <stop offset='1' stop-color='#EF5' stop-opacity='0' />
+    </radialGradient>
+  </defs>
+  <rect fill='url(#a)' height='1000' width='1000' />
+  <g fill='none' stroke='#081' stroke-miterlimit='10' stroke-opacity='.2' stroke-width='10'>
+    <polygon points='-500,500 500,-500 1500,500 500,1500' />
+    <polygon points='-475,500 500,-475 1475,500 500,1475' />
+    <polygon points='-450,500 500,-450 1450,500 500,1450' />
+    <polygon points='-425,500 500,-425 1425,500 500,1425' />
+    <polygon points='-400,500 500,-400 1400,500 500,1400' />
+    <polygon points='-375,500 500,-375 1375,500 500,1375' />
+    <polygon points='-350,500 500,-350 1350,500 500,1350' />
+    <polygon points='-325,500 500,-325 1325,500 500,1325' />
+    <polygon points='-300,500 500,-300 1300,500 500,1300' />
+    <polygon points='-275,500 500,-275 1275,500 500,1275' />
+    <polygon points='-250,500 500,-250 1250,500 500,1250' />
+    <polygon points='-225,500 500,-225 1225,500 500,1225' />
+    <polygon points='-200,500 500,-200 1200,500 500,1200' />
+    <polygon points='-175,500 500,-175 1175,500 500,1175' />
+    <polygon points='-150,500 500,-150 1150,500 500,1150' />
+    <polygon points='-125,500 500,-125 1125,500 500,1125' />
+    <polygon points='-100,500 500,-100 1100,500 500,1100' />
+    <polygon points='-75,500 500,-75 1075,500 500,1075' />
+    <polygon points='-50,500 500,-50 1050,500 500,1050' />
+    <polygon points='-25,500 500,-25 1025,500 500,1025' />
+    <polygon points='0,500 500,0 1000,500 500,1000' />
+    <polygon points='25,500 500,25 975,500 500,975' />
+    <polygon points='50,500 500,50 950,500 500,950' />
+    <polygon points='75,500 500,75 925,500 500,925' />
+    <polygon points='100,500 500,100 900,500 500,900' />
+    <polygon points='125,500 500,125 875,500 500,875' />
+    <polygon points='150,500 500,150 850,500 500,850' />
+    <polygon points='175,500 500,175 825,500 500,825' />
+    <polygon points='200,500 500,200 800,500 500,800' />
+    <polygon points='225,500 500,225 775,500 500,775' />
+    <polygon points='250,500 500,250 750,500 500,750' />
+    <polygon points='275,500 500,275 725,500 500,725' />
+    <polygon points='300,500 500,300 700,500 500,700' />
+    <polygon points='325,500 500,325 675,500 500,675' />
+    <polygon points='350,500 500,350 650,500 500,650' />
+    <polygon points='375,500 500,375 625,500 500,625' />
+    <polygon points='400,500 500,400 600,500 500,600' />
+    <polygon points='425,500 500,425 575,500 500,575' />
+    <polygon points='450,500 500,450 550,500 500,550' />
+    <polygon points='475,500 500,475 525,500 500,525' />
+  </g>
+  <rect fill='url(#b)' fill-opacity='.2' height='1000' width='1000' />
+</svg>
