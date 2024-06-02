@@ -85,7 +85,8 @@ sealed class ImageParser(
      * @see defaultImports
      * @see previewImports
      * @see materialReceiverTypeImport
-     * @see ImageVectorNode.Path.pathImports
+     * @see ImageVectorNode.Path.imports
+     * @see ImageVectorNode.Group.imports
      */
     protected fun createImports(
         nodes: List<ImageVectorNode>,
@@ -161,7 +162,7 @@ sealed class ImageParser(
         ): IconFileContents {
             val content = readContent(file)
 
-            val root = parse(content = content, fileType = FileType.Svg)
+            val root = XmlParser.parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgRootNode } as SvgRootNode
             svg.resolveUseNodes()
             val (_, _, viewportWidth, viewportHeight) = svg.viewBox
@@ -229,7 +230,7 @@ sealed class ImageParser(
         ): IconFileContents {
             val content = readContent(file)
 
-            val root = parse(content = content, fileType = FileType.Avg)
+            val root = XmlParser.parse(content = content, fileType = FileType.Avg)
             val avg = root.children.single { it is AvgRootNode } as AvgRootNode
             val nodes = avg.asNodes(minified = config.minified)
 
