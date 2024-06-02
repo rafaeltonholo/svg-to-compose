@@ -3,7 +3,15 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toPercentage
+import kotlin.math.roundToInt
 
+/**
+ * Represents an `<stop>` element of an SVG `linearGradient` or `radialGradient` element.
+ *
+ * The `<stop>` element defines a color stop along the gradient line.
+ *
+ * see: [SVG Gradient Stops](https://www.w3.org/TR/SVG11/single-page.html#pservers-GradientStops)
+ */
 class SvgGradientStopNode(
     parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
@@ -27,7 +35,36 @@ class SvgGradientStopNode(
     /**
      * [StopOpacityProperty](https://www.w3.org/TR/SVG11/single-page.html#pservers-StopOpacityProperty)
      */
-    val stopOpacity: Float by attribute(name = "stop-opacity", defaultValue = 1f)
+    private val stopOpacity: Float by attribute(name = "stop-opacity", defaultValue = 1f)
+
+    /**
+     * Computes the color of the gradient stop, taking into account the
+     * `stop-color` and `stop-opacity` attributes.
+     *
+     * The resulting color is an instance of [SvgColor].
+     *
+     * @return The computed gradient color.
+     */
+    @OptIn(ExperimentalStdlibApi::class)
+    val gradientColor
+        get(): SvgColor {
+            val format = HexFormat {
+                number {
+                    prefix = "#"
+                }
+                upperCase = true
+            }
+            val currentColor = (
+                "#" + stopColor
+                    .toComposeColor()
+                    .color
+                )
+                .hexToUInt(format)
+            val alpha = (currentColor shr 24) and 0xFFu
+            val mask = ((alpha.toInt() * stopOpacity).roundToInt() and 0xFF).toUInt()
+            val gradientColor = (currentColor and 0x00FFFFFFu) or (mask shl 24)
+            return SvgColor(value = gradientColor.toHexString(format))
+        }
 
     override fun toString(): String = toJsString {
         append("\"offset\":\"$offset, \"")
