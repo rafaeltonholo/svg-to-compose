@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.parser
 
+import com.fleeksoft.ksoup.helper.ValidationException
 import com.fleeksoft.ksoup.nodes.Attributes
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
@@ -7,6 +8,7 @@ import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
 import dev.tonholo.s2c.domain.svg.SvgDefsNode
+import dev.tonholo.s2c.domain.svg.SvgEllipseNode
 import dev.tonholo.s2c.domain.svg.SvgGradientStopNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
 import dev.tonholo.s2c.domain.svg.SvgLinearGradientNode
@@ -27,6 +29,8 @@ import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlPendingParentElement
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ParserException
 
 /**
  * A parser for SVG (Scalable Vector Graphics) files.
@@ -144,7 +148,8 @@ class SvgParser : XmlParser() {
             parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
             replacement = findReplacementNode(
-                href = attributes[SvgUseNode.HREF_ATTR_KEY],
+                href = attributes[SvgUseNode.HREF_ATTR_KEY].takeIf { it.isNotEmpty() }
+                    ?: attributes[SvgUseNode.HREF_ATTR_NO_NS_KEY],
                 rootElement = rootElement,
                 useNodeAttrs = attributes,
                 elementsWithId = elementsWithId,
@@ -172,6 +177,11 @@ class SvgParser : XmlParser() {
         )
 
         SvgPolylineNode.TAG_NAME -> SvgPolylineNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgEllipseNode.TAG_NAME -> SvgEllipseNode(
             parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
@@ -224,21 +234,31 @@ class SvgParser : XmlParser() {
                 }
             } as? SvgNode
 
-        val replacement = processedNode
-            ?: rootElement.getElementById(href.normalizedId())?.let { node ->
-                createSvgElement(
-                    nodeName = node.tagName(),
-                    attributes = node.attributes(),
-                    parent = XmlPendingParentElement,
-                    rootElement = rootElement,
-                    elementsWithId = elementsWithId,
-                    elementsPendingParent = elementsPendingParent,
-                    root = root,
-                ).also {
-                    elementsWithId += it
-                    elementsPendingParent += it
-                } as SvgNode
-            } ?: error("Missing element with id '$href' on SVG tree.")
+        val replacement = try {
+            processedNode
+                ?: rootElement.getElementById(href.normalizedId())?.let { node ->
+                    createSvgElement(
+                        nodeName = node.tagName(),
+                        attributes = node.attributes(),
+                        parent = XmlPendingParentElement,
+                        rootElement = rootElement,
+                        elementsWithId = elementsWithId,
+                        elementsPendingParent = elementsPendingParent,
+                        root = root,
+                    ).also {
+                        elementsWithId += it
+                        elementsPendingParent += it
+                    } as SvgNode
+                } ?: error("Missing element with id '$href' on SVG tree.")
+        } catch (e: ValidationException) {
+            throw ParserException(
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Failed to find a replacement for <use> element. The ID of the element is null.",
+                cause = e
+            )
+        } catch (e: Exception) {
+            throw e
+        }
 
         return SvgUseNode.createReplacementGroupNode(useNodeAttrs, replacement, parent)
     }

@@ -272,7 +272,7 @@ class Processor(
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
                 if (AppConfig.debug) {
-                    e.printStackTrace()
+                    error(e.stackTraceToString())
                 }
                 printEmpty()
                 errors.add(file to e)
