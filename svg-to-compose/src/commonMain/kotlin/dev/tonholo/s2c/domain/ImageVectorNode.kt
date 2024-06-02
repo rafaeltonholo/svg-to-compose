@@ -162,7 +162,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                     add("strokeLineJoin" to "${it.toCompose()}")
                 }
                 strokeMiterLimit?.let {
-                    add("strokeMiterLimit" to "${it}f")
+                    add("strokeLineMiter" to "${it}f")
                 }
                 strokeLineWidth?.let {
                     add("strokeLineWidth" to "${it}f")
