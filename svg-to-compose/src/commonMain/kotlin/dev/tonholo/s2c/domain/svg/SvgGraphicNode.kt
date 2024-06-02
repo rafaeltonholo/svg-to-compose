@@ -27,7 +27,7 @@ abstract class SvgGraphicNode<out T>(
 
     val opacity: Float? by attribute()
 
-    val fillOpacity: Float? by attribute(name = "fill-opacity")
+    val fillOpacity: Float? by attribute(name = "fill-opacity", inherited = true)
 
     val style: String? by attribute()
 
