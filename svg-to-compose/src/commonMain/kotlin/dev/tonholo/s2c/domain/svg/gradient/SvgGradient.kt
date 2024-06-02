@@ -45,18 +45,6 @@ sealed class SvgGradient<out T>(
                 .unzip()
         }
 
-    internal inline fun calculateGradientCoordinate(length: SvgLength): Float {
-        val root = rootParent as SvgRootNode
-        return if (gradientUnits == "userSpaceOnUse") {
-            val boundingBox = root.viewportWidth
-            // TODO: calculate bounding box.
-            length.toFloat(boundingBox)
-        } else {
-            val baseDimension = root.viewportWidth
-            length.toFloat(baseDimension)
-        }
-    }
-
     internal inline fun calculateGradientXCoordinate(
         length: SvgLength,
         target: List<PathNodes> = emptyList(),
@@ -101,14 +89,6 @@ sealed class SvgGradient<out T>(
             val baseDimension = max(root.viewportWidth, root.viewportHeight)
             length.toFloat(baseDimension)
         }
-    }
-
-    internal inline fun calculateGradientCoordinate(
-        length: SvgLength?,
-        defaultLength: SvgLength
-    ): Float {
-        val svgLength = length ?: defaultLength
-        return calculateGradientCoordinate(svgLength)
     }
 
     abstract fun toBrush(

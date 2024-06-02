@@ -23,6 +23,8 @@ data object XmlPendingParentElement : XmlParentNode {
     override val children: MutableSet<XmlNode> = mutableSetOf()
 }
 
+private const val MAX_DEPTH = 5
+
 abstract class XmlChildNode(
     parent: XmlParentNode,
 ) : XmlNode {
@@ -66,7 +68,7 @@ abstract class XmlChildNode(
             var parentTag = parent.tagName
             var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
             var deep = 0
-            while (currentParent != null && currentParent !is XmlRootNode && deep++ < 5) {
+            while (currentParent != null && currentParent !is XmlRootNode && deep++ < MAX_DEPTH) {
                 parentTag = "${currentParent.tagName}.$parentTag"
                 currentParent = (currentParent as? XmlChildNode)?.parent
             }

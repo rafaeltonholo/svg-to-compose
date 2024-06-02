@@ -155,7 +155,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.MoveTo,
         minified = minified,
-    ), CoordinatePoint {
+    ),
+        CoordinatePoint {
         override val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
         override val y = values[1]
             .lowercase()
@@ -201,8 +202,11 @@ sealed class PathNodes(
             values = listOf(
                 x.toString(),
                 y.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -241,7 +245,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ArcTo,
         minified = minified,
-    ), CoordinatePoint {
+    ),
+        CoordinatePoint {
         /**
          * rx
          */
@@ -352,8 +357,11 @@ sealed class PathNodes(
                 isPositiveArc.toString(),
                 x.toString(),
                 y.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -393,7 +401,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.VerticalLineTo,
         minified = minified,
-    ), CoordinateY {
+    ),
+        CoordinateY {
         override val y = values
             .first()
             .lowercase()
@@ -436,8 +445,11 @@ sealed class PathNodes(
         ): VerticalLineTo = VerticalLineTo(
             values = listOf(
                 y.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -472,7 +484,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.HorizontalLineTo,
         minified = minified,
-    ), CoordinateX {
+    ),
+        CoordinateX {
         override val x = values
             .first()
             .lowercase()
@@ -515,8 +528,11 @@ sealed class PathNodes(
         ): HorizontalLineTo = HorizontalLineTo(
             values = listOf(
                 x.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -557,7 +573,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.LineTo,
         minified = minified,
-    ), CoordinatePoint {
+    ),
+        CoordinatePoint {
         override val x = values
             .first()
             .lowercase()
@@ -608,8 +625,11 @@ sealed class PathNodes(
             values = listOf(
                 x.toString(),
                 y.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -648,7 +668,10 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.CurveTo,
         minified = minified,
-    ), ControlPoint1, ControlPoint2, ControlPoint3 {
+    ),
+        ControlPoint1,
+        ControlPoint2,
+        ControlPoint3 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         override val y1 = values[1].toFloat()
         override val x2 = values[2].toFloat()
@@ -715,8 +738,11 @@ sealed class PathNodes(
                 y2.toString(),
                 x3.toString(),
                 y3.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -758,7 +784,9 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ReflectiveCurveTo,
         minified = minified,
-    ), ControlPoint1, ControlPoint2 {
+    ),
+        ControlPoint1,
+        ControlPoint2 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         override val y1 = values[1].toFloat()
         override val x2 = values[2].toFloat()
@@ -814,8 +842,11 @@ sealed class PathNodes(
                 y1.toString(),
                 x2.toString(),
                 y2.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -855,7 +886,9 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.QuadTo,
         minified = minified,
-    ), ControlPoint1, ControlPoint2 {
+    ),
+        ControlPoint1,
+        ControlPoint2 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         override val y1 = values[1].toFloat()
         override val x2 = values[2].toFloat()
@@ -912,8 +945,11 @@ sealed class PathNodes(
                 y1.toString(),
                 x2.toString(),
                 y2.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -955,7 +991,8 @@ sealed class PathNodes(
         isRelative = isRelative,
         command = PathCommand.ReflectiveQuadTo,
         minified = minified,
-    ), ControlPoint1 {
+    ),
+        ControlPoint1 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
         override val y1 = values[1]
             .lowercase()
@@ -1003,8 +1040,11 @@ sealed class PathNodes(
             values = listOf(
                 x1.toString(),
                 y1.toString().let {
-                    if (shouldClose) it + PathCommand.Close.value
-                    else it
+                    if (shouldClose) {
+                        it + PathCommand.Close.value
+                    } else {
+                        it
+                    }
                 },
             ),
             isRelative = isRelative,
@@ -1156,4 +1196,3 @@ internal interface ControlPointY3 {
  * in more intricate path definitions.
  */
 internal interface ControlPoint3 : ControlPointX3, ControlPointY3
-
