@@ -34,7 +34,9 @@ class SvgUseNode(
         val baseDimension = root.viewportHeight
         height.toFloatOrNull(baseDimension) ?: error("Invalid height '$height'")
     }
-    val href: String by attribute(namespace = SvgNode.XLINK_NS)
+    val href: String by attribute<String?, String>(namespace = SvgNode.XLINK_NS) { href ->
+        href ?: attributes[HREF_ATTR_NO_NS_KEY] ?: error("Missing href attribute")
+    }
     override val transform: SvgTransform? by attribute<String?, SvgTransform?> {
         it?.let(::SvgTransform)
     }
@@ -70,7 +72,8 @@ class SvgUseNode(
 
     companion object {
         const val TAG_NAME = "use"
-        const val HREF_ATTR_KEY = "${SvgNode.XLINK_NS}:href"
+        const val HREF_ATTR_NO_NS_KEY = "href"
+        const val HREF_ATTR_KEY = "${SvgNode.XLINK_NS}:$HREF_ATTR_NO_NS_KEY"
 
         /**
          * Creates the [SvgGroupNode] that wrap the [replacement] as per

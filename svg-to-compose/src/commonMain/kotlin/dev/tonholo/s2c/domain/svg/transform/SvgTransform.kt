@@ -51,6 +51,7 @@ value class SvgTransform(val value: String) {
         .map { transform ->
             val name = transform.takeWhile { it != '(' }
             val values = transform
+                .trim()
                 .removePrefix("$name(")
                 .removeSuffix(")")
                 .split(", ", ", ", " ")
