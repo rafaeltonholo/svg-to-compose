@@ -26,35 +26,12 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
     override val imports: Set<String>
         get() = emptySet() // should never be used directly.
 
-    override fun toCompose(): String? {
-        return value.uppercase()
+    val color: String
+        get() = value.uppercase()
             .removePrefix("#")
             .let {
                 when {
-                    it.startsWith(RGBA_PREFIX) || it.startsWith(RGB_PREFIX) -> {
-                        val values = it
-                            .removePrefix("$RGBA_PREFIX(")
-                            .removePrefix("$RGB_PREFIX(")
-                            .removeSuffix(")")
-                            .split(", ", ",")
-                        when (values.size) {
-                            RGBA_SIZE -> {
-                                values.foldIndexed("") { index, acc, value ->
-                                    if (index == values.lastIndex) {
-                                        (value.toFloat() * RGB_MAX_VALUE).roundToInt().toString(radix = 16) + acc
-                                    } else {
-                                        acc + value.toInt().toString(radix = 16)
-                                    }
-                                }.uppercase()
-                            }
-
-                            RGB_SIZE -> {
-                                values.fold("") { acc, value -> acc + value.toInt().toString(radix = 16) }
-                            }
-
-                            else -> "none"
-                        }
-                    }
+                    it.startsWith(RGBA_PREFIX) || it.startsWith(RGB_PREFIX) -> fromRgb(it)
 
                     it.length == FULL_HEXADECIMAL_COLOR_SIZE -> "FF$it"
 
@@ -68,7 +45,33 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
                     else -> it
                 }
             }
-            .takeIf { it.lowercase() != "none" }
-            ?.let { "$NAME(0x$it)" }
+
+    override fun toCompose(): String? = color
+        .takeIf { it.lowercase() != "none" }
+        ?.let { "$NAME(0x$it)" }
+
+    private fun fromRgb(it: String): String {
+        val values = it
+            .removePrefix("$RGBA_PREFIX(")
+            .removePrefix("$RGB_PREFIX(")
+            .removeSuffix(")")
+            .split(", ", ",")
+        return when (values.size) {
+            RGBA_SIZE -> {
+                values.foldIndexed("") { index, acc, value ->
+                    if (index == values.lastIndex) {
+                        (value.toFloat() * RGB_MAX_VALUE).roundToInt().toString(radix = 16) + acc
+                    } else {
+                        acc + value.toInt().toString(radix = 16)
+                    }
+                }.uppercase()
+            }
+
+            RGB_SIZE -> {
+                values.fold("") { acc, value -> acc + value.toInt().toString(radix = 16) }
+            }
+
+            else -> "none"
+        }
     }
 }

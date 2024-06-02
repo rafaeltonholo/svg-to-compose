@@ -41,7 +41,7 @@ sealed class SvgGradient<out T>(
 
             return children
                 .filterIsInstance<SvgGradientStopNode>()
-                .map { it.stopColor to it.offset }
+                .map { it.gradientColor to it.offset }
                 .unzip()
         }
 
