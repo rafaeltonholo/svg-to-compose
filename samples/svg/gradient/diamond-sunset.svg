@@ -2,7 +2,7 @@
 <!-- https://www.svgbackgrounds.com/category/gradient/ -->
 <svg height='100%' width='100%' xmlns='http://www.w3.org/2000/svg'>
   <defs>
-    <linearGradient id='a' x1='0' x2='0' y1='0' y2='1'>
+    <linearGradient id='a' x1='0' x2='0' y1='0' y2='100%'>
       <stop offset='0' stop-color='#80F' />
       <stop offset='1' stop-color='#f40' />
     </linearGradient>
