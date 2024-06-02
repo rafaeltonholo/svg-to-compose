@@ -1,0 +1,32 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 2000 1500' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#000000' height='1500' width='2000' />
+  <defs>
+    <path
+        d='M0.74-509.63l485.39 352.65l-185.4 570.61h-599.97l-185.4-570.61L0.74-509.63 M0.74-510.87l-486.56 353.51l185.85 571.99h601.42L487.3-157.36L0.74-510.87L0.74-510.87z'
+        fill='none' id='a' stroke-opacity='0.5' stroke-width='61.7' />
+  </defs>
+  <g transform='translate(725, 1100) scale(0.397)'>
+    <g transform='rotate(-89.6 0 0)'>
+      <g transform='translate(1000 750)'>
+        <use href='#a' stroke='#000' transform='rotate(7.2 0 0) scale(1.072)' />
+        <use href='#a' stroke='#002b00' transform='rotate(14.4 0 0) scale(1.144)' />
+        <use href='#a' stroke='#003200' transform='rotate(21.6 0 0) scale(1.216)' />
+        <use href='#a' stroke='#003d00' transform='rotate(28.8 0 0) scale(1.288)' />
+        <use href='#a' stroke='#004a00' transform='rotate(36 0 0) scale(1.36)' />
+        <use href='#a' stroke='#005900' transform='rotate(43.2 0 0) scale(1.432)' />
+        <use href='#a' stroke='#006900' transform='rotate(50.4 0 0) scale(1.504)' />
+        <use href='#a' stroke='#007900' transform='rotate(57.6 0 0) scale(1.576)' />
+        <use href='#a' stroke='#008900' transform='rotate(64.8 0 0) scale(1.648)' />
+        <use href='#a' stroke='#009a00' transform='rotate(72 0 0) scale(1.72)' />
+        <use href='#a' stroke='#00aa00' transform='rotate(79.2 0 0) scale(1.792)' />
+        <use href='#a' stroke='#00bb00' transform='rotate(86.4 0 0) scale(1.864)' />
+        <use href='#a' stroke='#00cb00' transform='rotate(93.6 0 0) scale(1.936)' />
+        <use href='#a' stroke='#00dc00' transform='rotate(100.8 0 0) scale(2.008)' />
+        <use href='#a' stroke='#00ee00' transform='rotate(108 0 0) scale(2.08)' />
+        <use href='#a' stroke='#0F0' transform='rotate(115.2 0 0) scale(2.152)' />
+      </g>
+    </g>
+  </g>
+</svg>

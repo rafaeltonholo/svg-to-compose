@@ -1,0 +1,15 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg height='100%' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='a' x1='0' x2='0' y1='0' y2='1'>
+      <stop offset='0' stop-color='#80F' />
+      <stop offset='1' stop-color='#f40' />
+    </linearGradient>
+  </defs>
+  <pattern height='24' id='b' patternUnits='userSpaceOnUse' width='24'>
+    <circle cx='12' cy='12' fill='#ffffff' r='12' />
+  </pattern>
+  <rect fill='url(#a)' height='100%' width='100%' />
+  <rect fill='url(#b)' fill-opacity='0.1' height='100%' width='100%' />
+</svg>

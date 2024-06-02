@@ -1,0 +1,48 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#ff0000' height='1000' width='1000' />
+  <defs>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='a' r='60%'>
+      <stop offset='0' stop-color='#ff0000' />
+      <stop offset='1' stop-color='#900' />
+    </radialGradient>
+    <radialGradient cx='500' cy='500' gradientUnits='userSpaceOnUse' id='b' r='70%'>
+      <stop offset='0' stop-color='#FF0' stop-opacity='1' />
+      <stop offset='1' stop-color='#FF0' stop-opacity='0' />
+    </radialGradient>
+  </defs>
+  <rect fill='url(#a)' height='1000' width='1000' />
+  <g fill='none' stroke='#F40' stroke-miterlimit='10' stroke-opacity='.5' stroke-width='2'>
+    <circle cx='500' cy='500' r='725' />
+    <circle cx='500' cy='500' r='700' />
+    <circle cx='500' cy='500' r='675' />
+    <circle cx='500' cy='500' r='650' />
+    <circle cx='500' cy='500' r='625' />
+    <circle cx='500' cy='500' r='600' />
+    <circle cx='500' cy='500' r='575' />
+    <circle cx='500' cy='500' r='550' />
+    <circle cx='500' cy='500' r='525' />
+    <circle cx='500' cy='500' r='500' />
+    <circle cx='500' cy='500' r='475' />
+    <circle cx='500' cy='500' r='450' />
+    <circle cx='500' cy='500' r='425' />
+    <circle cx='500' cy='500' r='400' />
+    <circle cx='500' cy='500' r='375' />
+    <circle cx='500' cy='500' r='350' />
+    <circle cx='500' cy='500' r='325' />
+    <circle cx='500' cy='500' r='300' />
+    <circle cx='500' cy='500' r='275' />
+    <circle cx='500' cy='500' r='250' />
+    <circle cx='500' cy='500' r='225' />
+    <circle cx='500' cy='500' r='200' />
+    <circle cx='500' cy='500' r='175' />
+    <circle cx='500' cy='500' r='150' />
+    <circle cx='500' cy='500' r='125' />
+    <circle cx='500' cy='500' r='100' />
+    <circle cx='500' cy='500' r='75' />
+    <circle cx='500' cy='500' r='50' />
+    <circle cx='500' cy='500' r='25' />
+  </g>
+  <rect fill='url(#b)' fill-opacity='.5' height='1000' width='1000' />
+</svg>

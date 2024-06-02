@@ -1,0 +1,69 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg height='100%' viewBox='0 0 1200 800' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#ff0000' height='800' width='1200' />
+  <defs>
+    <linearGradient gradientUnits='userSpaceOnUse' id='a' x1='600' x2='600' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff0000' />
+      <stop offset='1' stop-color='#E0F' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='b' x1='650' x2='650' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff0019' />
+      <stop offset='1' stop-color='#ce00f3' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='c' x1='700' x2='700' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff0031' />
+      <stop offset='1' stop-color='#b000e6' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='d' x1='750' x2='750' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff004a' />
+      <stop offset='1' stop-color='#9400da' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='e' x1='800' x2='800' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff0063' />
+      <stop offset='1' stop-color='#7a00ce' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='f' x1='850' x2='850' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff007c' />
+      <stop offset='1' stop-color='#6200c1' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='g' x1='900' x2='900' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff0094' />
+      <stop offset='1' stop-color='#4d00b5' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='h' x1='950' x2='950' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff00ad' />
+      <stop offset='1' stop-color='#3900a8' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='i' x1='1000' x2='1000' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff00c6' />
+      <stop offset='1' stop-color='#28009c' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='j' x1='1050' x2='1050' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff00df' />
+      <stop offset='1' stop-color='#180090' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='k' x1='1100' x2='1100' y1='25' y2='777'>
+      <stop offset='0' stop-color='#ff00f7' />
+      <stop offset='1' stop-color='#0b0083' />
+    </linearGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='l' x1='1150' x2='1150' y1='25' y2='777'>
+      <stop offset='0' stop-color='#E0F' />
+      <stop offset='1' stop-color='#007' />
+    </linearGradient>
+  </defs>
+  <g fill-opacity='1'>
+    <rect fill='url(#a)' height='800' width='1200' />
+    <rect fill='url(#b)' height='800' width='1100' x='100' />
+    <rect fill='url(#c)' height='800' width='1000' x='200' />
+    <rect fill='url(#d)' height='800' width='900' x='300' />
+    <rect fill='url(#e)' height='800' width='800' x='400' />
+    <rect fill='url(#f)' height='800' width='700' x='500' />
+    <rect fill='url(#g)' height='800' width='600' x='600' />
+    <rect fill='url(#h)' height='800' width='500' x='700' />
+    <rect fill='url(#i)' height='800' width='400' x='800' />
+    <rect fill='url(#j)' height='800' width='300' x='900' />
+    <rect fill='url(#k)' height='800' width='200' x='1000' />
+    <rect fill='url(#l)' height='800' width='100' x='1100' />
+  </g>
+</svg>

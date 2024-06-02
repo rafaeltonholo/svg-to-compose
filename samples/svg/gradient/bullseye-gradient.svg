@@ -1,0 +1,13 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg height='100%' viewBox='0 0 800 800' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#000000' height='800' width='800' />
+  <g fill-opacity='1'>
+    <circle cx='400' cy='400' fill='#000000' r='600' />
+    <circle cx='400' cy='400' fill='#230046' r='500' />
+    <circle cx='400' cy='400' fill='#2f0052' r='400' />
+    <circle cx='400' cy='400' fill='#3b075e' r='300' />
+    <circle cx='400' cy='400' fill='#48156a' r='200' />
+    <circle cx='400' cy='400' fill='#552277' r='100' />
+  </g>
+</svg>

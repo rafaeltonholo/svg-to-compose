@@ -1,0 +1,21 @@
+﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
+<!-- https://www.svgbackgrounds.com/category/gradient/ -->
+<svg height='100%' viewBox='0 0 800 400' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#330000' height='400' width='800' />
+  <defs>
+    <radialGradient cx='396' cy='281' gradientUnits='userSpaceOnUse' id='a' r='514'>
+      <stop offset='0' stop-color='#D18' />
+      <stop offset='1' stop-color='#330000' />
+    </radialGradient>
+    <linearGradient gradientUnits='userSpaceOnUse' id='b' x1='400' x2='400' y1='148' y2='333'>
+      <stop offset='0' stop-color='#FA3' stop-opacity='0' />
+      <stop offset='1' stop-color='#FA3' stop-opacity='0.5' />
+    </linearGradient>
+  </defs>
+  <rect fill='url(#a)' height='400' width='800' />
+  <g fill-opacity='0.4'>
+    <circle cx='267.5' cy='61' fill='url(#b)' r='300' />
+    <circle cx='532.5' cy='61' fill='url(#b)' r='300' />
+    <circle cx='400' cy='30' fill='url(#b)' r='300' />
+  </g>
+</svg>
