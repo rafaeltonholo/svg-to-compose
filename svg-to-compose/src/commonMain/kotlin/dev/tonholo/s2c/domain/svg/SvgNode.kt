@@ -62,11 +62,11 @@ class SvgRootNode(
 ) : SvgElementNode<SvgRootNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
     override val constructor = ::SvgRootNode
     val width: Float by attribute<SvgLength?, Float> { width ->
-        width?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
+        width?.toFloat(baseDimension = viewportWidth)
             ?: viewportWidth
     }
     val height: Float by attribute<SvgLength?, Float> { height ->
-        height?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
+        height?.toFloat(baseDimension = viewportHeight)
             ?: viewportHeight
     }
     var viewBox: FloatArray by attribute<String?, _> { viewBox ->
@@ -112,7 +112,9 @@ class SvgRootNode(
      * can be omitted.
      */
     private val safeWidth: Float?
-        get() = if (attributes.contains("width")) width else null
+        inline get() = attributes["width"]
+            ?.let(::SvgLength)
+            ?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
 
     /**
      * Checks if width is present in the attribute map.
@@ -124,7 +126,9 @@ class SvgRootNode(
      * can be omitted.
      */
     private val safeHeight: Float?
-        get() = if (attributes.contains("height")) height else null
+        inline get() = attributes["height"]
+            ?.let(::SvgLength)
+            ?.toFloat(baseDimension = SVG_DEFAULT_HEIGHT)
 
     private inline fun parseViewBox(viewBox: String?): FloatArray? =
         viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()

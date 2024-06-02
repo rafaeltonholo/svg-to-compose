@@ -1,4 +1,3 @@
-
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.IconWriter
@@ -221,6 +220,224 @@ private sealed class SampleFile(
             input = "$BASE_PATH/transform/rect-transform.svg",
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
         )
+
+        sealed interface Gradient {
+            class AbstractEnvelope(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/abstract-envelope.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/AbstractEnvelope.$suffix.kt",
+            )
+
+            class BermudaCircle(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/bermuda-circle.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaCircle.$suffix.kt",
+            )
+
+            class BermudaDiamond(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/bermuda-diamond.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaDiamond.$suffix.kt",
+            )
+
+            class BermudaSquare(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/bermuda-square.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaSquare.$suffix.kt",
+            )
+
+            class BermudaTraingle(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/bermuda-traingle.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaTraingle.$suffix.kt",
+            )
+
+            class BullseyeGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/bullseye-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BullseyeGradient.$suffix.kt",
+            )
+
+            class CorneredStairs(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/cornered-stairs.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/CorneredStairs.$suffix.kt",
+            )
+
+            class DiamondSunset(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/diamond-sunset.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DiamondSunset.$suffix.kt",
+            )
+
+            class DragonScales(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/dragon-scales.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DragonScales.$suffix.kt",
+            )
+
+            class GeometricIntersection(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/geometric-intersection.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/GeometricIntersection.$suffix.kt",
+            )
+
+            class LinearGradient01(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/linear-gradient01.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LinearGradient01.$suffix.kt",
+            )
+
+            class LiquidCheese(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/liquid-cheese.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LiquidCheese.$suffix.kt",
+            )
+
+            class ParabolicEllipse(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/parabolic-ellipse.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicEllipse.$suffix.kt",
+            )
+
+            class ParabolicPentagon(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/parabolic-pentagon.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicPentagon.$suffix.kt",
+            )
+
+            class ParabolicRectangle(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/parabolic-rectangle.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicRectangle.$suffix.kt",
+            )
+
+            class ParabolicTriangle(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/parabolic-triangle.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicTriangle.$suffix.kt",
+            )
+
+            class QuantumGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/quantum-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg()}/gradientQuantumGradient.$suffix.kt",
+            )
+
+            class RadiantGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/radiant-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RadiantGradient.$suffix.kt",
+            )
+
+            class RosePetals(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/rose-petals.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RosePetals.$suffix.kt",
+            )
+
+            class SlantedGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/slanted-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SlantedGradient.$suffix.kt",
+            )
+
+            class SpectrumGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/spectrum-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SpectrumGradient.$suffix.kt",
+            )
+
+            class StrokeGradient(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/stroke-gradient.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/StrokeGradient.$suffix.kt",
+            )
+
+            class SubtlePrism(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/subtle-prism.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SubtlePrism.$suffix.kt",
+            )
+
+            class WinterySunburst(
+                sampleAppPackage: SampleAppPackage,
+                suffix: String,
+            ) : SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/gradient/wintery-sunburst.svg",
+                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/WinterySunburst.$suffix.kt",
+            )
+        }
     }
 
     sealed interface Avg {
