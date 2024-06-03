@@ -1,24 +1,24 @@
 ﻿<!-- Gradient Backgrounds by SVGBackgrounds.com -->
 <!-- https://www.svgbackgrounds.com/category/gradient/ -->
-<svg height='100%' viewBox='0 0 2 1' width='100%' xmlns='http://www.w3.org/2000/svg'>
-  <rect fill='#77aa77' height='1' width='2' />
+<svg height='100%' viewBox='0 0 200 100' width='100%' xmlns='http://www.w3.org/2000/svg'>
+  <rect fill='#77aa77' height='100' width='200' />
   <defs>
-    <linearGradient gradientUnits='userSpaceOnUse' id='a' x1='0' x2='0' y1='0' y2='1'>
+    <linearGradient gradientUnits='userSpaceOnUse' id='a' x1='0' x2='0' y1='0' y2='100'>
       <stop offset='0' stop-color='#77aa77' />
       <stop offset='1' stop-color='#4fd' />
     </linearGradient>
-    <linearGradient gradientUnits='userSpaceOnUse' id='b' x1='0' x2='0' y1='0' y2='1'>
+    <linearGradient gradientUnits='userSpaceOnUse' id='b' x1='0' x2='0' y1='0' y2='100'>
       <stop offset='0' stop-color='#cf8' stop-opacity='0' />
       <stop offset='1' stop-color='#cf8' stop-opacity='1' />
     </linearGradient>
-    <linearGradient gradientUnits='userSpaceOnUse' id='c' x1='0' x2='2' y1='0' y2='2'>
+    <linearGradient gradientUnits='userSpaceOnUse' id='c' x1='0' x2='2' y1='0' y2='200'>
       <stop offset='0' stop-color='#cf8' stop-opacity='0' />
       <stop offset='1' stop-color='#cf8' stop-opacity='1' />
     </linearGradient>
   </defs>
-  <rect fill='url(#a)' height='1' width='2' x='0' y='0' />
+  <rect fill='url(#a)' height='100' width='200' x='0' y='0' />
   <g fill-opacity='0.5'>
-    <polygon fill='url(#b)' points='0 1 0 0 2 0' />
-    <polygon fill='url(#c)' points='2 1 2 0 0 0' />
+    <polygon fill='url(#b)' points='0 100 0 0 200 0' />
+    <polygon fill='url(#c)' points='200 100 200 0 0 0' />
   </g>
 </svg>
