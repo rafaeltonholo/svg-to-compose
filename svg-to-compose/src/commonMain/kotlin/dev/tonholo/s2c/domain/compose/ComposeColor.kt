@@ -31,7 +31,7 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
             .removePrefix("#")
             .let {
                 when {
-                    it.startsWith(RGBA_PREFIX) || it.startsWith(RGB_PREFIX) -> fromRgb(it)
+                    it.startsWith(RGBA_PREFIX) || it.startsWith(RGB_PREFIX) -> fromRgba(it)
 
                     it.length == FULL_HEXADECIMAL_COLOR_SIZE -> "FF$it"
 
@@ -50,8 +50,8 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
         .takeIf { it.lowercase() != "none" }
         ?.let { "$NAME(0x$it)" }
 
-    private fun fromRgb(it: String): String {
-        val values = it
+    private fun fromRgba(rgba: String): String {
+        val values = rgba
             .removePrefix("$RGBA_PREFIX(")
             .removePrefix("$RGB_PREFIX(")
             .removeSuffix(")")
