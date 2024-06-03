@@ -6,7 +6,7 @@ package dev.tonholo.s2c.parser.method
  * When generating large icons, it's crucial to consider this constraint.
  *
  * For a deeper understanding, refer to the section
- * [Limitations of the Java Virtual Machine](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.11)
+ * [Limitations of the Java Virtual Machine](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.11)
  * and [The Java® Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html).
  */
 interface MethodSizeAccountable {
