@@ -2,6 +2,10 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.delegate.attribute
+import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_HEIGHT
+import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_TRANSFORM
+import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_VIEW_BOX
+import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_WIDTH
 import dev.tonholo.s2c.domain.svg.gradient.SvgGradient
 import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlChildNode
@@ -21,6 +25,7 @@ sealed interface SvgNode : XmlNode {
         const val ATTR_Y = "y"
         const val ATTR_WIDTH = "width"
         const val ATTR_HEIGHT = "height"
+        const val ATTR_VIEW_BOX = "viewBox"
         const val ATTR_TRANSFORM = "transform"
 
         // Wouldn't need to set this as a function of the companion
@@ -31,7 +36,7 @@ sealed interface SvgNode : XmlNode {
 }
 
 fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
-    var stacked = attributes["transform"]
+    var stacked = attributes[ATTR_TRANSFORM]
     if (parent !is SvgDefsNode) {
         var currentParent: XmlParentNode? = parent
 
@@ -39,7 +44,7 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
             val transform = if (currentParent is SvgRootNode) {
                 currentParent.transform?.value
             } else {
-                currentParent.attributes["transform"]
+                currentParent.attributes[ATTR_TRANSFORM]
             }
 
             transform?.let { value ->
@@ -47,7 +52,7 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
             }
             currentParent = (currentParent as? XmlChildNode)?.parent
             if (currentParent is SvgDefsNode) {
-                stacked = attributes["transform"]
+                stacked = attributes[ATTR_TRANSFORM]
                 break
             }
         }
@@ -97,7 +102,7 @@ class SvgRootNode(
         var transform = it
         if (viewportX != 0f || viewportY != 0f) {
             transform = "translate(${-viewportX}, ${-viewportY})"
-            attributes["transform"] = transform
+            attributes[ATTR_TRANSFORM] = transform
         }
         transform?.let(::SvgTransform)
     }
@@ -112,7 +117,7 @@ class SvgRootNode(
      * can be omitted.
      */
     private val safeWidth: Float?
-        inline get() = attributes["width"]
+        inline get() = attributes[ATTR_WIDTH]
             ?.let(::SvgLength)
             ?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
 
@@ -126,7 +131,7 @@ class SvgRootNode(
      * can be omitted.
      */
     private val safeHeight: Float?
-        inline get() = attributes["height"]
+        inline get() = attributes[ATTR_HEIGHT]
             ?.let(::SvgLength)
             ?.toFloat(baseDimension = SVG_DEFAULT_HEIGHT)
 
@@ -134,7 +139,7 @@ class SvgRootNode(
         viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()
 
     private inline fun getDimensionFromViewBox(dimensionIndex: Int): Float? =
-        parseViewBox(attributes["viewBox"])?.getOrNull(dimensionIndex)
+        parseViewBox(attributes[ATTR_VIEW_BOX])?.getOrNull(dimensionIndex)
 
     companion object {
         const val TAG_NAME = "svg"
