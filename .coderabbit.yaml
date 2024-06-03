@@ -11,6 +11,10 @@ reviews:
     - "!**/samples/**"
     - "!**/sampleApp/**"
     - "!**/sample-app/**"
+    - "!*.xml"
+    - "!*.svg"
+    - "!**/config/detekt.yml"
+    - "!**/.run/**"
   auto_review:
     enabled: true
     ignore_title_keywords:
