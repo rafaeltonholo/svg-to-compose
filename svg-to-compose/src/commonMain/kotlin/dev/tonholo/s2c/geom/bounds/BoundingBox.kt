@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.geom.bounds
 
 import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.geom.PrecisePoint2D
 import dev.tonholo.s2c.geom.bounds.BoundingBox.NoBoundingBox
 import kotlin.math.max
 import kotlin.math.min
@@ -170,8 +171,7 @@ private fun PathNodes.calculateBoundingBox(
     return when (this) {
         is PathNodes.ArcTo -> ArcBoundingBoxCalculator(
             boundingBox = boundingBox,
-            currentX = currentX,
-            currentY = currentY,
+            current = PrecisePoint2D(x = currentX, y = currentY),
             x = x.toDouble(),
             y = y.toDouble(),
             rx = a.toDouble(),

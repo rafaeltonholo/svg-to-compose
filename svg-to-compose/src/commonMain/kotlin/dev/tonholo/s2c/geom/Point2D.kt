@@ -16,7 +16,8 @@ data class Point2D(val x: Float, val y: Float) {
 
 operator fun FloatArray.plus(other: Point2D): FloatArray = this + floatArrayOf(other.x, other.y)
 
-// TODO: consider migrating Point2D to use Double instead.
+// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44):
+//  consider migrating Point2D to use Double instead and removing PrecisePoint2D.
 /**
  * A class representing a 2D point with double precision.
  *

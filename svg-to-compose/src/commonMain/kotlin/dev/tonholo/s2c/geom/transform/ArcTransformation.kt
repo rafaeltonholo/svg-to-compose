@@ -116,10 +116,11 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
     }
 
     private fun decomposeEllipseMatrix(matrix: Array<out FloatArray>): FloatArray {
-        // TODO: consider using DoubleArray instead of FloatArray.
-        // While using Float, we are loosing precision on decimals and the calculation of
-        // majorAxisSqr - lastColumn is getting different then the expected.
-        // Should consider using Double for all transformations instead.
+        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44):
+        //  consider using DoubleArray instead of FloatArray.
+        //  While using Float, we are loosing precision on decimals and the calculation of
+        //  majorAxisSqr - lastColumn is getting different then the expected.
+        //  Should consider using Double for all transformations instead.
         val m = matrix.map { row ->
             row.map { it.toDouble() }
         }

@@ -27,8 +27,7 @@ private const val ANGLE_360 = 360
  * https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
  *
  * @param boundingBox The current bounding box.
- * @param currentX The current x-coordinate.
- * @param currentY The current y-coordinate.
+ * @param current The current coordinate.
  * @param x The x-coordinate of the arc's end point.
  * @param y The y-coordinate of the arc's end point.
  * @param rx The x-axis radius of the arc.
@@ -40,8 +39,7 @@ private const val ANGLE_360 = 360
  */
 internal class ArcBoundingBoxCalculator(
     private val boundingBox: BoundingBox,
-    private val currentX: Double,
-    private val currentY: Double,
+    private val current: PrecisePoint2D,
     private val x: Double,
     private val y: Double,
     private var rx: Double,
@@ -56,8 +54,8 @@ internal class ArcBoundingBoxCalculator(
 
     // (eq. 5.1)
     private val primedCoordinates = PrecisePoint2D(
-        x = (currentX - x) / 2,
-        y = (currentY - y) / 2,
+        x = (current.x - x) / 2,
+        y = (current.y - y) / 2,
     ).transform(
         AffineTransformation.Matrix(
             floatArrayOf(cosPhi.toFloat(), sinPhi.toFloat(), 0f),
@@ -75,7 +73,7 @@ internal class ArcBoundingBoxCalculator(
     // https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
     fun calculate(): BoundingBox {
         // If rx = 0 or ry = 0, then treat this as a straight line from (x1, y1) to (x2, y2) and stop.
-        if (rx == 0.0 || ry == 0.0 || (currentX == x && currentY == y)) {
+        if (rx == 0.0 || ry == 0.0 || (current.x == x && current.y == y)) {
             // calculate bounding box as line.
             return boundingBox.copy(
                 minX = min(boundingBox.minX, x),
@@ -103,7 +101,7 @@ internal class ArcBoundingBoxCalculator(
             }
             .plus(
                 listOf(
-                    PrecisePoint2D(currentX, currentY),
+                    PrecisePoint2D(current.x, current.y),
                     PrecisePoint2D(x, y),
                 )
             )
@@ -173,8 +171,8 @@ internal class ArcBoundingBoxCalculator(
                 floatArrayOf(0f, 0f, 0f),
             )
         ) + PrecisePoint2D(
-            x = (currentX + x) / 2,
-            y = (currentY + y) / 2,
+            x = (current.x + x) / 2,
+            y = (current.y + y) / 2,
         )
     }
 
@@ -238,7 +236,7 @@ internal class ArcBoundingBoxCalculator(
     }
 
     private fun pointAt(t: Double): PrecisePoint2D {
-        if (currentX == x && currentY == y) return PrecisePoint2D(x = x, y = y)
+        if (current.x == x && current.y == y) return PrecisePoint2D(x = x, y = y)
         val tInAngle = (theta + t * delta) / ANGLE_180 * PI
         val sinTheta = sin(tInAngle)
         val cosTheta = cos(tInAngle)

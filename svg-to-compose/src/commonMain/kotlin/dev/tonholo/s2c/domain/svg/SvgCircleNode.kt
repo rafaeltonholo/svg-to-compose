@@ -49,7 +49,10 @@ fun SvgCircleNode.asNode(
         createDashedCircle(minified)
     }
 
-    else -> createSimpleCircle(minified)
+    else -> run {
+        val nodes = createSimpleCircleNodes(minified, radius)
+        createSimpleCircle(nodes, minified)
+    }
 }
 
 private fun SvgCircleNode.buildNormalizedPath(): String = buildString {
@@ -67,19 +70,19 @@ private fun SvgCircleNode.buildNormalizedPath(): String = buildString {
  * @param minified A [Boolean] parameter that specifies whether the output
  * [ImageVectorNode.Path] should be minified. If `true`, the output will not
  * include any spaces or newlines.
- * @param radius The radius of the circle.
+ * @param nodes A list of [PathNodes] representing the circle.
  * @param override Parameters which are intended to override the default parameters.
  * If not provided, default parameters are considered.
  * @return An [ImageVectorNode.Path] which represents the SVG circle.
  */
 private fun SvgCircleNode.createSimpleCircle(
+    nodes: List<PathNodes>,
     minified: Boolean,
-    radius: Float = this.radius,
     override: ImageVectorNode.Path.Params? = null,
 ): ImageVectorNode.Path {
     val wrapper = ImageVectorNode.NodeWrapper(
         normalizedPath = buildNormalizedPath(),
-        nodes = createSimpleCircleNodes(minified, radius),
+        nodes = nodes,
     )
     return ImageVectorNode.Path(
         params = override ?: ImageVectorNode.Path.Params(
@@ -161,10 +164,9 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
                 val innerRadius = radius - ((strokeWidth ?: 1f) / 2f)
                 val nodes = createSimpleCircleNodes(minified, innerRadius)
                 add(
-                    // TODO: accept nodes as parameters.
                     createSimpleCircle(
-                        minified,
-                        radius = innerRadius,
+                        nodes = nodes,
+                        minified = minified,
                         override = ImageVectorNode.Path.Params(
                             fill = fillBrush(nodes),
                             fillAlpha = fillOpacity,

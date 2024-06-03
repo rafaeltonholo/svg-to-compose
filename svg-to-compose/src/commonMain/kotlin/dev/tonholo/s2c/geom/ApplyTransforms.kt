@@ -17,6 +17,7 @@ import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
 
+// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44): migrate from FloatArray to DoubleArray
 sealed class AffineTransformation(
     vararg matrix: FloatArray,
 ) {

@@ -9,7 +9,7 @@ class SvgUseNode(
     parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
     val replacement: SvgGroupNode,
-) : SvgPresentationNode<SvgUseNode>(parent) {
+) : SvgChildNode<SvgUseNode>(parent) {
     override val constructor
         get() = error("SvgUseNode can't use constructor property.")
 

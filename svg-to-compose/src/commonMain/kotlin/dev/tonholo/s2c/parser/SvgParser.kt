@@ -72,7 +72,10 @@ class SvgParser : XmlParser() {
      * @param elementsPendingParent A set of nodes that are waiting for their parent to be created.
      * @param root The root node of the SVG document, or null if the document has no root node.
      * @return The created [XmlNode].
+     * @suppress `CyclomaticComplexMethod` is catch because of the `when` expression, which in
+     * this case can't be avoided.
      */
+    @Suppress("CyclomaticComplexMethod")
     private fun createSvgElement(
         nodeName: String,
         attributes: Attributes,
@@ -235,29 +238,26 @@ class SvgParser : XmlParser() {
             } as? SvgNode
 
         val replacement = try {
-            processedNode
-                ?: rootElement.getElementById(href.normalizedId())?.let { node ->
-                    createSvgElement(
-                        nodeName = node.tagName(),
-                        attributes = node.attributes(),
-                        parent = XmlPendingParentElement,
-                        rootElement = rootElement,
-                        elementsWithId = elementsWithId,
-                        elementsPendingParent = elementsPendingParent,
-                        root = root,
-                    ).also {
-                        elementsWithId += it
-                        elementsPendingParent += it
-                    } as SvgNode
-                } ?: error("Missing element with id '$href' on SVG tree.")
+            processedNode ?: rootElement.getElementById(href.normalizedId())?.let { node ->
+                createSvgElement(
+                    nodeName = node.tagName(),
+                    attributes = node.attributes(),
+                    parent = XmlPendingParentElement,
+                    rootElement = rootElement,
+                    elementsWithId = elementsWithId,
+                    elementsPendingParent = elementsPendingParent,
+                    root = root,
+                ).also {
+                    elementsWithId += it
+                    elementsPendingParent += it
+                } as SvgNode
+            } ?: error("Missing element with id '$href' on SVG tree.")
         } catch (e: ValidationException) {
             throw ParserException(
                 errorCode = ErrorCode.ParseSvgError,
                 message = "Failed to find a replacement for <use> element. The ID of the element is null.",
                 cause = e
             )
-        } catch (e: Exception) {
-            throw e
         }
 
         return SvgUseNode.createReplacementGroupNode(useNodeAttrs, replacement, parent)

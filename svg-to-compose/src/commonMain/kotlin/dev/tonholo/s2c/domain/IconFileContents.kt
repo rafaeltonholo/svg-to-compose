@@ -35,7 +35,8 @@ val materialReceiverTypeImport = setOf(
 )
 
 /**
- * Represents the contents of an icon file, including its package, icon name, theme, dimensions, nodes, and other attributes.
+ * Represents the contents of an icon file, including its package, icon name,
+ * theme, dimensions, nodes, and other attributes.
  *
  * @property pkg The package name of the icon.
  * @property iconName The name of the icon.

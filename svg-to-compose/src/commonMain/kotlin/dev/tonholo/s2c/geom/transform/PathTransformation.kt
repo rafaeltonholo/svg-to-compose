@@ -6,6 +6,7 @@ import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.Point2D
 
+// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44): migrate from FloatArray to DoubleArray
 internal sealed class PathTransformation<T : PathNodes> {
     abstract fun T.applyTransformation(
         cursor: FloatArray,
