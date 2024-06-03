@@ -17,20 +17,22 @@ class SvgPathNode(
     val clipPath: String? by attribute(name = "clip-path")
 
     val fillBrush: ComposeBrush? by lazy {
-        val fill = fill?.value ?: return@lazy null
-        if (fill.startsWith("url(")) {
-            getGradient(fill)
-        } else {
-            fill.toBrush()
+        fill?.value?.let { fill ->
+            if (fill.startsWith("url(")) {
+                getGradient(fill)
+            } else {
+                fill.toBrush()
+            }
         }
     }
 
     val strokeBrush: ComposeBrush? by lazy {
-        val stroke = stroke?.value ?: return@lazy null
-        if (stroke.startsWith("url(")) {
-            getGradient(stroke)
-        } else {
-            stroke.toBrush()
+        stroke?.value?.let { stroke ->
+            if (stroke.startsWith("url(")) {
+                getGradient(stroke)
+            } else {
+                stroke.toBrush()
+            }
         }
     }
 
