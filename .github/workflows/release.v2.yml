@@ -1,0 +1,156 @@
+name: Release V2
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  file-name: s2c
+
+jobs:
+  create-release-binaries:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Prepares environment for building
+        uses: ./.github/actions/setup
+
+      - name: Prepare nodeJS enviroment for integrity check
+        uses: ./.github/actions/setup-nodejs
+        with:
+          os: ${{ matrix.os }}
+
+      - name: Cache Kotlin Konan
+        id: cache-kotlin-konan
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan/**/*
+          key: kotlin-konan-${{ matrix.os }}
+
+      - name: Build Native Binary for macos
+        if: matrix.os == 'macos-latest'
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          gradle-version: wrapper
+          job-id: ${{ matrix.os }}
+          arguments: releaseMacOS
+
+      - name: Build Native Binary for Windows
+        if: matrix.os == 'windows-latest'
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          gradle-version: wrapper
+          job-id: ${{ matrix.os }}
+          arguments: releaseWindows
+
+      - name: Build Native Binary for Linux
+        if: matrix.os == 'ubuntu-latest'
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          gradle-version: wrapper
+          job-id: ${{ matrix.os }}
+          arguments: releaseLinux
+
+      - name: CLI Integrity check using SVG
+        uses: ./.github/actions/cli-integrity-check
+        with:
+          type: svg
+        continue-on-error: false
+
+      - name: CLI Integrity check using XML
+        uses: ./.github/actions/cli-integrity-check
+        with:
+          type: xml
+        continue-on-error: false
+
+      - name: Uploading macos Arm64 binaries
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'macos-latest'
+        with:
+          name: ${{ env.file-name }}-macosArm64-binaries # add tag to file name.
+          path: svg-to-compose/build/bin/macosArm64/releaseExecutable/
+          if-no-files-found: error
+
+      - name: Uploading macos x64 binaries
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'macos-latest'
+        with:
+          name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
+          path: svg-to-compose/build/bin/macosX64/releaseExecutable/
+          if-no-files-found: error
+
+      - name: Uploading Linux binaries
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: ${{ env.file-name }}-linuxX64-binaries # add tag to file name.
+          path: svg-to-compose/build/bin/linuxX64/releaseExecutable/
+          if-no-files-found: error
+
+      - name: Uploading Windows binaries
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'windows-latest'
+        with:
+          name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
+          path: svg-to-compose/build/bin/mingwX64/releaseExecutable/
+          if-no-files-found: error
+
+      - name: Uploading script
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest' # should only run once.
+        with:
+          name: s2c
+          path: |
+            s2c
+            app.properties
+          if-no-files-found: error
+
+  upload-to-release:
+    permissions:
+      contents: write
+      deployments: write
+    runs-on: ubuntu-latest
+    needs: create-release-binaries
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: ${{ env.file-name }}-*-binaries
+          merge-multiple: false
+      - name: Download script artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          name: s2c
+      - name: Get Release version
+        id: getversion
+        shell: bash
+        run: echo "version=$(cat artifacts/app.properties | grep '^VERSION=' | cut -d= -f2)" >> $GITHUB_OUTPUT
+      - name: Compress binaries
+        run: |
+          cd artifacts
+          zip -r s2c-linuxX64-binaries.zip s2c-linuxX64-binaries
+          zip -r s2c-macosArm64-binaries.zip s2c-macosArm64-binaries
+          zip -r s2c-macosX64-binaries.zip s2c-macosX64-binaries
+          zip -r s2c-mingwX64-binaries.zip s2c-mingwX64-binaries
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Create Github release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: true
+          files: |
+            artifacts/s2c-linuxX64-binaries.zip
+            artifacts/s2c-macosArm64-binaries.zip
+            artifacts/s2c-macosX64-binaries.zip
+            artifacts/s2c-mingwX64-binaries.zip
+            artifacts/s2c
