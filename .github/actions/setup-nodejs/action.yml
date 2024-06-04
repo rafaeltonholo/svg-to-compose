@@ -23,4 +23,4 @@ runs:
     - name: Install global dependencies
       shell: bash
       run: |
-        npm -g install svgo svg2vectordrawable avocado
+        npm -g install svgo avocado
