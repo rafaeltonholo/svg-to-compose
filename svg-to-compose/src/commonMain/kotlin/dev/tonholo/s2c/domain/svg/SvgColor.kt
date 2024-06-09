@@ -1,11 +1,14 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeColor
+import dev.tonholo.s2c.domain.compose.toBrush
 import kotlin.jvm.JvmInline
 
 @JvmInline
 value class SvgColor private constructor(val value: String) {
     companion object {
+        val Default = SvgColor("#FF000000")
         operator fun invoke(value: String): SvgColor = SvgColor(
             namedColors[value] ?: value
         )
@@ -15,9 +18,10 @@ value class SvgColor private constructor(val value: String) {
 /**
  * @return black color when [SvgColor] is `null`.
  */
-fun SvgColor?.orDefault(): SvgColor = this ?: SvgColor("black")
+fun SvgColor?.orDefault(): SvgColor = this ?: SvgColor.Default
 
 fun SvgColor.toComposeColor(): ComposeColor = ComposeColor(value)
+fun SvgColor.toBrush(): ComposeBrush = value.toBrush()
 
 /**
  * @see <a href="http://www.w3.org/TR/SVG11/single-page.html#types-ColorKeywords">W3 Color Keywords</a>
