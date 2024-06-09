@@ -4,6 +4,8 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.PathFillType
 import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
+import dev.tonholo.s2c.domain.svg.SvgColor
+import dev.tonholo.s2c.domain.svg.toBrush
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
@@ -100,6 +102,9 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             params.strokeLineJoin?.let { addAll(it.imports) }
             params.fill?.let { addAll(it.imports) }
             params.stroke?.let { addAll(it.imports) }
+            if (params.fill == null && params.stroke == null) {
+                addAll(SvgColor.Default.toBrush().imports)
+            }
         }
 
         /**
@@ -166,6 +171,10 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 }
                 strokeLineWidth?.let {
                     add("strokeLineWidth" to "${it}f")
+                }
+
+                if (params.fill == null && params.stroke == null) {
+                    add("fill" to requireNotNull(SvgColor.Default.toBrush().toCompose()))
                 }
             }
         }

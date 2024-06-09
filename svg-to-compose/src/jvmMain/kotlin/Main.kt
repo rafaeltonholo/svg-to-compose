@@ -131,6 +131,15 @@ private sealed class SampleFile(
             output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
         )
 
+        class Smiley(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/smiley.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Smiley.$suffix.kt",
+        )
+
         class Illustration(
             sampleAppPackage: SampleAppPackage,
             suffix: String,
