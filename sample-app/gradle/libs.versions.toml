@@ -2,7 +2,7 @@
 activity-compose = "1.9.0"
 agp = "8.4.2"
 androidxComposeCompiler = "1.5.10"
-compose-bom = "2024.05.00"
+compose-bom = "2024.06.00"
 core-ktx = "1.13.1"
 googleMaterial = "1.12.0"
 kotlin = "2.0.0"
