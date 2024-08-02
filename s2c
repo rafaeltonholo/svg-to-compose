@@ -8,7 +8,7 @@ VERBOSE=false
 PLATFORM_WINDOWS="mingwX64"
 PLATFORM_LINUX="linuxX64"
 PLATFORM_MAC_OS="macosX64"
-PLATFORM_MAC_M1="macosArm64"
+PLATFORM_MAC_APPLE_SILICON="macosArm64"
 
 if [[ "$*" == *"--debug"* ]]; then
   DEBUG=true
@@ -72,8 +72,8 @@ fn_os_check() {
       *)            PLATFORM="UNKNOWN:${unameOut}"
   esac
 
-  if [[ $PLATFORM == "$PLATFORM_MAC_OS" ]] && sysctl -n machdep.cpu.brand_string | grep -q 'Apple M1'; then
-      PLATFORM=$PLATFORM_MAC_M1
+  if [[ $PLATFORM == "$PLATFORM_MAC_OS" ]] && [[ $(uname -m ) == "arm64" ]]; then
+      PLATFORM=$PLATFORM_MAC_APPLE_SILICON
   fi
 }
 
