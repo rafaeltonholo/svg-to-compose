@@ -7,6 +7,8 @@ integrity-check/
 local.properties
 .s2c/
 
+github_issue_[0-9]*.svg
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

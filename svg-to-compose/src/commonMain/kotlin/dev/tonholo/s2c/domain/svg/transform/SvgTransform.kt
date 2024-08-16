@@ -54,8 +54,12 @@ value class SvgTransform(val value: String) {
                 .trim()
                 .removePrefix("$name(")
                 .removeSuffix(")")
-                .split(", ", ", ", " ")
-                .map { it.toFloat() }
+                .split(", ", ", ", " ", ",")
+                .map {
+                    requireNotNull(it.toFloatOrNull()) {
+                        "unable to parse value $it to Float. transform = $value"
+                    }
+                }
 
             name to values
         }
