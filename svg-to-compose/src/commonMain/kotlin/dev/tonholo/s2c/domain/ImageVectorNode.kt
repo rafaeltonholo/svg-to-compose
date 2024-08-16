@@ -488,8 +488,9 @@ private fun normalizePath(path: String): String {
             continue
         }
 
+        val isNotENotation = char != 'e'
         val isNotClosingCommand = (char.isLetter() && char.lowercaseChar() != PathCommand.Close.value)
-        val isNegativeSign = (lastChar.isDigit() && char == '-')
+        val isNegativeSignSeparator = (lastChar.isDigit() && char == '-')
         val reachMaximumDotNumbers = dotCount == 2
 
         char.toPathCommand()?.let {
@@ -506,7 +507,7 @@ private fun normalizePath(path: String): String {
             .trimWhitespaceBeforeClose(lastChar, current = char)
             .append(
                 when {
-                    isNotClosingCommand || isNegativeSign || reachMaximumDotNumbers -> {
+                    isNotENotation && (isNotClosingCommand || isNegativeSignSeparator || reachMaximumDotNumbers) -> {
                         dotCount = resetDotCount(current = char)
                         " $char"
                     }
