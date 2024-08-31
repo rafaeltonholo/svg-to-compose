@@ -3,7 +3,7 @@ kotlin = "2.0.0"
 clikt = "4.4.0"
 okio = "3.9.0"
 detekt = "1.23.6"
-build-konfig = "0.15.1"
+build-konfig = "0.15.2"
 ksoup = "0.1.2"
 
 [libraries]
