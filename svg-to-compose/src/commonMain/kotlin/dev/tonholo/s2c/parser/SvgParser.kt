@@ -1,9 +1,9 @@
 package dev.tonholo.s2c.parser
 
-import com.fleeksoft.ksoup.helper.ValidationException
 import com.fleeksoft.ksoup.nodes.Attributes
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
+import com.fleeksoft.ksoup.ported.exception.ValidationException
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.svg.SvgCircleNode
 import dev.tonholo.s2c.domain.svg.SvgClipPath
