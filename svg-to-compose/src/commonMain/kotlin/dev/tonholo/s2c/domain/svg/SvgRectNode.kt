@@ -35,8 +35,8 @@ class SvgRectNode(
         val baseDimension = root.viewportHeight
         y?.toIntOrNull(baseDimension)
     }
-    val rx: Int? by attribute()
-    val ry: Int? by attribute()
+    val rx: Double? by attribute()
+    val ry: Double? by attribute()
 
     companion object {
         const val TAG_NAME = "rect"
@@ -66,8 +66,8 @@ fun SvgRectNode.asNode(
 }
 
 private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
-    val xCornerSize = rx ?: ry ?: 0
-    val yCornerSize = ry ?: rx ?: 0
+    val xCornerSize = rx ?: ry ?: 0.0
+    val yCornerSize = ry ?: rx ?: 0.0
     val x = x ?: 0
     val y = y ?: 0
     val strokeDashArray = strokeDashArray
@@ -78,11 +78,11 @@ private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWra
             strokeDashArray != null && rx == null && ry == null ->
                 createDashedRect(strokeDashArray, x, y, isMinified)
 
-            xCornerSize == 0 && yCornerSize == 0 ->
+            xCornerSize == 0.0 && yCornerSize == 0.0 ->
                 createRegularRect(x, y, isMinified)
 
             else ->
-                createRoundedCornerRect(x, y, yCornerSize, isMinified, xCornerSize)
+                createRoundedCornerRect(x, y, xCornerSize, yCornerSize, isMinified)
         },
     )
 }
@@ -137,9 +137,9 @@ private fun SvgRectNode.createRegularRect(
 private fun SvgRectNode.createRoundedCornerRect(
     x: Int,
     y: Int,
-    yCornerSize: Int,
+    xCornerSize: Double,
+    yCornerSize: Double,
     isMinified: Boolean,
-    xCornerSize: Int,
 ) = listOf(
     pathNode(command = PathCommand.MoveTo) {
         args(x, y + yCornerSize)
