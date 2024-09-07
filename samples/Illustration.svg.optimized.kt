@@ -830,8 +830,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF7E5C63)),
             ) {
-                // m 75.52 72.16
-                moveToRelative(dx = 75.52f, dy = 72.16f)
+                // M 75.52 72.16
+                moveTo(x = 75.52f, y = 72.16f)
                 // l -12.04 6.33
                 lineToRelative(dx = -12.04f, dy = 6.33f)
                 // l -3 -13.21
@@ -1031,8 +1031,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF111528)),
             ) {
-                // m 38.8 69.42
-                moveToRelative(dx = 38.8f, dy = 69.42f)
+                // M 38.8 69.42
+                moveTo(x = 38.8f, y = 69.42f)
                 // l -0.07 -0.28
                 lineToRelative(dx = -0.07f, dy = -0.28f)
                 // A 13 13 0 0 1 38.3 66
@@ -1287,8 +1287,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF111528)),
             ) {
-                // m 50.25 76.66
-                moveToRelative(dx = 50.25f, dy = 76.66f)
+                // M 50.25 76.66
+                moveTo(x = 50.25f, y = 76.66f)
                 // l -0.15 -1.94
                 lineToRelative(dx = -0.15f, dy = -1.94f)
                 // l -0.16 0.01
@@ -1584,8 +1584,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF111528)),
             ) {
-                // m 53.96 91.33
-                moveToRelative(dx = 53.96f, dy = 91.33f)
+                // M 53.96 91.33
+                moveTo(x = 53.96f, y = 91.33f)
                 // l 2.2 -6.71
                 lineToRelative(dx = 2.2f, dy = -6.71f)
                 // L 56 84.57
@@ -1896,8 +1896,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFF111528)),
             ) {
-                // m 54.3 89.5
-                moveToRelative(dx = 54.3f, dy = 89.5f)
+                // M 54.3 89.5
+                moveTo(x = 54.3f, y = 89.5f)
                 // l 2.29 2.43
                 lineToRelative(dx = 2.29f, dy = 2.43f)
                 // a 0.16 0.16 0 1 0 0.23 -0.21
@@ -2465,8 +2465,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFFFBC4DB)),
             ) {
-                // m 54.35 28.1
-                moveToRelative(dx = 54.35f, dy = 28.1f)
+                // M 54.35 28.1
+                moveTo(x = 54.35f, y = 28.1f)
                 // l 0.03 -0.02z
                 lineToRelative(dx = 0.03f, dy = -0.02f)
                 close()
@@ -2847,8 +2847,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFFA583A0)),
             ) {
-                // m 58.02 43.54
-                moveToRelative(dx = 58.02f, dy = 43.54f)
+                // M 58.02 43.54
+                moveTo(x = 58.02f, y = 43.54f)
                 // l -0.16 -0.09
                 lineToRelative(dx = -0.16f, dy = -0.09f)
                 // a 0.2 0.2 0 0 1 0.16 0.09
@@ -4652,8 +4652,8 @@ val IllustrationSvgOptimized: ImageVector
             path(
                 fill = SolidColor(Color(0xFFFBBF4C)),
             ) {
-                // m 97.7 40.62
-                moveToRelative(dx = 97.7f, dy = 40.62f)
+                // M 97.7 40.62
+                moveTo(x = 97.7f, y = 40.62f)
                 // l -0.46 -7.64
                 lineToRelative(dx = -0.46f, dy = -7.64f)
                 // l -2.1 7.28

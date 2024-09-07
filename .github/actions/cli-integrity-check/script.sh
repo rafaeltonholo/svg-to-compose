@@ -42,7 +42,16 @@ for index in "${!files[@]}"; do
   input="$root_directory/samples/${type}/$filename.${ext}"
   output="$root_directory/integrity-check/${type}/$output_name.${suffix}.kt"
 
-  echo "Parsing $filename to Jetpack Compose Icon"
+  if [ $optimize == "true" ]; then
+    if [ $type == "svg" ]; then
+      echo "svgo version $(svgo --version)"
+    else
+      echo "avocado version $(avocado --version)"
+    fi
+  fi
+
+  s2c_version=$(command "$root_directory/s2c" --version)
+  echo "Parsing $filename to Jetpack Compose Icon using $s2c_version"
   if ! command "$root_directory/s2c" -o "$output" \
         -p "$package" \
         --theme "$theme" \

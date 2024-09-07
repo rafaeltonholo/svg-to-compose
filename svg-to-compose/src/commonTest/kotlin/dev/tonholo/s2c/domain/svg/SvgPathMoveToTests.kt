@@ -17,7 +17,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
     }
 
     @Test
-    fun `ensure a 'm' command is parsed to MoveTo relative`() {
+    fun `ensure the first MoveTo command is always absolute`() {
         // Arrange
         val path = SvgPathNode(
             parent = root,
@@ -29,6 +29,24 @@ class SvgPathMoveToTests : BaseSvgTest() {
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
         with(nodes.first()) {
+            assertIs<PathNodes.MoveTo>(this)
+            assertTrue(isRelative.not())
+        }
+    }
+
+    @Test
+    fun `ensure a 'm' command is parsed to MoveTo relative`() {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf("d" to "M85.122 64.795 m-5.122 4.7"),
+        )
+        // Act
+        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val nodes = node.wrapper.nodes
+        // Assert
+        assertEquals(expected = 2, actual = nodes.size)
+        with(nodes.last()) {
             assertIs<PathNodes.MoveTo>(this)
             assertTrue(isRelative)
         }

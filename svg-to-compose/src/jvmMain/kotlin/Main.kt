@@ -17,8 +17,8 @@ import kotlin.system.exitProcess
 fun main() {
     AppConfig.debug = true
     AppConfig.silent = false
-    val suffix = "v4"
-    val (pkg, path, output) = SampleFile.Directory(
+    val suffix = "63"
+    val (pkg, path, output) = SampleFile.Svg.GithubIssue(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
         suffix,
     )
@@ -111,6 +111,15 @@ private sealed class SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = BASE_PATH,
             output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+        )
+
+        class GithubIssue(
+            sampleAppPackage: SampleAppPackage,
+            suffix: String,
+        ) : SampleFile(
+            sampleAppPackage = sampleAppPackage.svg(),
+            input = "$BASE_PATH/github_issue_$suffix.svg",
+            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/GithubIssue.$suffix.kt",
         )
 
         class Brasil(

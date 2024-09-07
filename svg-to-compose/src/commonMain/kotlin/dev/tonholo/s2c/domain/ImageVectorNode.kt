@@ -383,7 +383,7 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
             verbose("current commands list=$commands")
             verbose("current=$current, currentCommand=$currentCommand")
 
-            val isRelative = currentCommand.isLowerCase()
+            val isRelative = isRelativeCommand(nodes, currentCommand)
             current = current.lowercase()
             val node = createNode(current, commands, isRelative, currentCommand, minified)
             lastCommand = currentCommand
@@ -400,6 +400,18 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
         normalizedPath = normalizedPath,
         nodes = nodes,
     )
+}
+
+/**
+ * Verifies if the current command is a relative command.
+ *
+ * @return `true` in case the command is lowercased and it is not the very
+ *  first move to command, which should be absolute
+ */
+private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean {
+    return command.isLowerCase() && (
+        node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
+        )
 }
 
 private fun createNode(

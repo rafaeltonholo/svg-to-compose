@@ -14,7 +14,7 @@ ij_smart_tabs = false
 ij_visual_guides =
 ij_wrap_on_typing = false
 
-[*.js]
+[*.sh]
 indent_size = 2
 
 [*.properties]
