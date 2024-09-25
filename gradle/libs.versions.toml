@@ -14,13 +14,12 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 com-codingfeline-buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "build-konfig" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}
 org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version = "8.5.0" }
+com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version = "8.6.1" }
 
 [plugins]
 com-vanniktech-gradle-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 org-jetbrains-kotlin-plugin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin"}
 org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 io-gitlab-arturbosch-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
 com-codingfeline-buildkonfig = { id = "com.codingfeline.buildkonfig" }

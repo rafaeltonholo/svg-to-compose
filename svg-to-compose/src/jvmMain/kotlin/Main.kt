@@ -19,13 +19,13 @@ fun main() {
     AppConfig.silent = false
     val suffix = "63"
     val (pkg, path, output) = SampleFile.Directory(
-        SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
+        SampleAppPackage("dev.tonholo.svgToCompose.playground.ui.icon"),
         suffix,
     )
 
     val config = ParserConfig(
         pkg = pkg.value,
-        theme = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme",
+        theme = "dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme",
         // When enabling the optimize flag,
         // make sure your default node has installed
         // svgo and avocado.

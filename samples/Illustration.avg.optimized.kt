@@ -1,4 +1,4 @@
-package dev.tonholo.sampleApp.ui.icon.avg
+package dev.tonholo.svgToCompose.playground.ui.icon.avg
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,7 @@ val IllustrationAvgOptimized: ImageVector
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme.IllustrationAvgOptimized",
+            name = "dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme.IllustrationAvgOptimized",
             defaultWidth = 116.0.dp,
             defaultHeight = 114.0.dp,
             viewportWidth = 116.0f,
@@ -5667,7 +5667,7 @@ val IllustrationAvgOptimized: ImageVector
 @Preview
 @Composable
 private fun IconPreview() {
-    dev.tonholo.sampleApp.ui.theme.SampleAppTheme {
+    dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

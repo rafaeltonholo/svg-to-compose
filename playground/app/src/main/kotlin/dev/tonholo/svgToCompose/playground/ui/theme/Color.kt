@@ -1,4 +1,4 @@
-package dev.tonholo.sampleApp.ui.theme
+package dev.tonholo.svgToCompose.playground.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

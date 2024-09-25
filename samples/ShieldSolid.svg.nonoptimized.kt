@@ -1,4 +1,4 @@
-package dev.tonholo.sampleApp.ui.icon.svg
+package dev.tonholo.svgToCompose.playground.ui.icon.svg
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,7 @@ val ShieldSolidSvgNonOptimized: ImageVector
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme.ShieldSolidSvgNonOptimized",
+            name = "dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme.ShieldSolidSvgNonOptimized",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
@@ -126,7 +126,7 @@ val ShieldSolidSvgNonOptimized: ImageVector
 @Preview
 @Composable
 private fun IconPreview() {
-    dev.tonholo.sampleApp.ui.theme.SampleAppTheme {
+    dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

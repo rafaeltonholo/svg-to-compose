@@ -1,4 +1,4 @@
-package dev.tonholo.sampleApp.ui.theme
+package dev.tonholo.svgToCompose.playground.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -14,6 +14,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import dev.tonholo.svgToCompose.playground.ui.theme.Pink40
+import dev.tonholo.svgToCompose.playground.ui.theme.Pink80
+import dev.tonholo.svgToCompose.playground.ui.theme.Purple40
+import dev.tonholo.svgToCompose.playground.ui.theme.Purple80
+import dev.tonholo.svgToCompose.playground.ui.theme.PurpleGrey40
+import dev.tonholo.svgToCompose.playground.ui.theme.PurpleGrey80
+import dev.tonholo.svgToCompose.playground.ui.theme.Typography
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,

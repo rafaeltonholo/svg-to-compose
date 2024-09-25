@@ -10,8 +10,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
     alias(libs.plugins.io.gitlab.arturbosch.detekt)
     alias(libs.plugins.com.codingfeline.buildkonfig)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.powerAssert)

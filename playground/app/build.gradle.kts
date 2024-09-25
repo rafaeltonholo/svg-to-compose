@@ -1,17 +1,16 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("dev.tonholo.s2c") version "1.0.0-alpha01"
 }
 
 android {
-    namespace = "dev.tonholo.sampleApp"
+    namespace = "dev.tonholo.svgToCompose.playground"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "dev.tonholo.sampleApp"
+        applicationId = "dev.tonholo.svgToCompose.playground"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -56,10 +55,10 @@ android {
 
 svgToCompose {
     processor {
-        val basePackage = "dev.tonholo.sampleApp.ui.icon"
-        val theme = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme"
-        val svg by creating {
-            origin = layout.projectDirectory.dir("../samples/svg")
+        val basePackage = "dev.tonholo.svgToCompose.playground.ui.icon"
+        val theme = "dev.tonholo.svgToCompose.playground.ui.theme.SampleAppTheme"
+        create("svg") {
+            origin = layout.projectDirectory.dir("../../samples/svg")
             destinationPackage = "$basePackage.svg"
             this.theme = theme
             recursive = true
@@ -67,7 +66,7 @@ svgToCompose {
             optimize = false
         }
         val avg by creating {
-            origin = layout.projectDirectory.dir("../samples/avg")
+            origin = layout.projectDirectory.dir("../../samples/avg")
             destinationPackage = "$basePackage.avg"
             this.theme = theme
             recursive = true
