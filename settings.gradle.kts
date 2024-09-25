@@ -1,4 +1,4 @@
-import java.util.*
+import java.util.Properties
 
 rootProject.name = "SVG-to-Compose-parent"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -24,15 +24,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        versionCatalogs {
-            create("sampleLibs") {
-                from(files("sample-app/gradle/libs.versions.toml"))
-            }
-        }
     }
 }
 
-include(":svg-to-compose")
+include(
+    ":svg-to-compose",
+    ":svg-to-compose-gradle-plugin",
+)
 
 val localPropertiesFile = file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -44,6 +42,6 @@ if (localPropertiesFile.exists()) {
 // are not going to change the way end result of the icon in the
 // Jetpack Compose Preview.
     if (properties["enable_sample_app"]?.toString()?.toBoolean() == true) {
-        include(":sample-app")
+        includeBuild("sample-app")
     }
 }

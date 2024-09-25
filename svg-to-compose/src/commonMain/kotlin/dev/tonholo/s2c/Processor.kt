@@ -56,7 +56,7 @@ class Processor(
         output: String,
         config: ParserConfig,
         recursive: Boolean,
-        maxDepth: Int = AppConfig.MAX_RECURSIVE_DEPTH,
+        maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
     ) {
         verbose("Start processor execution")
         val filePath = path.toPath()
