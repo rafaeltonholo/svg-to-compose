@@ -18,7 +18,7 @@ fun main() {
     AppConfig.debug = true
     AppConfig.silent = false
     val suffix = "63"
-    val (pkg, path, output) = SampleFile.Svg.GithubIssue(
+    val (pkg, path, output) = SampleFile.Directory(
         SampleAppPackage("dev.tonholo.sampleApp.ui.icon"),
         suffix,
     )
@@ -29,7 +29,7 @@ fun main() {
         // When enabling the optimize flag,
         // make sure your default node has installed
         // svgo and avocado.
-        optimize = false,
+        optimize = true,
         receiverType = null,
         addToMaterial = false,
         noPreview = false,

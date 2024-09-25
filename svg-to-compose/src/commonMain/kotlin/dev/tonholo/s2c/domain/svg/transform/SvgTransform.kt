@@ -49,7 +49,7 @@ value class SvgTransform(val value: String) {
     private inline fun transforms(): List<Pair<String, List<Float>>> = value
         .split(REGEX_TRANSFORM_SPLIT.toRegex())
         .map { transform ->
-            val name = transform.takeWhile { it != '(' }
+            val name = transform.takeWhile { it != '(' }.trim()
             val values = transform
                 .trim()
                 .removePrefix("$name(")
@@ -66,6 +66,6 @@ value class SvgTransform(val value: String) {
 
     companion object {
         private const val REGEX_TRANSFORM_SPLIT =
-            """(?<=\))\s(?=\w)"""
+            """(?<=\))(?=\s|\w)"""
     }
 }
