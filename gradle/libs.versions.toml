@@ -4,7 +4,7 @@ clikt = "4.4.0"
 okio = "3.9.0"
 detekt = "1.23.7"
 build-konfig = "0.15.2"
-ksoup = "0.1.6"
+ksoup = "0.1.9"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
