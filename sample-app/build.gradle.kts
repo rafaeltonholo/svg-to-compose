@@ -1,8 +1,9 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(sampleLibs.plugins.androidApplication)
-    alias(sampleLibs.plugins.kotlinAndroid)
-    alias(sampleLibs.plugins.compose.compiler)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.compose.compiler)
+    id("dev.tonholo.s2c") version "1.0.0-alpha01"
 }
 
 android {
@@ -45,27 +46,48 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = sampleLibs.versions.androidxComposeCompiler.get()
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    composeOptions { }
+}
+
+svgToCompose {
+    processor {
+        val basePackage = "dev.tonholo.sampleApp.ui.icon"
+        val theme = "dev.tonholo.sampleApp.ui.theme.SampleAppTheme"
+        val svg by creating {
+            origin = layout.projectDirectory.dir("../samples/svg")
+            destinationPackage = "$basePackage.svg"
+            this.theme = theme
+            recursive = true
+            minified = true
+            optimize = false
+        }
+        val avg by creating {
+            origin = layout.projectDirectory.dir("../samples/avg")
+            destinationPackage = "$basePackage.avg"
+            this.theme = theme
+            recursive = true
+            minified = false
+            optimize = true
         }
     }
 }
 
 dependencies {
 
-    implementation(sampleLibs.core.ktx)
-    implementation(sampleLibs.lifecycle.runtime.ktx)
-    implementation(sampleLibs.activity.compose)
-    implementation(platform(sampleLibs.compose.bom))
-    implementation(sampleLibs.ui)
-    implementation(sampleLibs.ui.graphics)
-    implementation(sampleLibs.ui.tooling.preview)
-    implementation(sampleLibs.material3)
-    implementation(sampleLibs.google.material)
+    implementation(libs.core.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation(libs.google.material)
 
-    debugImplementation(sampleLibs.bundles.androidx.compose.ui.debug)
+    debugImplementation(libs.bundles.androidx.compose.ui.debug)
 }

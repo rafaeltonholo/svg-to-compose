@@ -13,11 +13,15 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.io.gitlab.arturbosch.detekt)
-    id(libs.plugins.com.codingfeline.buildkonfig.get().pluginId)
+    alias(libs.plugins.com.codingfeline.buildkonfig)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.powerAssert)
+    alias(libs.plugins.com.vanniktech.gradle.maven.publish)
 }
 
 val rootBuildDir = File(project.rootDir.absolutePath, "build")
+
+group = "dev.tonholo.s2c"
+version = "1.3.1"
 
 kotlin {
     fun createReleaseTask(name: String, targets: List<KotlinNativeTargetWithHostTests>) {
@@ -132,6 +136,15 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
     commonTestImplementation(kotlin("test"))
     commonTestImplementation(kotlin("stdlib"))
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "testMaven"
+            url = uri(rootProject.layout.buildDirectory.dir("localMaven"))
+        }
+    }
 }
 
 tasks.withType<Detekt>().configureEach {
