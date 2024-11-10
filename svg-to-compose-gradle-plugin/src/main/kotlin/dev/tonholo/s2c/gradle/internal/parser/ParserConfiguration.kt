@@ -9,4 +9,5 @@ interface ParserConfiguration {
     var makeInternal: Boolean
     var minified: Boolean
     var exclude: Regex?
+    var iconNameMapper: ((String) -> String)?
 }

@@ -32,6 +32,8 @@ package dev.tonholo.s2c.parser
  * @property minified if `true`, minifies the output removing all generated comments and
  * inlining the path functions parameters
  * @property exclude regex to exclude some icons from the parsing
+ * @property iconNameMapper a mapper function to change the icon name before parsing.
+ *  This will directly reflects on the name of the generated file.
  */
 data class ParserConfig(
     val pkg: String,
@@ -43,4 +45,5 @@ data class ParserConfig(
     val makeInternal: Boolean,
     val minified: Boolean,
     val exclude: Regex? = null,
+    val iconNameMapper: ((String) -> String)? = null,
 )

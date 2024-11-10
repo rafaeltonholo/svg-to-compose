@@ -314,6 +314,12 @@ class Processor(
             output.segments.last().removeSuffix(output.extension)
         } else {
             file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
+        }.let { iconName ->
+            config
+                .iconNameMapper
+                ?.invoke(iconName)
+                ?.takeIf { it.isNotEmpty() }
+                ?: iconName
         }
         val targetFile = tempFileWriter.create(
             file = file,
