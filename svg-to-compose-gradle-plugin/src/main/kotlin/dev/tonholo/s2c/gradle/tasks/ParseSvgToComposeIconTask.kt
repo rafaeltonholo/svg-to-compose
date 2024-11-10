@@ -12,7 +12,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectories
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.findByType
@@ -32,9 +32,9 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
     @get:Internal
     var isKmp: Boolean = false
 
-    @get:OutputDirectories
+    @get:Internal
     val outputDirectories: Map<String, File>
-        get() = configurations.asMap.mapValues { (name, configuration) ->
+        get() = configurations.asMap.mapValues { (_, configuration) ->
             val destination = configuration.destinationPackage.replace(".", "/")
             project.layout.buildDirectory.dir(
                 buildString {
@@ -46,10 +46,25 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
                             "main/kotlin/"
                         },
                     )
-                    append("${destination}/$name")
+                    append(destination)
                 },
             ).get().asFile
         }
+
+    @get:OutputDirectory
+    val sourceDirectory: File get() = project.layout.buildDirectory.dir(
+        buildString {
+            append("generated/svgToCompose/")
+            append(
+                if (isKmp) {
+                    "commonMain/"
+                } else {
+                    "main/"
+                },
+            )
+            append("kotlin/")
+        },
+    ).get().asFile
 
     private val processor = Processor(
         fileSystem = FileSystem.SYSTEM,
@@ -100,7 +115,7 @@ fun TaskContainer.registerParseSvgToComposeIconTask(extension: SvgToComposeExten
         configurations = extension.configurations
     }
 
-    val outputDirectories = task.map { it.outputDirectories.values }
+    val outputDirectories = task.map { it.sourceDirectory }
 
     if (kmpExtension != null) {
         val sourceSet = kmpExtension.targets
