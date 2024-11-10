@@ -8,4 +8,5 @@ interface ParserConfiguration {
     var noPreview: Boolean
     var makeInternal: Boolean
     var minified: Boolean
+    var exclude: Regex?
 }

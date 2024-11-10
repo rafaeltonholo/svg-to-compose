@@ -73,6 +73,8 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
                     addToMaterial = configuration.addToMaterial,
                     noPreview = configuration.noPreview,
                     makeInternal = configuration.makeInternal,
+                    exclude = configuration.exclude,
+                    iconNameMapper = configuration.iconNameMapper,
                 ),
                 recursive = configuration.recursive,
                 maxDepth = configuration.maxDepth,

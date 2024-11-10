@@ -31,6 +31,7 @@ package dev.tonholo.s2c.parser
  * from outside modules
  * @property minified if `true`, minifies the output removing all generated comments and
  * inlining the path functions parameters
+ * @property exclude regex to exclude some icons from the parsing
  */
 data class ParserConfig(
     val pkg: String,
@@ -41,4 +42,5 @@ data class ParserConfig(
     val noPreview: Boolean,
     val makeInternal: Boolean,
     val minified: Boolean,
+    val exclude: Regex? = null,
 )

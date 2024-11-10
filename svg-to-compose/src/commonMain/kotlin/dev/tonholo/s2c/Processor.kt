@@ -84,6 +84,7 @@ class Processor(
                 filePath = filePath,
                 recursive = recursive,
                 maxDepth = maxDepth,
+                exclude = config.exclude,
             )
         } else {
             output("🔍 File detected")
@@ -172,6 +173,7 @@ class Processor(
         filePath: Path,
         recursive: Boolean,
         maxDepth: Int,
+        exclude: Regex? = null,
     ): List<Path> = buildList {
         if (outputPath.isDirectory.not()) {
             printEmpty()
@@ -196,8 +198,10 @@ class Processor(
 
         val imageFiles = fileSystem
             .listRecursively(filePath, maxDepth = deep)
-            .filter {
-                it.name.endsWith(FileType.Svg.extension) || it.name.endsWith(FileType.Avg.extension)
+            .filter { path ->
+                val isNotExcluded = exclude?.let(path.name::matches)?.not() ?: true
+                isNotExcluded &&
+                    (path.name.endsWith(FileType.Svg.extension) || path.name.endsWith(FileType.Avg.extension))
             }
 
         verbose("svg/xml files = $imageFiles")

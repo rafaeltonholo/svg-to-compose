@@ -18,6 +18,8 @@ abstract class ProcessorConfiguration @Inject constructor() : SourceConfiguratio
     override var noPreview: Boolean = AppDefaults.NO_PREVIEW
     override var makeInternal: Boolean = AppDefaults.MAKE_INTERNAL
     override var minified: Boolean = AppDefaults.MINIFIED
+    override var exclude: Regex? = null
+    override var iconNameMapper: ((String) -> String)? = null
 
     override fun toString(): String {
         return "ProcessorConfiguration(origin = $origin, " +
@@ -30,7 +32,8 @@ abstract class ProcessorConfiguration @Inject constructor() : SourceConfiguratio
             "addToMaterial = $addToMaterial, " +
             "noPreview = $noPreview, " +
             "makeInternal = $makeInternal, " +
-            "minified = $minified)"
+            "minified = $minified, " +
+            "exclude = $exclude)"
     }
 
     internal fun validate(): List<String> {
