@@ -18,7 +18,7 @@ val defaultImports = setOf(
     "androidx.compose.ui.unit.dp",
 )
 
-val previewImports = setOf(
+val previewComponentsImports = setOf(
     "androidx.compose.foundation.Image",
     "androidx.compose.foundation.layout.Arrangement",
     "androidx.compose.foundation.layout.Column",
@@ -27,8 +27,15 @@ val previewImports = setOf(
     "androidx.compose.runtime.Composable",
     "androidx.compose.ui.Alignment",
     "androidx.compose.ui.Modifier",
-    "androidx.compose.ui.tooling.preview.Preview",
 )
+val androidPreviewImports = buildSet {
+    addAll(previewComponentsImports)
+    add("androidx.compose.ui.tooling.preview.Preview")
+}
+val kmpPreviewImports = buildSet {
+    addAll(previewComponentsImports)
+    add("org.jetbrains.compose.ui.tooling.preview.Preview")
+}
 
 val materialReceiverTypeImport = setOf(
     "androidx.compose.material.icons.Icons"

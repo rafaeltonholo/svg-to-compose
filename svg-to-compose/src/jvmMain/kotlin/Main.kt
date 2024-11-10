@@ -35,6 +35,7 @@ fun main() {
         noPreview = false,
         makeInternal = false,
         minified = false,
+        kmpPreview = false,
     )
     try {
         val fileSystem = FileSystem.SYSTEM

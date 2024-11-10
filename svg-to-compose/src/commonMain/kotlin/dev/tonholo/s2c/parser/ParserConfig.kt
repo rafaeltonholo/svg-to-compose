@@ -25,6 +25,8 @@ package dev.tonholo.s2c.parser
  * import androidx.compose.material.icons.Icons
  * val Icons.Filled.MyIcon: ImageVector get() = <implementation>
  * ```
+ * @property kmpPreview if `true`, a KMP compatible `@Preview Composable` function will be
+ * generated for the parsed icon.
  * @property noPreview if `true`, no `@Preview Composable` function will be generated for
  * the parsed icon.
  * @property makeInternal if `true`, the generated icon will be set as `internal`, hiding it
@@ -41,6 +43,7 @@ data class ParserConfig(
     val optimize: Boolean,
     val receiverType: String?,
     val addToMaterial: Boolean,
+    val kmpPreview: Boolean,
     val noPreview: Boolean,
     val makeInternal: Boolean,
     val minified: Boolean,

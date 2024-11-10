@@ -3,11 +3,12 @@ package dev.tonholo.s2c.parser
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
+import dev.tonholo.s2c.domain.androidPreviewImports
 import dev.tonholo.s2c.domain.avg.AvgRootNode
 import dev.tonholo.s2c.domain.avg.asNodes
 import dev.tonholo.s2c.domain.defaultImports
+import dev.tonholo.s2c.domain.kmpPreviewImports
 import dev.tonholo.s2c.domain.materialReceiverTypeImport
-import dev.tonholo.s2c.domain.previewImports
 import dev.tonholo.s2c.domain.svg.SvgRootNode
 import dev.tonholo.s2c.domain.svg.asNodes
 import dev.tonholo.s2c.error.ErrorCode
@@ -83,7 +84,7 @@ sealed class ImageParser(
      * @return a set of [String]s representing all the required imports.
      *
      * @see defaultImports
-     * @see previewImports
+     * @see androidPreviewImports
      * @see materialReceiverTypeImport
      * @see ImageVectorNode.Path.imports
      * @see ImageVectorNode.Group.imports
@@ -94,7 +95,7 @@ sealed class ImageParser(
     ): Set<String> = buildSet {
         addAll(defaultImports)
         if (config.noPreview.not()) {
-            addAll(previewImports)
+            addAll(if (config.kmpPreview) kmpPreviewImports else androidPreviewImports)
         }
         if (config.addToMaterial) {
             addAll(materialReceiverTypeImport)

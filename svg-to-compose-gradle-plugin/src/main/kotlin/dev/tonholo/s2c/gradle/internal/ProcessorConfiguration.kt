@@ -21,6 +21,10 @@ abstract class ProcessorConfiguration @Inject constructor() : SourceConfiguratio
     override var exclude: Regex? = null
     override var iconNameMapper: ((String) -> String)? = null
 
+    fun makeInternal() {
+        makeInternal = true
+    }
+
     override fun toString(): String {
         return "ProcessorConfiguration(origin = $origin, " +
             "destinationPackage = $destinationPackage, " +

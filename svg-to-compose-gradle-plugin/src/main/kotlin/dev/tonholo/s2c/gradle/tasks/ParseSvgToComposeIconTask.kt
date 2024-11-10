@@ -52,19 +52,20 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
         }
 
     @get:OutputDirectory
-    val sourceDirectory: File get() = project.layout.buildDirectory.dir(
-        buildString {
-            append("generated/svgToCompose/")
-            append(
-                if (isKmp) {
-                    "commonMain/"
-                } else {
-                    "main/"
-                },
-            )
-            append("kotlin/")
-        },
-    ).get().asFile
+    val sourceDirectory: File
+        get() = project.layout.buildDirectory.dir(
+            buildString {
+                append("generated/svgToCompose/")
+                append(
+                    if (isKmp) {
+                        "commonMain/"
+                    } else {
+                        "main/"
+                    },
+                )
+                append("kotlin/")
+            },
+        ).get().asFile
 
     private val processor = Processor(
         fileSystem = FileSystem.SYSTEM,
@@ -90,6 +91,7 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
                     makeInternal = configuration.makeInternal,
                     exclude = configuration.exclude,
                     iconNameMapper = configuration.iconNameMapper,
+                    kmpPreview = isKmp,
                 ),
                 recursive = configuration.recursive,
                 maxDepth = configuration.maxDepth,
