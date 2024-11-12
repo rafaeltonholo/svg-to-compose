@@ -1,6 +1,6 @@
 [versions]
 activity-compose = "1.9.2"
-agp = "8.6.1"
+agp = "8.7.2"
 androidxComposeCompiler = "1.5.10"
 compose-bom = "2024.09.02"
 core-ktx = "1.13.1"
