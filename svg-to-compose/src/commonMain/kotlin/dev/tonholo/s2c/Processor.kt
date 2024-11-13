@@ -8,6 +8,7 @@ import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.isFile
 import dev.tonholo.s2c.extensions.listRecursively
+import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.debug
@@ -19,6 +20,7 @@ import dev.tonholo.s2c.logger.warn
 import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
+import dev.tonholo.s2c.parser.mapIconName
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -58,6 +60,9 @@ class Processor(
         recursive: Boolean,
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
     ) {
+        if (config.silent) {
+            AppConfig.silent = true
+        }
         verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()
@@ -87,8 +92,14 @@ class Processor(
                 exclude = config.exclude,
             )
         } else {
+            val isExcluded = config.exclude?.let(filePath.name::matches) ?: false
+            if (isExcluded) {
+                output("File in excluded list. Skipping parse.")
+                return
+            }
+
             output("🔍 File detected")
-            outputPath = ensureKotlinFileExtension(outputPath)
+            outputPath = ensureKotlinFileExtension(outputPath, filePath, config)
             if (runRecursively) {
                 warn("Recursive flag added to a file. Ignoring recursive search.")
                 runRecursively = false
@@ -141,12 +152,27 @@ class Processor(
      * @param outputPath The intended output path.
      * @return The validated output path with a guaranteed Kotlin file extension (.kt).
      */
-    private fun ensureKotlinFileExtension(outputPath: Path): Path {
-        return if (outputPath.extension.isEmpty() || outputPath.extension.lowercase() != ".kt") {
-            output("Output path is missing kotlin file extension. Appending it to the output.")
-            "$outputPath.kt".toPath()
-        } else {
-            outputPath
+    private fun ensureKotlinFileExtension(outputPath: Path, inputPath: Path, config: ParserConfig): Path {
+        return when {
+            outputPath.isDirectory -> {
+                val filename = inputPath
+                    .name
+                    .removeSuffix(FileType.Svg.extension)
+                    .removeSuffix(FileType.Avg.extension)
+                    .let(config::mapIconName)
+                    .pascalCase()
+                output("Output path is a directory. Creating a Kotlin file based on the input file name.")
+                outputPath / "$filename.kt"
+            }
+
+            outputPath.extension.isEmpty() || outputPath.extension.lowercase() != ".kt" -> {
+                output("Output path is missing kotlin file extension. Appending it to the output.")
+                "$outputPath.kt".toPath()
+            }
+
+            else -> {
+                outputPath
+            }
         }
     }
 
@@ -314,13 +340,7 @@ class Processor(
             output.segments.last().removeSuffix(output.extension)
         } else {
             file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
-        }.let { iconName ->
-            config
-                .iconNameMapper
-                ?.invoke(iconName)
-                ?.takeIf { it.isNotEmpty() }
-                ?: iconName
-        }
+        }.let(config::mapIconName)
         val targetFile = tempFileWriter.create(
             file = file,
         )

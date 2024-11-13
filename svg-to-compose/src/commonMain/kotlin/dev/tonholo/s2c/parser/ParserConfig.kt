@@ -36,6 +36,7 @@ package dev.tonholo.s2c.parser
  * @property exclude regex to exclude some icons from the parsing
  * @property iconNameMapper a mapper function to change the icon name before parsing.
  *  This will directly reflects on the name of the generated file.
+ * @property silent if `true`, no console output will be displayed.
  */
 data class ParserConfig(
     val pkg: String,
@@ -49,4 +50,11 @@ data class ParserConfig(
     val minified: Boolean,
     val exclude: Regex? = null,
     val iconNameMapper: ((String) -> String)? = null,
+    val silent: Boolean = false,
 )
+
+fun ParserConfig.mapIconName(iconName: String): String =
+    iconNameMapper
+        ?.invoke(iconName)
+        ?.takeIf { it.isNotEmpty() }
+        ?: iconName
