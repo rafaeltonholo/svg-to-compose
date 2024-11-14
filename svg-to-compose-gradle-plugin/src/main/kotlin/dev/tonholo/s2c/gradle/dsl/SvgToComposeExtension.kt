@@ -13,5 +13,5 @@ abstract class SvgToComposeExtension {
         action.execute(configurations)
     }
 
-    internal fun validate(): List<String> = configurations.flatMap { it.validate() }
+    internal fun validate(): List<String> = configurations.flatMap { config -> config.validate() }
 }

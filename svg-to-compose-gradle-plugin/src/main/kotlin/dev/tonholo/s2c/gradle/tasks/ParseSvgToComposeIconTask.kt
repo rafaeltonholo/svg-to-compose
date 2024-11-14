@@ -2,6 +2,8 @@ package dev.tonholo.s2c.gradle.tasks
 
 import com.android.build.gradle.BaseExtension
 import dev.tonholo.s2c.Processor
+import dev.tonholo.s2c.gradle.cache.CacheData
+import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
 import dev.tonholo.s2c.gradle.internal.ProcessorConfiguration
 import dev.tonholo.s2c.io.IconWriter
@@ -21,12 +23,15 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import java.nio.file.Path
 import java.security.MessageDigest
-import java.util.Properties
 import kotlin.experimental.and
 
 private const val GENERATED_FOLDER = "generated/svgToCompose"
+
 abstract class ParseSvgToComposeIconTask : DefaultTask() {
     init {
         group = "svg-to-compose"
@@ -42,7 +47,7 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
 
     private val outputDirectories: Map<String, File>
         get() = configurations.asMap.mapValues { (_, configuration) ->
-            val destination = configuration.destinationPackage.replace(".", "/")
+            val destination = configuration.destinationPackage.get().replace(".", "/")
             project.objects.directoryProperty().convention(
                 project.layout.buildDirectory.dir(
                     buildString {
@@ -78,7 +83,7 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
             )
         ).get().asFile
 
-    private val cacheFile by lazy { project.layout.buildDirectory.file("${GENERATED_FOLDER}/s2c.cache").get().asFile }
+    private val cacheFile by lazy { project.layout.buildDirectory.file("${GENERATED_FOLDER}/cache.bin").get().asFile }
     private val fileHashMap = mutableMapOf<Path, String>()
     private val processor = Processor(
         fileSystem = FileSystem.SYSTEM,
@@ -91,9 +96,9 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
         loadCache()
         configurations.asMap.forEach { (key, configuration) ->
             println("key = $key, value = $configuration")
-
-            val files = configuration.origin.asFile.listFiles { file ->
-                val isNotExcluded = configuration.exclude?.let(file.name::matches)?.not() ?: true
+            val iconConfiguration = configuration.iconConfiguration.get()
+            val files = configuration.origin.get().asFile.listFiles { file ->
+                val isNotExcluded = iconConfiguration.exclude.orNull?.let(file.name::matches)?.not() ?: true
                 isNotExcluded && (file.extension == "svg" || file.extension == "xml")
             } ?: emptyArray()
 
@@ -126,21 +131,21 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
                     path = file.absolutePath,
                     output = requireNotNull(outputDirectories[key]).absolutePath,
                     config = ParserConfig(
-                        pkg = configuration.destinationPackage,
-                        optimize = configuration.optimize,
-                        minified = configuration.minified,
-                        theme = configuration.theme,
-                        receiverType = configuration.receiverType,
-                        addToMaterial = configuration.addToMaterial,
-                        noPreview = configuration.noPreview,
-                        makeInternal = configuration.makeInternal,
-                        exclude = configuration.exclude,
-                        iconNameMapper = configuration.iconNameMapper,
+                        pkg = configuration.destinationPackage.get(),
+                        optimize = configuration.optimize.get(),
+                        minified = iconConfiguration.minified.get(),
+                        theme = iconConfiguration.theme.get(),
+                        receiverType = iconConfiguration.receiverType.orNull,
+                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                        noPreview = iconConfiguration.noPreview.get(),
+                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                        exclude = iconConfiguration.exclude.orNull,
+                        iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
                         kmpPreview = isKmp,
                         silent = false,
                     ),
-                    recursive = configuration.recursive,
-                    maxDepth = configuration.maxDepth,
+                    recursive = configuration.recursive.get(),
+                    maxDepth = configuration.maxDepth.get(),
                 )
             }
         }
@@ -158,64 +163,102 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
 
     private fun saveCache() {
         println("Saving cache...")
-        val properties = Properties()
-        fileHashMap.forEach { (path, hash) ->
-            println("path = $path, hash = $hash")
-            properties[path.toString()] = hash
+        println("Generating extension configuration hashes")
+        val configurations = configurations.asMap.mapValues { (_, configuration) ->
+            configuration.calculateHash()
         }
-        FileOutputStream(cacheFile).use { properties.store(it, null) }
+        println("Generating file hashes")
+        val files = fileHashMap.mapKeys { (path, _) -> path.toString() }
+        println("Building Cache Data")
+        val cacheData = CacheData(
+            files = files,
+            extensionConfiguration = configurations,
+        )
+        println("Writing cache file")
+        try {
+            ObjectOutputStream(FileOutputStream(cacheFile))
+                .use {
+                    it.writeObject(cacheData)
+                }
+            println("Cache file written")
+        } catch (e: IOException) {
+            println("Error writing cache file: ${e.message}")
+            e.printStackTrace()
+        }
     }
 
     private fun loadCache() {
-        if (cacheFile.exists() && fileHashMap.isEmpty()) {
-            val properties = Properties()
-            FileInputStream(cacheFile).use { properties.load(it) }
-            properties.forEach { key, value ->
-                val path = Path.of(key as String)
-                val hash = value as String
-                fileHashMap[path] = hash
+        if (cacheFile.exists()) {
+            val cacheData = try {
+                ObjectInputStream(FileInputStream(cacheFile)).use {
+                    it.readObject() as CacheData
+                }.also { println("Cache file loaded") }
+            } catch (e: IOException) {
+                println("Error loading cache file: ${e.message}")
+                e.printStackTrace()
+                null
             }
+            cacheData?.validate()
         }
     }
 
-    internal fun removeCacheIfExists() {
+    private fun removeCacheIfExists() {
         if (cacheFile.exists()) {
             cacheFile.delete()
         }
     }
-}
 
-context(Project)
-fun TaskContainer.registerParseSvgToComposeIconTask(extension: SvgToComposeExtension){
-    val kmpExtension = extensions.findByType<KotlinMultiplatformExtension>()
-    val task = tasks.register("parseSvgToComposeIcon", ParseSvgToComposeIconTask::class.java) {
-        val errors = extension.validate()
-        println(errors)
-        check(errors.isEmpty()) {
-            "Errors: $errors"
+    private fun CacheData.validate() {
+        if (fileHashMap.isEmpty()) {
+            fileHashMap.putAll(files.mapKeys { (path, _) -> Path.of(path) })
+        } else {
+            // validate that the files are the same
         }
 
-        isKmp = kmpExtension != null
-        configurations = extension.configurations
-    }
-
-    val outputDirectories = task.map { it.sourceDirectory }
-
-    if (kmpExtension != null) {
-        val sourceSet = kmpExtension.targets
-            .first { it.platformType == KotlinPlatformType.common }
-            .compilations
-            .first { it.platformType == KotlinPlatformType.common }
-            .defaultSourceSet
-            .kotlin
-
-        sourceSet.srcDirs(outputDirectories)
-    } else {
-        val sourceSet = (project.extensions.findByName("android") as BaseExtension)
-            .sourceSets
-            .first { it.name == "main" }
-            .kotlin
-
-        sourceSet.srcDirs(outputDirectories)
+        configurations.asMap.forEach { (key, configuration) ->
+            val cachedConfig = extensionConfiguration[key]
+            if (cachedConfig != null && cachedConfig != configuration.calculateHash()) {
+                fileHashMap.clear()
+                removeCacheIfExists()
+            }
+        }
     }
 }
+
+fun TaskContainer.registerParseSvgToComposeIconTask(project: Project, extension: SvgToComposeExtension) =
+    with(project) {
+        val kmpExtension = extensions.findByType<KotlinMultiplatformExtension>()
+        val task = tasks.register("parseSvgToComposeIcon", ParseSvgToComposeIconTask::class.java) {
+            val errors = extension.validate()
+            println("errors = $errors")
+            check(errors.isEmpty()) {
+                buildString {
+                    appendLine("Found ${errors.size} configuration errors. See next lines for more details.")
+                    append(errors.joinToString("\n") { "\t- $it" })
+                }
+            }
+
+            isKmp = kmpExtension != null
+            configurations = extension.configurations
+        }
+
+        val outputDirectories = task.map { it.sourceDirectory }
+
+        if (kmpExtension != null) {
+            val sourceSet = kmpExtension.targets
+                .first { it.platformType == KotlinPlatformType.common }
+                .compilations
+                .first { it.platformType == KotlinPlatformType.common }
+                .defaultSourceSet
+                .kotlin
+
+            sourceSet.srcDirs(outputDirectories)
+        } else {
+            val sourceSet = (project.extensions.findByName("android") as BaseExtension)
+                .sourceSets
+                .first { it.name == "main" }
+                .kotlin
+
+            sourceSet.srcDirs(outputDirectories)
+        }
+    }
