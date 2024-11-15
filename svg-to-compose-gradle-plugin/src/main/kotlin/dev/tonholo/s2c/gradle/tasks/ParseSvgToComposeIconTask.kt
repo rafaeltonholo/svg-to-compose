@@ -5,7 +5,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.gradle.cache.CacheData
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
-import dev.tonholo.s2c.gradle.internal.ProcessorConfiguration
+import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.parser.ParserConfig

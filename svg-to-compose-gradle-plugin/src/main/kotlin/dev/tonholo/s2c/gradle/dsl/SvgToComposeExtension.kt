@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.gradle.dsl
 
-import dev.tonholo.s2c.gradle.internal.ProcessorConfiguration
+import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Internal

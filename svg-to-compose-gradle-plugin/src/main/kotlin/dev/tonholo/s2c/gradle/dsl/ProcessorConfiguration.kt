@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.gradle.internal
+package dev.tonholo.s2c.gradle.dsl
 
 import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
