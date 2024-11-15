@@ -126,32 +126,39 @@ abstract class ParseSvgToComposeIconTask : DefaultTask() {
                 println("Files eligible for processing: ${filesToProcess.map { it.name }}")
             }
 
-            filesToProcess.forEach { file ->
-                processor.run(
-                    path = file.absolutePath,
-                    output = requireNotNull(outputDirectories[key]).absolutePath,
-                    config = ParserConfig(
-                        pkg = configuration.destinationPackage.get(),
-                        optimize = configuration.optimize.get(),
-                        minified = iconConfiguration.minified.get(),
-                        theme = iconConfiguration.theme.get(),
-                        receiverType = iconConfiguration.receiverType.orNull,
-                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                        noPreview = iconConfiguration.noPreview.get(),
-                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                        exclude = iconConfiguration.exclude.orNull,
-                        iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
-                        kmpPreview = isKmp,
-                        silent = false,
-                    ),
-                    recursive = configuration.recursive.get(),
-                    maxDepth = configuration.maxDepth.get(),
-                )
-            }
+            filesToProcess
+                .chunked(5)
+                .map { it.stream() }
+                .forEach { files ->
+                    files.parallel().forEach { file ->
+                        processor.run(
+                            path = file.absolutePath,
+                            output = requireNotNull(outputDirectories[key]).absolutePath,
+                            config = ParserConfig(
+                                pkg = configuration.destinationPackage.get(),
+                                optimize = configuration.optimize.get(),
+                                minified = iconConfiguration.minified.get(),
+                                theme = iconConfiguration.theme.get(),
+                                receiverType = iconConfiguration.receiverType.orNull,
+                                addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                                noPreview = iconConfiguration.noPreview.get(),
+                                makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                                exclude = iconConfiguration.exclude.orNull,
+                                iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
+                                kmpPreview = isKmp,
+                                silent = false,
+                                keepTempFolder = true,
+                            ),
+                            recursive = false, // TODO: recursive should be handled by plugin.
+                            maxDepth = configuration.maxDepth.get(),
+                        )
+                    }
+                }
         }
         println("Finished processing files. Creating cache...")
         saveCache()
         println("Cache created.")
+        processor.dispose()
     }
 
     private fun calculateFileHash(file: File): String {

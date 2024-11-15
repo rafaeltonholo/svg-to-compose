@@ -51,6 +51,7 @@ data class ParserConfig(
     val exclude: Regex? = null,
     val iconNameMapper: ((String) -> String)? = null,
     val silent: Boolean = false,
+    val keepTempFolder: Boolean = false,
 )
 
 fun ParserConfig.mapIconName(iconName: String): String =

@@ -142,6 +142,10 @@ class Processor(
         }
     }
 
+    fun dispose() {
+        tempFileWriter.clear()
+    }
+
     /**
      * Ensures the output path has a Kotlin file extension (.kt).
      *
@@ -378,7 +382,9 @@ class Processor(
             output = iconOutput,
         )
 
-        tempFileWriter.clear()
+        if (config.keepTempFolder.not()) {
+            tempFileWriter.clear()
+        }
     }
 
     private fun buildRelativePackage(

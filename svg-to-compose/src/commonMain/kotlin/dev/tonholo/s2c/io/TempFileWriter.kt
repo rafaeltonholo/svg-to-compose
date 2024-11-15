@@ -17,10 +17,11 @@ class TempFileWriter(
     fun create(
         file: Path,
     ): Path = debugSection("Creating temporary file") {
-        fileSystem.createDirectories(dir = tempFolder, mustCreate = false)
+        val tempDir = tempFolder / file.name.removeSuffix(file.extension)
+        fileSystem.createDirectories(dir = tempDir, mustCreate = false)
 
         val extension = file.extension
-        val targetFile = tempFolder / "${TARGET_FILENAME}$extension"
+        val targetFile = tempDir / "${TARGET_FILENAME}$extension"
 
         fileSystem.copy(file, targetFile)
 
