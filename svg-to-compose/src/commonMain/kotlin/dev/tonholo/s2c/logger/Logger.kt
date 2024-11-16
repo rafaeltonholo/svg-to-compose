@@ -2,6 +2,15 @@ package dev.tonholo.s2c.logger
 
 import AppConfig
 
+interface Logger {
+    fun debug(message: Any)
+    fun <T> debugSection(title: String, block: () -> T): T
+    fun <T> verboseSection(title: String, block: () -> T): T
+    fun verbose(message: String)
+    fun warn(message: String)
+    fun output(message: String)
+}
+
 internal fun debug(message: Any) {
     if (!AppConfig.silent && AppConfig.debug) {
         println("D: $message")
@@ -60,4 +69,24 @@ internal fun printEmpty() {
     if (!AppConfig.silent) {
         println()
     }
+}
+
+internal fun Logger(): Logger = object : Logger {
+    override fun debug(message: Any) =
+        dev.tonholo.s2c.logger.debug(message)
+
+    override fun <T> debugSection(title: String, block: () -> T): T =
+        dev.tonholo.s2c.logger.debugSection(title, block)
+
+    override fun <T> verboseSection(title: String, block: () -> T): T =
+        dev.tonholo.s2c.logger.verboseSection(title, block)
+
+    override fun verbose(message: String) =
+        dev.tonholo.s2c.logger.verbose(message)
+
+    override fun warn(message: String) =
+        dev.tonholo.s2c.logger.warn(message)
+
+    override fun output(message: String) =
+        dev.tonholo.s2c.logger.output(message)
 }
