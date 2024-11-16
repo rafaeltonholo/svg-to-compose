@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.gradle.cache
+package dev.tonholo.s2c.gradle.internal.cache
 
 import java.io.Serializable
 

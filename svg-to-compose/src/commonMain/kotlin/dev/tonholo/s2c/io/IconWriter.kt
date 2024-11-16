@@ -11,7 +11,7 @@ import okio.FileSystem
 import okio.Path
 
 class IconWriter(
-    private val fileSystem: FileSystem,
+    private val fileManager: FileManager,
 ) {
     fun write(
         iconName: String,
@@ -21,18 +21,18 @@ class IconWriter(
         printEmpty()
         output("📝 Writing icon file on $output")
         debugSection("Writing document") {
-            val outputExists = fileSystem.exists(output)
+            val outputExists = fileManager.exists(output)
             verbose("outputExists=$outputExists")
             if (output.isDirectory && outputExists.not()) {
                 printEmpty()
                 output("📢 Output directory is missing. Creating it automatically.")
-                fileSystem.createDirectories(output)
+                fileManager.createDirectories(output)
             } else if (output.isDirectory.not()) {
                 output.parent?.let { parent ->
                     verbose("Checking if parent directory exists.")
-                    if (fileSystem.exists(parent).not()) {
+                    if (fileManager.exists(parent).not()) {
                         output("Output parent's directory doesn't exists. Creating.")
-                        fileSystem.createDirectories(parent, mustCreate = true)
+                        fileManager.createDirectories(parent, mustCreate = true)
                     }
                 }
             }
@@ -47,7 +47,7 @@ class IconWriter(
 
             debug("Writing..")
 
-            fileSystem.write(file = targetFile, mustCreate = false) {
+            fileManager.write(file = targetFile, mustCreate = false) {
                 writeUtf8(fileContents)
             }
 

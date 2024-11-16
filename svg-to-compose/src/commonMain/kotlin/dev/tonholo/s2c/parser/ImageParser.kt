@@ -14,7 +14,9 @@ import dev.tonholo.s2c.domain.svg.asNodes
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
-import okio.FileSystem
+import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.parser.ImageParser.Companion.invoke
+import dev.tonholo.s2c.parser.ImageParser.Companion.parse
 import okio.Path
 
 /**
@@ -22,16 +24,16 @@ import okio.Path
  * and Android Vector Drawable Images and returns an [IconFileContents]
  * object.
  *
- * The class requires a [FileSystem] parameter.
+ * The class requires a [FileManager] parameter.
  *
- * @property fileSystem a [FileSystem] instance that allows reading from the file system.
- * @constructor Creates an [ImageParser] object with the specified [FileSystem].
+ * @property fileManager a [FileManager] instance that allows reading from the file system.
+ * @constructor Creates an [ImageParser] object with the specified [FileManager].
  *
  * @see [ImageParser.SvgParser]
  * @see [ImageParser.AndroidVectorParser]
  */
 sealed class ImageParser(
-    private val fileSystem: FileSystem,
+    protected val fileManager: FileManager,
 ) {
     /**
      * Parse a SVG/AVG icon and creates a [IconFileContents] object containing
@@ -51,14 +53,6 @@ sealed class ImageParser(
         iconName: String,
         config: ParserConfig,
     ): IconFileContents
-
-    protected fun readContent(file: Path): String {
-        val content = fileSystem.read(file) {
-            readUtf8()
-        }
-
-        return content
-    }
 
     /**
      * This function generates the Icon's imports for the provided list of
@@ -127,14 +121,14 @@ sealed class ImageParser(
      * This class is responsible for parsing an SVG file type and creates
      * all the required information to generate a Jetpack Compose Icon.
      *
-     * @constructor Takes a FileSystem parameter.
+     * @constructor Takes a FileManager parameter.
      *
-     * @param fileSystem The Main tool that helps to manage files and allows
+     * @param fileManager The Main tool that helps to manage files and allows
      *  reading data from the file system.
      */
     class SvgParser(
-        fileSystem: FileSystem,
-    ) : ImageParser(fileSystem) {
+        fileManager: FileManager,
+    ) : ImageParser(fileManager) {
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -161,7 +155,7 @@ sealed class ImageParser(
             iconName: String,
             config: ParserConfig,
         ): IconFileContents {
-            val content = readContent(file)
+            val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgRootNode } as SvgRootNode
@@ -197,14 +191,14 @@ sealed class ImageParser(
      * This class is responsible for parsing an AVG file type and creates
      * all the required information to generate a Jetpack Compose Icon.
      *
-     * @constructor Takes a FileSystem parameter.
+     * @constructor Takes a FileManager parameter.
      *
-     * @param fileSystem The Main tool that helps to manage files and allows
+     * @param fileManager The Main tool that helps to manage files and allows
      * reading data from the file system.
      */
     class AndroidVectorParser(
-        fileSystem: FileSystem,
-    ) : ImageParser(fileSystem) {
+        fileManager: FileManager,
+    ) : ImageParser(fileManager) {
         /**
          * Parses an AVG file into an [IconFileContents] object.
          *
@@ -229,7 +223,7 @@ sealed class ImageParser(
             iconName: String,
             config: ParserConfig,
         ): IconFileContents {
-            val content = readContent(file)
+            val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Avg)
             val avg = root.children.single { it is AvgRootNode } as AvgRootNode
@@ -263,19 +257,19 @@ sealed class ImageParser(
          * An operator function [invoke] that oversees the creation of parsers
          * for SVG and Android Vector Drawable Images.
          *
-         * The function accepts a [FileSystem] parameter for file management and
+         * The function accepts a [FileManager] parameter for file management and
          * then employs it in the creation of specific parser objects:
          * SVG ([SvgParser]) and Android Vector ([AndroidVectorParser]). Upon populating
          * the parsers object, the method returns the singleton instance of [ImageParser]
          * to enable a sequence of operations.
          *
-         * @param fileSystem a [FileSystem] instance that allows reading from the file system.
+         * @param fileManager a [FileManager] instance that allows reading from the file system.
          * @return a singleton instance of [ImageParser].
          */
-        operator fun invoke(fileSystem: FileSystem): Companion {
+        operator fun invoke(fileManager: FileManager): Companion {
             parsers = mapOf(
-                SVG_EXTENSION to SvgParser(fileSystem),
-                ANDROID_VECTOR_EXTENSION to AndroidVectorParser(fileSystem),
+                SVG_EXTENSION to SvgParser(fileManager),
+                ANDROID_VECTOR_EXTENSION to AndroidVectorParser(fileManager),
             )
 
             return this // returning Companion to enable chain call.
@@ -307,7 +301,7 @@ sealed class ImageParser(
         ): String {
             if (::parsers.isInitialized.not()) {
                 error(
-                    "Parsers not initialized. Call ImageParser(fileSystem) before calling ImageParser.parse()",
+                    "Parsers not initialized. Call ImageParser(fileManager) before calling ImageParser.parse()",
                 )
             }
 

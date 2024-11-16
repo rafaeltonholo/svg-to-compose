@@ -15,6 +15,6 @@ class Svg2ComposePlugin : Plugin<Project> {
     }
 
     private fun Project.configure(extension: SvgToComposeExtension) {
-        tasks.registerParseSvgToComposeIconTask(this, extension)
+        registerParseSvgToComposeIconTask(extension)
     }
 }

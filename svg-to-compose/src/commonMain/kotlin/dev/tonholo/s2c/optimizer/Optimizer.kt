@@ -7,6 +7,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.extensions.extension
+import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
@@ -125,7 +126,7 @@ sealed class Optimizer {
      * @see <a href="https://svgo.dev/">SVGO documentation</a>
      */
     data class SvgoOptimizer(
-        val fileSystem: FileSystem,
+        val fileManager: FileManager,
     ) : Optimizer() {
         override val command: String = "svgo"
         override val allowedExtension: String = FileType.Svg.extension
@@ -136,11 +137,11 @@ sealed class Optimizer {
             val svgoConfigFile = tempFolder / svgoConfigFilename
 
             // Create temp directory in case of not having it yet.
-            fileSystem.createDirectory(tempFolder)
+            fileManager.createDirectory(tempFolder)
 
-            if (!fileSystem.exists(svgoConfigFile)) {
+            if (!fileManager.exists(svgoConfigFile)) {
                 output("⚙️ writing svgo config file")
-                fileSystem.write(svgoConfigFile) {
+                fileManager.write(svgoConfigFile) {
                     writeUtf8(SvgoConfigContent)
                 }
             }
@@ -179,13 +180,13 @@ sealed class Optimizer {
     }
 
     class Factory(
-        fileSystem: FileSystem,
+        fileManager: FileManager,
     ) {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */
         private val svgOptimizers: Set<Optimizer> = setOf(
-            SvgoOptimizer(fileSystem),
+            SvgoOptimizer(fileManager),
         )
 
         /**

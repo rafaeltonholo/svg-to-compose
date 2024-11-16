@@ -1,7 +1,7 @@
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.io.IconWriter
-import dev.tonholo.s2c.io.TempFileWriter
+import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.parser.ParserConfig
@@ -40,13 +40,7 @@ fun main() {
     try {
         val fileSystem = FileSystem.SYSTEM
         Processor(
-            fileSystem = fileSystem,
-            iconWriter = IconWriter(
-                fileSystem = fileSystem,
-            ),
-            tempFileWriter = TempFileWriter(
-                fileSystem = fileSystem,
-            ),
+            fileManager = FileManager(fileSystem, Logger()),
         ).run(
             path = path,
             output = output,

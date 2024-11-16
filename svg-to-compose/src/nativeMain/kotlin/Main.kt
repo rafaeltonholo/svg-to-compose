@@ -12,8 +12,8 @@ import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.BuildKonfig
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.io.IconWriter
-import dev.tonholo.s2c.io.TempFileWriter
+import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
@@ -96,9 +96,14 @@ class Client : CliktCommand() {
     ).flag()
 
     private val noPreview by option(
-        names = arrayOf("-np", "--no-preview", "--kmp"),
+        names = arrayOf("-np", "--no-preview"),
         help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
             "KMP, since KMP doesn't support previews yet.",
+    ).flag()
+
+    private val isKmp by option(
+        names = arrayOf("--kmp"),
+        help = "Ensures the output is compatible with KMP. Default: false",
     ).flag()
 
     private val makeInternal by option(
@@ -140,6 +145,7 @@ class Client : CliktCommand() {
         verbose("   debug = $debug")
         verbose("   verbose = $verbose")
         verbose("   noPreview = $noPreview")
+        verbose("   isKmp = $isKmp")
         verbose("   makeInternal = $makeInternal")
         verbose("   minified = $minified")
         verbose("   recursive = $recursive")
@@ -153,13 +159,7 @@ class Client : CliktCommand() {
         try {
             val fileSystem = FileSystem.SYSTEM
             Processor(
-                fileSystem = fileSystem,
-                iconWriter = IconWriter(
-                    fileSystem = fileSystem,
-                ),
-                tempFileWriter = TempFileWriter(
-                    fileSystem = fileSystem,
-                ),
+                fileManager = FileManager(fileSystem, Logger()),
             ).run(
                 path = path,
                 output = output,
@@ -172,6 +172,8 @@ class Client : CliktCommand() {
                     noPreview = noPreview,
                     makeInternal = makeInternal,
                     minified = minified,
+                    silent = silent,
+                    kmpPreview = isKmp,
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
