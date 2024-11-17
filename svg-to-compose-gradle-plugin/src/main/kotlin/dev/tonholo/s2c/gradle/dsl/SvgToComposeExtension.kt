@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.gradle.dsl
 
-import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Internal
@@ -13,5 +12,31 @@ abstract class SvgToComposeExtension {
         action.execute(configurations)
     }
 
-    internal fun validate(): List<String> = configurations.flatMap { config -> config.validate() }
+    fun NamedDomainObjectContainer<ProcessorConfiguration>.common(action: Action<ProcessorConfiguration>) {
+        create("common") {
+            action.execute(this)
+        }
+    }
+
+    internal fun validate(): List<String> = configurations.flatMap { config ->
+        if (config == configurations.commonOrNull) {
+            emptyList()
+        } else {
+            config.validate()
+        }
+    }
+
+    internal fun applyCommonIfDefined() {
+        configurations.commonOrNull?.let { common ->
+            configurations.remove(common)
+            configurations.configureEach {
+                if (this != common) {
+                    merge(common)
+                }
+            }
+        }
+    }
+
+    private val NamedDomainObjectContainer<ProcessorConfiguration>.commonOrNull: ProcessorConfiguration?
+        get() = findByName("common")
 }

@@ -1,9 +1,10 @@
 package dev.tonholo.s2c.gradle.internal.parser
 
 import dev.tonholo.s2c.AppDefaults
-import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
+import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
+import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
@@ -13,6 +14,8 @@ import java.security.MessageDigest
 import java.util.Base64
 import kotlin.experimental.and
 
+private typealias IconMapper = (String) -> String
+
 internal class IconParserConfigurationImpl(
     project: Project,
     override val parentName: String,
@@ -21,48 +24,34 @@ internal class IconParserConfigurationImpl(
     override val iconVisibility: Property<IconVisibility> = project
         .objects
         .property<IconVisibility>()
-        .convention(
-            if (AppDefaults.MAKE_INTERNAL) {
-                IconVisibility.Internal
-            } else {
-                IconVisibility.Public
-            }
-        )
 
     internal val receiverType: Property<String?> = project
         .objects
         .property<String?>()
-        .convention(null)
 
     internal val addToMaterialIcons: Property<Boolean> = project
         .objects
         .property<Boolean>()
-        .convention(AppDefaults.ADD_TO_MATERIAL_ICONS)
 
     internal val minified: Property<Boolean> = project
         .objects
         .property<Boolean>()
-        .convention(AppDefaults.MINIFIED)
 
     internal val noPreview: Property<Boolean> = project
         .objects
         .property<Boolean>()
-        .convention(AppDefaults.NO_PREVIEW)
 
     internal val theme: Property<String> = project
         .objects
         .property<String>()
-        .convention("")
 
-    internal val mapIconNameTo: Property<((String) -> String)?> = project
+    internal val mapIconNameTo: Property<IconMapper?> = project
         .objects
-        .property<((String) -> String)?>()
-        .convention(null)
+        .property<IconMapper?>()
 
     internal val exclude: Property<Regex?> = project
         .objects
         .property<Regex?>()
-        .convention(null)
 
     override fun makeInternal() {
         iconVisibility.set(IconVisibility.Internal)
@@ -142,7 +131,48 @@ internal class IconParserConfigurationImpl(
                     },
             )
             append("|")
-        }.also { println(it) }
+        }
         return digest.digest(raw.toByteArray()).joinToString("") { "%02x".format(it and 0xff.toByte()) }
+    }
+
+    internal fun merge(common: IconParserConfigurationImpl) {
+        iconVisibility
+            .setIfNotPresent(
+                provider = common.iconVisibility,
+                defaultValue = if (AppDefaults.MAKE_INTERNAL) {
+                    IconVisibility.Internal
+                } else {
+                    IconVisibility.Public
+                }
+            )
+        receiverType.setIfNotPresent(
+            provider = common.receiverType,
+            defaultValue = null,
+        )
+        addToMaterialIcons.setIfNotPresent(
+            provider = common.addToMaterialIcons,
+            defaultValue = AppDefaults.ADD_TO_MATERIAL_ICONS,
+        )
+        minified.setIfNotPresent(provider = common.minified, defaultValue = AppDefaults.MINIFIED)
+        noPreview.setIfNotPresent(provider = common.noPreview, defaultValue = AppDefaults.NO_PREVIEW)
+        theme.setIfNotPresent(provider = common.theme, defaultValue = "")
+        mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo, defaultValue = null)
+        exclude.setIfNotPresent(provider = common.exclude, defaultValue = null)
+    }
+
+    override fun toString(): String {
+        return buildString {
+            appendLine("IconParserConfigurationImpl(")
+            appendLine("  name='$name', ")
+            appendLine("  iconVisibility=${iconVisibility.orNull}, ")
+            appendLine("  receiverType='${receiverType.orNull}', ")
+            appendLine("  addToMaterialIcons=${addToMaterialIcons.orNull}, ")
+            appendLine("  minified=${minified.orNull}, ")
+            appendLine("  noPreview=${noPreview.orNull}, ")
+            appendLine("  theme='${theme.orNull}', ")
+            appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
+            appendLine("  exclude=${exclude.orNull}, ")
+            append(")")
+        }
     }
 }

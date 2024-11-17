@@ -10,10 +10,10 @@ import org.gradle.api.file.Directory
  */
 internal interface SourceConfiguration : Configuration {
     /**
-     * Sets the source directory for the vectors.
-     * @param directory The source directory.
+     * Sets the icons origin directory for the vectors.
+     * @param origin The icons origin directory.
      */
-    fun from(directory: Directory)
+    fun from(origin: Directory)
 
     /**
      * Sets the destination package for the generated `ImageVector`s.

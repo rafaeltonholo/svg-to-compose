@@ -4,6 +4,7 @@ import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.dsl.source.SourceConfiguration
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
+import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
@@ -23,15 +24,12 @@ abstract class ProcessorConfiguration @Inject constructor(
     internal val recursive: Property<Boolean> = project
         .objects
         .property<Boolean>()
-        .convention(AppDefaults.RECURSIVE)
     internal val maxDepth: Property<Int> = project
         .objects
         .property<Int>()
-        .convention(AppDefaults.MAX_RECURSIVE_DEPTH)
     internal val optimize: Property<Boolean> = project
         .objects
         .property<Boolean>()
-        .convention(AppDefaults.OPTIMIZE)
 
     internal val iconConfiguration: Property<IconParserConfigurationImpl> by lazy {
         project
@@ -40,8 +38,8 @@ abstract class ProcessorConfiguration @Inject constructor(
             .convention(IconParserConfigurationImpl(project, fullName))
     }
 
-    override fun from(directory: Directory) {
-        origin.set(directory)
+    override fun from(origin: Directory) {
+        this.origin.set(origin)
     }
 
     override fun destinationPackage(fullPackage: String) {
@@ -76,15 +74,18 @@ abstract class ProcessorConfiguration @Inject constructor(
             ?.asFile
             ?.let { origin ->
                 if (origin.exists().not()) {
-                    errors.add("${configurationName()}: The specified origin should exist.")
+                    errors.add("${configurationName()}: The specified icons origin should exist.")
                 }
 
                 if (origin.isDirectory.not()) {
-                    errors.add("${configurationName()}: The specified origin should be a directory.")
+                    errors.add("${configurationName()}: The specified icons origin path should be a directory.")
                 }
-            } ?: errors.add("${configurationName()}: Origin cannot be null.")
+            }
+            ?: errors.add(
+                "${configurationName()}: The icons origin cannot be null. Have you missed calling from(\"origin\")?",
+            )
 
-        if (destinationPackage.isPresent.not() || destinationPackage.get().isBlank()) {
+        if (destinationPackage.orNull.isNullOrBlank()) {
             errors.add("${configurationName()}: Destination package cannot be empty.")
         }
 
@@ -103,7 +104,34 @@ abstract class ProcessorConfiguration @Inject constructor(
             append(maxDepth.get())
             append("|")
             append(iconConfiguration.get().calculateHash())
-        }.also { println(it) }
+        }
         return digest.digest(raw.toByteArray()).joinToString("") { "%02x".format(it and 0xff.toByte()) }
+    }
+
+    fun merge(common: ProcessorConfiguration) {
+        origin.setIfNotPresent(common.origin)
+        destinationPackage.setIfNotPresent(common.destinationPackage)
+        recursive.setIfNotPresent(common.recursive, defaultValue = AppDefaults.RECURSIVE)
+        maxDepth.setIfNotPresent(common.maxDepth, defaultValue = AppDefaults.MAX_RECURSIVE_DEPTH)
+        optimize.setIfNotPresent(common.optimize, defaultValue = AppDefaults.OPTIMIZE)
+        common.iconConfiguration.orNull?.let { commonIconConfig ->
+            iconConfiguration
+                .get()
+                .merge(commonIconConfig)
+        }
+    }
+
+    override fun toString(): String {
+        return buildString {
+            appendLine("ProcessorConfiguration(")
+            appendLine("  name='$name', ")
+            appendLine("  iconConfiguration=${iconConfiguration.orNull}, ")
+            appendLine("  optimize=${optimize.orNull}, ")
+            appendLine("  maxDepth=${maxDepth.orNull}, ")
+            appendLine("  recursive=${recursive.orNull}, ")
+            appendLine("  destinationPackage=${destinationPackage.orNull}, ")
+            appendLine("  origin=${origin.orNull}, ")
+            append(")")
+        }
     }
 }

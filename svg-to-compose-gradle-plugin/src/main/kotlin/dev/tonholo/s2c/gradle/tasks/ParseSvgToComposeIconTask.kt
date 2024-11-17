@@ -52,24 +52,25 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     var isKmp: Boolean = false
 
     private val outputDirectories: Map<String, File>
-        get() = configurations.asMap.mapValues { (_, configuration) ->
-            val destination = configuration.destinationPackage.get().replace(".", "/")
-            project.objects.directoryProperty().convention(
-                project.layout.buildDirectory.dir(
-                    buildString {
-                        append(GENERATED_FOLDER)
-                        append(
-                            if (isKmp) {
-                                "/commonMain/kotlin/"
-                            } else {
-                                "/main/kotlin/"
-                            },
-                        )
-                        append(destination)
-                    },
-                ),
-            ).get().asFile
-        }
+        get() = configurations
+            .associate { configuration ->
+                val destination = configuration.destinationPackage.get().replace(".", "/")
+                configuration.name to project.objects.directoryProperty().convention(
+                    project.layout.buildDirectory.dir(
+                        buildString {
+                            append(GENERATED_FOLDER)
+                            append(
+                                if (isKmp) {
+                                    "/commonMain/kotlin/"
+                                } else {
+                                    "/main/kotlin/"
+                                },
+                            )
+                            append(destination)
+                        },
+                    ),
+                ).get().asFile
+            }
 
     @get:OutputDirectory
     val sourceDirectory: File
@@ -92,12 +93,11 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @TaskAction
     fun run() {
         cacheManager.initialize(configurations.asMap)
-        configurations.asMap.forEach { (key, configuration) ->
-            logger.debug("key = $key, value = $configuration")
+        configurations.forEach { configuration ->
             val filesToProcess = findFilesToProcess(configuration)
 
             if (filesToProcess.isEmpty()) {
-                logger.debug("No files to process for configuration $key")
+                logger.output("No files to process for configuration '${configuration.name}'")
                 return@forEach
             } else {
                 logger.debug("Files eligible for processing: ${filesToProcess.map { it.name }}")
@@ -111,7 +111,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     files.parallel().forEach { path ->
                         processor.run(
                             path = path.toFile().absolutePath,
-                            output = requireNotNull(outputDirectories[key]).absolutePath,
+                            output = requireNotNull(outputDirectories[configuration.name]).absolutePath,
                             config = ParserConfig(
                                 pkg = configuration.destinationPackage.get(),
                                 optimize = configuration.optimize.get(),
@@ -163,6 +163,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         "parseSvgToComposeIcon",
         ParseSvgToComposeIconTask::class.java,
     ) {
+        extension.applyCommonIfDefined()
         val errors = extension.validate()
         logger.debug("errors = {}", errors)
         check(errors.isEmpty()) {
