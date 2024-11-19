@@ -105,7 +105,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
             val iconConfiguration = configuration.iconConfiguration.get()
             filesToProcess
-                .chunked(5)
+                .chunked(size = 5)
                 .map { it.stream() }
                 .forEach { files ->
                     files.parallel().forEach { path ->
@@ -127,7 +127,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                                 silent = false,
                                 keepTempFolder = true,
                             ),
-                            recursive = false, // TODO: recursive should be handled by plugin.
+                            recursive = false, // recursive search is handled by the plugin.
                             maxDepth = configuration.maxDepth.get(),
                         )
                     }

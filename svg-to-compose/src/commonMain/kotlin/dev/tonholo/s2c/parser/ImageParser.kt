@@ -82,6 +82,8 @@ sealed class ImageParser(
      * @see materialReceiverTypeImport
      * @see ImageVectorNode.Path.imports
      * @see ImageVectorNode.Group.imports
+     * @see createGroupImports
+     * @see createChunkFunctionsImports
      */
     protected fun createImports(
         nodes: List<ImageVectorNode>,
@@ -96,23 +98,23 @@ sealed class ImageParser(
         }
         val nodeImports = nodes
             .asSequence()
-            .flatMap {
-                if (it is ImageVectorNode.ChunkFunction) {
-                    it.nodes
-                } else {
-                    listOf(it)
-                }
-            }
-            .flatMap { node ->
-                if (node is ImageVectorNode.Group) {
-                    node.imports + node.commands.flatMap { node.imports }
-                } else {
-                    node.imports
-                }
-            } // consider group
+            .flatMap(::createChunkFunctionsImports)
+            .flatMap(::createGroupImports)
             .toSet()
 
         addAll(nodeImports)
+    }
+
+    private fun createGroupImports(node: ImageVectorNode) = if (node is ImageVectorNode.Group) {
+        node.imports + node.commands.flatMap { node.imports }
+    } else {
+        node.imports
+    }
+
+    private fun createChunkFunctionsImports(node: ImageVectorNode) = if (node is ImageVectorNode.ChunkFunction) {
+        node.nodes
+    } else {
+        listOf(node)
     }
 
     /**

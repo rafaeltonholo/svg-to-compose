@@ -7,7 +7,6 @@ import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
-import okio.FileSystem
 import okio.Path
 
 class IconWriter(

@@ -118,11 +118,9 @@ fun FileManager(
     fileSystem: FileSystem,
     logger: Logger,
 ): FileManager = object : FileManager {
-    override fun isDirectory(path: Path): Boolean = try {
+    override fun isDirectory(path: Path): Boolean {
         val metadata = fileSystem.metadata(path)
-        metadata.isDirectory
-    } catch (e: IOException) {
-        throw e
+        return metadata.isDirectory
     }
 
     override fun createDirectory(dir: Path) {

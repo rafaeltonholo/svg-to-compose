@@ -21,7 +21,6 @@ import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.mapIconName
-import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 

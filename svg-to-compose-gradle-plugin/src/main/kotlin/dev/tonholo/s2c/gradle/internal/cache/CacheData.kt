@@ -18,4 +18,8 @@ import java.io.Serializable
 data class CacheData(
     val files: Map<String, String>,
     val extensionConfiguration: Map<String, String>,
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}

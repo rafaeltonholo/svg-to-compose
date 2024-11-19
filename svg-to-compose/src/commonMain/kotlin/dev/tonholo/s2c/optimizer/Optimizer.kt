@@ -12,7 +12,6 @@ import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.optimizer.svgo.SvgoConfigContent
-import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 
