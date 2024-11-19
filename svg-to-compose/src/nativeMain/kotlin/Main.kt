@@ -9,8 +9,8 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import dev.tonholo.s2c.AppDefaults
-import dev.tonholo.s2c.BuildKonfig
 import dev.tonholo.s2c.Processor
+import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
@@ -28,7 +28,7 @@ class Client : CliktCommand() {
 
     init {
         eagerOption("-v", "--version", help = "Show this CLI version") {
-            throw PrintMessage("SVG to Compose version: ${BuildKonfig.VERSION}")
+            throw PrintMessage("SVG to Compose version: ${BuildConfig.VERSION}")
         }
     }
 

@@ -1,11 +1,7 @@
 plugins {
     `kotlin-dsl`
-    alias(libs.plugins.org.jetbrains.kotlin.jvm)
-    alias(libs.plugins.com.vanniktech.gradle.maven.publish)
+    dev.tonholo.s2c.conventions.gradle.plugin
 }
-
-group = "dev.tonholo.s2c"
-version = "1.0.0-alpha01"
 
 gradlePlugin {
     plugins {
@@ -23,20 +19,8 @@ kotlin {
 }
 
 dependencies {
-    // Get access to Kotlin multiplatform source sets
-    implementation(kotlin("gradle-plugin"))
-    compileOnly(gradleApi())
     compileOnly(libs.com.android.tools.build.gradle)
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
     implementation(libs.com.squareup.okio)
     implementation(projects.svgToCompose)
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "testMaven"
-            url = uri(rootProject.layout.buildDirectory.dir("localMaven"))
-        }
-    }
 }

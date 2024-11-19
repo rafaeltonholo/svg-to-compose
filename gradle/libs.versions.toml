@@ -1,25 +1,23 @@
 [versions]
+agp = "8.7.2"
 kotlin = "2.0.21"
 clikt = "4.4.0"
 okio = "3.9.1"
 detekt = "1.23.7"
-build-konfig = "0.15.2"
 ksoup = "0.2.0"
 maven-publish = "0.28.0"
+buildconfig = "5.5.0"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
-com-codingfeline-buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "build-konfig" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}
-org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version = "8.6.1" }
 
-[plugins]
-com-vanniktech-gradle-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
-org-jetbrains-kotlin-plugin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin"}
-org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-org-jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-io-gitlab-arturbosch-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}
-com-codingfeline-buildkonfig = { id = "com.codingfeline.buildkonfig" }
+# Plugins
+org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+org-jetbrains-kotlin-powerAssert-plugin = { module = "org.jetbrains.kotlin:kotlin-power-assert", version.ref = "kotlin" }
+com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+io-gitlab-arturbosch-detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+com-github-gmazzo-buildconfig-plugin = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
+com-vanniktech-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
