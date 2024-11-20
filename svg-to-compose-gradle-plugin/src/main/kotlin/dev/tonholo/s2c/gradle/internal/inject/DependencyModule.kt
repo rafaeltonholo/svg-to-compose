@@ -44,7 +44,7 @@ internal class DependencyModule(
         .provider {
             Processor(
                 logger = get(),
-                fileManager = FileManager(get(), get()),
+                fileManager = get(),
                 iconWriter = IconWriter(get()),
                 tempFileWriter = TempFileWriter(get(), get()),
             )
@@ -65,7 +65,15 @@ internal class DependencyModule(
         .property(T::class.java)
         .apply {
             if (!isPresent) {
-                set(providers[T::class.java]?.invoke()?.get() as T)
+                val provider = providers[T::class.java]
+                    ?: throw IllegalArgumentException("No provider found for ${T::class.java.simpleName}")
+                val instance = provider.invoke().get()
+                if (instance !is T) {
+                    throw ClassCastException(
+                        "Provider returned ${instance::class.java.simpleName} but expected ${T::class.java.simpleName}",
+                    )
+                }
+                set(instance)
             }
         }
         .get()
