@@ -158,7 +158,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         logger.debug("Finished processing files. Creating cache...")
         cacheManager.saveCache()
         logger.debug("Cache created.")
-        processor.dispose()
         if (errors.isNotEmpty()) {
             throw ExitProgramException(
                 errorCode = ErrorCode.GradlePluginError,
@@ -172,6 +171,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         if (scope.isActive) {
             scope.cancel()
         }
+        processor.dispose()
     }
 
     private fun List<Path>.processParallel(
