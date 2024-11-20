@@ -27,7 +27,7 @@ class Processor(
     private val iconWriter: IconWriter = IconWriter(fileManager),
     private val tempFileWriter: TempFileWriter = TempFileWriter(logger, fileManager),
     private val optimizers: Optimizer.Factory = Optimizer.Factory(logger, fileManager),
-    private val parser: ImageParser.Companion = ImageParser(fileManager),
+    private val parser: ImageParser.Factory = ImageParser.Factory(fileManager),
 ) {
     /**
      * Starts the processor execution.

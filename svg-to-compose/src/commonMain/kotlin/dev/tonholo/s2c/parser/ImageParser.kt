@@ -15,8 +15,6 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
-import dev.tonholo.s2c.parser.ImageParser.Companion.invoke
-import dev.tonholo.s2c.parser.ImageParser.Companion.parse
 import okio.Path
 
 /**
@@ -249,33 +247,23 @@ sealed class ImageParser(
         }
     }
 
-    companion object {
-        private const val SVG_EXTENSION = ".svg"
-        private const val ANDROID_VECTOR_EXTENSION = ".xml"
-
-        private lateinit var parsers: Map<String, ImageParser>
-
-        /**
-         * An operator function [invoke] that oversees the creation of parsers
-         * for SVG and Android Vector Drawable Images.
-         *
-         * The function accepts a [FileManager] parameter for file management and
-         * then employs it in the creation of specific parser objects:
-         * SVG ([SvgParser]) and Android Vector ([AndroidVectorParser]). Upon populating
-         * the parsers object, the method returns the singleton instance of [ImageParser]
-         * to enable a sequence of operations.
-         *
-         * @param fileManager a [FileManager] instance that allows reading from the file system.
-         * @return a singleton instance of [ImageParser].
-         */
-        operator fun invoke(fileManager: FileManager): Companion {
-            parsers = mapOf(
-                SVG_EXTENSION to SvgParser(fileManager),
-                ANDROID_VECTOR_EXTENSION to AndroidVectorParser(fileManager),
-            )
-
-            return this // returning Companion to enable chain call.
-        }
+    /**
+     * An factory that oversees the creation of parsers for SVG and
+     * Android Vector Drawable Images.
+     *
+     * The function accepts a [FileManager] parameter for file management and
+     * then employs it in the creation of specific parser objects:
+     * SVG ([SvgParser]) and Android Vector ([AndroidVectorParser]). Upon populating
+     * the parsers object, the method returns the singleton instance of [ImageParser]
+     * to enable a sequence of operations.
+     *
+     * @param fileManager a [FileManager] instance that allows reading from the file system.
+     */
+    class Factory(fileManager: FileManager) {
+        private val parsers: Map<String, ImageParser> = mapOf(
+            FileType.Svg.extension to SvgParser(fileManager),
+            FileType.Avg.extension to AndroidVectorParser(fileManager),
+        )
 
         /**
          * A part of the sealed [ImageParser] companion object, [parse] is a function
@@ -291,7 +279,6 @@ sealed class ImageParser(
          * the file.
          * @param config An instance of the [ParserConfig] class, which contains
          * configurations required for parsing the file.
-         * @throws UnsupportedOperationException if the parsers are not initialized.
          * @throws ExitProgramException if an unsupported file extension is provided.
          * @returns A string after parsing the mentioned file using the appropriate
          * parser based on the file extension.
@@ -301,12 +288,6 @@ sealed class ImageParser(
             iconName: String,
             config: ParserConfig,
         ): String {
-            if (::parsers.isInitialized.not()) {
-                error(
-                    "Parsers not initialized. Call ImageParser(fileManager) before calling ImageParser.parse()",
-                )
-            }
-
             val extension = file.extension
             return parsers[extension]?.parse(
                 file = file,

@@ -165,13 +165,13 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 causes = errors.values.toTypedArray(),
             )
         }
+        processor.dispose()
     }
 
     internal fun dispose() {
         if (scope.isActive) {
             scope.cancel()
         }
-        processor.dispose()
     }
 
     private fun List<Path>.processParallel(
