@@ -106,7 +106,7 @@ sealed class ImageParser(
     }
 
     private fun createGroupImports(node: ImageVectorNode) = if (node is ImageVectorNode.Group) {
-        node.imports + node.commands.flatMap { node.imports }
+        node.imports + node.commands.flatMap { it.imports }
     } else {
         node.imports
     }
