@@ -161,7 +161,7 @@ fun FileManager(
         return fileSystem
             .listRecursively(from, maxDepth = depth)
             .filter { path ->
-                val isNotExcluded = exclude?.let(path.name::matches)?.not() != false
+                val isNotExcluded = exclude == null || !path.name.matches(exclude)
                 isNotExcluded &&
                     (path.name.endsWith(FileType.Svg.extension) || path.name.endsWith(FileType.Avg.extension))
             }
