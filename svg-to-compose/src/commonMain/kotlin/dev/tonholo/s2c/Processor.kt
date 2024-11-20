@@ -60,9 +60,8 @@ class Processor(
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
         mapIconName: IconMapperFn? = null,
     ) {
-        if (config.silent) {
-            AppConfig.silent = true
-        }
+        // TODO: Move to Main.kt when logger refactor.
+        AppConfig.silent = config.silent
         logger.verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()

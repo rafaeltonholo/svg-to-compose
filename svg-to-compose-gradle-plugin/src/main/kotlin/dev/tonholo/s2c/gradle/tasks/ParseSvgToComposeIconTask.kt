@@ -10,6 +10,7 @@ import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
 import dev.tonholo.s2c.gradle.internal.cache.CacheManager
 import dev.tonholo.s2c.gradle.internal.inject.DependencyModule
+import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
@@ -27,6 +28,8 @@ import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -51,6 +54,10 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val showStackTrace: Boolean by lazy {
+        project.gradle.startParameter.showStacktrace != ShowStacktrace.INTERNAL_EXCEPTIONS
+    }
+    private val logLevel: LogLevel by lazy { project.gradle.startParameter.logLevel }
 
     init {
         group = "svg-to-compose"
@@ -59,10 +66,14 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     }
 
     @get:Internal
-    lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
+    internal lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
 
     @get:Internal
-    var isKmp: Boolean = false
+    internal var isKmp: Boolean = false
+
+    @get:Internal
+    @set:org.gradle.api.tasks.options.Option(option = "silent", description = "Run icon parsing without outputs.")
+    internal var silent: Boolean = false
 
     private val outputDirectories: Map<String, File>
         get() = configurations
@@ -105,6 +116,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @TaskAction
     fun run() {
+        logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
         cacheManager.initialize(configurations.asMap)
         val errors = mutableMapOf<Path, Throwable>()
         configurations.forEach { configuration ->
@@ -190,7 +202,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                         makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
                         exclude = iconConfiguration.exclude.orNull,
                         kmpPreview = isKmp,
-                        silent = true,
+                        silent = true, // TODO: remove when logger migration is done.
                         keepTempFolder = true,
                     ),
                     recursive = false, // recursive search is handled by the plugin.

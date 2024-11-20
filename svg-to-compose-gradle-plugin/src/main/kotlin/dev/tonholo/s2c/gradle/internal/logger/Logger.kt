@@ -1,11 +1,26 @@
 package dev.tonholo.s2c.gradle.internal.logger
 
 import dev.tonholo.s2c.logger.Logger
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger as GradleLogger
 
+private lateinit var logLevel: LogLevel
 internal fun Logger(
     logger: GradleLogger,
 ): Logger = object : Logger {
+
+    init {
+        if (::logLevel.isInitialized.not()) {
+            logLevel = when {
+                logger.isErrorEnabled -> LogLevel.ERROR
+                logger.isQuietEnabled -> LogLevel.QUIET
+                logger.isWarnEnabled -> LogLevel.WARN
+                logger.isInfoEnabled -> LogLevel.INFO
+                else -> LogLevel.DEBUG
+            }
+        }
+    }
+
     override fun debug(message: Any) {
         logger.debug(message.toString())
     }
@@ -37,10 +52,17 @@ internal fun Logger(
     }
 
     override fun output(message: String) {
-        println(message)
+        if (logLevel != LogLevel.QUIET) {
+            logger.lifecycle(message)
+        }
     }
 
     override fun error(message: String, throwable: Throwable?) {
         logger.error(message, throwable)
     }
+}
+
+@Suppress("UnusedReceiverParameter")
+internal fun Logger.setLogLevel(level: LogLevel) {
+    logLevel = level
 }
