@@ -30,4 +30,8 @@ internal fun Logger(
     override fun output(message: String) {
         logger.info(message)
     }
+
+    override fun error(message: String, throwable: Throwable) {
+        logger.error(message, throwable)
+    }
 }

@@ -5,15 +5,14 @@ import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.dsl.source.SourceConfiguration
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
+import okio.ByteString.Companion.toByteString
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
-import java.security.MessageDigest
 import javax.inject.Inject
-import kotlin.experimental.and
 
 abstract class ProcessorConfiguration @Inject constructor(
     project: Project,
@@ -93,7 +92,6 @@ abstract class ProcessorConfiguration @Inject constructor(
     }
 
     internal fun calculateHash(): String {
-        val digest = MessageDigest.getInstance("SHA-256")
         val raw = buildString {
             append(origin.get())
             append("|")
@@ -105,7 +103,7 @@ abstract class ProcessorConfiguration @Inject constructor(
             append("|")
             append(iconConfiguration.get().calculateHash())
         }
-        return digest.digest(raw.toByteArray()).joinToString("") { "%02x".format(it and 0xff.toByte()) }
+        return raw.toByteArray().toByteString().sha256().hex()
     }
 
     fun merge(common: ProcessorConfiguration) {

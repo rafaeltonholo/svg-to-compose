@@ -2,6 +2,10 @@ package dev.tonholo.s2c.gradle.tasks
 
 import com.android.build.gradle.BaseExtension
 import dev.tonholo.s2c.Processor
+import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.error.MissingDependencyException
+import dev.tonholo.s2c.error.OptimizationException
+import dev.tonholo.s2c.error.ParserException
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
@@ -93,6 +97,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @TaskAction
     fun run() {
         cacheManager.initialize(configurations.asMap)
+        val errors = mutableMapOf<Path, Exception>()
         configurations.forEach { configuration ->
             val filesToProcess = findFilesToProcess(configuration)
 
@@ -104,34 +109,69 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             }
 
             val iconConfiguration = configuration.iconConfiguration.get()
+            val parent = configuration.origin.get().asFile.toOkioPath()
+            val recursive = configuration.recursive.get()
             filesToProcess
                 .chunked(size = 5)
                 .map { it.stream() }
                 .forEach { files ->
                     files.parallel().forEach { path ->
-                        processor.run(
-                            path = path.toFile().absolutePath,
-                            output = requireNotNull(outputDirectories[configuration.name]).absolutePath,
-                            config = ParserConfig(
-                                pkg = configuration.destinationPackage.get(),
-                                optimize = configuration.optimize.get(),
-                                minified = iconConfiguration.minified.get(),
-                                theme = iconConfiguration.theme.get(),
-                                receiverType = iconConfiguration.receiverType.orNull,
-                                addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                                noPreview = iconConfiguration.noPreview.get(),
-                                makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                                exclude = iconConfiguration.exclude.orNull,
-                                iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
-                                kmpPreview = isKmp,
-                                silent = false,
-                                keepTempFolder = true,
-                            ),
-                            recursive = false, // recursive search is handled by the plugin.
-                            maxDepth = configuration.maxDepth.get(),
-                        )
+                        val output = requireNotNull(outputDirectories[configuration.name])
+                            .toOkioPath()
+                            .let { output ->
+                                if (recursive && path.parent != parent) {
+                                    (output / path.relativeTo(parent)).parent
+                                } else {
+                                    null
+                                } ?: output
+                            }
+                        val destinationPackage = configuration.destinationPackage.get().let { pkg ->
+                            pkg + if (recursive && path.parent != parent) {
+                                ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
+                            } else {
+                                ""
+                            }
+                        }
+                        try {
+                            processor.run(
+                                path = path.toFile().absolutePath,
+                                output = output.toFile().absolutePath,
+                                config = ParserConfig(
+                                    pkg = destinationPackage,
+                                    optimize = configuration.optimize.get(),
+                                    minified = iconConfiguration.minified.get(),
+                                    theme = iconConfiguration.theme.get(),
+                                    receiverType = iconConfiguration.receiverType.orNull,
+                                    addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                                    noPreview = iconConfiguration.noPreview.get(),
+                                    makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                                    exclude = iconConfiguration.exclude.orNull,
+                                    iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
+                                    kmpPreview = isKmp,
+                                    silent = false,
+                                    keepTempFolder = true,
+                                    parallel = true,
+                                ),
+                                recursive = false, // recursive search is handled by the plugin.
+                                maxDepth = configuration.maxDepth.get(),
+                            )
+                        } catch (e: ExitProgramException) {
+                            errors += path to e
+                        } catch (e: ParserException) {
+                            errors += path to e
+                        } catch (e: MissingDependencyException) {
+                            errors += path to e
+                        } catch (e: OptimizationException) {
+                            errors += path to e
+                        }
                     }
                 }
+        }
+        if (errors.isNotEmpty()) {
+            errors.forEach { (path, exception) ->
+                cacheManager.removeFromCache(path)
+                logger.error(message = "Failed to parse $path.", throwable = exception)
+            }
         }
         logger.debug("Finished processing files. Creating cache...")
         cacheManager.saveCache()

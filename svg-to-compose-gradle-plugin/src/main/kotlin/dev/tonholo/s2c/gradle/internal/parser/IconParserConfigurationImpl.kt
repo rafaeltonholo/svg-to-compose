@@ -5,14 +5,13 @@ import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
+import okio.ByteString.Companion.toByteString
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
-import java.security.MessageDigest
 import java.util.Base64
-import kotlin.experimental.and
 
 private typealias IconMapper = (String) -> String
 
@@ -102,7 +101,6 @@ internal class IconParserConfigurationImpl(
     }
 
     internal fun calculateHash(): String {
-        val digest = MessageDigest.getInstance("SHA-256")
         val raw = buildString {
             append(receiverType.orNull)
             append("|")
@@ -132,7 +130,7 @@ internal class IconParserConfigurationImpl(
             )
             append("|")
         }
-        return digest.digest(raw.toByteArray()).joinToString("") { "%02x".format(it and 0xff.toByte()) }
+        return raw.toByteArray().toByteString().sha256().hex()
     }
 
     internal fun merge(common: IconParserConfigurationImpl) {

@@ -4,6 +4,7 @@ import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.tasks.GENERATED_FOLDER
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
+import okio.ByteString.Companion.toByteString
 import okio.Path
 import okio.Path.Companion.toPath
 import org.gradle.api.Project
@@ -12,8 +13,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.security.MessageDigest
-import kotlin.experimental.and
 
 internal class CacheManager(
     private val logger: Logger,
@@ -75,6 +74,10 @@ internal class CacheManager(
         }
     }
 
+    fun removeFromCache(path: Path) {
+        fileHashMap.remove(path)
+    }
+
     private fun loadCache() {
         if (cacheFile.exists()) {
             val cacheData = try {
@@ -90,12 +93,11 @@ internal class CacheManager(
         }
     }
 
-    private fun calculateFileHash(path: Path): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val fileBytes = fileManager.readBytes(path)
-        val hashBytes = digest.digest(fileBytes)
-        return hashBytes.joinToString(separator = "") { byte -> "%02x".format(byte and 0xff.toByte()) }
-    }
+    private fun calculateFileHash(path: Path): String = fileManager
+        .readBytes(path)
+        .toByteString()
+        .sha256()
+        .hex()
 
     private fun removeCacheIfExists() {
         if (cacheFile.exists()) {
