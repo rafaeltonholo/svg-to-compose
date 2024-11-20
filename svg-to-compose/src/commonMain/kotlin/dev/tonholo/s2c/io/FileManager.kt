@@ -84,6 +84,14 @@ interface FileManager {
     @Throws(IOException::class)
     fun readContent(file: Path): String
 
+    /**
+     * Reads the entire content of a file into a byte array.
+     *
+     * @param file The path to the file to be read.
+     * @return A byte array containing the entire content of the file.
+     * @throws IOException If an I/O error occurs while reading the file.
+     */
+    @Throws(IOException::class)
     fun readBytes(file: Path): ByteArray
 
     /**

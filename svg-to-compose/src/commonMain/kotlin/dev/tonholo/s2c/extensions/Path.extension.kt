@@ -32,5 +32,4 @@ fun Path.encodeToMd5(): String =
 val Path.filename
     get() = segments
         .last()
-        .dropLastWhile { it != '.' }
-        .dropLast(n = 1)
+        .substringBeforeLast('.')
