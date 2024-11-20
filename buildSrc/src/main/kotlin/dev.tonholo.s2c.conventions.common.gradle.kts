@@ -1,10 +1,11 @@
-import dev.tonholo.s2c.conventions.GROUP
-import dev.tonholo.s2c.conventions.Version
+import dev.tonholo.s2c.conventions.AppProperties
 
 plugins {
     id("dev.tonholo.s2c.conventions.publication")
     id("dev.tonholo.s2c.conventions.detekt")
 }
 
-group = GROUP
-version = Version
+AppProperties.init(rootProject)
+
+group = AppProperties.group
+version = AppProperties.version

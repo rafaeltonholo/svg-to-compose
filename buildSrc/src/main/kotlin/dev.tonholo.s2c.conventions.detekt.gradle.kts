@@ -1,3 +1,4 @@
+import dev.tonholo.s2c.conventions.detekt.DetektConfig
 import dev.tonholo.s2c.conventions.libs
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
@@ -29,16 +30,14 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<Detekt>().configureEach {
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+    jvmTarget = DetektConfig.javaVersion
     exclude {
-        with(it.file.absolutePath) {
-            contains("build") ||
-                contains("sampleApp") ||
-                contains("jvm") // JVM is not officially supported. It is only added to enable debugging.
+        DetektConfig.excludedDirs.any { dir ->
+            it.file.absolutePath in dir
         }
     }
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+    jvmTarget = DetektConfig.javaVersion
 }

@@ -1,3 +1,4 @@
+import dev.tonholo.s2c.conventions.AppProperties
 import dev.tonholo.s2c.conventions.kmp.targets.useJvm
 import dev.tonholo.s2c.conventions.kmp.targets.useNative
 import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
@@ -17,14 +18,8 @@ kotlin {
 buildConfig {
     packageName(group.toString().plus(".config"))
     useKotlinOutput()
-    val envFile = File("${rootDir.absolutePath}/app.properties")
-    val env = mutableListOf<Pair<String, String>>()
-    envFile.forEachLine { line ->
-        val (name, value) = line.split("=")
-        env += name to value
-    }
-    env.forEach { (name, value) ->
-        buildConfigField(name, value)
+    AppProperties.forEach { (name, value) ->
+        buildConfigField(name, value.toString())
     }
 }
 
