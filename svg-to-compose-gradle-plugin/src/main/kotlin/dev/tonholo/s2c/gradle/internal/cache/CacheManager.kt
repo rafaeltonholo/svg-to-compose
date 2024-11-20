@@ -61,8 +61,7 @@ internal class CacheManager(
                 }
             logger.debug("Cache file written")
         } catch (e: IOException) {
-            logger.debug("Error writing cache file: ${e.message}")
-            e.printStackTrace()
+            logger.error("Error writing cache file: ${e.message}", e)
         }
     }
 
@@ -87,8 +86,7 @@ internal class CacheManager(
                     logger.debug("Cache file loaded")
                 }
             } catch (e: IOException) {
-                logger.debug("Error loading cache file: ${e.message}")
-                e.printStackTrace()
+                logger.error("Error loading cache file: ${e.message}", e)
                 null
             }
             cacheData?.validate()
