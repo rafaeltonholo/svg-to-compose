@@ -11,6 +11,8 @@ reviews:
     - "!**/samples/**"
     - "!**/sampleApp/**"
     - "!**/sample-app/**"
+    - "!**/playground/**"
+    - "!**/playground-kmp/**"
     - "!*.xml"
     - "!*.svg"
     - "!**/config/detekt.yml"
