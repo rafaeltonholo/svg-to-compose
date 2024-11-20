@@ -7,6 +7,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.extensions.extension
+import dev.tonholo.s2c.extensions.filename
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
@@ -145,7 +146,8 @@ sealed class Optimizer {
                 }
             }
 
-            val optimizedFile = "$S2C_TEMP_FOLDER/target.optimized.svg".toPath()
+            val tempDir = requireNotNull(file.parent)
+            val optimizedFile = tempDir / "${file.filename}.optimized.svg"
 
             runOptimization(
                 errorCode = ErrorCode.SvgoOptimizationError,

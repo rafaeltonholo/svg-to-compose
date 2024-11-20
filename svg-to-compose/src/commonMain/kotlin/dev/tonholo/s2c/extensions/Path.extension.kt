@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.extensions
 
+import okio.ByteString.Companion.toByteString
 import okio.FileSystem
 import okio.Path
 
@@ -24,3 +25,12 @@ val Path.extension: String
 
 val Path.isFile: Boolean
     get() = extension.isNotEmpty()
+
+fun Path.encodeToMd5(): String =
+    toString().encodeToByteArray().toByteString().md5().hex()
+
+val Path.filename
+    get() = segments
+        .last()
+        .dropLastWhile { it != '.' }
+        .dropLast(n = 1)

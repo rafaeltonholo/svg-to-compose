@@ -9,6 +9,7 @@ interface Logger {
     fun verbose(message: String)
     fun warn(message: String)
     fun output(message: String)
+    fun error(message: String, throwable: Throwable)
 }
 
 internal fun debug(message: Any) {
@@ -89,4 +90,9 @@ internal fun Logger(): Logger = object : Logger {
 
     override fun output(message: String) =
         dev.tonholo.s2c.logger.output(message)
+
+    override fun error(message: String, throwable: Throwable) {
+        println("E: $message")
+        throwable.printStackTrace()
+    }
 }

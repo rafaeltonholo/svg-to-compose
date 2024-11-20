@@ -1,12 +1,10 @@
 package dev.tonholo.s2c.io
 
 import AppConfig.S2C_TEMP_FOLDER
-import dev.tonholo.s2c.extensions.extension
+import dev.tonholo.s2c.extensions.encodeToMd5
 import dev.tonholo.s2c.logger.debugSection
 import okio.Path
 import okio.Path.Companion.toPath
-
-private const val TARGET_FILENAME = "target"
 
 class TempFileWriter(
     private val fileManager: FileManager,
@@ -16,11 +14,10 @@ class TempFileWriter(
     fun create(
         file: Path,
     ): Path = debugSection("Creating temporary file") {
-        val tempDir = tempFolder / file.name.removeSuffix(file.extension)
-        fileManager.createDirectories(dir = tempDir, mustCreate = false)
+        val tempDir = tempFolder / file.encodeToMd5()
+        fileManager.createDirectories(dir = tempDir, mustCreate = true)
 
-        val extension = file.extension
-        val targetFile = tempDir / "${TARGET_FILENAME}$extension"
+        val targetFile = tempDir / file.name
 
         fileManager.copy(file, targetFile)
 
