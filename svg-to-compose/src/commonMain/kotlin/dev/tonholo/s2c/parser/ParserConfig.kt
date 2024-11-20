@@ -34,9 +34,9 @@ package dev.tonholo.s2c.parser
  * @property minified if `true`, minifies the output removing all generated comments and
  * inlining the path functions parameters
  * @property exclude regex to exclude some icons from the parsing
- * @property iconNameMapper a mapper function to change the icon name before parsing.
- *  This will directly reflects on the name of the generated file.
  * @property silent if `true`, no console output will be displayed.
+ * @property keepTempFolder if `true`, the [dev.tonholo.s2c.Processor] won't request to
+ * delete the temp folder. Useful when running parallel execution.
  */
 data class ParserConfig(
     val pkg: String,
@@ -49,14 +49,6 @@ data class ParserConfig(
     val makeInternal: Boolean,
     val minified: Boolean,
     val exclude: Regex? = null,
-    val iconNameMapper: ((String) -> String)? = null,
     val silent: Boolean = false,
     val keepTempFolder: Boolean = false,
-    val parallel: Boolean = false,
 )
-
-fun ParserConfig.mapIconName(iconName: String): String =
-    iconNameMapper
-        ?.invoke(iconName)
-        ?.takeIf { it.isNotEmpty() }
-        ?: iconName

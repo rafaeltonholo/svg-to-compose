@@ -5,14 +5,16 @@ clikt = "4.4.0"
 okio = "3.9.1"
 detekt = "1.23.7"
 ksoup = "0.2.0"
-maven-publish = "0.28.0"
+maven-publish = "0.29.0"
 buildconfig = "5.5.0"
+kotlinx-coroutines = "1.9.0"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}
+org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 # Plugins
 org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

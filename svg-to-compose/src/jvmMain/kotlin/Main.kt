@@ -40,6 +40,7 @@ fun main() {
     try {
         val fileSystem = FileSystem.SYSTEM
         Processor(
+            logger = Logger(),
             fileManager = FileManager(fileSystem, Logger()),
         ).run(
             path = path,

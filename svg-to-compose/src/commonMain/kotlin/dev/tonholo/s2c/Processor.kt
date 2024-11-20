@@ -11,23 +11,21 @@ import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
-import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugSection
-import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.printEmpty
-import dev.tonholo.s2c.logger.verbose
-import dev.tonholo.s2c.logger.warn
 import dev.tonholo.s2c.optimizer.Optimizer
+import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
-import dev.tonholo.s2c.parser.mapIconName
+import dev.tonholo.s2c.parser.orDefault
 import okio.Path
 import okio.Path.Companion.toPath
 
 class Processor(
+    private val logger: Logger,
     private val fileManager: FileManager,
     private val iconWriter: IconWriter = IconWriter(fileManager),
-    private val tempFileWriter: TempFileWriter = TempFileWriter(fileManager),
+    private val tempFileWriter: TempFileWriter = TempFileWriter(logger, fileManager),
     private val optimizers: Optimizer.Factory = Optimizer.Factory(fileManager),
     private val parser: ImageParser.Companion = ImageParser(fileManager),
 ) {
@@ -60,11 +58,12 @@ class Processor(
         config: ParserConfig,
         recursive: Boolean,
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
+        mapIconName: IconMapperFn? = null,
     ) {
         if (config.silent) {
             AppConfig.silent = true
         }
-        verbose("Start processor execution")
+        logger.verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()
         val isDirectory = try {
@@ -84,7 +83,7 @@ class Processor(
         printEmpty()
         var runRecursively = recursive
         val files = if (isDirectory) {
-            output("🔍 Directory detected")
+            logger.info("🔍 Directory detected")
             findSvgAndXmlFilesInDirectory(
                 outputPath = outputPath,
                 filePath = filePath,
@@ -95,20 +94,20 @@ class Processor(
         } else {
             val isExcluded = config.exclude?.let(filePath.name::matches) ?: false
             if (isExcluded) {
-                output("File in excluded list. Skipping parse.")
+                logger.output("File in excluded list. Skipping parse.")
                 return
             }
 
-            output("🔍 File detected")
-            outputPath = ensureKotlinFileExtension(outputPath, filePath, config)
+            logger.info("🔍 File detected")
+            outputPath = ensureKotlinFileExtension(outputPath, filePath, mapIconName.orDefault())
             if (runRecursively) {
-                warn("Recursive flag added to a file. Ignoring recursive search.")
+                logger.warn("Recursive flag added to a file. Ignoring recursive search.")
                 runRecursively = false
             }
             listOf(filePath)
         }
 
-        val optimizers = createOptimizers(files, config)
+        val optimizers = createOptimizers(files, config.optimize)
 
         val errors = mutableListOf<Pair<Path, Exception>>()
         processFiles(
@@ -119,15 +118,20 @@ class Processor(
             runRecursively = runRecursively,
             filePath = filePath,
             errors = errors,
+            mapIconName = mapIconName.orDefault(),
         )
 
         if (errors.isEmpty()) {
-            output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
+            if (files.size == 1) {
+                logger.output("🎉 ${files.single()} parsed to Jetpack Compose icon with success 🎉")
+            } else {
+                logger.output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
+            }
         } else {
-            debugSection("Full error messages") {
+            logger.debugSection("Full error messages") {
                 errors.filter { (_, exception) ->
                     exception.message?.isNotEmpty() == true
-                }.forEach { debug(it) }
+                }.forEach { logger.debug(it) }
             }
 
             throw ExitProgramException(
@@ -137,8 +141,16 @@ class Processor(
                     |Please see the logs for more information.
                     |
                     |Files failed to parse:
-                    |${errors.map { it.first }.joinToString("\n") { "    - $it" }}
-                """.trimMargin()
+                    |${
+                    errors.joinToString("\n") { (path, exception) ->
+                        buildString {
+                            appendLine("    - $path")
+                            appendLine("      Cause: ${exception.message}")
+                        }
+                    }
+                }
+                """.trimMargin(),
+                causes = errors.map { it.second }.toTypedArray(),
             )
         }
     }
@@ -157,21 +169,21 @@ class Processor(
      * @param outputPath The intended output path.
      * @return The validated output path with a guaranteed Kotlin file extension (.kt).
      */
-    private fun ensureKotlinFileExtension(outputPath: Path, inputPath: Path, config: ParserConfig): Path {
+    private fun ensureKotlinFileExtension(outputPath: Path, inputPath: Path, mapIconName: IconMapperFn): Path {
         return when {
             outputPath.isDirectory -> {
                 val filename = inputPath
                     .name
                     .removeSuffix(FileType.Svg.extension)
                     .removeSuffix(FileType.Avg.extension)
-                    .let(config::mapIconName)
+                    .let(mapIconName)
                     .pascalCase()
-                output("Output path is a directory. Creating a Kotlin file based on the input file name.")
+                logger.info("Output path is a directory. Creating a Kotlin file based on the input file name.")
                 outputPath / "$filename.kt"
             }
 
             outputPath.extension.isEmpty() || outputPath.extension.lowercase() != ".kt" -> {
-                output("Output path is missing kotlin file extension. Appending it to the output.")
+                logger.info("Output path is missing kotlin file extension. Appending it to the output.")
                 "$outputPath.kt".toPath()
             }
 
@@ -227,7 +239,7 @@ class Processor(
             exclude = exclude,
         )
 
-        verbose("svg/xml files = $imageFiles")
+        logger.verbose("svg/xml files = $imageFiles")
 
         addAll(imageFiles)
 
@@ -243,13 +255,13 @@ class Processor(
         }
     }
 
-    private fun createOptimizers(files: List<Path>, config: ParserConfig) = if (config.optimize) {
-        verbose("Verifying optimization dependencies")
+    private fun createOptimizers(files: List<Path>, optimize: Boolean) = if (optimize) {
+        logger.verbose("Verifying optimization dependencies")
         optimizers.verifyDependency(
             hasSvg = files.any { it.extension == FileType.Svg.extension },
             hasAvg = files.any { it.extension == FileType.Avg.extension },
         )
-        verbose("Finished verification")
+        logger.verbose("Finished verification")
         optimizers
     } else {
         null
@@ -275,6 +287,7 @@ class Processor(
         runRecursively: Boolean,
         filePath: Path,
         errors: MutableList<Pair<Path, Exception>>,
+        mapIconName: IconMapperFn,
     ) {
         for (file in files) {
             try {
@@ -285,6 +298,7 @@ class Processor(
                     config = config,
                     recursive = runRecursively,
                     basePath = filePath,
+                    mapIconName = mapIconName,
                 )
                 printEmpty()
             } catch (e: ExitProgramException) {
@@ -296,9 +310,9 @@ class Processor(
             ) {
                 printEmpty()
                 // the generic exception is expected since we are going to exit the program with a failure later.
-                output("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}")
-                if (AppConfig.debug) {
-                    output(e.stackTraceToString())
+                logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
+                if (AppConfig.stackTrace) {
+                    logger.output(e.stackTraceToString())
                 }
                 printEmpty()
                 errors.add(file to e)
@@ -329,14 +343,15 @@ class Processor(
         config: ParserConfig,
         recursive: Boolean,
         basePath: Path,
+        mapIconName: IconMapperFn,
     ) {
-        output("⏳ Processing ${file.name}")
+        logger.output("⏳ Processing ${file.name}")
 
         val iconName = if (output.isFile) {
             output.segments.last().removeSuffix(output.extension)
         } else {
             file.name.removeSuffix(FileType.Svg.extension).removeSuffix(FileType.Avg.extension)
-        }.let(config::mapIconName)
+        }.let(mapIconName)
         val targetFile = tempFileWriter.create(
             file = file,
         )
@@ -352,7 +367,7 @@ class Processor(
 
         val pkg = "${config.pkg}$relativePackage"
 
-        output("👓 Parsing the ${finalFile.extension} file")
+        logger.info("👓 Parsing the ${finalFile.extension} file")
         val fileContents = parser.parse(
             file = finalFile,
             iconName = iconName,
@@ -361,7 +376,7 @@ class Processor(
             ),
         )
 
-        verbose("File contents = $fileContents")
+        logger.verbose("File contents = $fileContents")
 
         val iconOutput = if (recursive.not() || file == basePath) {
             output

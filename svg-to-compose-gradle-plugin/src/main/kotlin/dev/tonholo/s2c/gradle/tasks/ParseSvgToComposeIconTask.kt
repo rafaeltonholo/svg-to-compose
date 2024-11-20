@@ -2,18 +2,26 @@ package dev.tonholo.s2c.gradle.tasks
 
 import com.android.build.gradle.BaseExtension
 import dev.tonholo.s2c.Processor
+import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.error.MissingDependencyException
-import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.error.ParserException
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
 import dev.tonholo.s2c.gradle.internal.cache.CacheManager
 import dev.tonholo.s2c.gradle.internal.inject.DependencyModule
+import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.ParserConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
@@ -42,6 +50,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val processor: Processor = dependencies.get()
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
         group = "svg-to-compose"
@@ -97,15 +106,15 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @TaskAction
     fun run() {
         cacheManager.initialize(configurations.asMap)
-        val errors = mutableMapOf<Path, Exception>()
+        val errors = mutableMapOf<Path, Throwable>()
         configurations.forEach { configuration ->
             val filesToProcess = findFilesToProcess(configuration)
 
             if (filesToProcess.isEmpty()) {
-                logger.output("No files to process for configuration '${configuration.name}'")
+                logger.info("No files to process for configuration '${configuration.name}'")
                 return@forEach
             } else {
-                logger.debug("Files eligible for processing: ${filesToProcess.map { it.name }}")
+                logger.info("Files eligible for processing: ${filesToProcess.map { it.name }}")
             }
 
             val iconConfiguration = configuration.iconConfiguration.get()
@@ -113,70 +122,115 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             val recursive = configuration.recursive.get()
             filesToProcess
                 .chunked(size = 5)
-                .map { it.stream() }
                 .forEach { files ->
-                    files.parallel().forEach { path ->
-                        val output = requireNotNull(outputDirectories[configuration.name])
-                            .toOkioPath()
-                            .let { output ->
-                                if (recursive && path.parent != parent) {
-                                    (output / path.relativeTo(parent)).parent
-                                } else {
-                                    null
-                                } ?: output
-                            }
-                        val destinationPackage = configuration.destinationPackage.get().let { pkg ->
-                            pkg + if (recursive && path.parent != parent) {
-                                ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
-                            } else {
-                                ""
-                            }
-                        }
-                        try {
-                            processor.run(
-                                path = path.toFile().absolutePath,
-                                output = output.toFile().absolutePath,
-                                config = ParserConfig(
-                                    pkg = destinationPackage,
-                                    optimize = configuration.optimize.get(),
-                                    minified = iconConfiguration.minified.get(),
-                                    theme = iconConfiguration.theme.get(),
-                                    receiverType = iconConfiguration.receiverType.orNull,
-                                    addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                                    noPreview = iconConfiguration.noPreview.get(),
-                                    makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                                    exclude = iconConfiguration.exclude.orNull,
-                                    iconNameMapper = iconConfiguration.mapIconNameTo.orNull,
-                                    kmpPreview = isKmp,
-                                    silent = false,
-                                    keepTempFolder = true,
-                                    parallel = true,
-                                ),
-                                recursive = false, // recursive search is handled by the plugin.
-                                maxDepth = configuration.maxDepth.get(),
-                            )
-                        } catch (e: ExitProgramException) {
-                            errors += path to e
-                        } catch (e: ParserException) {
-                            errors += path to e
-                        } catch (e: MissingDependencyException) {
-                            errors += path to e
-                        } catch (e: OptimizationException) {
-                            errors += path to e
-                        }
+                    runBlocking {
+                        logger.debug("Processing ${files.size} files")
+                        val operations = files.processParallel(
+                            configuration,
+                            recursive,
+                            parent,
+                            iconConfiguration,
+                            errors,
+                        )
+                        operations.joinAll()
+                        logger.debug("End processing ${files.size} files.")
                     }
                 }
         }
         if (errors.isNotEmpty()) {
-            errors.forEach { (path, exception) ->
+            errors.forEach { (path, _) ->
+                logger.debug("Removing $path from cache")
                 cacheManager.removeFromCache(path)
-                logger.error(message = "Failed to parse $path.", throwable = exception)
             }
         }
         logger.debug("Finished processing files. Creating cache...")
         cacheManager.saveCache()
         logger.debug("Cache created.")
         processor.dispose()
+        if (errors.isNotEmpty()) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.GradlePluginError,
+                "Failed to parse ${errors.size} icons. See logs for more details",
+                causes = errors.values.toTypedArray(),
+            )
+        }
+    }
+
+    internal fun dispose() {
+        if (scope.isActive) {
+            scope.cancel()
+        }
+    }
+
+    private fun List<Path>.processParallel(
+        configuration: ProcessorConfiguration,
+        recursive: Boolean,
+        parent: Path,
+        iconConfiguration: IconParserConfigurationImpl,
+        errors: MutableMap<Path, Throwable>,
+    ) = map { path ->
+        scope.launch {
+            logger.debug("Enqueued $path to parse.")
+            val output = buildOutput(configuration, recursive, path, parent)
+            val destinationPackage =
+                buildDestinationPackage(configuration, recursive, path, parent)
+            try {
+                logger.debug("Parsing $path.")
+                processor.run(
+                    path = path.toFile().absolutePath,
+                    output = output.toFile().absolutePath,
+                    config = ParserConfig(
+                        pkg = destinationPackage,
+                        optimize = configuration.optimize.get(),
+                        minified = iconConfiguration.minified.get(),
+                        theme = iconConfiguration.theme.get(),
+                        receiverType = iconConfiguration.receiverType.orNull,
+                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                        noPreview = iconConfiguration.noPreview.get(),
+                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                        exclude = iconConfiguration.exclude.orNull,
+                        kmpPreview = isKmp,
+                        silent = true,
+                        keepTempFolder = true,
+                    ),
+                    recursive = false, // recursive search is handled by the plugin.
+                    maxDepth = configuration.maxDepth.get(),
+                    mapIconName = iconConfiguration.mapIconNameTo.orNull,
+                )
+            } catch (e: ExitProgramException) {
+                errors += path to requireNotNull(e.cause)
+            } catch (e: ParserException) {
+                errors += path to e
+            }
+        }
+    }
+
+    private fun buildOutput(
+        configuration: ProcessorConfiguration,
+        recursive: Boolean,
+        path: Path,
+        parent: Path
+    ): Path = requireNotNull(outputDirectories[configuration.name])
+        .toOkioPath()
+        .let { output ->
+            if (recursive && path.parent != parent) {
+                (output / path.relativeTo(parent)).parent
+            } else {
+                null
+            } ?: output
+        }
+
+    private fun buildDestinationPackage(
+        configuration: ProcessorConfiguration,
+        recursive: Boolean,
+        path: Path,
+        parent: Path
+    ): String = configuration.destinationPackage.get().let { pkg ->
+        pkg + if (recursive && path.parent != parent) {
+            ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
+        } else {
+            ""
+        }
     }
 
     private fun findFilesToProcess(configuration: ProcessorConfiguration): List<Path> {
@@ -203,6 +257,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         "parseSvgToComposeIcon",
         ParseSvgToComposeIconTask::class.java,
     ) {
+        doLast { dispose() }
         extension.applyCommonIfDefined()
         val errors = extension.validate()
         logger.debug("errors = {}", errors)

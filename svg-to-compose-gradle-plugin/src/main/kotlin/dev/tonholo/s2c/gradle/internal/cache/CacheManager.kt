@@ -83,7 +83,9 @@ internal class CacheManager(
             val cacheData = try {
                 ObjectInputStream(FileInputStream(cacheFile)).use {
                     it.readObject() as CacheData
-                }.also { logger.debug("Cache file loaded") }
+                }.also {
+                    logger.debug("Cache file loaded")
+                }
             } catch (e: IOException) {
                 logger.debug("Error loading cache file: ${e.message}")
                 e.printStackTrace()

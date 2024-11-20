@@ -43,9 +43,10 @@ internal class DependencyModule(
         .providers
         .provider {
             Processor(
+                logger = get(),
                 fileManager = FileManager(get(), get()),
                 iconWriter = IconWriter(get()),
-                tempFileWriter = TempFileWriter(get()),
+                tempFileWriter = TempFileWriter(get(), get()),
             )
         }
 

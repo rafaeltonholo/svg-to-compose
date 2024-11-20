@@ -17,21 +17,30 @@ internal fun Logger(
         }
     }
 
-    override fun <T> verboseSection(title: String, block: () -> T): T = debugSection(title, block)
+    override fun <T> verboseSection(title: String, block: () -> T): T {
+        logger.trace("STARTING: $title")
+        return block().also {
+            logger.trace("ENDING: $title")
+        }
+    }
 
     override fun verbose(message: String) {
-        logger.debug(message)
+        logger.trace(message)
     }
 
     override fun warn(message: String) {
         logger.warn(message)
     }
 
-    override fun output(message: String) {
+    override fun info(message: String) {
         logger.info(message)
     }
 
-    override fun error(message: String, throwable: Throwable) {
+    override fun output(message: String) {
+        println(message)
+    }
+
+    override fun error(message: String, throwable: Throwable?) {
         logger.error(message, throwable)
     }
 }

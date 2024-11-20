@@ -3,4 +3,5 @@ internal object AppConfig {
     var debug = false
     var verbose = false
     var silent = false
+    var stackTrace = debug
 }
