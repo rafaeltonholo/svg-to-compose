@@ -325,7 +325,11 @@ internal fun Project.registerParseSvgToComposeIconTask(
 
         sourceSet.srcDirs(outputDirectories)
     } else {
-        val sourceSet = (project.extensions.findByName("android") as BaseExtension)
+        val androidExtension = project.extensions.findByName("android") as? BaseExtension
+        requireNotNull(androidExtension) {
+            "Android plugin must be applied to use this plugin in Android projects"
+        }
+        val sourceSet = androidExtension
             .sourceSets
             .first { it.name == "main" }
             .kotlin
