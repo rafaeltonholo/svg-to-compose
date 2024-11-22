@@ -43,8 +43,8 @@ internal fun Logger(
         logger.trace(message)
     }
 
-    override fun warn(message: String) {
-        logger.warn(message)
+    override fun warn(message: String, throwable: Throwable?) {
+        logger.warn(message, throwable)
     }
 
     override fun info(message: String) {

@@ -7,7 +7,7 @@ interface Logger {
     fun <T> debugSection(title: String, block: () -> T): T
     fun <T> verboseSection(title: String, block: () -> T): T
     fun verbose(message: String)
-    fun warn(message: String)
+    fun warn(message: String, throwable: Throwable? = null)
     fun info(message: String)
     fun output(message: String)
     fun error(message: String, throwable: Throwable? = null)
@@ -122,7 +122,7 @@ internal fun Logger(): Logger = object : Logger {
     override fun verbose(message: String) =
         dev.tonholo.s2c.logger.verbose(message)
 
-    override fun warn(message: String) =
+    override fun warn(message: String, throwable: Throwable?) =
         dev.tonholo.s2c.logger.warn(message)
 
     override fun info(message: String) =

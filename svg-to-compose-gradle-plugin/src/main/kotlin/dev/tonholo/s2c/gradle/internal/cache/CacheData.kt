@@ -16,8 +16,18 @@ import java.io.Serializable
  *  etc.
  */
 data class CacheData(
-    val files: Map<String, String>,
-    val extensionConfiguration: Map<String, String>,
+    val files: List<IconCacheData>,
+    val extensionConfiguration: Map<String, Sha256Hash>,
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}
+
+data class IconCacheData(
+    val origin: String,
+    val hash: Sha256Hash,
+    val output: String? = null,
 ) : Serializable {
     companion object {
         private const val serialVersionUID = 1L

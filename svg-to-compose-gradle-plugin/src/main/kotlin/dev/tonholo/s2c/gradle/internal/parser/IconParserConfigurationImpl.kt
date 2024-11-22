@@ -4,21 +4,20 @@ import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
+import dev.tonholo.s2c.gradle.internal.cache.Cacheable
+import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
+import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
-import okio.ByteString.Companion.toByteString
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
-import java.util.Base64
 
 private typealias IconMapper = (String) -> String
 
 internal class IconParserConfigurationImpl(
     project: Project,
     override val parentName: String,
-) : IconParserConfiguration, Configuration {
+) : IconParserConfiguration, Configuration, Cacheable {
     override val name: String = "icons"
     override val iconVisibility: Property<IconVisibility> = project
         .objects
@@ -100,7 +99,7 @@ internal class IconParserConfigurationImpl(
         return errors
     }
 
-    internal fun calculateHash(): String {
+    override fun calculateHash(): Sha256Hash {
         val raw = buildString {
             append(receiverType.orNull)
             append("|")
@@ -114,23 +113,10 @@ internal class IconParserConfigurationImpl(
             append("|")
             append(exclude.orNull)
             append("|")
-            append(
-                mapIconNameTo
-                    .orNull
-                    ?.let { mapper ->
-                        ByteArrayOutputStream()
-                            .use { byteStream ->
-                                ObjectOutputStream(byteStream).use { outputStream ->
-                                    outputStream.writeObject(mapper)
-                                }
-                                byteStream.toByteArray()
-                            }
-                            .let { Base64.getEncoder().encodeToString(it) }
-                    },
-            )
+            append(mapIconNameTo.orNull?.let { "fn()" })
             append("|")
         }
-        return raw.toByteArray().toByteString().sha256().hex()
+        return raw.sha256()
     }
 
     internal fun merge(common: IconParserConfigurationImpl) {

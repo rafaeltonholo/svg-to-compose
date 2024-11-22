@@ -33,7 +33,7 @@ tasks.withType<Detekt>().configureEach {
     jvmTarget = DetektConfig.javaVersion
     exclude {
         DetektConfig.excludedDirs.any { dir ->
-            it.file.absolutePath in dir
+            dir in it.file.absolutePath
         }
     }
 }

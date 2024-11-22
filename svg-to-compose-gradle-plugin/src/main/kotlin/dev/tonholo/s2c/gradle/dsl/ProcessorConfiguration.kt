@@ -3,9 +3,11 @@ package dev.tonholo.s2c.gradle.dsl
 import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.dsl.source.SourceConfiguration
+import dev.tonholo.s2c.gradle.internal.cache.Cacheable
+import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
+import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
-import okio.ByteString.Companion.toByteString
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
@@ -16,7 +18,7 @@ import javax.inject.Inject
 
 abstract class ProcessorConfiguration @Inject constructor(
     project: Project,
-) : SourceConfiguration {
+) : SourceConfiguration, Cacheable {
     override val parentName: String = "svgToCompose.processor"
     internal val origin: DirectoryProperty = project.objects.directoryProperty()
     internal val destinationPackage: Property<String> = project.objects.property()
@@ -91,7 +93,7 @@ abstract class ProcessorConfiguration @Inject constructor(
         return errors
     }
 
-    internal fun calculateHash(): String {
+    override fun calculateHash(): Sha256Hash {
         val raw = buildString {
             append(origin.get())
             append("|")
@@ -103,7 +105,7 @@ abstract class ProcessorConfiguration @Inject constructor(
             append("|")
             append(iconConfiguration.get().calculateHash())
         }
-        return raw.toByteArray().toByteString().sha256().hex()
+        return raw.sha256()
     }
 
     fun merge(common: ProcessorConfiguration) {

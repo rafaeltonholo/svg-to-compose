@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InvalidClassException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
@@ -20,7 +21,7 @@ internal class CacheManager(
     private val project: Project,
 ) {
     private val cacheFile by lazy { project.layout.buildDirectory.file("$GENERATED_FOLDER/cache.bin").get().asFile }
-    private val fileHashMap = mutableMapOf<Path, String>()
+    private val fileHashMap = mutableListOf<IconCacheData>()
     private lateinit var configurations: Map<String, ProcessorConfiguration>
 
     fun initialize(configurations: Map<String, ProcessorConfiguration>) {
@@ -30,27 +31,42 @@ internal class CacheManager(
         loadCache()
     }
 
+    private operator fun List<IconCacheData>.get(origin: Path): IconCacheData? =
+        firstOrNull { it.origin == origin.toString() }
+
     fun hasCacheChanged(path: Path): Boolean {
         val currentHash = calculateFileHash(path)
-        val previousHash = fileHashMap[path]
-        val hasChanged = previousHash != currentHash
-        if (hasChanged) {
-            fileHashMap[path] = currentHash
+        val prev = fileHashMap.get(origin = path)
+        val hasChanged = prev?.hash != currentHash
+        if (hasChanged && prev != null) {
+            fileHashMap.remove(prev)
+            fileHashMap.add(prev.copy(hash = currentHash))
         }
         return hasChanged
     }
 
-    fun saveCache() {
+    fun saveCache(outputFiles: MutableMap<Path, Path>) {
         logger.debug("Saving cache...")
         logger.debug("Generating extension configuration hashes")
         val configurations = configurations.mapValues { (_, configuration) ->
             configuration.calculateHash()
         }
-        logger.debug("Generating file hashes")
-        val files = fileHashMap.mapKeys { (path, _) -> path.toString() }
+        outputFiles.map { (origin, output) ->
+            val cache = fileHashMap[origin]
+                ?.also { cache ->
+                    fileHashMap.remove(cache)
+                }
+                ?: IconCacheData(
+                    origin = origin.toString(),
+                    hash = calculateFileHash(origin),
+                    output = output.toString(),
+                )
+
+            fileHashMap.add(cache)
+        }
         logger.debug("Building Cache Data")
         val cacheData = CacheData(
-            files = files,
+            files = fileHashMap,
             extensionConfiguration = configurations,
         )
         logger.debug("Writing cache file")
@@ -66,15 +82,21 @@ internal class CacheManager(
     }
 
     fun removeDeletedFilesFromCache() {
-        val deletedFiles = fileHashMap.keys.filter { path -> path.toFile().exists().not() }
-        deletedFiles.forEach { file ->
-            fileHashMap.remove(file)
-            // TODO: delete generated file.
+        val deletedFiles = fileHashMap.filter { cache ->
+            fileManager.exists(cache.origin.toPath()).not()
+        }
+        if (deletedFiles.isNotEmpty()) {
+            deletedFiles.forEach { file ->
+                logger.output("Deleted origin file detected. Deleting generated file ${file.output}.")
+                fileHashMap.remove(file)
+                fileManager.delete(requireNotNull(file.output).toPath())
+            }
         }
     }
 
     fun removeFromCache(path: Path) {
-        fileHashMap.remove(path)
+        val key = fileHashMap.firstOrNull { it.origin == path.toString() }
+        fileHashMap.remove(key)
     }
 
     private fun loadCache() {
@@ -85,6 +107,10 @@ internal class CacheManager(
                 }.also {
                     logger.debug("Cache file loaded")
                 }
+            } catch (e: InvalidClassException) {
+                logger.warn("Cache serial version probably changed. Removing cache.", e)
+                removeCacheIfExists()
+                null
             } catch (e: IOException) {
                 logger.error("Error loading cache file: ${e.message}", e)
                 null
@@ -93,11 +119,9 @@ internal class CacheManager(
         }
     }
 
-    private fun calculateFileHash(path: Path): String = fileManager
+    private fun calculateFileHash(path: Path): Sha256Hash = fileManager
         .readBytes(path)
-        .toByteString()
         .sha256()
-        .hex()
 
     private fun removeCacheIfExists() {
         if (cacheFile.exists()) {
@@ -107,7 +131,7 @@ internal class CacheManager(
 
     private fun CacheData.validate() {
         if (fileHashMap.isEmpty()) {
-            fileHashMap.putAll(files.mapKeys { (path, _) -> path.toPath() })
+            fileHashMap.addAll(files)
         } else {
             // validate that the files are the same
         }

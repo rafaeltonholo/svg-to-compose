@@ -45,7 +45,7 @@ internal class DependencyModule(
             Processor(
                 logger = get(),
                 fileManager = get(),
-                iconWriter = IconWriter(get()),
+                iconWriter = IconWriter(get(), get()),
                 tempFileWriter = TempFileWriter(get(), get()),
             )
         }

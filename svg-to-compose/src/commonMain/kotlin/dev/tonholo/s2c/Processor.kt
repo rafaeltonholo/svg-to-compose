@@ -24,7 +24,7 @@ import okio.Path.Companion.toPath
 class Processor(
     private val logger: Logger,
     private val fileManager: FileManager,
-    private val iconWriter: IconWriter = IconWriter(fileManager),
+    private val iconWriter: IconWriter = IconWriter(logger, fileManager),
     private val tempFileWriter: TempFileWriter = TempFileWriter(logger, fileManager),
     private val optimizers: Optimizer.Factory = Optimizer.Factory(logger, fileManager),
     private val parser: ImageParser.Factory = ImageParser.Factory(fileManager),
@@ -50,6 +50,7 @@ class Processor(
      * @param output The path where the output file(s) should be stored.
      * @param config The configuration parameters for the parser.
      * @throws ExitProgramException In case of an error while parsing the files,
+     * @return list of parsed files.
      * or if no files are found at the specified path.
      */
     fun run(
@@ -59,7 +60,7 @@ class Processor(
         recursive: Boolean,
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
         mapIconName: IconMapperFn? = null,
-    ) {
+    ): List<Path> {
         // TODO: Move to Main.kt when logger refactor.
         AppConfig.silent = config.silent
         logger.verbose("Start processor execution")
@@ -94,7 +95,7 @@ class Processor(
             val isExcluded = config.exclude?.let(filePath.name::matches) ?: false
             if (isExcluded) {
                 logger.output("File in excluded list. Skipping parse.")
-                return
+                return emptyList()
             }
 
             logger.info("🔍 File detected")
@@ -109,7 +110,7 @@ class Processor(
         val optimizers = createOptimizers(files, config.optimize)
 
         val errors = mutableListOf<Pair<Path, Exception>>()
-        processFiles(
+        val processedFiles = processFiles(
             files = files,
             optimizers = optimizers,
             outputPath = outputPath,
@@ -152,6 +153,7 @@ class Processor(
                 causes = errors.map { it.second }.toTypedArray(),
             )
         }
+        return processedFiles
     }
 
     fun dispose() {
@@ -287,10 +289,11 @@ class Processor(
         filePath: Path,
         errors: MutableList<Pair<Path, Exception>>,
         mapIconName: IconMapperFn,
-    ) {
+    ): List<Path> {
+        val processedFiles = mutableListOf<Path>()
         for (file in files) {
             try {
-                processFile(
+                val processedFile = processFile(
                     file = file,
                     optimizers = optimizers,
                     output = outputPath,
@@ -299,6 +302,7 @@ class Processor(
                     basePath = filePath,
                     mapIconName = mapIconName,
                 )
+                processedFiles += processedFile
                 printEmpty()
             } catch (e: ExitProgramException) {
                 throw e
@@ -317,6 +321,7 @@ class Processor(
                 errors.add(file to e)
             }
         }
+        return processedFiles
     }
 
     /**
@@ -343,7 +348,7 @@ class Processor(
         recursive: Boolean,
         basePath: Path,
         mapIconName: IconMapperFn,
-    ) {
+    ): Path {
         logger.output("⏳ Processing ${file.name}")
 
         val iconName = if (output.isFile) {
@@ -382,7 +387,7 @@ class Processor(
         } else {
             output / relativePackage.removePrefix(".").replace(".", "/")
         }
-        iconWriter.write(
+        val outputFile = iconWriter.write(
             iconName = iconName,
             fileContents = fileContents,
             output = iconOutput,
@@ -391,6 +396,8 @@ class Processor(
         if (config.keepTempFolder.not()) {
             tempFileWriter.clear()
         }
+
+        return outputFile
     }
 
     private fun buildRelativePackage(

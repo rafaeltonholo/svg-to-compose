@@ -16,12 +16,13 @@ import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.ParserConfig
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okio.Path
 import okio.Path.Companion.toOkioPath
@@ -120,6 +121,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
             cacheManager.initialize(configurations.asMap)
             val errors = mutableMapOf<Path, Throwable>()
+            val outputFiles = mutableMapOf<Path, Path>()
             configurations.forEach { configuration ->
                 val filesToProcess = findFilesToProcess(configuration)
 
@@ -144,8 +146,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                             iconConfiguration,
                             errors,
                         )
-                        operations.joinAll()
+                        val processedFiles = operations.awaitAll()
                         logger.debug("End processing ${files.size} files.")
+                        outputFiles.putAll(processedFiles.filterNotNull())
                     }
             }
             if (errors.isNotEmpty()) {
@@ -155,7 +158,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 }
             }
             logger.debug("Finished processing files. Creating cache...")
-            cacheManager.saveCache()
+            cacheManager.saveCache(outputFiles)
             logger.debug("Cache created.")
             if (errors.isNotEmpty()) {
                 throw ExitProgramException(
@@ -181,8 +184,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         parent: Path,
         iconConfiguration: IconParserConfigurationImpl,
         errors: MutableMap<Path, Throwable>,
-    ) = map { path ->
-        scope.launch {
+    ): List<Deferred<Pair<Path, Path>?>> = map { path ->
+        scope.async {
             logger.debug("Enqueued $path to parse.")
             val output = buildOutput(configuration, recursive, path, parent)
             val destinationPackage =
@@ -209,11 +212,13 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     recursive = false, // recursive search is handled by the plugin.
                     maxDepth = configuration.maxDepth.get(),
                     mapIconName = iconConfiguration.mapIconNameTo.orNull,
-                )
+                ).singleOrNull()?.let { path to it }
             } catch (e: ExitProgramException) {
                 errors += path to requireNotNull(e.cause)
+                null
             } catch (e: ParserException) {
                 errors += path to e
+                null
             }
         }
     }
