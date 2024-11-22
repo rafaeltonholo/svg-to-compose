@@ -1,4 +1,5 @@
-import dev.tonholo.s2c.gradle.ExperimentalParallelProcessing
+import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
+import dev.tonholo.s2c.annotations.ExperimentalParallelProcessing
 
 plugins {
     alias(libs.plugins.android.application)
@@ -79,6 +80,10 @@ svgToCompose {
         val avg by creating {
             from(layout.projectDirectory.dir("../../samples/avg"))
             destinationPackage("$basePackage.avg")
+            icons {
+                @OptIn(DelicateSvg2ComposeApi::class)
+                persist()
+            }
         }
     }
 }

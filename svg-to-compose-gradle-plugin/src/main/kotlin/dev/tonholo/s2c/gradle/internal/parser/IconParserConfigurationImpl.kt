@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.gradle.internal.parser
 
 import dev.tonholo.s2c.AppDefaults
+import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
@@ -51,6 +52,10 @@ internal class IconParserConfigurationImpl(
         .objects
         .property<Regex?>()
 
+    internal val isCodeGenerationPersistent: Property<Boolean?> = project
+        .objects
+        .property<Boolean?>()
+
     override fun makeInternal() {
         iconVisibility.set(IconVisibility.Internal)
     }
@@ -89,6 +94,11 @@ internal class IconParserConfigurationImpl(
         )
     }
 
+    @DelicateSvg2ComposeApi
+    override fun persist() {
+        isCodeGenerationPersistent.set(true)
+    }
+
     override fun validate(): List<String> {
         val errors = mutableListOf<String>()
         val noPreview = noPreview.get()
@@ -115,6 +125,7 @@ internal class IconParserConfigurationImpl(
             append("|")
             append(mapIconNameTo.orNull?.let { "fn()" })
             append("|")
+            append(isCodeGenerationPersistent.orNull)
         }
         return raw.sha256()
     }

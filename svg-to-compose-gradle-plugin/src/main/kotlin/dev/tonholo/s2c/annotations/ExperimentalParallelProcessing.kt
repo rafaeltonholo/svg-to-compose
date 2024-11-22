@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.gradle
+package dev.tonholo.s2c.annotations
 
 @RequiresOptIn(
     message = "The icon processing in parallel is experimental and might contains bugs.",

@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.gradle.dsl
 
-import dev.tonholo.s2c.gradle.ExperimentalParallelProcessing
+import dev.tonholo.s2c.annotations.ExperimentalParallelProcessing
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.provider.Property

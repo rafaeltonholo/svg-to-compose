@@ -78,21 +78,24 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         get() = configurations
             .associate { configuration ->
                 val destination = configuration.destinationPackage.get().replace(".", "/")
-                configuration.name to project.objects.directoryProperty().convention(
-                    project.layout.buildDirectory.dir(
+                val outputFolder = if (configuration.iconConfiguration.orNull?.isCodeGenerationPersistent?.orNull == true) {
+                    project.layout.projectDirectory.dir(
                         buildString {
-                            append(GENERATED_FOLDER)
                             append(
                                 if (isKmp) {
-                                    "/commonMain/kotlin/"
+                                    "src/commonMain/kotlin"
                                 } else {
-                                    "/main/kotlin/"
+                                    "src/main/kotlin"
                                 },
                             )
-                            append(destination)
                         },
-                    ),
-                ).get().asFile
+                    ).asFile.toOkioPath()
+                } else {
+                    sourceDirectory.toOkioPath()
+                }
+                val configurationDestination = outputFolder / destination
+
+                configuration.name to configurationDestination.toFile()
             }
 
     @get:OutputDirectory

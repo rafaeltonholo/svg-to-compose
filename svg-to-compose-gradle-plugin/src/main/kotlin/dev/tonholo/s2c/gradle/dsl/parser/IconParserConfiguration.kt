@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.gradle.dsl.parser
 
+import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
+import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import org.gradle.api.provider.Property
 
@@ -117,4 +119,24 @@ interface IconParserConfiguration {
      * exclude them from the generation process.
      */
     fun exclude(vararg patterns: Regex)
+
+    /**
+     * Persists all generated files inside the project's source set, using the given
+     * [ProcessorConfiguration.destinationPackage] instead of the build generated folder.
+     *
+     * By default, generated files are placed in the build directory. This function
+     * allows you to change this behavior and store the generated files directly within
+     * your project's source code.
+     *
+     * **Note:**
+     * - Using this option might require you to manually refresh or rebuild your project
+     * in your IDE to recognize the newly generated files. It's also important to consider
+     * potential implications for version control and build reproducibility.
+     *
+     * **IMPORTANT:**
+     * - By marking a icon generation as persistent, you understand that any changes made
+     * in the target files are going to be overridden by the plugin.
+     */
+    @DelicateSvg2ComposeApi
+    fun persist()
 }
