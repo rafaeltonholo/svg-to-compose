@@ -1,3 +1,5 @@
+import dev.tonholo.s2c.gradle.ExperimentalParallelProcessing
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -55,6 +57,9 @@ android {
 
 svgToCompose {
     processor {
+        @OptIn(ExperimentalParallelProcessing::class)
+        useParallelism(parallelism = 20)
+
         common {
             recursive()
             optimize(enabled = false)

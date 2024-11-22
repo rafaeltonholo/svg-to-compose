@@ -16,7 +16,6 @@ import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.ParserConfig
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -30,7 +29,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -55,9 +53,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val showStackTrace: Boolean by lazy {
-        project.gradle.startParameter.showStacktrace != ShowStacktrace.INTERNAL_EXCEPTIONS
-    }
     private val logLevel: LogLevel by lazy { project.gradle.startParameter.logLevel }
 
     init {
@@ -68,6 +63,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @get:Internal
     internal lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
+
+    @get:Internal
+    internal var maxParallelExecutions: Int = 0
 
     @get:Internal
     internal var isKmp: Boolean = false
@@ -135,22 +133,11 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 val iconConfiguration = configuration.iconConfiguration.get()
                 val parent = configuration.origin.get().asFile.toOkioPath()
                 val recursive = configuration.recursive.get()
-                filesToProcess
-                    .chunked(size = 5)
-                    .forEach { files ->
-                        logger.debug("Processing ${files.size} files")
-                        val operations = files.processParallel(
-                            configuration,
-                            recursive,
-                            parent,
-                            iconConfiguration,
-                            errors,
-                        )
-                        val processedFiles = operations.awaitAll()
-                        logger.debug("End processing ${files.size} files.")
-                        outputFiles.putAll(processedFiles.filterNotNull())
-                    }
+                logger.debug("Processing ${filesToProcess.size} files")
+                processFiles(filesToProcess, configuration, recursive, parent, iconConfiguration, errors, outputFiles)
+                logger.debug("End processing ${filesToProcess.size} files.")
             }
+
             if (errors.isNotEmpty()) {
                 errors.forEach { (path, _) ->
                     logger.debug("Removing $path from cache")
@@ -172,54 +159,89 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
+    private suspend fun processFiles(
+        filesToProcess: List<Path>,
+        configuration: ProcessorConfiguration,
+        recursive: Boolean,
+        parent: Path,
+        iconConfiguration: IconParserConfigurationImpl,
+        errors: MutableMap<Path, Throwable>,
+        outputFiles: MutableMap<Path, Path>
+    ) {
+        if (maxParallelExecutions > 1) {
+            filesToProcess
+                .chunked(size = maxParallelExecutions)
+                .forEach { files ->
+                    logger.debug("Processing ${files.size} files")
+                    val operations = files.map { path ->
+                        scope.async {
+                            path.process(configuration, recursive, parent, iconConfiguration, errors)
+                        }
+                    }
+                    val processedFiles = operations.awaitAll()
+                    logger.debug("End processing ${files.size} files.")
+                    outputFiles.putAll(processedFiles.filterNotNull())
+                }
+        } else {
+            val processedFiles = filesToProcess.map { files ->
+                files.process(
+                    configuration,
+                    recursive,
+                    parent,
+                    iconConfiguration,
+                    errors,
+                )
+            }
+            outputFiles.putAll(processedFiles.filterNotNull())
+        }
+    }
+
     internal fun dispose() {
         if (scope.isActive) {
             scope.cancel()
         }
     }
 
-    private fun List<Path>.processParallel(
+    private fun Path.process(
         configuration: ProcessorConfiguration,
         recursive: Boolean,
         parent: Path,
         iconConfiguration: IconParserConfigurationImpl,
         errors: MutableMap<Path, Throwable>,
-    ): List<Deferred<Pair<Path, Path>?>> = map { path ->
-        scope.async {
-            logger.debug("Enqueued $path to parse.")
-            val output = buildOutput(configuration, recursive, path, parent)
-            val destinationPackage =
-                buildDestinationPackage(configuration, recursive, path, parent)
-            try {
-                logger.debug("Parsing $path.")
-                processor.run(
-                    path = path.toFile().absolutePath,
-                    output = output.toFile().absolutePath,
-                    config = ParserConfig(
-                        pkg = destinationPackage,
-                        optimize = configuration.optimize.get(),
-                        minified = iconConfiguration.minified.get(),
-                        theme = iconConfiguration.theme.get(),
-                        receiverType = iconConfiguration.receiverType.orNull,
-                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                        noPreview = iconConfiguration.noPreview.get(),
-                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                        exclude = iconConfiguration.exclude.orNull,
-                        kmpPreview = isKmp,
-                        silent = true, // TODO: remove when logger migration is done.
-                        keepTempFolder = true,
-                    ),
-                    recursive = false, // recursive search is handled by the plugin.
-                    maxDepth = configuration.maxDepth.get(),
-                    mapIconName = iconConfiguration.mapIconNameTo.orNull,
-                ).singleOrNull()?.let { path to it }
-            } catch (e: ExitProgramException) {
-                errors += path to requireNotNull(e.cause)
-                null
-            } catch (e: ParserException) {
-                errors += path to e
-                null
-            }
+    ): Pair<Path, Path>? {
+        logger.debug("Enqueued $path to parse.")
+        val output = buildOutput(configuration, recursive, this, parent)
+        val destinationPackage =
+            buildDestinationPackage(configuration, recursive, this, parent)
+        return try {
+            logger.debug("Parsing $path.")
+            processor.run(
+                path = toFile().absolutePath,
+                output = output.toFile().absolutePath,
+                config = ParserConfig(
+                    pkg = destinationPackage,
+                    optimize = configuration.optimize.get(),
+                    minified = iconConfiguration.minified.get(),
+                    theme = iconConfiguration.theme.get(),
+                    receiverType = iconConfiguration.receiverType.orNull,
+                    addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                    noPreview = iconConfiguration.noPreview.get(),
+                    makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                    exclude = iconConfiguration.exclude.orNull,
+                    kmpPreview = isKmp,
+                    silent = true, // TODO: remove when logger migration is done.
+                    keepTempFolder = true,
+                ),
+                recursive = false, // recursive search is handled by the plugin.
+                maxDepth = configuration.maxDepth.get(),
+                mapIconName = iconConfiguration.mapIconNameTo.orNull,
+            ).singleOrNull()?.let { this to it }
+        } catch (e: ExitProgramException) {
+            errors += this to requireNotNull(e.cause)
+            null
+        } catch (e: ParserException) {
+            errors += this to e
+            null
         }
     }
 
@@ -288,6 +310,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
 
         isKmp = kmpExtension != null
         configurations = extension.configurations
+        maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
     }
 
     val outputDirectories = task.map { it.sourceDirectory }
