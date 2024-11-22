@@ -232,7 +232,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
                     exclude = iconConfiguration.exclude.orNull,
                     kmpPreview = isKmp,
-                    silent = true, // TODO: remove when logger migration is done.
+                    silent = true, // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration is done.
                     keepTempFolder = true,
                 ),
                 recursive = false, // recursive search is handled by the plugin.

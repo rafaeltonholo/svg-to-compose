@@ -61,7 +61,7 @@ class Processor(
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
         mapIconName: IconMapperFn? = null,
     ): List<Path> {
-        // TODO: Move to Main.kt when logger refactor.
+        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): Move to Main.kt when logger refactor.
         AppConfig.silent = config.silent
         logger.verbose("Start processor execution")
         val filePath = path.toPath()
