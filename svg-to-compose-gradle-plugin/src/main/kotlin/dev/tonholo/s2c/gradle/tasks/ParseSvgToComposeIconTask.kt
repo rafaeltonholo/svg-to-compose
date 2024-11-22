@@ -115,27 +115,27 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         ).get().asFile
 
     @TaskAction
-    fun run() {
-        logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
-        cacheManager.initialize(configurations.asMap)
-        val errors = mutableMapOf<Path, Throwable>()
-        configurations.forEach { configuration ->
-            val filesToProcess = findFilesToProcess(configuration)
+    fun run() = runBlocking {
+        try {
+            logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
+            cacheManager.initialize(configurations.asMap)
+            val errors = mutableMapOf<Path, Throwable>()
+            configurations.forEach { configuration ->
+                val filesToProcess = findFilesToProcess(configuration)
 
-            if (filesToProcess.isEmpty()) {
-                logger.info("No files to process for configuration '${configuration.name}'")
-                return@forEach
-            } else {
-                logger.info("Files eligible for processing: ${filesToProcess.map { it.name }}")
-            }
+                if (filesToProcess.isEmpty()) {
+                    logger.info("No files to process for configuration '${configuration.name}'")
+                    return@forEach
+                } else {
+                    logger.info("Files eligible for processing: ${filesToProcess.map { it.name }}")
+                }
 
-            val iconConfiguration = configuration.iconConfiguration.get()
-            val parent = configuration.origin.get().asFile.toOkioPath()
-            val recursive = configuration.recursive.get()
-            filesToProcess
-                .chunked(size = 5)
-                .forEach { files ->
-                    runBlocking {
+                val iconConfiguration = configuration.iconConfiguration.get()
+                val parent = configuration.origin.get().asFile.toOkioPath()
+                val recursive = configuration.recursive.get()
+                filesToProcess
+                    .chunked(size = 5)
+                    .forEach { files ->
                         logger.debug("Processing ${files.size} files")
                         val operations = files.processParallel(
                             configuration,
@@ -147,25 +147,26 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                         operations.joinAll()
                         logger.debug("End processing ${files.size} files.")
                     }
-                }
-        }
-        if (errors.isNotEmpty()) {
-            errors.forEach { (path, _) ->
-                logger.debug("Removing $path from cache")
-                cacheManager.removeFromCache(path)
             }
+            if (errors.isNotEmpty()) {
+                errors.forEach { (path, _) ->
+                    logger.debug("Removing $path from cache")
+                    cacheManager.removeFromCache(path)
+                }
+            }
+            logger.debug("Finished processing files. Creating cache...")
+            cacheManager.saveCache()
+            logger.debug("Cache created.")
+            if (errors.isNotEmpty()) {
+                throw ExitProgramException(
+                    errorCode = ErrorCode.GradlePluginError,
+                    "Failed to parse ${errors.size} icons. See logs for more details",
+                    causes = errors.values.toTypedArray(),
+                )
+            }
+        } finally {
+            processor.dispose()
         }
-        logger.debug("Finished processing files. Creating cache...")
-        cacheManager.saveCache()
-        logger.debug("Cache created.")
-        if (errors.isNotEmpty()) {
-            throw ExitProgramException(
-                errorCode = ErrorCode.GradlePluginError,
-                "Failed to parse ${errors.size} icons. See logs for more details",
-                causes = errors.values.toTypedArray(),
-            )
-        }
-        processor.dispose()
     }
 
     internal fun dispose() {
