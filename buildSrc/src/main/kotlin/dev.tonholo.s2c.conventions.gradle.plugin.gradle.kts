@@ -1,5 +1,6 @@
 plugins {
     id("dev.tonholo.s2c.conventions.common")
+    id("dev.tonholo.s2c.conventions.publication")
     org.jetbrains.kotlin.jvm
 }
 

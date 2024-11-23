@@ -14,7 +14,7 @@ import kotlin.system.exitProcess
  * This is only for debugging purposes.
  * Should never be used in production.
  */
-fun main() {
+private fun main() {
     AppConfig.debug = true
     AppConfig.silent = false
     val suffix = "63"

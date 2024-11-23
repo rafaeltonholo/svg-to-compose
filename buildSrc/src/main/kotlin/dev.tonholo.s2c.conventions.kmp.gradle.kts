@@ -8,6 +8,7 @@ plugins {
     id("dev.tonholo.s2c.conventions.common")
     org.jetbrains.kotlin.multiplatform
     com.github.gmazzo.buildconfig
+    id("dev.tonholo.s2c.conventions.publication")
 }
 
 kotlin {

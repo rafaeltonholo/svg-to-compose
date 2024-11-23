@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.GradlePlugin
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     `kotlin-dsl`
     dev.tonholo.s2c.conventions.gradle.plugin
@@ -17,6 +20,19 @@ gradlePlugin {
 
 kotlin {
     compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
+}
+
+mavenPublishing {
+    configure(
+        GradlePlugin(
+            javadocJar = JavadocJar.Dokka("dokkaGenerate"),
+            sourcesJar = true,
+        )
+    )
+    pom {
+        name.set("SVG/XML to Compose Gradle Plugin")
+        description.set("A Gradle plugin that converts SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.")
+    }
 }
 
 dokka {
