@@ -1,6 +1,7 @@
 plugins {
     `kotlin-dsl`
     dev.tonholo.s2c.conventions.gradle.plugin
+    dev.tonholo.s2c.conventions.dokka
 }
 
 gradlePlugin {
@@ -16,6 +17,10 @@ gradlePlugin {
 
 kotlin {
     compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
+}
+
+dokka {
+    moduleName.set("SVG/XML to Compose Gradle Plugin")
 }
 
 dependencies {

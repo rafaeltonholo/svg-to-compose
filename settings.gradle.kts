@@ -11,6 +11,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         google()
         mavenCentral()
@@ -18,6 +19,7 @@ dependencyResolutionManagement {
 }
 
 include(
+    ":docs",
     ":svg-to-compose",
     ":svg-to-compose-gradle-plugin",
 )

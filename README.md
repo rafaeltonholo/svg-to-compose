@@ -157,9 +157,9 @@ Command:
       -opt=false \
       <parent-path>/shield-halved-solid.svg
 ```
-Input file: ![shield-halved-solid.svg](samples/svg/shield-halved-solid.svg)
+Input file: ![shield-halved-solid.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/shield-halved-solid.svg)
 
-Output file: [ShieldSolid.nonoptimized.kt](samples/ShieldSolid.svg.nonoptimized.kt)
+Output file: [ShieldSolid.nonoptimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/ShieldSolid.svg.nonoptimized.kt)
 
 #### With optimization
 Command:
@@ -171,9 +171,9 @@ Command:
       <parent-path>/shield-halved-solid.svg
 ```
 
-Input file: ![shield-halved-solid.svg](samples/svg/shield-halved-solid.svg)
+Input file: ![shield-halved-solid.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/shield-halved-solid.svg)
 
-Output file: [ShieldSolid.svg.optimized.kt](samples/ShieldSolid.svg.optimized.kt)
+Output file: [ShieldSolid.svg.optimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/ShieldSolid.svg.optimized.kt)
 
 
 ### Complex SVG file
@@ -187,9 +187,9 @@ Command:
       <parent-path>/illustration.svg
 ```
 
-Input file: ![illustration.svg](samples/svg/illustration.svg)
+Input file: ![illustration.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/illustration.svg)
 
-Output file: [Illustration.svg.nonoptimized.kt](samples/Illustration.svg.nonoptimized.kt)
+Output file: [Illustration.svg.nonoptimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/Illustration.svg.nonoptimized.kt)
 
 #### With optimization
 Command:
@@ -201,9 +201,9 @@ Command:
       <parent-path>/illustration.svg
 ```
 
-Input file: ![illustration.svg](samples/svg/illustration.svg)
+Input file: ![illustration.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/illustration.svg)
 
-Output file: [Illustration.svg.optimized.kt](samples/Illustration.svg.optimized.kt)
+Output file: [Illustration.svg.optimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/Illustration.svg.optimized.kt)
 
 
 # License

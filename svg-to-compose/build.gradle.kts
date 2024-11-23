@@ -1,6 +1,7 @@
 plugins {
     dev.tonholo.s2c.conventions.kmp
     dev.tonholo.s2c.conventions.testing
+    dev.tonholo.s2c.conventions.dokka
 }
 
 kotlin {
@@ -19,4 +20,8 @@ kotlin {
             implementation(libs.clikt)
         }
     }
+}
+
+dokka {
+    moduleName.set("SVG/XML to Compose Library")
 }

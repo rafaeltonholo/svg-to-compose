@@ -15,6 +15,7 @@ dependencies {
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
     implementation(libs.org.jetbrains.kotlin.powerAssert.plugin)
+    implementation(libs.org.jetbrains.dokka.gradle.plugin)
     implementation(libs.io.gitlab.arturbosch.detekt.gradle.plugin)
     implementation(libs.com.github.gmazzo.buildconfig.plugin)
     implementation(libs.com.vanniktech.gradle.maven.publish)

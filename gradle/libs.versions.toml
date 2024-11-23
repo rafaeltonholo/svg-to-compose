@@ -8,6 +8,7 @@ ksoup = "0.2.0"
 maven-publish = "0.29.0"
 buildconfig = "5.5.0"
 kotlinx-coroutines = "1.9.0"
+dokka = "2.0.0-Beta"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
@@ -17,6 +18,7 @@ com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "kso
 org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 # Plugins
+org-jetbrains-dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 org-jetbrains-kotlin-powerAssert-plugin = { module = "org.jetbrains.kotlin:kotlin-power-assert", version.ref = "kotlin" }
 com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }

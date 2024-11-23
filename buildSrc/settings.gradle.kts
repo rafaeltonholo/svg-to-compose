@@ -1,4 +1,5 @@
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         gradlePluginPortal()
         google()
