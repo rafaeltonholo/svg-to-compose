@@ -8,6 +8,8 @@ plugins {
 }
 
 gradlePlugin {
+    website.set("https://github.com/rafaeltonholo/svg-to-compose")
+    vcsUrl.set("https://github.com/rafaeltonholo/svg-to-compose")
     plugins {
         create("svgToCompose") {
             id = group.toString()

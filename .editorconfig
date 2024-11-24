@@ -150,3 +150,6 @@ ij_yaml_spaces_within_brackets = true
 
 [*.svg]
 indent_size = 2
+
+[*.md]
+max_line_length = 80
