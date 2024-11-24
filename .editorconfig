@@ -131,6 +131,7 @@ ij_markdown_min_lines_around_header = 1
 ij_markdown_min_lines_between_paragraphs = 1
 ij_markdown_wrap_text_if_long = true
 ij_markdown_wrap_text_inside_blockquotes = true
+max_line_length = 80
 
 [{*.toml,Cargo.lock,Cargo.toml.orig,Gopkg.lock,Pipfile,poetry.lock}]
 ij_toml_keep_indents_on_empty_lines = false
@@ -150,6 +151,3 @@ ij_yaml_spaces_within_brackets = true
 
 [*.svg]
 indent_size = 2
-
-[*.md]
-max_line_length = 80
