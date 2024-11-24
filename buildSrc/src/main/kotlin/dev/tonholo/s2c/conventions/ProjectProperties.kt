@@ -11,8 +11,10 @@ internal abstract class ProjectProperties(
     private var _properties: Properties? = null
     val properties
         get() = requireNotNull(_properties) {
-            "Missing app.properties initialization. " +
-                "Did you miss applying the '$ownerPluginName' in the current project?"
+            buildString {
+                append("Missing $propertiesName initialization. ")
+                append("Did you miss applying the '$ownerPluginName' in the current project?")
+            }
         }
 
     open fun init(project: Project) {
