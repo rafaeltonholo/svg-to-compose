@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
@@ -14,9 +15,7 @@ import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.CommonLogger
-import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
-import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.parser.ParserConfig
 import okio.FileSystem
 import platform.posix.exit
@@ -59,15 +58,6 @@ class Client : CliktCommand() {
         help = "Enable SVG/AVG optimization before parsing to Jetpack Compose icon. The optimization process uses " +
             "the following programs: svgo, avocado from NPM Registry",
     ).boolean().default(true)
-
-    @Deprecated("Context provider is a wrong naming for what this is supposed to do.")
-    private val contextProvider by option(
-        names = arrayOf("-cp", "--context-provider"),
-        help = """
-        Deprecated: use --receiver-type or -rt instead.
-        """.trimIndent(),
-        hidden = true,
-    )
 
     private val receiverType by option(
         names = arrayOf("-rt", "--receiver-type"),
@@ -138,24 +128,44 @@ class Client : CliktCommand() {
         help = "A regex used to exclude some icons from the parsing.",
     )
 
+    private val mapIconNameTo by option(
+        names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
+        help = """Replace the icon's name first value of this parameter with the second. 
+            |This is useful when you want to remove part of the icon's name from the output icon.
+            |
+            |Example:
+            |```
+            |    s2c <args> \
+            |        -o ./my-app/src/my/pkg/icons \
+            |        -rt Icons.Filled \
+            |        --map-icon-name-from-to "_filled" ""
+            |        ./my-app/assets/svgs
+            |```
+        """.trimMargin(),
+    ).pair()
+
+    private val logger = CommonLogger()
+
     override fun run() {
-        verbose("Args:")
-        verbose("   path = $path")
-        verbose("   pacakge = $pkg")
-        verbose("   theme = $theme")
-        verbose("   output = $output")
-        verbose("   optimize = $optimize")
-        verbose("   receiverType = $receiverType")
-        verbose("   addToMaterial = $addToMaterial")
-        verbose("   debug = $debug")
-        verbose("   verbose = $verbose")
-        verbose("   noPreview = $noPreview")
-        verbose("   isKmp = $isKmp")
-        verbose("   makeInternal = $makeInternal")
-        verbose("   minified = $minified")
-        verbose("   recursive = $recursive")
-        verbose("   recursiveDepth = $recursiveDepth")
-        verbose("   silent = $silent")
+        logger.verbose("Args:")
+        logger.verbose("   path = $path")
+        logger.verbose("   pacakge = $pkg")
+        logger.verbose("   theme = $theme")
+        logger.verbose("   output = $output")
+        logger.verbose("   optimize = $optimize")
+        logger.verbose("   receiverType = $receiverType")
+        logger.verbose("   addToMaterial = $addToMaterial")
+        logger.verbose("   debug = $debug")
+        logger.verbose("   verbose = $verbose")
+        logger.verbose("   noPreview = $noPreview")
+        logger.verbose("   isKmp = $isKmp")
+        logger.verbose("   makeInternal = $makeInternal")
+        logger.verbose("   minified = $minified")
+        logger.verbose("   recursive = $recursive")
+        logger.verbose("   recursiveDepth = $recursiveDepth")
+        logger.verbose("   silent = $silent")
+        logger.verbose("   exclude = $exclude")
+        logger.verbose("   mapIconNameTo = $mapIconNameTo")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -164,8 +174,8 @@ class Client : CliktCommand() {
         try {
             val fileSystem = FileSystem.SYSTEM
             Processor(
-                logger = CommonLogger(),
-                fileManager = FileManager(fileSystem, CommonLogger()),
+                logger = logger,
+                fileManager = FileManager(fileSystem, logger),
             ).run(
                 path = path,
                 output = output,
@@ -173,7 +183,7 @@ class Client : CliktCommand() {
                     pkg = pkg,
                     theme = theme,
                     optimize = optimize,
-                    receiverType = receiverType ?: @Suppress("DEPRECATION") contextProvider,
+                    receiverType = receiverType,
                     addToMaterial = addToMaterial,
                     noPreview = noPreview,
                     makeInternal = makeInternal,
@@ -184,12 +194,14 @@ class Client : CliktCommand() {
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
+                mapIconName = mapIconNameTo?.let { (from, to) ->
+                    { iconName -> iconName.replace(from, to) }
+                },
             )
         } catch (e: ExitProgramException) {
             printEmpty()
-            output(e.message.orEmpty())
+            logger.output(e.message.orEmpty())
             exit(e.errorCode.code)
         }
     }
-
 }
