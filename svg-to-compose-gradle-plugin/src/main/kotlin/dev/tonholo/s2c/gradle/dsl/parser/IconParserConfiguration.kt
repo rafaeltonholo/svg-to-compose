@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.gradle.dsl.parser
 
 import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
-import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
+import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import org.gradle.api.provider.Property
 
 /**

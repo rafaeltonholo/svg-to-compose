@@ -52,6 +52,7 @@ abstract class SvgToComposeExtension {
     @Suppress("UnusedReceiverParameter")
     @ExperimentalParallelProcessing
     fun NamedDomainObjectContainer<ProcessorConfiguration>.useParallelism(parallelism: Int) {
+        require(parallelism >= 0) { "Parallelism must be non-negative, got: $parallelism" }
         maxParallelExecutions.set(parallelism)
     }
 

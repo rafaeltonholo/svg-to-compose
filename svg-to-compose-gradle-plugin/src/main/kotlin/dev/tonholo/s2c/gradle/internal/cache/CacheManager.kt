@@ -4,7 +4,6 @@ import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.tasks.GENERATED_FOLDER
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
-import okio.ByteString.Companion.toByteString
 import okio.Path
 import okio.Path.Companion.toPath
 import org.gradle.api.Project
