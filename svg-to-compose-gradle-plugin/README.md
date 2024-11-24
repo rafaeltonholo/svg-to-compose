@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Motivation](#motivation)
+- [Platform support](#platform-support)
 - [Installation](#installation)
 - [How It Works](#how-it-works) 
 - [Configuration](#configuration)
@@ -19,6 +20,12 @@ development time.
 By using the **SVG/XML to Compose** plugin, you can automate and customize the
 integration of vector assets into your Compose projects, ensuring a more
 efficient and error-free workflow.
+
+## Platform support
+| Platform             | Support |
+|----------------------|:-------:|
+| Android              |    ✅    |
+| Kotlin Multiplatform |    ✅    |
 
 ## Installation
 
