@@ -44,7 +44,8 @@ internal class CommonLogger : Logger {
 
     override fun warn(message: String, throwable: Throwable?) {
         if (!AppConfig.silent) {
-            println("WARNING ⚠️: $message") // TODO: add color to output.
+            // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): add color to output.
+            println("WARNING ⚠️: $message")
             if (AppConfig.stackTrace) {
                 throwable?.printStackTrace()
             }

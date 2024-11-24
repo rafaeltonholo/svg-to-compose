@@ -14,7 +14,6 @@ import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.CommonLogger
-import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.logger.verbose
@@ -134,6 +133,11 @@ class Client : CliktCommand() {
         help = "Enable silent run mode. This will suppress all the output logs this CLI provides.",
     ).flag()
 
+    private val exclude by option(
+        names = arrayOf("--exclude"),
+        help = "A regex used to exclude some icons from the parsing.",
+    )
+
     override fun run() {
         verbose("Args:")
         verbose("   path = $path")
@@ -176,6 +180,7 @@ class Client : CliktCommand() {
                     minified = minified,
                     silent = silent,
                     kmpPreview = isKmp,
+                    exclude = exclude?.let(::Regex),
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
