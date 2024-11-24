@@ -19,7 +19,7 @@ dependencyResolutionManagement {
 }
 
 include(
-    ":docs",
+//    ":docs",
     ":svg-to-compose",
     ":svg-to-compose-gradle-plugin",
 )

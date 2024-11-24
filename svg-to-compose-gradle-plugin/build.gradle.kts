@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.JavadocJar
 plugins {
     `kotlin-dsl`
     dev.tonholo.s2c.conventions.gradle.plugin
-    dev.tonholo.s2c.conventions.dokka
 }
 
 gradlePlugin {
@@ -27,7 +26,7 @@ kotlin {
 mavenPublishing {
     configure(
         GradlePlugin(
-            javadocJar = JavadocJar.Dokka("dokkaGenerate"),
+            javadocJar = JavadocJar.Dokka("dokkaHtml"),
             sourcesJar = true,
         )
     )
@@ -37,9 +36,9 @@ mavenPublishing {
     }
 }
 
-dokka {
-    moduleName.set("SVG/XML to Compose Gradle Plugin")
-}
+//dokka {
+//    moduleName.set("SVG/XML to Compose Gradle Plugin")
+//}
 
 dependencies {
     compileOnly(libs.com.android.tools.build.gradle)

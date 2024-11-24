@@ -8,7 +8,7 @@ ksoup = "0.2.0"
 maven-publish = "0.29.0"
 buildconfig = "5.5.0"
 kotlinx-coroutines = "1.9.0"
-dokka = "2.0.0-Beta"
+dokka = "1.9.20"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
