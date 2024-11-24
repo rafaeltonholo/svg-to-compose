@@ -1,6 +1,11 @@
 package dev.tonholo.s2c.logger
 
 internal class CommonLogger : Logger {
+    private companion object {
+        private const val SECTION_WIDTH = 50
+        private const val SECTION_PADDING = SECTION_WIDTH / 2
+    }
+
     override fun debug(message: Any) {
         if (!AppConfig.silent && AppConfig.debug) {
             println("D: $message")
@@ -25,14 +30,14 @@ internal class CommonLogger : Logger {
 
     private fun startSection(message: String) {
         println()
-        val section = "=".repeat(25 - (message.length / 2))
+        val section = "=".repeat(SECTION_PADDING - (message.length / 2))
         println("$section $message $section")
         println()
     }
 
     private fun endSection() {
         println()
-        println("=".repeat(n = 50))
+        println("=".repeat(SECTION_WIDTH))
         println()
     }
 
