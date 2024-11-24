@@ -2,7 +2,6 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.CommonLogger
-import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.parser.ParserConfig
@@ -76,7 +75,7 @@ private sealed class SampleFile(
     output: String,
 ) {
     companion object {
-        const val ROOT_SAMPLE_APP_PATH = "playground/src/main/kotlin"
+        const val ROOT_PLAYGROUND_ANDROID_APP_PATH = "playground/app/src/main/kotlin"
     }
 
     private val projectDirectory: Path = Paths.get("").toAbsolutePath().parent
@@ -93,7 +92,7 @@ private sealed class SampleFile(
     ) : SampleFile(
         sampleAppPackage = sampleAppPackage,
         input = "samples/",
-        output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.toDirectory()}"
+        output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.toDirectory()}"
     )
 
     sealed interface Svg {
@@ -107,7 +106,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = BASE_PATH,
-            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
         )
 
         class GithubIssue(
@@ -116,7 +115,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/github_issue_$suffix.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/GithubIssue.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/GithubIssue.$suffix.kt",
         )
 
         class Brasil(
@@ -125,7 +124,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/brasil.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Brasil.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Brasil.$suffix.kt",
         )
 
         class ShieldSolid(
@@ -134,7 +133,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/shield-halved-solid.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
         )
 
         class Smiley(
@@ -143,7 +142,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/smiley.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Smiley.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Smiley.$suffix.kt",
         )
 
         class Illustration(
@@ -152,7 +151,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/illustration.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Illustration.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Illustration.$suffix.kt",
         )
 
         class Rects(
@@ -161,7 +160,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/rects.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
         )
 
         class DashArrayRect(
@@ -170,7 +169,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/dash-array-rect.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayRect.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayRect.$suffix.kt",
         )
 
         class ComplexRects(
@@ -179,7 +178,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/complex-rects.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ComplexRects.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ComplexRects.$suffix.kt",
         )
 
         class RoundedRect(
@@ -188,7 +187,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/rects/rounded-rect.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RoundedRect.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RoundedRect.$suffix.kt",
         )
 
         class SimpleCircle(
@@ -197,7 +196,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/circle/simple-circle.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/SimpleCircle.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/SimpleCircle.$suffix.kt",
         )
 
         class DashArrayCircle(
@@ -206,7 +205,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/circle/dasharray-circle.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
         )
 
         class Android(
@@ -215,7 +214,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/android.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Android.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Android.$suffix.kt",
         )
 
         class AndroidDevelopers(
@@ -224,7 +223,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/android-developers.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
         )
 
         class RectTransform(
@@ -233,7 +232,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.svg(),
             input = "$BASE_PATH/transform/rect-transform.svg",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
         )
 
         sealed interface Gradient {
@@ -243,7 +242,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/abstract-envelope.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/AbstractEnvelope.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/AbstractEnvelope.$suffix.kt",
             )
 
             class BermudaCircle(
@@ -252,7 +251,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/bermuda-circle.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaCircle.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaCircle.$suffix.kt",
             )
 
             class BermudaDiamond(
@@ -261,7 +260,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/bermuda-diamond.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaDiamond.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaDiamond.$suffix.kt",
             )
 
             class BermudaSquare(
@@ -270,7 +269,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/bermuda-square.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaSquare.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaSquare.$suffix.kt",
             )
 
             class BermudaTraingle(
@@ -279,7 +278,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/bermuda-traingle.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaTraingle.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaTraingle.$suffix.kt",
             )
 
             class BullseyeGradient(
@@ -288,7 +287,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/bullseye-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BullseyeGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BullseyeGradient.$suffix.kt",
             )
 
             class CorneredStairs(
@@ -297,7 +296,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/cornered-stairs.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/CorneredStairs.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/CorneredStairs.$suffix.kt",
             )
 
             class DiamondSunset(
@@ -306,7 +305,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/diamond-sunset.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DiamondSunset.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DiamondSunset.$suffix.kt",
             )
 
             class DragonScales(
@@ -315,7 +314,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/dragon-scales.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DragonScales.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DragonScales.$suffix.kt",
             )
 
             class GeometricIntersection(
@@ -324,7 +323,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/geometric-intersection.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/GeometricIntersection.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/GeometricIntersection.$suffix.kt",
             )
 
             class LinearGradient01(
@@ -333,7 +332,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/linear-gradient01.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LinearGradient01.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LinearGradient01.$suffix.kt",
             )
 
             class LiquidCheese(
@@ -342,7 +341,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/liquid-cheese.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LiquidCheese.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LiquidCheese.$suffix.kt",
             )
 
             class ParabolicEllipse(
@@ -351,7 +350,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/parabolic-ellipse.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicEllipse.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicEllipse.$suffix.kt",
             )
 
             class ParabolicPentagon(
@@ -360,7 +359,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/parabolic-pentagon.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicPentagon.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicPentagon.$suffix.kt",
             )
 
             class ParabolicRectangle(
@@ -369,7 +368,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/parabolic-rectangle.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicRectangle.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicRectangle.$suffix.kt",
             )
 
             class ParabolicTriangle(
@@ -378,7 +377,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/parabolic-triangle.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicTriangle.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicTriangle.$suffix.kt",
             )
 
             class QuantumGradient(
@@ -387,7 +386,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/quantum-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg()}/gradientQuantumGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg()}/gradientQuantumGradient.$suffix.kt",
             )
 
             class RadiantGradient(
@@ -396,7 +395,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/radiant-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RadiantGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RadiantGradient.$suffix.kt",
             )
 
             class RosePetals(
@@ -405,7 +404,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/rose-petals.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RosePetals.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RosePetals.$suffix.kt",
             )
 
             class SlantedGradient(
@@ -414,7 +413,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/slanted-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SlantedGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SlantedGradient.$suffix.kt",
             )
 
             class SpectrumGradient(
@@ -423,7 +422,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/spectrum-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SpectrumGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SpectrumGradient.$suffix.kt",
             )
 
             class StrokeGradient(
@@ -432,7 +431,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/stroke-gradient.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/StrokeGradient.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/StrokeGradient.$suffix.kt",
             )
 
             class SubtlePrism(
@@ -441,7 +440,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/subtle-prism.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SubtlePrism.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SubtlePrism.$suffix.kt",
             )
 
             class WinterySunburst(
@@ -450,7 +449,7 @@ private sealed class SampleFile(
             ) : SampleFile(
                 sampleAppPackage = sampleAppPackage.svg(),
                 input = "$BASE_PATH/gradient/wintery-sunburst.svg",
-                output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/WinterySunburst.$suffix.kt",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/WinterySunburst.$suffix.kt",
             )
         }
     }
@@ -466,7 +465,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.avg(),
             input = BASE_PATH,
-            output = "${ROOT_SAMPLE_APP_PATH}/${sampleAppPackage.avg().toDirectory()}",
+            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.avg().toDirectory()}",
         )
 
         class ShieldSolid(
@@ -475,7 +474,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.avg(),
             input = "$BASE_PATH/shield-halved-solid.xml",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.avg().toDirectory()}/ShieldSolid.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/ShieldSolid.$suffix.kt",
         )
 
         class Illustration(
@@ -484,7 +483,7 @@ private sealed class SampleFile(
         ) : SampleFile(
             sampleAppPackage = sampleAppPackage.avg(),
             input = "$BASE_PATH/illustration.xml",
-            output = "$ROOT_SAMPLE_APP_PATH/${sampleAppPackage.avg().toDirectory()}/Illustration.$suffix.kt",
+            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/Illustration.$suffix.kt",
         )
     }
 }
