@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 
 internal fun Project.createBuildTasks(target: KotlinNativeTargetWithHostTests) {
+    val projectName = name
     val targetName = target.name.replaceFirstChar { it.uppercaseChar() }
     val taskName = "buildDebug$targetName"
     if (tasks.findByName(taskName) != null) {
@@ -11,8 +12,8 @@ internal fun Project.createBuildTasks(target: KotlinNativeTargetWithHostTests) {
     }
     task(taskName) {
         dependsOn(
-            ":$name:compileKotlin$targetName",
-            ":$name:linkDebugExecutable$targetName"
+            ":$projectName:compileKotlin$targetName",
+            ":$projectName:linkDebugExecutable$targetName"
         )
         group = "build"
         description = "Build debug binary for ${target.targetName}"
@@ -20,8 +21,8 @@ internal fun Project.createBuildTasks(target: KotlinNativeTargetWithHostTests) {
 
     task("buildRelease$targetName") {
         dependsOn(
-            ":$name:compileKotlin$targetName",
-            ":$name:linkReleaseExecutable$targetName"
+            ":$projectName:compileKotlin$targetName",
+            ":$projectName:linkReleaseExecutable$targetName"
         )
         group = "build"
         description = "Build release binary for ${target.targetName}"
