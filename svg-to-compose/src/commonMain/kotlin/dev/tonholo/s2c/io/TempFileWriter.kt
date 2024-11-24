@@ -16,7 +16,7 @@ class TempFileWriter(
         file: Path,
     ): Path = logger.debugSection("Creating temporary file") {
         val tempDir = tempFolder / file.encodeToMd5()
-        fileManager.createDirectories(dir = tempDir, mustCreate = true)
+        fileManager.createDirectories(dir = tempDir, mustCreate = false)
 
         val targetFile = tempDir / file.name
 
