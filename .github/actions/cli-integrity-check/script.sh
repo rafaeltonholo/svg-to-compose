@@ -31,7 +31,7 @@ else
   ext="svg"
 fi
 
-base_package="dev.tonholo.sampleApp.ui"
+base_package="dev.tonholo.svgToCompose.playground.ui"
 package="$base_package.icon.${type}"
 theme="$base_package.theme.SampleAppTheme"
 errors=()
