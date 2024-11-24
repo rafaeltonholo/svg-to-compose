@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.logger
 
+import AppConfig
+
 internal class CommonLogger : Logger {
     private companion object {
         private const val SECTION_WIDTH = 50
@@ -57,8 +59,11 @@ internal class CommonLogger : Logger {
         }
     }
 
-    override fun info(message: String) =
-        println("I: $message")
+    override fun info(message: String) {
+        if (!AppConfig.silent) {
+            println("I: $message")
+        }
+    }
 
     override fun output(message: String) {
         if (!AppConfig.silent) {
