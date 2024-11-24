@@ -102,7 +102,7 @@ internal class IconParserConfigurationImpl(
     override fun validate(): List<String> {
         val errors = mutableListOf<String>()
         val noPreview = noPreview.get()
-        if (noPreview.not() && (theme.isPresent.not() || theme.get().isBlank())) {
+        if (noPreview.not() && theme.orNull.isNullOrBlank()) {
             errors.add("${configurationName()}: Theme name cannot be empty when Preview is enabled.")
         }
 
@@ -113,13 +113,13 @@ internal class IconParserConfigurationImpl(
         val raw = buildString {
             append(receiverType.orNull)
             append("|")
-            append(addToMaterialIcons.get())
+            append(addToMaterialIcons.orNull)
             append("|")
-            append(noPreview.get())
+            append(noPreview.orNull)
             append("|")
-            append(iconVisibility.get())
+            append(iconVisibility.orNull)
             append("|")
-            append(minified.get())
+            append(minified.orNull)
             append("|")
             append(exclude.orNull)
             append("|")
