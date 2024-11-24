@@ -119,11 +119,7 @@ internal fun warn(message: String, throwable: Throwable? = null) = logger.warn(m
         expression = "logger.output(message)",
     ),
 )
-internal fun output(message: String) {
-    if (!AppConfig.silent) {
-        println(message)
-    }
-}
+internal fun output(message: String) = logger.output(message)
 
 internal fun printEmpty() {
     if (!AppConfig.silent) {
