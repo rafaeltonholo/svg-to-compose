@@ -1,6 +1,7 @@
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.CommonLogger
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
@@ -40,8 +41,8 @@ private fun main() {
     try {
         val fileSystem = FileSystem.SYSTEM
         Processor(
-            logger = Logger(),
-            fileManager = FileManager(fileSystem, Logger()),
+            logger = CommonLogger(),
+            fileManager = FileManager(fileSystem, CommonLogger()),
         ).run(
             path = path,
             output = output,
@@ -75,7 +76,7 @@ private sealed class SampleFile(
     output: String,
 ) {
     companion object {
-        const val ROOT_SAMPLE_APP_PATH = "sample-app/src/main/kotlin"
+        const val ROOT_SAMPLE_APP_PATH = "playground/src/main/kotlin"
     }
 
     private val projectDirectory: Path = Paths.get("").toAbsolutePath().parent

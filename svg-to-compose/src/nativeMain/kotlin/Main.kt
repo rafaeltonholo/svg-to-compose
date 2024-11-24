@@ -13,6 +13,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.CommonLogger
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
@@ -159,8 +160,8 @@ class Client : CliktCommand() {
         try {
             val fileSystem = FileSystem.SYSTEM
             Processor(
-                logger = Logger(),
-                fileManager = FileManager(fileSystem, Logger()),
+                logger = CommonLogger(),
+                fileManager = FileManager(fileSystem, CommonLogger()),
             ).run(
                 path = path,
                 output = output,

@@ -1,17 +1,74 @@
 package dev.tonholo.s2c.logger
 
-import AppConfig
-
+/**
+ * Abstraction for logging operations.
+ */
 interface Logger {
+    /**
+     * Logs a debug message.
+     *
+     * @param message The message to log.
+     */
     fun debug(message: Any)
+
+    /**
+     * Executes a block of code within a debug section.
+     *
+     * @param title The title of the debug section.
+     * @param block The code to execute within the section.
+     * @return The result of the block execution.
+     */
     fun <T> debugSection(title: String, block: () -> T): T
+
+    /**
+     * Executes a block of code within a verbose section.
+     *
+     * @param title The title of the verbose section.
+     * @param block The code to execute within the section.
+     * @return The result of the block execution.
+     */
     fun <T> verboseSection(title: String, block: () -> T): T
+
+    /**
+     * Logs a verbose message.
+     *
+     * @param message The message to log.
+     */
     fun verbose(message: String)
+
+    /**
+     * Logs a warning message.
+     *
+     * @param message The message to log.
+     * @param throwable An optional throwable associated with the warning.
+     */
     fun warn(message: String, throwable: Throwable? = null)
+
+    /**
+     * Logs an info message.
+     *
+     * @param message The message to log.
+     */
     fun info(message: String)
+
+    /**
+     * Logs an output message.
+     *
+     * @param message The message to log.
+     */
     fun output(message: String)
+
+    /**
+     * Logs an error message.
+     *
+     * @param message The message to log.
+     * @param throwable An optional throwable associated with the error.
+     */
     fun error(message: String, throwable: Throwable? = null)
 }
+
+// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): Remove after passing logger via dependency.
+private val logger = CommonLogger()
 
 @Deprecated(
     "Use logger instead.",
@@ -19,11 +76,7 @@ interface Logger {
         expression = "logger.debug(message)",
     ),
 )
-internal fun debug(message: Any) {
-    if (!AppConfig.silent && AppConfig.debug) {
-        println("D: $message")
-    }
-}
+internal fun debug(message: Any) = logger.debug(message)
 
 @Deprecated(
     "Use logger instead.",
@@ -32,12 +85,7 @@ internal fun debug(message: Any) {
     ),
 )
 internal fun <T> debugSection(title: String, block: () -> T): T =
-    if (!AppConfig.silent && AppConfig.debug) {
-        startSection(title)
-        block().also { endSection() }
-    } else {
-        block()
-    }
+    logger.debugSection(title, block)
 
 @Deprecated(
     "Use logger instead.",
@@ -46,25 +94,7 @@ internal fun <T> debugSection(title: String, block: () -> T): T =
     ),
 )
 internal fun <T> verboseSection(title: String, block: () -> T) =
-    if (!AppConfig.silent && AppConfig.verbose) {
-        startSection(title)
-        block().also { endSection() }
-    } else {
-        block()
-    }
-
-private fun startSection(message: String) {
-    println()
-    val section = "=".repeat(25 - (message.length / 2))
-    println("$section $message $section")
-    println()
-}
-
-private fun endSection() {
-    println()
-    println("=".repeat(n = 50))
-    println()
-}
+    logger.verboseSection(title, block)
 
 @Deprecated(
     "Use logger instead.",
@@ -72,11 +102,7 @@ private fun endSection() {
         expression = "logger.verbose(message)",
     ),
 )
-internal fun verbose(message: String) {
-    if (!AppConfig.silent && AppConfig.verbose) {
-        println("V: $message")
-    }
-}
+internal fun verbose(message: String) = logger.verbose(message)
 
 @Suppress("ForbiddenComment")
 @Deprecated(
@@ -85,11 +111,7 @@ internal fun verbose(message: String) {
         expression = "logger.warn(message)",
     ),
 )
-internal fun warn(message: String) {
-    if (!AppConfig.silent) {
-        println("WARNING ⚠️: $message") // TODO: add color to output.
-    }
-}
+internal fun warn(message: String, throwable: Throwable? = null) = logger.warn(message, throwable)
 
 @Deprecated(
     "Use logger instead.",
@@ -106,35 +128,5 @@ internal fun output(message: String) {
 internal fun printEmpty() {
     if (!AppConfig.silent) {
         println()
-    }
-}
-
-internal fun Logger(): Logger = object : Logger {
-    override fun debug(message: Any) =
-        dev.tonholo.s2c.logger.debug(message)
-
-    override fun <T> debugSection(title: String, block: () -> T): T =
-        dev.tonholo.s2c.logger.debugSection(title, block)
-
-    override fun <T> verboseSection(title: String, block: () -> T): T =
-        dev.tonholo.s2c.logger.verboseSection(title, block)
-
-    override fun verbose(message: String) =
-        dev.tonholo.s2c.logger.verbose(message)
-
-    override fun warn(message: String, throwable: Throwable?) =
-        dev.tonholo.s2c.logger.warn(message)
-
-    override fun info(message: String) =
-        println("I: $message")
-
-    override fun output(message: String) =
-        dev.tonholo.s2c.logger.output(message)
-
-    override fun error(message: String, throwable: Throwable?) {
-        println("E: $message")
-        if (AppConfig.stackTrace) {
-            throwable?.printStackTrace()
-        }
     }
 }
