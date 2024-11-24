@@ -1,4 +1,4 @@
-package dev.tonholo.svgToCompose.playground.ui.theme
+package dev.tonholo.svg_to_compose.playground.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
