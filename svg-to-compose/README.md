@@ -166,7 +166,7 @@ Disabling SVG optimization:
 s2c -o OutputIconFile.kt \
   -p your.app.package.icon \
   -t your.app.package.theme.YourAppComposeTheme \
-  --opitmize false \
+  --optimize false \
   input.svg
 ```
 
