@@ -23,7 +23,7 @@ import platform.posix.exit
 fun main(args: Array<String>) = Client()
     .main(args)
 
-class Client : CliktCommand() {
+class Client : CliktCommand(name = "s2c") {
 
     init {
         eagerOption("-v", "--version", help = "Show this CLI version") {
