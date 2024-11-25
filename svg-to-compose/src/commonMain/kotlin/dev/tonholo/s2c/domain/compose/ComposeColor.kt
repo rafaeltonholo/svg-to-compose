@@ -60,18 +60,22 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
             RGBA_SIZE -> {
                 values.foldIndexed("") { index, acc, value ->
                     if (index == values.lastIndex) {
-                        (value.toFloat() * RGB_MAX_VALUE).roundToInt().toString(radix = 16) + acc
+                        (value.toFloat() * RGB_MAX_VALUE).roundToInt().toHexString() + acc
                     } else {
-                        acc + value.toInt().toString(radix = 16)
+                        acc + value.toInt().toHexString()
                     }
                 }.uppercase()
             }
 
             RGB_SIZE -> {
-                values.fold("") { acc, value -> acc + value.toInt().toString(radix = 16) }
+                "FF" + values.fold("") { acc, value -> acc + value.toInt().toHexString() }
             }
 
             else -> "none"
         }
     }
+
+    private fun Int.toHexString(): String = toString(radix = 16)
+        .padStart(length = 2, padChar = '0')
+        .uppercase()
 }

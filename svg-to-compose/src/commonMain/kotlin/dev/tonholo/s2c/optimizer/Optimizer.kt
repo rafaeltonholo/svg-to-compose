@@ -7,15 +7,18 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.MissingDependencyException
 import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.extensions.extension
-import dev.tonholo.s2c.logger.output
+import dev.tonholo.s2c.extensions.filename
+import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.printEmpty
-import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.optimizer.svgo.SvgoConfigContent
-import okio.FileSystem
+import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 
-sealed class Optimizer {
+sealed class Optimizer(
+    private val logger: Logger,
+) {
     /**
      * Represents the external command that will be used
      * for optimization.
@@ -66,7 +69,7 @@ sealed class Optimizer {
             showStdout = false
             showStderr = false
         }.also { (code, _) ->
-            verbose("exit code = $code")
+            logger.verbose("exit code = $code")
         }.exitCode == 0
 
     /**
@@ -92,14 +95,14 @@ sealed class Optimizer {
         errorCode: ErrorCode,
         vararg args: String,
     ) {
-        verbose(
+        logger.verbose(
             """
                 |Args:
                 |   errorCode=$errorCode,
                 |   args=${args.joinToString(" ")}
             """.trimMargin()
         )
-        output("⏳ Running $command")
+        logger.output("⏳ Running $command")
         try {
             command(program = command) {
                 args(*args)
@@ -116,7 +119,7 @@ sealed class Optimizer {
         } catch (e: IllegalStateException) {
             throw OptimizationException(errorCode, throwable = e)
         }
-        output("✅ Finished $command")
+        logger.output("✅ Finished $command")
     }
 
     /**
@@ -124,9 +127,10 @@ sealed class Optimizer {
      *
      * @see <a href="https://svgo.dev/">SVGO documentation</a>
      */
-    data class SvgoOptimizer(
-        val fileSystem: FileSystem,
-    ) : Optimizer() {
+    class SvgoOptimizer(
+        private val logger: Logger,
+        private val fileManager: FileManager,
+    ) : Optimizer(logger) {
         override val command: String = "svgo"
         override val allowedExtension: String = FileType.Svg.extension
 
@@ -135,17 +139,29 @@ sealed class Optimizer {
             val tempFolder = S2C_TEMP_FOLDER.toPath()
             val svgoConfigFile = tempFolder / svgoConfigFilename
 
-            // Create temp directory in case of not having it yet.
-            fileSystem.createDirectory(tempFolder)
+            try {
+                // Create temp directory in case of not having it yet.
+                fileManager.createDirectory(tempFolder)
 
-            if (!fileSystem.exists(svgoConfigFile)) {
-                output("⚙️ writing svgo config file")
-                fileSystem.write(svgoConfigFile) {
-                    writeUtf8(SvgoConfigContent)
+                if (!fileManager.exists(svgoConfigFile)) {
+                    logger.output("⚙️ writing svgo config file")
+                    fileManager.write(svgoConfigFile) {
+                        writeUtf8(SvgoConfigContent)
+                    }
                 }
+            } catch (e: IOException) {
+                throw OptimizationException(
+                    ErrorCode.SvgoOptimizationError,
+                    "Failed to setup SVGO configuration: ${e.message}",
+                    e,
+                )
             }
 
-            val optimizedFile = "$S2C_TEMP_FOLDER/target.optimized.svg".toPath()
+            val tempDir = file.parent ?: throw OptimizationException(
+                ErrorCode.SvgoOptimizationError,
+                "Unable to determine parent directory for file: $file"
+            )
+            val optimizedFile = tempDir / "${file.filename}.optimized.svg"
 
             runOptimization(
                 errorCode = ErrorCode.SvgoOptimizationError,
@@ -165,7 +181,9 @@ sealed class Optimizer {
      *
      * @see <a href="https://github.com/alexjlockwood/avocado">Avocado documentation</a>
      */
-    data object AvocadoOptimizer : Optimizer() {
+    class AvocadoOptimizer(
+        logger: Logger,
+    ) : Optimizer(logger) {
         override val command: String = "avocado"
         override val allowedExtension: String = FileType.Avg.extension
 
@@ -179,20 +197,21 @@ sealed class Optimizer {
     }
 
     class Factory(
-        fileSystem: FileSystem,
+        private val logger: Logger,
+        fileManager: FileManager,
     ) {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */
         private val svgOptimizers: Set<Optimizer> = setOf(
-            SvgoOptimizer(fileSystem),
+            SvgoOptimizer(logger, fileManager),
         )
 
         /**
          * Set of optimizers that will be used specifically for AVG files.
          */
         private val avgOptimizers: Set<Optimizer> = setOf(
-            AvocadoOptimizer,
+            AvocadoOptimizer(logger),
         )
 
         /**
@@ -209,14 +228,14 @@ sealed class Optimizer {
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
                     printEmpty()
-                    output(optimizer.errorMessage)
+                    logger.output(optimizer.errorMessage)
                     hasMissingDependency = true
                 }
             }
 
             if (hasSvg) {
                 svgOptimizers.forEach {
-                    verbose("Verifying $it")
+                    logger.verbose("Verifying $it")
                     it.verifyDependency().also { hasDependency ->
                         showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
                     }
@@ -225,7 +244,7 @@ sealed class Optimizer {
 
             if (hasAvg) {
                 avgOptimizers.forEach {
-                    verbose("Verifying $it")
+                    logger.verbose("Verifying $it")
                     it.verifyDependency().also { hasDependency ->
                         showErrorLog(missingDependency = hasDependency.not(), optimizer = it)
                     }
@@ -250,7 +269,7 @@ sealed class Optimizer {
          * @return The [Path] object of the optimized file.
          */
         fun optimize(file: Path): Path {
-            output("🏎️  Optimizing ${file.extension}")
+            logger.output("🏎️  Optimizing ${file.extension}")
             printEmpty()
             return if (file.extension == FileType.Svg.extension) {
                 svgOptimizers.fold(file) { currentFile, optimizer ->

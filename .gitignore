@@ -6,6 +6,7 @@ temp.kt
 integrity-check/
 local.properties
 .s2c/
+publishing.properties
 
 github_issue_[0-9]*.svg
 

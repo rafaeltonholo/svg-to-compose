@@ -1,0 +1,21 @@
+/build
+.idea
+# Ignore the icon path since this project is intended
+# just for checking if all icons are correctly rendered
+# on Preview tab.
+/app/src/main/kotlin/dev/tonholo/svg_to_compose/playground/ui/icon
+
+/app/src/main/res/drawable/*
+!/app/src/main/res/drawable/brasil.xml
+!/app/src/main/res/drawable/ic_launcher_background.xml
+!/app/src/main/res/drawable/ic_launcher_foreground.xml
+/app/src/main/res/minimap-*/*
+!/app/src/main/res/minimap-*/ic_launcher.xml
+!/app/src/main/res/minimap-*/ic_launcher_round.xml
+/app/src/main/res/values/*
+!/app/src/main/res/values/color.xml
+!/app/src/main/res/values/strings.xml
+!/app/src/main/res/values/themes.xml
+/app/src/main/res/xml/*
+!/app/src/main/res/xml/backup_rules.xml
+!/app/src/main/res/xml/data_extraction_rules.xml

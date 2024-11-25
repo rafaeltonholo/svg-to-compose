@@ -48,20 +48,24 @@ value class SvgTransform(val value: String) {
 
     private inline fun transforms(): List<Pair<String, List<Float>>> = value
         .split(REGEX_TRANSFORM_SPLIT.toRegex())
-        .map { transform ->
-            val name = transform.takeWhile { it != '(' }.trim()
-            val values = transform
-                .trim()
-                .removePrefix("$name(")
-                .removeSuffix(")")
-                .split(", ", ", ", " ", ",")
-                .map {
-                    requireNotNull(it.toFloatOrNull()) {
-                        "unable to parse value $it to Float. transform = $value"
+        .mapNotNull { transform ->
+            if (transform.isBlank()) {
+                null
+            } else {
+                val name = transform.takeWhile { it != '(' }.trim()
+                val values = transform
+                    .trim()
+                    .removePrefix("$name(")
+                    .removeSuffix(")")
+                    .split(", ", ", ", " ", ",")
+                    .map {
+                        requireNotNull(it.toFloatOrNull()) {
+                            "unable to parse value $it to Float. transform = $value"
+                        }
                     }
-                }
 
-            name to values
+                name to values
+            }
         }
 
     companion object {

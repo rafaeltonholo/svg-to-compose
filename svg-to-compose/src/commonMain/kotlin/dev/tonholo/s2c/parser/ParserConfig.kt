@@ -25,12 +25,18 @@ package dev.tonholo.s2c.parser
  * import androidx.compose.material.icons.Icons
  * val Icons.Filled.MyIcon: ImageVector get() = <implementation>
  * ```
+ * @property kmpPreview if `true`, a KMP compatible `@Preview Composable` function will be
+ * generated for the parsed icon.
  * @property noPreview if `true`, no `@Preview Composable` function will be generated for
  * the parsed icon.
  * @property makeInternal if `true`, the generated icon will be set as `internal`, hiding it
  * from outside modules
  * @property minified if `true`, minifies the output removing all generated comments and
  * inlining the path functions parameters
+ * @property exclude regex to exclude some icons from the parsing
+ * @property silent if `true`, no console output will be displayed.
+ * @property keepTempFolder if `true`, the [dev.tonholo.s2c.Processor] won't request to
+ * delete the temp folder. Useful when running parallel execution.
  */
 data class ParserConfig(
     val pkg: String,
@@ -38,7 +44,11 @@ data class ParserConfig(
     val optimize: Boolean,
     val receiverType: String?,
     val addToMaterial: Boolean,
+    val kmpPreview: Boolean,
     val noPreview: Boolean,
     val makeInternal: Boolean,
     val minified: Boolean,
+    val exclude: Regex? = null,
+    val silent: Boolean = false,
+    val keepTempFolder: Boolean = false,
 )
