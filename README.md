@@ -1,234 +1,303 @@
 # SVG to Compose
+[![Built with KMP](https://img.shields.io/badge/Built_with_KMP-gray?logo=kotlin)](https://kotlinlang.org/docs/multiplatform.html)
+[![SVG to Compose Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose?display_name=tag&label=svg-to-compose&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose)
+[![SVG to Compose Gradle Plugin Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose-gradle-plugin?display_name=tag&label=svg-to-compose-gradle-plugin&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose-gradle-plugin)
+[![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](./LICENSE)
 
-A command-line tool to convert SVG or an Android Vector Drawable (AVG) to
-Android Jetpack Compose Icons.
+A suite of tools to convert SVG or Android Vector Drawable (AVD/XML) files into Android Jetpack Compose Icons. This project provides:
 
-## Table of content
+- A **command-line tool** for manual conversion.
+- A **Gradle plugin** for automating the conversion within your build process.
+
+---
+
+For more detailed information on each tool, configurations, and features, please refer to the full documentation:
+
+- [Command-line Tool Documentation](./svg-to-compose/README.md)
+- [Gradle Plugin Documentation](./svg-to-compose/README.md)
+
+---
+
+## Table of Contents
 
 - [Why?](#why)
-- [Platform support](#platform-support)
-- [Installation](#installation)
-- [External dependencies](#external-dependencies)
-- [Using the command-line tool](#using-the-command-line-tool)
-- [Result Examples](#result-examples)
+- [Platform Support](#platform-support)
+- [Available Tools](#available-tools)
+    - [Command-line Tool](#command-line-tool)
+    - [Gradle Plugin](#gradle-plugin)
+- [Getting Started](#getting-started)
+    - [Command-line Tool Installation](#command-line-tool-installation)
+    - [Gradle Plugin Installation](#gradle-plugin-installation)
+- [Usage](#usage)
+    - [Using the Command-line Tool](#using-the-command-line-tool)
+    - [Using the Gradle Plugin](#using-the-gradle-plugin)
+- [License](#license)
 
 ## Why?
-We usually use Android Vector drawables to display icons on Android apps.
 
-With the addition of Jetpack Compose, we don't use XML to write views, and we
-can use all the power of Kotlin to speed up the view development process.
+With the introduction of Jetpack Compose, Android developers can leverage the full power of Kotlin to build UI components, moving away from traditional XML layouts. However, integrating vector assets like icons often still relies on using Android Vector Drawables (AVD/XML) resources.
 
-With that in mind, what if we could also avoid using our old approach to import
-icons to our project, and now rely on `ImageVector`s and creating the icons
-using Kotlin, following the same approach made for all Material Icons, from
-Google.
+This project aims to streamline the integration of vector assets into Compose applications by providing tools that convert SVG or AVD files directly into Compose `ImageVector` objects, following the same approach used for Google's Material Icons.
 
-There are existing plugins available, but they usually don't optimize the svg
-before converting it to Jetpack Compose Icons.
+**Key Advantages:**
 
-This command-line tool adds that functionality.
+- **Custom Parsing Algorithm:** The project employs its own parsing algorithm, written on Kotlin Multiplatform, specifically designed to handle complex vector graphics that are not fully supported by the standard `com.android.tools:sdk-common` library.
+- **Addresses Missing Features:** By addressing missing features in the default SDK tools, the algorithm can parse and convert complex SVGs and AVGs that other tools might fail to process correctly.
+- **Supports Complex Vectors:** Capable of handling intricate vector graphics, ensuring that even detailed icons are accurately converted.
+- **Optimization via Trusted Tools**: The optimization of SVGs is performed using external, well-known dependencies like **[SVGO](https://github.com/svg/svgo)** and **[Avocado](https://github.com/alexjlockwood/avocado)**, ensuring efficient and clean generated code without reinventing the wheel.
 
-## Platform support
-| Platform           | With optimization | Without optimization |
-|--------------------|:-----------------:|:--------------------:|
-| macOS Arm64        |         ✅         |          ✅           |
-| macOS x64          |         ✅         |          ✅           |
-| Linux x64          |         ✅         |          ✅           |
-| Windows (mingwX64) |         ✅         |          ✅           |
-| Windows (WSL)      |         ✅         |    ❌ (not tested)    |
+## Platform Support
 
-## Installation
-This CLI tool relies
-on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse
-the SVG/AVD file, thus we need the binaries to be able to run it.
-There are two ways to achieve this:
+### Command-line Tool
 
-1. Download the s2c script from this repository and save it in your preferred
-   folder, or
-2. Cloning the project.
+| Platform           | Command-line Tool |
+| ------------------ | :---------------: |
+| macOS Arm64        |        ✅         |
+| macOS x64          |        ✅         |
+| Linux x64          |        ✅         |
+| Windows (mingwX64) |        ✅         |
+| Windows (WSL)      |        ✅         |
 
-The script will take care of downloading or building the native binaries.
+### Gradle Plugin
+
+| Platform             | Gradle Plugin |
+| -------------------- | :-----------: |
+| Android              |      ✅       |
+| Kotlin Multiplatform |      ✅       |
+
+## Available Tools
+
+### Command-line Tool
+
+A CLI tool for manually converting SVG or AVD files into Jetpack Compose `ImageVector` objects. It supports optimization of SVGs and provides various options for customization.
+
+Ideal for CI integration as no additional dependencies are required (not even Java) other than the CLI tool's script and, if you wish, the optimization tools.
+
+[Full documentation for the Command-line Tool can be found here.](./svg-to-compose/README.md)
+
+### Gradle Plugin
+
+A Gradle plugin that automates the conversion process within your build system, ideal for projects with a large number of icons or for ensuring consistency and saving development time.
+
+[Full documentation for the Gradle Plugin can be found here.](./svg-to-compose/README.md)
+
+## Getting Started
+
+### Command-line Tool Installation
+
+The CLI tool relies on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse the SVG/AVD files. You can install it by:
+
+1. **Downloading the `s2c` script** from this repository and saving it in your preferred folder, or
+2. **Cloning the project**.
+
+The script will handle downloading or building the native binaries.
 
 After downloading the script or cloning the project:
-1. Give execution permission to the script:
-```console
-chmod +xw s2c
-```
-2. If you want to run the script from anywhere, you might need to add it to your
-   path, in your `~/.bashrc`, `~/.zshrc`,
-   `~/.zshenv`, or `~/.profile`:
-```shell
-export PATH=<s2c path>:$PATH
-```
-Replacing `<s2c path>` to the folder's path where you stored the script
 
-### External Dependencies
-This script relies on three others to perform the **optimization**:
-- [SVGO](https://github.com/svg/svgo): Optimizes the SVG reducing the paths.
-```console
-npm -g install svgo
-```
-- [Avocado](https://github.com/alexjlockwood/avocado): Optimizes Android VectorDrawable and AnimatedVectorDrawable 
-xml files.
+1. **Give execution permission** to the script:
 
-```console
-npm -g install avocado
-```
+    ```console
+    chmod +xw s2c
+    ```
+
+2. **Optionally, add the script to your PATH** to run it from anywhere:
+
+    ```shell
+    export PATH=<s2c path>:$PATH
+    ```
+
+    Replace `<s2c path>` with the folder's path where you stored the script.
+
+#### External Dependencies
+> [!NOTE]
+> This is optional. If you don't want to use external dependencies, make sure to disable optimization via `--optimize false` when using the CLI tool or by calling the `optimize(enabled = false)` when using the Gradle Plugin.
 
 > [!IMPORTANT]
-> If you don't want to optimize the SVG before converting it, you can just
-> disable the optimization using the parameter `-opt` or `--optimize` passing
-> `false`.
->
-> Optimization is enabled by default.
+> By default, Optimization is enabled by default on both CLI tool and Gradle Plugin  
+For SVG optimization, this script relies on:
 
-## Using the command-line tool
-Help for advance usage:
+- **[SVGO](https://github.com/svg/svgo)**: Optimizes SVG files by reducing paths.
+
+    ```console
+    npm -g install svgo
+    ```
+
+- **[Avocado](https://github.com/alexjlockwood/avocado)**: Optimizes Android VectorDrawable and AnimatedVectorDrawable XML files.
+
+    ```console
+    npm -g install avocado
+    ```
+
+### Gradle Plugin Installation
+
+The **SVG/XML to Compose** Gradle Plugin is available on [Maven Central](https://search.maven.org/). It simplifies the process of converting SVG and Android Vector Drawable (AVG/XML) files into Jetpack Compose `ImageVector` properties, automating the integration of vector assets into your Compose projects, ensuring a more efficient and error-free workflow.
+
+#### Applying the plugin
+
+Add the plugin to your module's `build.gradle.kts` file:
+
+```kotlin
+plugins {
+    id("dev.tonholo.s2c") version "<latest-version>"
+}
+```
+
+Ensure that Maven Central is included in your plugin repositories. If not, add the following to your `settings.gradle.kts` or `build.gradle.kts`:
+
+```kotlin
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+```
+
+### Configuring .gitignore
+Both the CLI tool and the Gradle plugin create a hidden folder to handle the conversion of the vectors without modifying the original file.
+
+To avoid VCS noise, make sure you add the following to your `.gitignore` which is located in the root folder of your project or the folder you are using the tool in:
+```
+.s2c
+```
+The algorithm will delete all the contents of the `.s2c` folder after parsing, but leave it empty. If you delete the folder, it will be recreated on the next run.
+
+## Usage
+
+### Using the Command-line Tool
+
+> [!NOTE]
+> For detailed usage instructions and options, please refer to the [Command-line Tool Documentation](./svg-to-compose/README.md).
+
+To see all available options, run:
+
 ```console
 s2c --help
 ```
-Help output:
-```console
-Usage: s2c [<options>] <path>
 
-Options:
-  -v, --version                                           Show this CLI version
-  -p, --package=<text>                                    Specify icons' package. This will replace package at the top of the icon file
-  -t, --theme=<text>                                      Specify project's theme name. This will take place in the Icon Preview composable function and in the ImageVector Builder's names.
-  -o, --output=<text>                                     output filename; if no .kt extension specified, it will be automatically added. In case of the input is a directory, output MUST also be a directory.
-  -opt, --optimize=true|false                             Enable SVG/AVG optimization before parsing to Jetpack Compose icon. The optimization process uses the following programs: svgo, avocado from NPM Registry
-  -rt, --receiver-type=<text>                             Adds a receiver type to the Icon definition. This will generate the Icon as a extension of the passed argument.
+**Example Commands**
 
-                                                          E.g.: s2c <args> -o MyIcon.kt -rt Icons.Filled my-icon.svg will creates the Compose Icon:
+- **Convert an SVG to a Compose Icon:**
 
-                                                          val Icons.Filled.MyIcon: ImageVector.
-  --add-to-material                                       Add the icon to the Material Icons context provider.
-  --debug                                                 Enable debug log.
-  --verbose                                               Enable verbose log.
-  -np, --no-preview                                       Removes the preview function from the file. It is very useful if you are generating the icons for KMP, since KMP doesn't support previews yet.
-  --kmp                                                   Ensures the output is compatible with KMP. Default: false
-  --make-internal                                         Mark the icon as internal
-  --minified                                              Remove all comments explaining the path logic creation and inline all method parameters.
-  -r, --recursive                                         Enables parsing of all files in the input directory, including those in subdirectories up to a maximum depth of 10
-  --recursive-depth, --depth=<int>                        The depth level for recursive file search within directory. The default value is 10.
-  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides.
-  --exclude=<text>                                        A regex used to exclude some icons from the parsing.
-  --map-icon-name-from-to, --from-to, --rename=<text>...  Replace the icon's name first value of this parameter with the second. This is useful when you want to remove part of the icon's name from the output icon.
+    ```console
+    s2c -o OutputIconFile.kt \
+        -p your.app.package.icon \
+        -t your.app.package.theme.YourAppComposeTheme \
+        input.svg
+    ```
 
-                                                          Example:
-                                                          ╭────────────────────────────────────────────╮
-                                                          │    s2c <args> \                            │
-                                                          │        -o ./my-app/src/my/pkg/icons \      │
-                                                          │        -rt Icons.Filled \                  │
-                                                          │        --map-icon-name-from-to "_filled" ""│
-                                                          │        ./my-app/assets/svgs                │
-                                                          ╰────────────────────────────────────────────╯
-  -h, --help                                              Show this message and exit
+- **Convert an Android Vector Drawable to a Compose Icon:**
 
-Arguments:
-  <path>  file *.svg | *.xml | directory
+    ```console
+    s2c -o OutputIconFile.kt \
+        -p your.app.package.icon \
+        -t your.app.package.theme.YourAppComposeTheme \
+        input.xml
+    ```
+
+- **Convert all SVGs and AVGs within a directory to Compose Icons:**
+
+    ```console
+    s2c -o /my/desired/directory \
+        -p your.app.package.icon \
+        -t your.app.package.theme.YourAppComposeTheme \
+        /my/svg/or/xml/directory
+    ```
+
+### Using the Gradle Plugin
+
+> [!NOTE]
+> For a complete list of configuration options and advanced usage, please refer to the [Gradle Plugin Documentation](./svg-to-compose-gradle-plugin/README.md).
+
+After applying the plugin, configure it in your `build.gradle.kts` file using the `svgToCompose` extension. This extension allows you to specify how the SVG/AVG files should be processed and converted.
+
+**Basic Configuration Example**
+
+```kotlin
+svgToCompose {
+    processor {
+        val projectIcons by creating {
+            from(layout.projectDirectory.dir("src/main/resources/icons"))
+            destinationPackage("com.example.app.ui.icons")
+            icons {
+                theme("com.example.app.ui.theme.AppTheme")
+            }
+            // Additional configurations...
+        }
+    }
+}
 ```
-
-Convert an SVG to a Compose Icon:
-```console
-s2c -o OutputIconFile.kt \
-    -p your.app.package.icon \
-    -t your.app.package.theme.YourAppComposeTheme \
-    input.svg
-```
-
-Convert an Android Drawable Vector to a Compose Icon:
-```console
-s2c -o OutputIconFile.kt \
-  -p your.app.package.icon \
-  -t your.app.package.theme.YourAppComposeTheme \
-  input.xml
-```
-
-Convert all SVGs and Android Drawable Vectors within a directory to Compose
-Icons:
-```console
-s2c -o /my/desired/directory \
-  -p your.app.package.icon \
-  -t your.app.package.theme.YourAppComposeTheme \
-  /my/svg/or/xml/directory
-```
-> [!WARNING]
-> If the input path is a directory and the output is not a directory,
-> the CLI will not parse any icon and will finish the execution with an error.
-
-Disabling SVG optimization:
-
-```console
-s2c -o OutputIconFile.kt \
-  -p your.app.package.icon \
-  -t your.app.package.theme.YourAppComposeTheme \
-  --opitmize false \
-  input.svg
-```
-
-> [!IMPORTANT]
-> If you don't specify the full qualifier of the Theme, you'll need to add the
-> import it later.
 
 ## Result Examples
-### Simple SVG file
-#### Without optimization
+
+### Simple SVG File
+
+#### Without Optimization
+
 Command:
+
 ```console
-./s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/ShieldSolid.kt \
-      -p dev.tonholo.composeicons.ui.icon \
-      --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-      -opt=false \
-      <parent-path>/shield-halved-solid.svg
+s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/ShieldSolid.kt \
+    -p dev.tonholo.composeicons.ui.icon \
+    --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+    -opt=false \
+    <parent-path>/shield-halved-solid.svg
 ```
 
 Input file: ![shield-halved-solid.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/shield-halved-solid.svg)
 
 Output file: [ShieldSolid.nonoptimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/ShieldSolid.svg.nonoptimized.kt)
 
-#### With optimization
+#### With Optimization
+
 Command:
+
 ```console
-./s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/ShieldSolid.kt \
-      -p dev.tonholo.composeicons.ui.icon \
-      --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-      -opt=true \
-      <parent-path>/shield-halved-solid.svg
+s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/ShieldSolid.kt \
+    -p dev.tonholo.composeicons.ui.icon \
+    --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+    -opt=true \
+    <parent-path>/shield-halved-solid.svg
 ```
 
 Input file: ![shield-halved-solid.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/shield-halved-solid.svg)
 
 Output file: [ShieldSolid.svg.optimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/ShieldSolid.svg.optimized.kt)
 
-### Complex SVG file
-#### Without optimization
+### Complex SVG File
+
+#### Without Optimization
+
 Command:
+
 ```console
-./s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/Illustration.kt \
-      -p dev.tonholo.composeicons.ui.icon \
-      --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-      -opt=false \
-      <parent-path>/illustration.svg
+s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/Illustration.kt \
+    -p dev.tonholo.composeicons.ui.icon \
+    --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+    -opt=false \
+    <parent-path>/illustration.svg
 ```
 
 Input file: ![illustration.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/illustration.svg)
 
 Output file: [Illustration.svg.nonoptimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/Illustration.svg.nonoptimized.kt)
 
-#### With optimization
+#### With Optimization
+
 Command:
+
 ```console
-./s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/Illustration.kt \
-      -p dev.tonholo.composeicons.ui.icon \
-      --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
-      -opt=true \
-      <parent-path>/illustration.svg
+s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/Illustration.kt \
+    -p dev.tonholo.composeicons.ui.icon \
+    --theme dev.tonholo.composeicons.ui.theme.ComposeIconsTheme \
+    -opt=true \
+    <parent-path>/illustration.svg
 ```
 
 Input file: ![illustration.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/illustration.svg)
 
 Output file: [Illustration.svg.optimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/Illustration.svg.optimized.kt)
 
-# License
-This software is released under the terms of the [MIT license](https://github.com/rafaeltonholo/svg-to-compose/blob/main/LICENSE).
+## License
+
+This software is released under the terms of the [MIT License](https://github.com/rafaeltonholo/svg-to-compose/blob/main/LICENSE).

@@ -1,4 +1,7 @@
 # SVG to Compose
+[![Built with KMP](https://img.shields.io/badge/Built_with_KMP-gray?logo=kotlin)](https://kotlinlang.org/docs/multiplatform.html)
+[![SVG to Compose Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose?display_name=tag&label=svg-to-compose&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose)
+[![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](./LICENSE)
 
 A command-line tool to convert SVG or an Android Vector Drawable (AVG) to
 Android Jetpack Compose Icons.
@@ -29,8 +32,8 @@ before converting it to Jetpack Compose Icons.
 This command-line tool adds that functionality.
 
 ## Platform support
-| Platform           | With optimization | Without optimization |
-|--------------------|:-----------------:|:--------------------:|
+| Platform           | With optimization | Without optimization   |
+|--------------------|:-----------------:|:----------------------:|
 | macOS Arm64        |         ✅         |          ✅           |
 | macOS x64          |         ✅         |          ✅           |
 | Linux x64          |         ✅         |          ✅           |

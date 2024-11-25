@@ -1,4 +1,6 @@
 # SVG/XML to Compose Gradle Plugin
+[![SVG to Compose Gradle Plugin Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose-gradle-plugin?display_name=tag&label=svg-to-compose-gradle-plugin&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose-gradle-plugin)
+[![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](./LICENSE)
 
 ## Table of Contents
 
@@ -22,8 +24,8 @@ integration of vector assets into your Compose projects, ensuring a more
 efficient and error-free workflow.
 
 ## Platform support
-| Platform             | Support |
-|----------------------|:-------:|
+| Platform             | Support  |
+|----------------------|:--------:|
 | Android              |    ✅    |
 | Kotlin Multiplatform |    ✅    |
 
@@ -222,6 +224,10 @@ svgToCompose {
 
 ### Persistent Generation
 
+> [!WARNING]
+> This is a delicate operation. Use `persist()` only if you're sure
+> you want to overwrite existing files in your source set.
+
 To persist generated icons in your source code (overwriting existing files):
 
 ```kotlin
@@ -237,7 +243,3 @@ svgToCompose {
     }
 }
 ```
-
-> [!WARNING]
-> This is a delicate operation. Use `persist()` only if you're sure
-> you want to overwrite existing files in your source set.
