@@ -1,20 +1,23 @@
 # SVG to Compose
+
 [![Built with KMP](https://img.shields.io/badge/Built_with_KMP-gray?logo=kotlin)](https://kotlinlang.org/docs/multiplatform.html)
 [![SVG to Compose Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose?display_name=tag&label=svg-to-compose&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose)
 [![SVG to Compose Gradle Plugin Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose-gradle-plugin?display_name=tag&label=svg-to-compose-gradle-plugin&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose-gradle-plugin)
 [![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](./LICENSE)
 
-A suite of tools to convert SVG or Android Vector Drawable (AVD/XML) files into Android Jetpack Compose Icons. This project provides:
+A suite of tools to convert SVG or Android Vector Drawable (AVD/XML) files into
+Android Jetpack Compose Icons. This project provides:
 
 - A **command-line tool** for manual conversion.
 - A **Gradle plugin** for automating the conversion within your build process.
 
 ---
 
-For more detailed information on each tool, configurations, and features, please refer to the full documentation:
+For more detailed information on each tool, configurations, and features, please
+refer to the full documentation:
 
 - [Command-line Tool Documentation](./svg-to-compose/README.md)
-- [Gradle Plugin Documentation](./svg-to-compose/README.md)
+- [Gradle Plugin Documentation](./svg-to-compose-gradle-plugin/README.md)
 
 ---
 
@@ -35,49 +38,69 @@ For more detailed information on each tool, configurations, and features, please
 
 ## Why?
 
-With the introduction of Jetpack Compose, Android developers can leverage the full power of Kotlin to build UI components, moving away from traditional XML layouts. However, integrating vector assets like icons often still relies on using Android Vector Drawables (AVD/XML) resources.
+With the introduction of Jetpack Compose, Android developers can leverage the
+full power of Kotlin to build UI components, moving away from traditional XML
+layouts. However, integrating vector assets like icons often still relies on
+using Android Vector Drawables (AVD/XML) resources.
 
-This project aims to streamline the integration of vector assets into Compose applications by providing tools that convert SVG or AVD files directly into Compose `ImageVector` objects, following the same approach used for Google's Material Icons.
+This project aims to streamline the integration of vector assets into Compose
+applications by providing tools that convert SVG or AVD files directly into
+Compose `ImageVector` objects, following the same approach used for Google's
+Material Icons.
 
 **Key Advantages:**
 
-- **Custom Parsing Algorithm:** The project employs its own parsing algorithm, written on Kotlin Multiplatform, specifically designed to handle complex vector graphics that are not fully supported by the standard `com.android.tools:sdk-common` library.
-- **Addresses Missing Features:** By addressing missing features in the default SDK tools, the algorithm can parse and convert complex SVGs and AVGs that other tools might fail to process correctly.
-- **Supports Complex Vectors:** Capable of handling intricate vector graphics, ensuring that even detailed icons are accurately converted.
-- **Optimization via Trusted Tools**: The optimization of SVGs is performed using external, well-known dependencies like **[SVGO](https://github.com/svg/svgo)** and **[Avocado](https://github.com/alexjlockwood/avocado)**, ensuring efficient and clean generated code without reinventing the wheel.
+- **Custom Parsing Algorithm:** The project employs its own parsing algorithm,
+  written on Kotlin Multiplatform, specifically designed to handle complex
+  vector graphics that are not fully supported by the standard
+  `com.android.tools:sdk-common` library.
+- **Addresses Missing Features:** By addressing missing features in the default
+  SDK tools, the algorithm can parse and convert complex SVGs and AVGs that
+  other tools might fail to process correctly.
+- **Supports Complex Vectors:** Capable of handling intricate vector graphics,
+  ensuring that even detailed icons are accurately converted.
+- **Optimization via Trusted Tools**: The optimization of SVGs is performed
+  using external, well-known dependencies like **[SVGO](https://github.com/svg/svgo)** 
+  and **[Avocado](https://github.com/alexjlockwood/avocado)**, ensuring 
+  efficient and clean generated code without reinventing the wheel.
 
 ## Platform Support
 
 ### Command-line Tool
 
 | Platform           | Command-line Tool |
-| ------------------ | :---------------: |
-| macOS Arm64        |        ✅         |
-| macOS x64          |        ✅         |
-| Linux x64          |        ✅         |
-| Windows (mingwX64) |        ✅         |
-| Windows (WSL)      |        ✅         |
+|--------------------|:-----------------:|
+| macOS Arm64        |         ✅         |
+| macOS x64          |         ✅         |
+| Linux x64          |         ✅         |
+| Windows (mingwX64) |         ✅         |
+| Windows (WSL)      |         ✅         |
 
 ### Gradle Plugin
 
 | Platform             | Gradle Plugin |
-| -------------------- | :-----------: |
-| Android              |      ✅       |
-| Kotlin Multiplatform |      ✅       |
+|----------------------|:-------------:|
+| Android              |       ✅       |
+| Kotlin Multiplatform |       ✅       |
 
 ## Available Tools
 
 ### Command-line Tool
 
-A CLI tool for manually converting SVG or AVD files into Jetpack Compose `ImageVector` objects. It supports optimization of SVGs and provides various options for customization.
+A CLI tool for manually converting SVG or AVD files into Jetpack Compose
+`ImageVector` objects. It supports optimization of SVGs and provides various
+options for customization.
 
-Ideal for CI integration as no additional dependencies are required (not even Java) other than the CLI tool's script and, if you wish, the optimization tools.
+Ideal for CI integration as no additional dependencies are required (not even
+Java) other than the CLI tool's script and, if you wish, the optimization tools.
 
 [Full documentation for the Command-line Tool can be found here.](./svg-to-compose/README.md)
 
 ### Gradle Plugin
 
-A Gradle plugin that automates the conversion process within your build system, ideal for projects with a large number of icons or for ensuring consistency and saving development time.
+A Gradle plugin that automates the conversion process within your build system,
+ideal for projects with a large number of icons or for ensuring consistency and
+saving development time.
 
 [Full documentation for the Gradle Plugin can be found here.](./svg-to-compose/README.md)
 
@@ -85,9 +108,12 @@ A Gradle plugin that automates the conversion process within your build system, 
 
 ### Command-line Tool Installation
 
-The CLI tool relies on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse the SVG/AVD files. You can install it by:
+The CLI tool relies
+on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse
+the SVG/AVD files. You can install it by:
 
-1. **Downloading the `s2c` script** from this repository and saving it in your preferred folder, or
+1. **Downloading the `s2c` script** from this repository and saving it in your
+   preferred folder, or
 2. **Cloning the project**.
 
 The script will handle downloading or building the native binaries.
@@ -106,14 +132,19 @@ After downloading the script or cloning the project:
     export PATH=<s2c path>:$PATH
     ```
 
-    Replace `<s2c path>` with the folder's path where you stored the script.
+   Replace `<s2c path>` with the folder's path where you stored the script.
 
 #### External Dependencies
+
 > [!NOTE]
-> This is optional. If you don't want to use external dependencies, make sure to disable optimization via `--optimize false` when using the CLI tool or by calling the `optimize(enabled = false)` when using the Gradle Plugin.
+> This is optional. If you don't want to use external dependencies, make sure to
+> disable optimization via `--optimize false` when using the CLI tool or by
+> calling the `optimize(enabled = false)` when using the Gradle Plugin.
 
 > [!IMPORTANT]
-> By default, Optimization is enabled by default on both CLI tool and Gradle Plugin  
+> By default, Optimization is enabled by default on both CLI tool and Gradle
+> Plugin.
+
 For SVG optimization, this script relies on:
 
 - **[SVGO](https://github.com/svg/svgo)**: Optimizes SVG files by reducing paths.
@@ -122,7 +153,8 @@ For SVG optimization, this script relies on:
     npm -g install svgo
     ```
 
-- **[Avocado](https://github.com/alexjlockwood/avocado)**: Optimizes Android VectorDrawable and AnimatedVectorDrawable XML files.
+- **[Avocado](https://github.com/alexjlockwood/avocado)**: Optimizes Android
+  VectorDrawable and AnimatedVectorDrawable XML files.
 
     ```console
     npm -g install avocado
@@ -130,7 +162,11 @@ For SVG optimization, this script relies on:
 
 ### Gradle Plugin Installation
 
-The **SVG/XML to Compose** Gradle Plugin is available on [Maven Central](https://search.maven.org/). It simplifies the process of converting SVG and Android Vector Drawable (AVG/XML) files into Jetpack Compose `ImageVector` properties, automating the integration of vector assets into your Compose projects, ensuring a more efficient and error-free workflow.
+The **SVG/XML to Compose** Gradle Plugin is available
+on [Maven Central](https://search.maven.org/). It simplifies the process of
+converting SVG and Android Vector Drawable (AVG/XML) files into Jetpack Compose
+`ImageVector` properties, automating the integration of vector assets into your
+Compose projects, ensuring a more efficient and error-free workflow.
 
 #### Applying the plugin
 
@@ -142,7 +178,8 @@ plugins {
 }
 ```
 
-Ensure that Maven Central is included in your plugin repositories. If not, add the following to your `settings.gradle.kts` or `build.gradle.kts`:
+Ensure that Maven Central is included in your plugin repositories. If not, add
+the following to your `settings.gradle.kts` or `build.gradle.kts`:
 
 ```kotlin
 pluginManagement {
@@ -154,20 +191,29 @@ pluginManagement {
 ```
 
 ### Configuring .gitignore
-Both the CLI tool and the Gradle plugin create a hidden folder to handle the conversion of the vectors without modifying the original file.
 
-To avoid VCS noise, make sure you add the following to your `.gitignore` which is located in the root folder of your project or the folder you are using the tool in:
+Both the CLI tool and the Gradle plugin create a hidden folder to handle the
+conversion of the vectors without modifying the original file.
+
+To avoid VCS noise, make sure you add the following to your `.gitignore` which
+is located in the root folder of your project or the folder you are using the
+tool in:
+
 ```
 .s2c
 ```
-The algorithm will delete all the contents of the `.s2c` folder after parsing, but leave it empty. If you delete the folder, it will be recreated on the next run.
+
+The algorithm will delete all the contents of the `.s2c` folder after parsing,
+but leave it empty. If you delete the folder, it will be recreated on the next
+run.
 
 ## Usage
 
 ### Using the Command-line Tool
 
 > [!NOTE]
-> For detailed usage instructions and options, please refer to the [Command-line Tool Documentation](./svg-to-compose/README.md).
+> For detailed usage instructions and options, please refer to
+> the [Command-line Tool Documentation](./svg-to-compose/README.md).
 
 To see all available options, run:
 
@@ -207,9 +253,12 @@ s2c --help
 ### Using the Gradle Plugin
 
 > [!NOTE]
-> For a complete list of configuration options and advanced usage, please refer to the [Gradle Plugin Documentation](./svg-to-compose-gradle-plugin/README.md).
+> For a complete list of configuration options and advanced usage, please refer
+> to the [Gradle Plugin Documentation](./svg-to-compose-gradle-plugin/README.md).
 
-After applying the plugin, configure it in your `build.gradle.kts` file using the `svgToCompose` extension. This extension allows you to specify how the SVG/AVG files should be processed and converted.
+After applying the plugin, configure it in your `build.gradle.kts` file using
+the `svgToCompose` extension. This extension allows you to specify how the
+SVG/AVG files should be processed and converted.
 
 **Basic Configuration Example**
 
