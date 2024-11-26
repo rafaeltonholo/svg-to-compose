@@ -2,7 +2,7 @@ name: Release V2
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "*.*.*"
 
 env:
   file-name: s2c
