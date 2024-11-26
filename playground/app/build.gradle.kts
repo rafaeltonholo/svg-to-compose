@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    id("dev.tonholo.s2c") version "2.0.0-alpha01"
+    id("dev.tonholo.s2c") version "2.0.0"
 }
 
 android {
