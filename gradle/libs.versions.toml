@@ -6,7 +6,7 @@ okio = "3.9.1"
 detekt = "1.23.7"
 ksoup = "0.2.0"
 maven-publish = "0.29.0"
-buildconfig = "5.5.0"
+buildconfig = "5.5.1"
 kotlinx-coroutines = "1.9.0"
 dokka = "1.9.20"
 
