@@ -4,52 +4,52 @@ import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.lexer.Lexer
 import dev.tonholo.s2c.lexer.Token
 
-class CssLexer : Lexer<CssTokenTypes> {
+internal class CssLexer : Lexer<CssTokenKind> {
     private var offset = 0
     private var input = ""
 
-    override fun tokenize(input: String): Sequence<Token<out CssTokenTypes>> = sequence {
+    override fun tokenize(input: String): Sequence<Token<out CssTokenKind>> = sequence {
         offset = 0
         this@CssLexer.input = input
         while (offset < input.length) {
             val char = input[offset]
             println("offset: $offset, char: $char")
             when (char.lowercaseChar()) {
-                in CssTokenTypes.WhiteSpace -> {
+                in CssTokenKind.WhiteSpace -> {
                     yield(handleWhitespace(start = offset))
                 }
 
-                in CssTokenTypes.Dot -> {
-                    yield(Token(CssTokenTypes.Dot, offset, offset + 1))
+                in CssTokenKind.Dot -> {
+                    yield(Token(CssTokenKind.Dot, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.Comma -> {
-                    yield(Token(CssTokenTypes.Comma, offset, offset + 1))
+                in CssTokenKind.Comma -> {
+                    yield(Token(CssTokenKind.Comma, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.Colon -> {
-                    yield(Token(CssTokenTypes.Colon, offset, offset + 1))
+                in CssTokenKind.Colon -> {
+                    yield(Token(CssTokenKind.Colon, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.Semicolon -> {
-                    yield(Token(CssTokenTypes.Semicolon, offset, offset + 1))
+                in CssTokenKind.Semicolon -> {
+                    yield(Token(CssTokenKind.Semicolon, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.OpenCurlyBrace -> {
-                    yield(Token(CssTokenTypes.OpenCurlyBrace, offset, offset + 1))
+                in CssTokenKind.OpenCurlyBrace -> {
+                    yield(Token(CssTokenKind.OpenCurlyBrace, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.CloseCurlyBrace -> {
-                    yield(Token(CssTokenTypes.CloseCurlyBrace, offset, offset + 1))
+                in CssTokenKind.CloseCurlyBrace -> {
+                    yield(Token(CssTokenKind.CloseCurlyBrace, offset, offset + 1))
                     offset++
                 }
 
-                in CssTokenTypes.Hash -> {
+                in CssTokenKind.Hash -> {
                     val next = peek(1)
                     val token = if (next != Char.EMPTY && next.isHexDigit()) {
                         var backwardLookupOffset = 0
@@ -60,14 +60,14 @@ class CssLexer : Lexer<CssTokenTypes> {
                             }
                         } while (prev == ' ')
 
-                        if (peek(backwardLookupOffset) in CssTokenTypes.Colon) {
-                            yield(Token(CssTokenTypes.Hash, offset, ++offset))
+                        if (peek(backwardLookupOffset) in CssTokenKind.Colon) {
+                            yield(Token(CssTokenKind.Hash, offset, ++offset))
                             handleHexDigit(start = offset)
                         } else {
-                            Token(CssTokenTypes.Hash, offset, ++offset)
+                            Token(CssTokenKind.Hash, offset, ++offset)
                         }
                     } else {
-                        Token(CssTokenTypes.Hash, offset, ++offset)
+                        Token(CssTokenKind.Hash, offset, ++offset)
                     }
 
                     yield(token)
@@ -88,23 +88,23 @@ class CssLexer : Lexer<CssTokenTypes> {
                 }
             }
         }
-        yield(Token(CssTokenTypes.EndOfFile, offset, offset))
+        yield(Token(CssTokenKind.EndOfFile, offset, offset))
     }
 
-    private fun handleWhitespace(start: Int): Token<CssTokenTypes> {
+    private fun handleWhitespace(start: Int): Token<CssTokenKind> {
         offset++
         while (offset < input.length) {
             val char = input[offset]
-            if (char !in CssTokenTypes.WhiteSpace) {
+            if (char !in CssTokenKind.WhiteSpace) {
                 break
             }
             offset++
         }
 
-        return Token(CssTokenTypes.WhiteSpace, start, offset)
+        return Token(CssTokenKind.WhiteSpace, start, offset)
     }
 
-    private fun handleIdentifier(start: Int): Token<CssTokenTypes> {
+    private fun handleIdentifier(start: Int): Token<CssTokenKind> {
         while (offset < input.length) {
             val char = input[offset]
             when (char) {
@@ -122,10 +122,10 @@ class CssLexer : Lexer<CssTokenTypes> {
             }
         }
 
-        return Token(CssTokenTypes.Identifier, start, offset)
+        return Token(CssTokenKind.Identifier, start, offset)
     }
 
-    private fun handleNumber(start: Int): Token<CssTokenTypes> {
+    private fun handleNumber(start: Int): Token<CssTokenKind> {
         while (offset < input.length) {
             val char = input[offset]
             when (char.lowercaseChar()) {
@@ -143,13 +143,13 @@ class CssLexer : Lexer<CssTokenTypes> {
             }
         }
 
-        return Token(CssTokenTypes.Number, start, offset)
+        return Token(CssTokenKind.Number, start, offset)
     }
 
-    private suspend fun SequenceScope<Token<out CssTokenTypes>>.yieldUrl(start: Int) {
+    private suspend fun SequenceScope<Token<out CssTokenKind>>.yieldUrl(start: Int) {
         val urlContentStart = advance(steps = 4)
-        yield(Token(CssTokenTypes.StartUrl, start, offset))
-        while (offset < input.length && input[offset] !in CssTokenTypes.EndUrl) {
+        yield(Token(CssTokenKind.StartUrl, start, offset))
+        while (offset < input.length && input[offset] !in CssTokenKind.EndUrl) {
             offset++
         }
 
@@ -165,12 +165,12 @@ class CssLexer : Lexer<CssTokenTypes> {
                         endOffset = urlContentStart + it.endOffset,
                     )
                 }
-                .filterNot { it.type == CssTokenTypes.EndOfFile }
+                .filterNot { it.kind == CssTokenKind.EndOfFile }
         )
-        yield(Token(CssTokenTypes.EndUrl, offset, ++offset))
+        yield(Token(CssTokenKind.EndUrl, offset, ++offset))
     }
 
-    private fun handleHexDigit(start: Int): Token<CssTokenTypes> {
+    private fun handleHexDigit(start: Int): Token<CssTokenKind> {
         while (offset < input.length) {
             val char = input[offset]
             when (char.lowercaseChar()) {
@@ -183,14 +183,16 @@ class CssLexer : Lexer<CssTokenTypes> {
             }
         }
 
-        return Token(CssTokenTypes.HexDigit, start, offset)
+        return Token(CssTokenKind.HexDigit, start, offset)
     }
 
-    private fun peek(offset: Int): Char = if (this.offset + offset >= input.length) {
-        Char.EMPTY
-    } else {
-        val index = this.offset + offset
-        input[index]
+    private fun peek(offset: Int): Char {
+        val peekIndex = this.offset + offset
+        return if (peekIndex < 0 || peekIndex >= input.length) {
+            Char.EMPTY
+        } else {
+            input[peekIndex]
+        }
     }
 
     private fun advance(steps: Int = 1): Int {
