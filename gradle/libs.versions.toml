@@ -11,7 +11,8 @@ kotlinx-coroutines = "1.9.0"
 dokka = "1.9.20"
 
 [libraries]
-clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
+com-github-ajalt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+com-github-ajalt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markdown", version.ref = "clikt" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}

@@ -19,7 +19,8 @@ kotlin {
         }
 
         nativeMain.dependencies {
-            implementation(libs.clikt)
+            implementation(libs.com.github.ajalt.clikt)
+            implementation(libs.com.github.ajalt.clikt.markdown)
         }
     }
 }
