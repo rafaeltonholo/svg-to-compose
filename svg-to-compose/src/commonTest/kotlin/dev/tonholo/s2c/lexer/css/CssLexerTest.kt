@@ -38,9 +38,7 @@ class CssLexerTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = 51, endOffset = 51),
         )
 
-        val lexer = CssLexer()
-        val actual = lexer.tokenize(input).toList()
-        assertEquals(expected, actual)
+        assert(input, expected)
     }
 
     @Test
@@ -76,9 +74,7 @@ class CssLexerTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = 51, endOffset = 51),
         )
 
-        val lexer = CssLexer()
-        val actual = lexer.tokenize(input).toList()
-        assertEquals(expected, actual)
+        assert(input, expected)
     }
 
     @Test
@@ -140,10 +136,7 @@ class CssLexerTest {
             Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 110, endOffset = 111),
             Token(kind = CssTokenKind.EndOfFile, startOffset = 111, endOffset = 111),
         )
-
-        val lexer = CssLexer()
-        val actual = lexer.tokenize(input).toList()
-        assertEquals(expected, actual)
+        assert(input, expected)
     }
 
     @Test
@@ -177,9 +170,7 @@ class CssLexerTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = 58, endOffset = 58),
         )
 
-        val lexer = CssLexer()
-        val actual = lexer.tokenize(input).toList()
-        assertEquals(expected, actual)
+        assert(input, expected)
     }
 
     @Test
@@ -206,8 +197,58 @@ class CssLexerTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = 36, endOffset = 36),
         )
 
+        assert(input, expected)
+    }
+
+    @Test
+    fun `create tokens for rule with element with multiple selectors`() {
+        val content = """
+            |dev.element-class#element-id {
+            |   display: none;
+            |}
+            """.trimMargin()
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Identifier, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.Dot, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.Identifier, startOffset = 4, endOffset = 17),
+            Token(kind = CssTokenKind.Hash, startOffset = 17, endOffset = 18),
+            Token(kind = CssTokenKind.Identifier, startOffset = 18, endOffset = 28),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 28, endOffset = 29),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 29, endOffset = 30),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 30, endOffset = 34),
+            Token(kind = CssTokenKind.Identifier, startOffset = 34, endOffset = 41),
+            Token(kind = CssTokenKind.Colon, startOffset = 41, endOffset = 42),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 42, endOffset = 43),
+            Token(kind = CssTokenKind.Identifier, startOffset = 43, endOffset = 47),
+            Token(kind = CssTokenKind.Semicolon, startOffset = 47, endOffset = 48),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 48, endOffset = 49),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 49, endOffset = 50),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 50, endOffset = 50),
+        )
+        assert(content, tokens)
+    }
+
+    @Test
+    fun `create tokens for css without formatting`() {
+        val content = """
+            |div{display:none}
+            """.trimMargin()
+
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Identifier, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.Identifier, startOffset = 4, endOffset = 11),
+            Token(kind = CssTokenKind.Colon, startOffset = 11, endOffset = 12),
+            Token(kind = CssTokenKind.Identifier, startOffset = 12, endOffset = 16),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 16, endOffset = 17),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 17, endOffset = 17),
+        )
+        assert(content, tokens)
+    }
+
+    private fun assert(content: String, tokens: List<Token<out CssTokenKind>>) {
         val lexer = CssLexer()
-        val actual = lexer.tokenize(input).toList()
-        assertEquals(expected, actual)
+        val actual = lexer.tokenize(content).toList()
+        assertEquals(tokens, actual)
     }
 }
