@@ -140,6 +140,9 @@ internal class CssAstParser(
                 PropertyValue.StringLiteral(content.substring(token.startOffset, token.endOffset))
             }
 
+            CssTokenKind.Identifier ->
+                PropertyValue.Identifier(content.substring(token.startOffset, token.endOffset))
+
             CssTokenKind.Number -> {
                 val unitsIdentifier = next()
                 val units = if (unitsIdentifier != null && unitsIdentifier.kind is CssTokenKind.Identifier) {
