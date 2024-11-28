@@ -36,5 +36,5 @@ internal sealed interface PropertyValue : Element {
     data class Number(val value: String, val units: String?) : PropertyValue
     data class Function(val name: String, val arguments: List<PropertyValue>) : PropertyValue
     data class Url(val value: String) : PropertyValue
-    data class Literal(val value: String) : PropertyValue
+    data class Identifier(val value: String) : PropertyValue
 }
