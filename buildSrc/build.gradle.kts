@@ -13,6 +13,7 @@ dependencies {
     // Workaround for using version catalog in Kotlin script convention plugins
     // https://github.com/gradle/gradle/issues/15383#issuecomment-779893192
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
+    implementation(libs.app.cash.burst.gradle.plugin)
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
     implementation(libs.org.jetbrains.kotlin.powerAssert.plugin)
     implementation(libs.org.jetbrains.dokka.gradle.plugin)

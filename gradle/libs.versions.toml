@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+burst = "2.2.0"
 kotlin = "2.1.0"
 clikt = "5.0.2"
 okio = "3.9.1"
@@ -17,6 +18,7 @@ com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = 
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup"}
 org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+app-cash-burst-gradle-plugin = { module = "app.cash.burst:burst-gradle-plugin", version.ref = "burst" }
 
 # Plugins
 org-jetbrains-dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
