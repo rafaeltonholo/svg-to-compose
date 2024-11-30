@@ -44,7 +44,7 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Class,
                             value = "my-rule",
                         ),
@@ -102,7 +102,7 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Id,
                             value = "my-rule",
                         ),
@@ -186,7 +186,7 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Class,
                             value = "my-rule",
                         ),
@@ -204,7 +204,7 @@ class CssAstParserTest {
                 ),
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Id,
                             value = "my-rule",
                         ),
@@ -252,7 +252,7 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Class,
                             value = "my-rule",
                         ),
@@ -305,11 +305,11 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Id,
                             value = "my-rule",
                         ),
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Class,
                             value = "my-class",
                         ),
@@ -364,7 +364,7 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Tag,
                             value = "div",
                         ),
@@ -429,15 +429,15 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Tag,
                             value = "div",
                         ),
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Class,
                             value = "content",
                         ),
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Id,
                             value = "my-rule",
                         ),
@@ -488,9 +488,21 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
-                            type = CssSelectorType.Tag,
-                            value = "div.element-class#element-id",
+                        CssSelector.Multiple(
+                            selectors = listOf(
+                                CssSelector.Single(
+                                    type = CssSelectorType.Tag,
+                                    value = "div",
+                                ),
+                                CssSelector.Single(
+                                    type = CssSelectorType.Class,
+                                    value = "element-class",
+                                ),
+                                CssSelector.Single(
+                                    type = CssSelectorType.Id,
+                                    value = "element-id",
+                                ),
+                            ),
                         ),
                     ),
                     declarations = listOf(
@@ -525,10 +537,58 @@ class CssAstParserTest {
             rules = listOf(
                 CssRule(
                     selectors = listOf(
-                        CssSelector(
+                        CssSelector.Single(
                             type = CssSelectorType.Tag,
                             value = "div",
                         ),
+                    ),
+                    declarations = listOf(
+                        CssDeclaration(
+                            property = "display",
+                            value = PropertyValue.Identifier("none"),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        assert(content, tokens, expected)
+    }
+
+    @Test
+    fun `parse rules for css with tag and id`() {
+        val content = """
+            |div#id { display:none }
+            """.trimMargin()
+
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Identifier, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.Hash, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.Identifier, startOffset = 4, endOffset = 6),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 6, endOffset = 7),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 7, endOffset = 8),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 8, endOffset = 9),
+            Token(kind = CssTokenKind.Identifier, startOffset = 9, endOffset = 16),
+            Token(kind = CssTokenKind.Colon, startOffset = 16, endOffset = 17),
+            Token(kind = CssTokenKind.Identifier, startOffset = 17, endOffset = 21),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 21, endOffset = 22),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 22, endOffset = 22),
+        )
+        val expected = CssRootNode(
+            rules = listOf(
+                CssRule(
+                    selectors = listOf(
+                        CssSelector.Multiple(
+                            selectors = listOf(
+                                CssSelector.Single(
+                                    type = CssSelectorType.Tag,
+                                    value = "div",
+                                ),
+                                CssSelector.Single(
+                                    type = CssSelectorType.Id,
+                                    value = "id",
+                                ),
+                            )
+                        )
                     ),
                     declarations = listOf(
                         CssDeclaration(

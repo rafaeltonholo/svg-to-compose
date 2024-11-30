@@ -4,12 +4,29 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.AstParser
 
+private val terminalTokens = listOf(
+    CssTokenKind.WhiteSpace,
+    CssTokenKind.Comma,
+    CssTokenKind.OpenCurlyBrace,
+    CssTokenKind.Semicolon,
+)
+
+private val selectorStarters = listOf(
+    CssTokenKind.Dot,
+    CssTokenKind.Hash,
+)
+
 internal class CssAstParser(
     private val content: String,
 ) : AstParser<CssTokenKind, CssRootNode> {
     private var offset = 0
     private val tokens = mutableListOf<Token<out CssTokenKind>>()
     override fun parse(tokens: List<Token<out CssTokenKind>>): CssRootNode {
+        val rules = parseRules(tokens)
+        return CssRootNode(rules)
+    }
+
+    private fun parseRules(tokens: List<Token<out CssTokenKind>>): List<CssRule> {
         this.tokens.addAll(tokens)
         val rules = mutableListOf<CssRule>()
         do {
@@ -18,27 +35,27 @@ internal class CssAstParser(
                 rules += rule
             }
         } while (rule != null)
-        return CssRootNode(rules)
+        return rules
     }
 
-    private fun next(): Token<out CssTokenKind>? = tokens
-        .takeIf { offset < it.size }
-        ?.get(offset++)
+    private fun next(): Token<out CssTokenKind>? = if (offset < tokens.size) {
+        tokens[offset++]
+    } else {
+        null
+    }
+
+    private fun peek(steps: Int): Token<out CssTokenKind>? = tokens.getOrNull(offset + steps)
 
     private fun parseNext(sibling: CssElement?): CssElement? {
         val starterToken = next() ?: return null
         val element = when (starterToken.kind) {
             // skip elements
-            CssTokenKind.WhiteSpace,
-            CssTokenKind.Comma,
-            CssTokenKind.OpenCurlyBrace,
-            CssTokenKind.Semicolon -> parseNext(sibling)
+            in terminalTokens -> parseNext(sibling)
 
             CssTokenKind.CloseCurlyBrace, CssTokenKind.EndOfFile -> null
 
             // Potential selectors
-            CssTokenKind.Dot -> createClassSelector()
-            CssTokenKind.Hash -> createIdSelector()
+            in selectorStarters -> createSelector(starterToken)
             CssTokenKind.Identifier -> createIdentifierElement(starterToken)
 
             else -> null
@@ -51,42 +68,78 @@ internal class CssAstParser(
         }
     }
 
-    private fun createClassSelector(): CssSelector {
-        val token = requireNotNull(next()) { "Expected token but found null" }
-        check(token.kind is CssTokenKind.Identifier) { "Expected identifier but found ${token.kind}" }
-        return CssSelector(
-            type = CssSelectorType.Class,
-            value = content.substring(token.startOffset, token.endOffset),
+    private fun createSelector(starterToken: Token<out CssTokenKind>): CssSelector {
+        return when (starterToken.kind) {
+            CssTokenKind.Dot -> createSelector(type = CssSelectorType.Class)
+            CssTokenKind.Hash -> createSelector(type = CssSelectorType.Id)
+
+            else -> error(
+                buildErrorMessage(
+                    message = "Expected identifier but found ${starterToken.kind}",
+                    backtrack = 1,
+                )
+            )
+        }
+    }
+
+    private fun createAggregateSelector(initiator: CssSelector): CssSelector.Multiple {
+        val selectors = mutableListOf(initiator)
+        while (true) {
+            val next = next()
+            if (next == null || next.kind in terminalTokens) {
+                break
+            }
+            selectors += createSelector(next)
+        }
+
+        return CssSelector.Multiple(
+            selectors = selectors,
         )
     }
 
-    private fun createIdSelector(): CssSelector {
+    private fun createSelector(type: CssSelectorType): CssSelector {
         val token = requireNotNull(next()) { "Expected token but found null" }
         check(token.kind is CssTokenKind.Identifier) { "Expected identifier but found ${token.kind}" }
-        return CssSelector(
-            type = CssSelectorType.Id,
+        val next = peek(steps = 0)
+        val selector = CssSelector.Single(
+            type = type,
             value = content.substring(token.startOffset, token.endOffset),
         )
+        return if (next?.kind in terminalTokens || next?.kind in selectorStarters) {
+            selector
+        } else {
+            createAggregateSelector(selector)
+        }
     }
 
     private fun createIdentifierElement(starterToken: Token<out CssTokenKind>): CssElement? {
         val token = requireNotNull(next()) { "Expected token but found null" }
+        val value = content.substring(starterToken.startOffset, starterToken.endOffset)
         return when (token.kind) {
-            is CssTokenKind.WhiteSpace,
-            is CssTokenKind.Comma,
-            is CssTokenKind.OpenCurlyBrace -> {
-                CssSelector(
+            in terminalTokens -> {
+                CssSelector.Single(
                     type = CssSelectorType.Tag,
-                    value = content.substring(starterToken.startOffset, starterToken.endOffset),
+                    value = value,
+                )
+            }
+
+            in selectorStarters -> {
+                rewind()
+                createAggregateSelector(
+                    CssSelector.Single(
+                        type = CssSelectorType.Tag,
+                        value = value,
+                    ),
                 )
             }
 
             is CssTokenKind.Colon -> {
-                val property = content.substring(starterToken.startOffset, starterToken.endOffset)
+                val propertyValueToken = next()
+                val propertyValue = propertyValueToken?.parsePropertyValue()
                 CssDeclaration(
-                    property = property,
-                    value = requireNotNull(next()?.parsePropertyValue()) {
-                        "Incomplete property '$property' value"
+                    property = value,
+                    value = requireNotNull(propertyValue) {
+                        "Incomplete property '$value' value"
                     },
                 )
             }
@@ -186,8 +239,8 @@ internal class CssAstParser(
         }
     }
 
-    private fun rewind() {
-        offset--
+    private fun rewind(steps: Int = 1) {
+        offset -= steps
     }
 
     private fun buildErrorMessage(
