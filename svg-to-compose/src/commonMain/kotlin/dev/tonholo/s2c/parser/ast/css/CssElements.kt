@@ -5,18 +5,18 @@ import dev.tonholo.s2c.parser.ast.Element
 internal sealed interface CssElement : Element
 
 internal data class CssRootNode(
-    val rules: List<CssRule>
+    val rules: List<CssRule>,
 ) : CssElement
 
 internal data class CssRule(
     val selectors: List<CssSelector>,
-    val declarations: List<CssDeclaration>
+    val declarations: List<CssDeclaration>,
 ) : CssElement
 
-internal data class CssSelector(
-    val type: CssSelectorType,
-    val value: String
-) : CssElement
+internal sealed interface CssSelector : CssElement {
+    data class Single(val type: CssSelectorType, val value: String) : CssSelector
+    data class Multiple(val selectors: List<CssSelector>) : CssSelector
+}
 
 internal sealed class CssSelectorType {
     data object Id : CssSelectorType()
