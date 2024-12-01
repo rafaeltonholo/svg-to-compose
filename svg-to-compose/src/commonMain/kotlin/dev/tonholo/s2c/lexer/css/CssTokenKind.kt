@@ -3,10 +3,24 @@ package dev.tonholo.s2c.lexer.css
 import dev.tonholo.s2c.lexer.TokenKind
 
 internal sealed class CssTokenKind(
-    override val representation: String,
+    override val representation: kotlin.String,
 ) : TokenKind {
     data object EndOfFile : CssTokenKind(representation = "")
-    data object WhiteSpace : CssTokenKind(representation = " \n\t")
+    data object WhiteSpace : CssTokenKind(representation = " \n\t") {
+        val significantAdjacentTokens = setOf(
+            Identifier,
+            Number,
+            String,
+            Function,
+            StartUrl,
+            EndUrl,
+            Hash,
+            OpenParenthesis,
+            CloseParenthesis,
+            OpenSquareBracket,
+            CloseSquareBracket,
+        )
+    }
     data object At : CssTokenKind(representation = "@")
     data object Dot : CssTokenKind(representation = ".")
     data object Asterisk : CssTokenKind(representation = "*")
@@ -31,7 +45,7 @@ internal sealed class CssTokenKind(
     // Decimal or float
     data object Number : CssTokenKind(representation = "")
     data object HexDigit : CssTokenKind(representation = "")
-    data object StringLiteral : CssTokenKind(representation = "")
+    data object String : CssTokenKind(representation = "")
     data object MultilineString : CssTokenKind(representation = "")
 
     // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
@@ -54,8 +68,8 @@ internal sealed class CssTokenKind(
     data object CloseCurlyBrace : CssTokenKind(representation = "}")
     data object OpenSquareBracket : CssTokenKind(representation = "[")
     data object CloseSquareBracket : CssTokenKind(representation = "]")
-    data object OpenFunctionBrace : CssTokenKind(representation = "(")
-    data object CloseFunctionBrace : CssTokenKind(representation = ")")
+    data object OpenParenthesis : CssTokenKind(representation = "(")
+    data object CloseParenthesis : CssTokenKind(representation = ")")
     data object HtmlComment : CssTokenKind(representation = "")
     data object MultilineComment : CssTokenKind(representation = "")
     data object SingleComment : CssTokenKind(representation = "")
