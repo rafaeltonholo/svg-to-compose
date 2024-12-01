@@ -31,10 +31,11 @@ internal data class CssDeclaration(
 ) : CssElement
 
 internal sealed interface PropertyValue : Element {
-    data class Color(val value: String) : PropertyValue
-    data class StringLiteral(val value: String) : PropertyValue
-    data class Number(val value: String, val units: String?) : PropertyValue
-    data class Function(val name: String, val arguments: List<PropertyValue>) : PropertyValue
-    data class Url(val value: String) : PropertyValue
-    data class Identifier(val value: String) : PropertyValue
+    data class Color(val value: kotlin.String) : PropertyValue
+    data class String(val value: kotlin.String) : PropertyValue
+    data class Number(val value: kotlin.String, val units: kotlin.String?) : PropertyValue
+    data class Function(val name: kotlin.String, val arguments: List<PropertyValue>) : PropertyValue
+    data class Url(val value: kotlin.String) : PropertyValue
+    data class Identifier(val value: kotlin.String) : PropertyValue
+    data class Multiple(val values: List<PropertyValue>) : PropertyValue
 }
