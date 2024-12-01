@@ -15,38 +15,48 @@ internal class CssLexer : Lexer<CssTokenKind> {
             val char = input[offset]
             println("offset: $offset, char: $char")
             when (char.lowercaseChar()) {
+                in CssTokenKind.AtKeyword -> {
+                    yield(handleAtKeyword(start = offset))
+                }
+
                 in CssTokenKind.WhiteSpace -> {
                     yield(handleWhitespace(start = offset))
                 }
 
+                in CssTokenKind.Greater -> {
+                    yield(handleDirectToken(kind = CssTokenKind.Greater, start = offset))
+                }
+
                 in CssTokenKind.Dot -> {
-                    yield(Token(CssTokenKind.Dot, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.Dot, start = offset))
                 }
 
                 in CssTokenKind.Comma -> {
-                    yield(Token(CssTokenKind.Comma, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.Comma, start = offset))
                 }
 
                 in CssTokenKind.Colon -> {
-                    yield(Token(CssTokenKind.Colon, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.Colon, start = offset))
                 }
 
                 in CssTokenKind.Semicolon -> {
-                    yield(Token(CssTokenKind.Semicolon, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.Semicolon, start = offset))
                 }
 
                 in CssTokenKind.OpenCurlyBrace -> {
-                    yield(Token(CssTokenKind.OpenCurlyBrace, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.OpenCurlyBrace, start = offset))
                 }
 
                 in CssTokenKind.CloseCurlyBrace -> {
-                    yield(Token(CssTokenKind.CloseCurlyBrace, offset, offset + 1))
-                    offset++
+                    yield(handleDirectToken(kind = CssTokenKind.CloseCurlyBrace, start = offset))
+                }
+
+                in CssTokenKind.OpenParenthesis -> {
+                    yield(handleDirectToken(kind = CssTokenKind.OpenParenthesis, start = offset))
+                }
+
+                in CssTokenKind.CloseParenthesis -> {
+                    yield(handleDirectToken(kind = CssTokenKind.CloseParenthesis, start = offset))
                 }
 
                 in CssTokenKind.Hash -> {
@@ -89,6 +99,22 @@ internal class CssLexer : Lexer<CssTokenKind> {
             }
         }
         yield(Token(CssTokenKind.EndOfFile, offset, offset))
+    }
+
+    private fun handleDirectToken(kind: CssTokenKind, start: Int): Token<CssTokenKind> {
+        val token = Token(kind, start, offset + 1)
+        offset++
+        return token
+    }
+
+    private fun handleAtKeyword(start: Int): Token<CssTokenKind.AtKeyword> {
+        while (offset < input.length) {
+            val char = input[++offset]
+            if (char == ' ') {
+                break
+            }
+        }
+        return Token(CssTokenKind.AtKeyword, start, offset)
     }
 
     private fun handleWhitespace(start: Int): Token<CssTokenKind> {
@@ -143,7 +169,32 @@ internal class CssLexer : Lexer<CssTokenKind> {
             }
         }
 
-        return Token(CssTokenKind.Number, start, offset)
+        // find if dimension is present
+        var dimension = ""
+        val startDimension = offset
+        while (offset < input.length) {
+            val char = input[offset++]
+            if (
+                char in CssTokenKind.OpenParenthesis ||
+                char in CssTokenKind.CloseParenthesis ||
+                char in CssTokenKind.WhiteSpace ||
+                char in CssTokenKind.Comma ||
+                char in CssTokenKind.Semicolon) {
+                offset--
+                break
+            }
+            dimension += char
+        }
+
+        if (dimension.isEmpty()) {
+            offset = startDimension
+        }
+
+        return when {
+            input[offset + 1] in CssTokenKind.Percent -> Token(CssTokenKind.Percentage, start, offset + 2)
+            dimension.isNotBlank() -> Token(CssTokenKind.Dimension, start, offset)
+            else -> Token(CssTokenKind.Number, start, offset)
+        }
     }
 
     private suspend fun SequenceScope<Token<out CssTokenKind>>.yieldUrl(start: Int) {
