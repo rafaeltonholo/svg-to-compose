@@ -21,7 +21,8 @@ internal sealed class CssTokenKind(
             CloseSquareBracket,
         )
     }
-    data object At : CssTokenKind(representation = "@")
+
+    data object AtKeyword : CssTokenKind(representation = "@")
     data object Dot : CssTokenKind(representation = ".")
     data object Asterisk : CssTokenKind(representation = "*")
     data object Ampersand : CssTokenKind(representation = "&")
@@ -44,6 +45,8 @@ internal sealed class CssTokenKind(
 
     // Decimal or float
     data object Number : CssTokenKind(representation = "")
+    data object Dimension : CssTokenKind(representation = "px|em|rem|cm|mm|in|pt|pc|vh|vw|vmin|vmax|ch|ex")
+    data object Percentage : CssTokenKind(representation = "%")
     data object HexDigit : CssTokenKind(representation = "")
     data object String : CssTokenKind(representation = "")
     data object MultilineString : CssTokenKind(representation = "")
