@@ -9,12 +9,13 @@ internal sealed class CssTokenKind(
     data object WhiteSpace : CssTokenKind(representation = " \n\t") {
         val significantAdjacentTokens = setOf(
             Identifier,
+            Hash,
+            Dot,
             Number,
             String,
             Function,
             StartUrl,
             EndUrl,
-            Hash,
             OpenParenthesis,
             CloseParenthesis,
             OpenSquareBracket,
