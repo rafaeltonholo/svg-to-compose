@@ -20,7 +20,7 @@ internal val selectorStarters = listOf(
 )
 
 internal class CssAstParser(
-    private val content: String
+    private val content: String,
 ) : AstParser<CssTokenKind, CssRootNode> {
     private val selectorParser: SelectorParser = SelectorParser(
         content = content,
@@ -149,11 +149,11 @@ private fun List<Token<out CssTokenKind>>.trim(): List<Token<out CssTokenKind>> 
             val next = tokens.getOrNull(i + 1)
             when {
                 // trim leading or trailing whitespaces
-                prev == null && next == null -> i++
+                prev == null || next == null -> i++
 
                 (token.kind is CssTokenKind.WhiteSpace &&
-                    prev?.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
-                    next?.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens) -> i++
+                    prev.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
+                    next.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens) -> i++
 
                 token.kind is CssTokenKind.WhiteSpace -> {
                     removeLast()
