@@ -2,11 +2,11 @@ package dev.tonholo.s2c.parser.ast.css.elements
 
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
+import dev.tonholo.s2c.parser.ast.css.CssComponent
+import dev.tonholo.s2c.parser.ast.css.CssComponentType
 import dev.tonholo.s2c.parser.ast.css.CssDeclaration
 import dev.tonholo.s2c.parser.ast.css.CssElement
 import dev.tonholo.s2c.parser.ast.css.CssRootNode
-import dev.tonholo.s2c.parser.ast.css.CssSelector
-import dev.tonholo.s2c.parser.ast.css.CssSelectorType
 import dev.tonholo.s2c.parser.ast.css.selectorStarters
 import dev.tonholo.s2c.parser.ast.css.selectors.SelectorParser
 import dev.tonholo.s2c.parser.ast.css.selectors.createAggregateSelectorParser
@@ -40,8 +40,8 @@ internal class IdentifierElementParser(
 
         return when (token.kind) {
             in terminalTokens -> {
-                CssSelector.Single(
-                    type = CssSelectorType.Tag,
+                CssComponent.Single(
+                    type = CssComponentType.Tag,
                     value = value,
                 )
             }
@@ -50,8 +50,8 @@ internal class IdentifierElementParser(
                 iterator.rewind()
                 selectorParser.createAggregateSelectorParser(
                     iterator,
-                    CssSelector.Single(
-                        type = CssSelectorType.Tag,
+                    CssComponent.Single(
+                        type = CssComponentType.Tag,
                         value = value,
                     ),
                 )

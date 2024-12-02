@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.parser.ast.css
 
+import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.Element
 
 internal sealed interface CssElement : Element
@@ -8,14 +9,33 @@ internal data class CssRootNode(
     val rules: List<CssRule>,
 ) : CssElement
 
-internal data class CssRule(
-    val selectors: List<CssSelector>,
+internal sealed interface CssRule : CssElement {
+    val components: List<CssComponent>
+}
+
+internal data class CssQualifiedRule(
+    override val components: List<CssComponent>,
+    // TODO: Declarations can also contain at-rules.
     val declarations: List<CssDeclaration>,
-) : CssElement
+) : CssRule
+
+internal data class CssAtRule(
+    val name: String,
+    override val components: List<CssComponent>,
+    val rules: List<CssRule>,
+) : CssRule
 
 internal sealed interface CssSelector : CssElement {
     data class Single(val type: CssSelectorType, val value: String) : CssSelector
     data class Multiple(val selectors: List<CssSelector>) : CssSelector
+internal sealed interface CssComponent : CssElement {
+    data class Single(
+        val type: CssComponentType,
+        val value: String,
+        val combinator: CssCombinator? = null,
+    ) : CssComponent
+
+    data class Multiple(val components: List<CssComponent>) : CssComponent
 }
 
 internal sealed class CssSelectorType {
@@ -23,6 +43,10 @@ internal sealed class CssSelectorType {
     data object Class : CssSelectorType()
     data object Tag : CssSelectorType()
     data object Universal : CssSelectorType()
+internal sealed interface CssComponentType {
+    data object Id : CssComponentType
+    data object Class : CssComponentType
+    data object Tag : CssComponentType
 }
 
 internal data class CssDeclaration(

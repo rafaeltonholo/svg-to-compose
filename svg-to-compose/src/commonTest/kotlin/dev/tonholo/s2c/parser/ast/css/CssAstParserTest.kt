@@ -42,10 +42,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "my-rule",
                         ),
                     ),
@@ -100,10 +100,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Id,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Id,
                             value = "my-rule",
                         ),
                     ),
@@ -184,10 +184,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "my-rule",
                         ),
                     ),
@@ -202,10 +202,10 @@ class CssAstParserTest {
                         ),
                     ),
                 ),
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Id,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Id,
                             value = "my-rule",
                         ),
                     ),
@@ -250,10 +250,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "my-rule",
                         ),
                     ),
@@ -303,14 +303,14 @@ class CssAstParserTest {
 
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Id,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Id,
                             value = "my-rule",
                         ),
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "my-class",
                         ),
                     ),
@@ -362,10 +362,10 @@ class CssAstParserTest {
 
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Tag,
                             value = "div",
                         ),
                     ),
@@ -427,18 +427,18 @@ class CssAstParserTest {
 
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Tag,
                             value = "div",
                         ),
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "content",
                         ),
-                        CssSelector.Single(
-                            type = CssSelectorType.Id,
+                        CssComponent.Single(
+                            type = CssComponentType.Id,
                             value = "my-rule",
                         ),
                     ),
@@ -486,20 +486,20 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Multiple(
-                            selectors = listOf(
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Multiple(
+                            components = listOf(
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "div",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Class,
+                                CssComponent.Single(
+                                    type = CssComponentType.Class,
                                     value = "element-class",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Id,
+                                CssComponent.Single(
+                                    type = CssComponentType.Id,
                                     value = "element-id",
                                 ),
                             ),
@@ -535,10 +535,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Tag,
                             value = "div",
                         ),
                     ),
@@ -575,16 +575,16 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Multiple(
-                            selectors = listOf(
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Multiple(
+                            components = listOf(
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "div",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Id,
+                                CssComponent.Single(
+                                    type = CssComponentType.Id,
                                     value = "id",
                                 ),
                             )
@@ -638,36 +638,36 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Multiple(
-                            selectors = listOf(
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Multiple(
+                            components = listOf(
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "div",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Class,
+                                CssComponent.Single(
+                                    type = CssComponentType.Class,
                                     value = "child",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "a",
                                 ),
                             ),
                         ),
-                        CssSelector.Multiple(
-                            selectors = listOf(
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                        CssComponent.Multiple(
+                            components = listOf(
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "a",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Class,
+                                CssComponent.Single(
+                                    type = CssComponentType.Class,
                                     value = "child",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "span",
                                 ),
                             ),
@@ -715,24 +715,24 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Multiple(
-                            selectors = listOf(
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Multiple(
+                            components = listOf(
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "div",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "span",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Tag,
+                                CssComponent.Single(
+                                    type = CssComponentType.Tag,
                                     value = "label",
                                 ),
-                                CssSelector.Single(
-                                    type = CssSelectorType.Class,
+                                CssComponent.Single(
+                                    type = CssComponentType.Class,
                                     value = "my-class",
                                 )
                             ),
@@ -776,10 +776,10 @@ class CssAstParserTest {
         )
         val expected = CssRootNode(
             rules = listOf(
-                CssRule(
-                    selectors = listOf(
-                        CssSelector.Single(
-                            type = CssSelectorType.Class,
+                CssQualifiedRule(
+                    components = listOf(
+                        CssComponent.Single(
+                            type = CssComponentType.Class,
                             value = "my-class",
                         ),
                     ),

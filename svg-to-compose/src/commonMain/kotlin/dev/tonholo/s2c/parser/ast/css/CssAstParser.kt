@@ -101,19 +101,19 @@ internal class CssAstParser(
             else -> null
         }
 
-        return if (element is CssSelector && sibling == null) {
+        return if (element is CssComponent && sibling == null) {
             createCssRule(element)
         } else {
             element
         }
     }
 
-    private fun createCssRule(element: CssSelector): CssElement {
-        val selectors = mutableListOf<CssSelector>()
+    private fun createCssRule(element: CssComponent): CssElement {
+        val selectors = mutableListOf<CssComponent>()
         val declarations = mutableListOf<CssDeclaration>()
         // get siblings selectors
         var next: CssElement? = element
-        while (next != null && next is CssSelector) {
+        while (next != null && next is CssComponent) {
             selectors += next
             next = parseNext(sibling = element)
             if (next is CssDeclaration) {
@@ -130,11 +130,10 @@ internal class CssAstParser(
             }
         }
 
-        return CssRule(
-            selectors = selectors,
+        return CssQualifiedRule(
+            components = selectors,
             declarations = declarations,
         )
-
     }
 }
 
