@@ -25,9 +25,6 @@ internal data class CssAtRule(
     val rules: List<CssRule>,
 ) : CssRule
 
-internal sealed interface CssSelector : CssElement {
-    data class Single(val type: CssSelectorType, val value: String) : CssSelector
-    data class Multiple(val selectors: List<CssSelector>) : CssSelector
 internal sealed interface CssComponent : CssElement {
     data class Single(
         val type: CssComponentType,
@@ -36,17 +33,31 @@ internal sealed interface CssComponent : CssElement {
     ) : CssComponent
 
     data class Multiple(val components: List<CssComponent>) : CssComponent
+    data class AtRule(val value: String) : CssComponent
 }
 
-internal sealed class CssSelectorType {
-    data object Id : CssSelectorType()
-    data object Class : CssSelectorType()
-    data object Tag : CssSelectorType()
-    data object Universal : CssSelectorType()
 internal sealed interface CssComponentType {
     data object Id : CssComponentType
     data object Class : CssComponentType
     data object Tag : CssComponentType
+    data class PseudoClass(val parameters: List<CssComponent> = emptyList()) : CssComponentType
+}
+
+internal sealed interface CssCombinator {
+    data object ChildCombinator : CssCombinator
+    data object NextSiblingCombinator : CssCombinator
+    data object DescendantCombinator : CssCombinator
+    data object SubsequentSiblingCombinator : CssCombinator
+
+    companion object {
+        fun from(tokenKind: CssTokenKind?): CssCombinator? = when (tokenKind) {
+            CssTokenKind.Greater -> ChildCombinator
+            CssTokenKind.Tilde -> NextSiblingCombinator
+            CssTokenKind.WhiteSpace -> DescendantCombinator
+            CssTokenKind.Plus -> SubsequentSiblingCombinator
+            else -> null
+        }
+    }
 }
 
 internal data class CssDeclaration(
@@ -57,7 +68,9 @@ internal data class CssDeclaration(
 internal sealed interface PropertyValue : Element {
     data class Color(val value: kotlin.String) : PropertyValue
     data class String(val value: kotlin.String) : PropertyValue
-    data class Number(val value: kotlin.String, val units: kotlin.String?) : PropertyValue
+    data class Number(val value: kotlin.String) : PropertyValue
+    data class Dimension(val value: kotlin.String) : PropertyValue
+    data class Percentage(val value: kotlin.String) : PropertyValue
     data class Function(val name: kotlin.String, val arguments: List<PropertyValue>) : PropertyValue
     data class Url(val value: kotlin.String) : PropertyValue
     data class Identifier(val value: kotlin.String) : PropertyValue
