@@ -51,6 +51,15 @@ internal sealed class CssTokenKind(
     data object HexDigit : CssTokenKind(representation = "")
     data object String : CssTokenKind(representation = "")
     data object MultilineString : CssTokenKind(representation = "")
+    data object Color : CssTokenKind(representation = "") {
+        val colorIdentifiers = setOf(
+            "rgb",
+            "rgba",
+            "hsl",
+            "hsla",
+            "currentColor",
+        )
+    }
 
     // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
     data object InvalidString : CssTokenKind(representation = "")

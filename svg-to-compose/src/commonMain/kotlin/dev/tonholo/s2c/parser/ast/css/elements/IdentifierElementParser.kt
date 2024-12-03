@@ -2,6 +2,7 @@ package dev.tonholo.s2c.parser.ast.css.elements
 
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
+import dev.tonholo.s2c.parser.ast.css.CssCombinator
 import dev.tonholo.s2c.parser.ast.css.CssComponent
 import dev.tonholo.s2c.parser.ast.css.CssComponentType
 import dev.tonholo.s2c.parser.ast.css.CssDeclaration
@@ -37,7 +38,6 @@ internal class IdentifierElementParser(
             )
         }
         val value = content.substring(starterToken.startOffset, starterToken.endOffset)
-
         return when (token.kind) {
             in terminalTokens -> {
                 CssComponent.Single(
@@ -53,6 +53,7 @@ internal class IdentifierElementParser(
                     CssComponent.Single(
                         type = CssComponentType.Tag,
                         value = value,
+                        combinator = CssCombinator.from(token.kind),
                     ),
                 )
             }

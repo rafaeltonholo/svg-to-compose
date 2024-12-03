@@ -3,6 +3,9 @@ package dev.tonholo.s2c.parser.ast.css
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.AstParser
+import dev.tonholo.s2c.parser.ast.css.consumer.AtRuleConsumer
+import dev.tonholo.s2c.parser.ast.css.consumer.CssConsumer
+import dev.tonholo.s2c.parser.ast.css.consumer.PseudoClassConsumer
 import dev.tonholo.s2c.parser.ast.css.elements.IdentifierElementParser
 import dev.tonholo.s2c.parser.ast.css.elements.PropertyParser
 import dev.tonholo.s2c.parser.ast.css.selectors.SelectorParser
@@ -11,21 +14,34 @@ internal val terminalTokens = listOf(
     CssTokenKind.Comma,
     CssTokenKind.OpenCurlyBrace,
     CssTokenKind.Semicolon,
+    CssTokenKind.CloseParenthesis,
 )
 
 internal val selectorStarters = listOf(
     CssTokenKind.Dot,
     CssTokenKind.Hash,
     CssTokenKind.WhiteSpace,
+    CssTokenKind.Greater,
+    CssTokenKind.Plus,
+    CssTokenKind.Tilde,
 )
 
 internal class CssAstParser(
     private val content: String,
 ) : AstParser<CssTokenKind, CssRootNode> {
+    private val atRuleConsumer: CssConsumer<CssAtRule> = AtRuleConsumer(
+        content = content,
+        parser = this,
+    )
     private val selectorParser: SelectorParser = SelectorParser(
         content = content,
-        iterator = this,
+        parser = this,
         buildErrorMessage = ::buildErrorMessage,
+    )
+    private val pseudoClassConsumer: CssConsumer<CssComponent> = PseudoClassConsumer(
+        content = content,
+        parser = this,
+        selectorParser = selectorParser,
     )
     private val identifierElementParser: IdentifierElementParser = IdentifierElementParser(
         content = content,
@@ -42,12 +58,12 @@ internal class CssAstParser(
     private var offset = 0
     private val tokens = mutableListOf<Token<out CssTokenKind>>()
     override fun parse(tokens: List<Token<out CssTokenKind>>): CssRootNode {
-        val rules = parseRules(tokens.trim())
+        this.tokens.addAll(tokens.trim())
+        val rules = parseRules()
         return CssRootNode(rules)
     }
 
-    private fun parseRules(tokens: List<Token<out CssTokenKind>>): List<CssRule> {
-        this.tokens.addAll(tokens)
+    fun parseRules(): List<CssRule> {
         val rules = mutableListOf<CssRule>()
         do {
             val rule = parseNext(null) as? CssRule
@@ -86,9 +102,12 @@ internal class CssAstParser(
         append("^".repeat(next.minus(current?.startOffset ?: 0)))
     }
 
-    private fun parseNext(sibling: CssElement?): CssElement? {
+    fun parseNext(sibling: CssElement?): CssElement? {
         val starterToken = next() ?: return null
         val element = when (starterToken.kind) {
+            is CssTokenKind.AtKeyword -> atRuleConsumer.consume(starterToken)
+            is CssTokenKind.Colon -> pseudoClassConsumer.consume(starterToken)
+
             // skip elements
             in terminalTokens -> parseNext(sibling)
 
@@ -101,7 +120,8 @@ internal class CssAstParser(
             else -> null
         }
 
-        return if (element is CssComponent && sibling == null) {
+        val isPseudoClass = element is CssComponent.Single && element.type is CssComponentType.PseudoClass
+        return if (element is CssComponent && !isPseudoClass && sibling == null) {
             createCssRule(element)
         } else {
             element
