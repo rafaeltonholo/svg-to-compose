@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.lexer
 
-internal data class Token<T : TokenKind>(
+data class Token<T : TokenKind>(
     val kind: T,
     // Inclusive
     val startOffset: Int,
