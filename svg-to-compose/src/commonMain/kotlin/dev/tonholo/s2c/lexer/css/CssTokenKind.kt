@@ -2,7 +2,7 @@ package dev.tonholo.s2c.lexer.css
 
 import dev.tonholo.s2c.lexer.TokenKind
 
-internal sealed class CssTokenKind(
+sealed class CssTokenKind(
     override val representation: kotlin.String,
 ) : TokenKind {
     data object EndOfFile : CssTokenKind(representation = "")

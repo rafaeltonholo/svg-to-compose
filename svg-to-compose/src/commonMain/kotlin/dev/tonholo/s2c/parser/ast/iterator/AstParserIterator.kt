@@ -10,7 +10,7 @@ import dev.tonholo.s2c.parser.ast.Element
  * @param TTokenKind The type of token kind.
  * @param TAstNode The type of AST node.
  */
-internal interface AstParserIterator<TTokenKind : TokenKind, TAstNode : Element> {
+interface AstParserIterator<TTokenKind : TokenKind, TAstNode : Element> {
     /**
      * Returns the next token in the iteration.
      */

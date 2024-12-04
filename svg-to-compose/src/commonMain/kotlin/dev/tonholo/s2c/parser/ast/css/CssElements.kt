@@ -3,29 +3,29 @@ package dev.tonholo.s2c.parser.ast.css
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.Element
 
-internal sealed interface CssElement : Element
+sealed interface CssElement : Element
 
-internal data class CssRootNode(
+data class CssRootNode(
     val rules: List<CssRule>,
 ) : CssElement
 
-internal sealed interface CssRule : CssElement {
+sealed interface CssRule : CssElement {
     val components: List<CssComponent>
 }
 
-internal data class CssQualifiedRule(
+data class CssQualifiedRule(
     override val components: List<CssComponent>,
     // TODO: Declarations can also contain at-rules.
     val declarations: List<CssDeclaration>,
 ) : CssRule
 
-internal data class CssAtRule(
+data class CssAtRule(
     val name: String,
     override val components: List<CssComponent>,
     val rules: List<CssRule>,
 ) : CssRule
 
-internal sealed interface CssComponent : CssElement {
+sealed interface CssComponent : CssElement {
     data class Single(
         val type: CssComponentType,
         val value: String,
@@ -36,14 +36,16 @@ internal sealed interface CssComponent : CssElement {
     data class AtRule(val value: String) : CssComponent
 }
 
-internal sealed interface CssComponentType {
+sealed interface CssComponentType {
     data object Id : CssComponentType
     data object Class : CssComponentType
     data object Tag : CssComponentType
+    data object Universal : CssComponentType
     data class PseudoClass(val parameters: List<CssComponent> = emptyList()) : CssComponentType
+    data object PseudoElement : CssComponentType
 }
 
-internal sealed interface CssCombinator {
+sealed interface CssCombinator {
     data object ChildCombinator : CssCombinator
     data object NextSiblingCombinator : CssCombinator
     data object DescendantCombinator : CssCombinator
@@ -60,12 +62,12 @@ internal sealed interface CssCombinator {
     }
 }
 
-internal data class CssDeclaration(
+data class CssDeclaration(
     val property: String,
     val value: PropertyValue,
 ) : CssElement
 
-internal sealed interface PropertyValue : Element {
+sealed interface PropertyValue : Element {
     data class Color(val value: kotlin.String) : PropertyValue
     data class String(val value: kotlin.String) : PropertyValue
     data class Number(val value: kotlin.String) : PropertyValue
