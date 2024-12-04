@@ -168,7 +168,10 @@ private fun List<Token<out CssTokenKind>>.trim(): List<Token<out CssTokenKind>> 
             val next = tokens.getOrNull(i + 1)
             when {
                 // trim leading or trailing whitespaces
-                prev == null || next == null -> i++
+                prev == null || next == null -> {
+                    removeLast()
+                    i++
+                }
 
                 (token.kind is CssTokenKind.WhiteSpace &&
                     prev.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
