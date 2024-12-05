@@ -102,7 +102,7 @@ A Gradle plugin that automates the conversion process within your build system,
 ideal for projects with a large number of icons or for ensuring consistency and
 saving development time.
 
-[Full documentation for the Gradle Plugin can be found here.](./svg-to-compose/README.md)
+[Full documentation for the Gradle Plugin can be found here.](./svg-to-compose-gradle-plugin/README.md)
 
 ## Getting Started
 
