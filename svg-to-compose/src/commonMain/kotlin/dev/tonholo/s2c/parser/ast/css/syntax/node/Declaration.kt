@@ -32,7 +32,7 @@ data class Declaration(
     override fun toString(): String {
         return buildString {
             appendLine("Declaration(")
-            appendLine("location = ${location},".prependIndent(indentSize = 2))
+            appendLine("location = $location,".prependIndent(indentSize = 2))
             appendLine("important = $important,".prependIndent(indentSize = 2))
             appendLine("property = \"$property\",".prependIndent(indentSize = 2))
             appendLine(

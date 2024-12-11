@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.lexer.css
 
 import dev.tonholo.s2c.extensions.EMPTY
-import dev.tonholo.s2c.lexer.Tokenizer
 import dev.tonholo.s2c.lexer.Token
+import dev.tonholo.s2c.lexer.Tokenizer
 
 internal class CssTokenizer : Tokenizer<CssTokenKind> {
     private var offset = 0

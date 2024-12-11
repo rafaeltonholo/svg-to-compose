@@ -24,7 +24,7 @@ sealed class Block<T : CssComponentValueNode>(
         override fun toString(): String {
             return buildString {
                 appendLine("SimpleBlock(")
-                appendLine("location = ${location},".prependIndent(indentSize = 2))
+                appendLine("location = $location,".prependIndent(indentSize = 2))
                 appendLine(
                     "children = [".prependIndent(indentSize = 2),
                 )

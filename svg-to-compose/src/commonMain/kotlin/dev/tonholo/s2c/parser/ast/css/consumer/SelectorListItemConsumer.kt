@@ -2,9 +2,7 @@ package dev.tonholo.s2c.parser.ast.css.consumer
 
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.CssCombinator
-import dev.tonholo.s2c.parser.ast.css.syntax.node.AtRule
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
-import dev.tonholo.s2c.parser.ast.css.syntax.node.CssNode
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
 import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator

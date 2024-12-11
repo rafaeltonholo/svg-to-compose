@@ -4,8 +4,8 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlTextNode
 import dev.tonholo.s2c.extensions.firstInstanceOf
-import dev.tonholo.s2c.lexer.css.CssTokenizer
 import dev.tonholo.s2c.lexer.css.CssTokenKind
+import dev.tonholo.s2c.lexer.css.CssTokenizer
 import dev.tonholo.s2c.parser.ast.AstParser
 import dev.tonholo.s2c.parser.ast.css.syntax.node.StyleSheet
 

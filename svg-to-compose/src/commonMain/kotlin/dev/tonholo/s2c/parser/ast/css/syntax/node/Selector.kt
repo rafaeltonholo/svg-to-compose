@@ -166,7 +166,7 @@ data class SelectorListItem(
         return buildString {
             appendLine("SelectorListItem(")
             appendLine(
-                "location = ${location},".prependIndent(indentSize = 2),
+                "location = $location,".prependIndent(indentSize = 2),
             )
             appendLine(
                 "selectors = [".prependIndent(indentSize = 2),

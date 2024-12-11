@@ -84,10 +84,12 @@ private fun Selector.calculateSpecificity(): CssSpecificity {
     var c = 0
     when (this) {
         is Selector.Id -> a = 1
+
         is Selector.Attribute,
         is Selector.Class -> b = 1
 
         is Selector.Type if name != "*" -> c = 1
+
         is Selector.PseudoClass -> {
             val specificity = calculateSpecificity()
             a = specificity.a
@@ -96,6 +98,7 @@ private fun Selector.calculateSpecificity(): CssSpecificity {
         }
 
         is Selector.PseudoElement -> c = 1
+
         else -> Unit
     }
     return CssSpecificity(a, b, c)
@@ -110,8 +113,7 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
         "not",
         "is",
         "has",
-        "matches",
-            -> {
+        "matches" -> {
             parameters
                 .maxOf { it.calculateSpecificity() }
                 .also {
@@ -122,8 +124,7 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
         }
 
         "nth-child",
-        "nth-last-child",
-            -> {
+        "nth-last-child" -> {
             parameters
                 .maxOf { it.calculateSpecificity() }
                 .also {
@@ -136,8 +137,7 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
         "before",
         "after",
         "first-line",
-        "first-letter",
-            -> {
+        "first-letter" -> {
             c = 1
         }
 
