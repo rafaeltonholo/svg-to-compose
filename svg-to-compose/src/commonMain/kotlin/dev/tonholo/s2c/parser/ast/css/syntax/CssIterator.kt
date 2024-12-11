@@ -53,9 +53,11 @@ internal class CssIterator(
                         i++
                     }
 
-                    (token.kind is CssTokenKind.WhiteSpace &&
-                        prev?.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
-                        next.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens) -> i++
+                    (
+                        token.kind is CssTokenKind.WhiteSpace &&
+                            prev?.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
+                            next.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens
+                        ) -> i++
 
                     token.kind is CssTokenKind.WhiteSpace -> {
                         removeLast()

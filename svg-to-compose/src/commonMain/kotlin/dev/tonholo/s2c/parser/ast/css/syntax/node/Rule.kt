@@ -42,10 +42,10 @@ data class AtRule(
     override fun toString(): String {
         return buildString {
             appendLine("AtRule(")
-            appendLine("location = ${location},".prependIndent(indentSize = 2))
+            appendLine("location = $location,".prependIndent(indentSize = 2))
             appendLine("name = \"$name\",".prependIndent(indentSize = 2))
-            appendLine("prelude = ${prelude},".prependIndent(indentSize = 2))
-            appendLine("block = ${block},".prependIndent(indentSize = 2))
+            appendLine("prelude = $prelude,".prependIndent(indentSize = 2))
+            appendLine("block = $block,".prependIndent(indentSize = 2))
             append(")")
         }
     }
@@ -62,9 +62,9 @@ data class QualifiedRule(
     override fun toString(): String {
         return buildString {
             appendLine("QualifiedRule(")
-            appendLine("location = ${location},".prependIndent(indentSize = 2))
-            appendLine("prelude = ${prelude},".prependIndent(indentSize = 2))
-            appendLine("block = ${block},".prependIndent(indentSize = 2))
+            appendLine("location = $location,".prependIndent(indentSize = 2))
+            appendLine("prelude = $prelude,".prependIndent(indentSize = 2))
+            appendLine("block = $block,".prependIndent(indentSize = 2))
             append(")")
         }
     }

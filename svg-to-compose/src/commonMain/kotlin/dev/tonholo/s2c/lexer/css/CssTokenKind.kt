@@ -51,6 +51,7 @@ sealed class CssTokenKind(
     data object Percentage : CssTokenKind(representation = "%")
     data object HexDigit : CssTokenKind(representation = "")
     data object String : CssTokenKind(representation = "")
+
     // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
     data object InvalidString : CssTokenKind(representation = "")
 

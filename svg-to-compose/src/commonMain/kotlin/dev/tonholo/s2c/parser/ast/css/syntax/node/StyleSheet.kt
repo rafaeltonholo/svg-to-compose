@@ -18,15 +18,17 @@ data class StyleSheet(
 
     override fun toString(): String = buildString {
         appendLine("StyleSheet(")
-        appendLine("location = ${location},".prependIndent(indentSize = 2))
+        appendLine("location = $location,".prependIndent(indentSize = 2))
         appendLine(
             "children = [".prependIndent(indentSize = 2),
         )
-        appendLine(children.joinToString { statement ->
-            statement
-                .toString()
-                .prependIndent(indentSize = 4)
-        })
+        appendLine(
+            children.joinToString { statement ->
+                statement
+                    .toString()
+                    .prependIndent(indentSize = 4)
+            },
+        )
         appendLine("],".prependIndent(indentSize = 2))
         append(")")
     }

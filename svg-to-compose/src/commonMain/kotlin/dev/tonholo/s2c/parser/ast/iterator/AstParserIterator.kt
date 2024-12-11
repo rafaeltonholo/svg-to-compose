@@ -10,6 +10,7 @@ import dev.tonholo.s2c.lexer.TokenKind
  */
 interface AstParserIterator<TTokenKind : TokenKind> {
     fun hasNext(): Boolean
+
     /**
      * Returns the next token in the iteration.
      */

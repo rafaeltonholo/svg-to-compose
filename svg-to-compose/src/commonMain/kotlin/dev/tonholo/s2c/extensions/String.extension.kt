@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.extensions
 
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 private const val PERCENT = 100f
 

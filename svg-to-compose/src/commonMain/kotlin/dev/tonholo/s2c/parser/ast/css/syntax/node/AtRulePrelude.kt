@@ -24,7 +24,7 @@ data class AtRulePrelude(
         return buildString {
             appendLine("AtRulePrelude(")
             appendLine(
-                "location = ${location},".prependIndent(indentSize = 2),
+                "location = $location,".prependIndent(indentSize = 2),
             )
             appendLine(
                 "value = \"${value}\",".prependIndent(indentSize = 2),
