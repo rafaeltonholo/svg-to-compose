@@ -2,23 +2,39 @@ package dev.tonholo.s2c.parser.ast.css.elements
 
 import app.cash.burst.Burst
 import app.cash.burst.burstValues
-import dev.tonholo.s2c.extensions.firstInstanceOf
 import dev.tonholo.s2c.parser.ast.css.CssCombinator
-import dev.tonholo.s2c.parser.ast.css.CssComponent
-import dev.tonholo.s2c.parser.ast.css.CssComponentType
-import dev.tonholo.s2c.parser.ast.css.CssQualifiedRule
+import dev.tonholo.s2c.parser.ast.css.CssSpecificity
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
+import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
+import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
+import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CssSpecificityTest {
+    private val location = CssLocation.Undefined
+
     @Test
     fun `when single universal selector then specificity is 0 0 0`() {
         // Arrange
-        val rule = CssQualifiedRule(
-            components = listOf(
-                CssComponent.Single(type = CssComponentType.Universal, value = "*"),
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = listOf(
+                            Selector.Type(
+                                location = location,
+                                name = "*",
+                            ),
+                        ),
+                    ),
+                ),
             ),
-            declarations = listOf(),
+            block = Block.EmptyDeclarationBlock,
         )
         val expected = "(0, 0, 0)"
         // Act
@@ -30,11 +46,22 @@ class CssSpecificityTest {
     @Test
     fun `when single id selector then specificity is 1 0 0`() {
         // Arrange
-        val rule = CssQualifiedRule(
-            components = listOf(
-                CssComponent.Single(type = CssComponentType.Id, value = "my-id"),
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = listOf(
+                            Selector.Id(
+                                location = location,
+                                name = "my-id",
+                            ),
+                        ),
+                    ),
+                ),
             ),
-            declarations = listOf(),
+            block = Block.EmptyDeclarationBlock,
         )
         val expected = "(1, 0, 0)"
         // Act
@@ -46,11 +73,22 @@ class CssSpecificityTest {
     @Test
     fun `when single class selector then specificity is 0 1 0`() {
         // Arrange
-        val rule = CssQualifiedRule(
-            components = listOf(
-                CssComponent.Single(type = CssComponentType.Class, value = "my-class"),
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = listOf(
+                            Selector.Class(
+                                location = location,
+                                name = "my-class",
+                            ),
+                        ),
+                    ),
+                ),
             ),
-            declarations = listOf(),
+            block = Block.EmptyDeclarationBlock,
         )
         val expected = "(0, 1, 0)"
         // Act
@@ -62,11 +100,22 @@ class CssSpecificityTest {
     @Test
     fun `when single tag selector then specificity is 0 0 1`() {
         // Arrange
-        val rule = CssQualifiedRule(
-            components = listOf(
-                CssComponent.Single(type = CssComponentType.Tag, value = "div"),
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = listOf(
+                            Selector.Type(
+                                location = location,
+                                name = "div",
+                            ),
+                        ),
+                    ),
+                ),
             ),
-            declarations = listOf(),
+            block = Block.EmptyDeclarationBlock,
         )
         val expected = "(0, 0, 1)"
         // Act
@@ -79,47 +128,38 @@ class CssSpecificityTest {
     @Burst
     fun `when multiple ids selectors then specificity is n 0 0 where n is number of selectors`(
         // Arrange
-        rule: CssQualifiedRule = burstValues(
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-0"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-1"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+        selectors: List<Selector> = burstValues(
+            listOf(
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-0"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-1"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-0"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-1"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-2"),
-                        ),
-                    )
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-0"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-1"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-2"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-0"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-1"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-2"),
-                            CssComponent.Single(type = CssComponentType.Id, value = "my-id-3"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-0"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-1"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-2"),
+                Selector.Id(location = CssLocation.Undefined, name = "my-id-3"),
             ),
         )
     ) {
         // Arrange (cont.)
-        val n = rule.components.firstInstanceOf<CssComponent.Multiple>().components.size
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = selectors,
+                    ),
+                ),
+            ),
+            block = Block.EmptyDeclarationBlock,
+        )
+        val n = selectors.size
         val expected = "($n, 0, 0)"
         // Act
         val actual = CssSpecificity(rule)
@@ -131,47 +171,38 @@ class CssSpecificityTest {
     @Burst
     fun `when multiple class selectors then specificity is 0 n 0 where n is number of selectors`(
         // Arrange
-        rule: CssQualifiedRule = burstValues(
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-0"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-1"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+        selectors: List<Selector> = burstValues(
+            listOf(
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-0"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-1"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-0"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-1"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-2"),
-                        ),
-                    )
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-0"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-1"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-2"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-0"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-1"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-2"),
-                            CssComponent.Single(type = CssComponentType.Class, value = "class-3"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-0"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-1"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-2"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class-3"),
             ),
         )
     ) {
         // Arrange (cont.)
-        val n = rule.components.firstInstanceOf<CssComponent.Multiple>().components.size
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = selectors,
+                    ),
+                ),
+            ),
+            block = Block.EmptyDeclarationBlock,
+        )
+        val n = selectors.size
         val expected = "(0, $n, 0)"
         // Act
         val actual = CssSpecificity(rule)
@@ -183,47 +214,38 @@ class CssSpecificityTest {
     @Burst
     fun `when multiple tag selectors then specificity is 0 0 n where n is number of selectors`(
         // Arrange
-        rule: CssQualifiedRule = burstValues(
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Tag, value = "ul"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "li"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+        selectors: List<Selector> = burstValues(
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "ul"),
+                Selector.Type(location = CssLocation.Undefined, name = "li"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Tag, value = "div"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "ul"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "li"),
-                        ),
-                    )
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "div"),
+                Selector.Type(location = CssLocation.Undefined, name = "ul"),
+                Selector.Type(location = CssLocation.Undefined, name = "li"),
             ),
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(type = CssComponentType.Tag, value = "div"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "section"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "ul"),
-                            CssComponent.Single(type = CssComponentType.Tag, value = "li"),
-                        ),
-                    ),
-                ),
-                declarations = listOf()
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "div"),
+                Selector.Type(location = CssLocation.Undefined, name = "section"),
+                Selector.Type(location = CssLocation.Undefined, name = "ul"),
+                Selector.Type(location = CssLocation.Undefined, name = "li"),
             ),
         )
     ) {
         // Arrange (cont.)
-        val n = rule.components.firstInstanceOf<CssComponent.Multiple>().components.size
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = selectors,
+                    ),
+                ),
+            ),
+            block = Block.EmptyDeclarationBlock,
+        )
+        val n = selectors.size
         val expected = "(0, 0, $n)"
         // Act
         val actual = CssSpecificity(rule)
@@ -235,88 +257,68 @@ class CssSpecificityTest {
     @Burst
     fun `should calculate specificity for multiple selectors`(
         // Arrange
-        rules: Pair<CssQualifiedRule, String> = burstValues(
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Single(type = CssComponentType.Tag, value = "li"),
-                    CssComponent.Single(type = CssComponentType.Class, value = "my-class"),
-                    CssComponent.Single(type = CssComponentType.Class, value = "my-second-class"),
-                ),
-                declarations = listOf(),
+        rules: Pair<List<Selector>, String> = burstValues(
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "li"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-class"),
+                Selector.Class(location = CssLocation.Undefined, name = "my-second-class"),
             ) to "(0, 2, 1)",
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Single(
-                        type = CssComponentType.Tag,
-                        value = "ol",
-                        combinator = CssCombinator.DescendantCombinator,
-                    ),
-                    CssComponent.Single(
-                        type = CssComponentType.Universal,
-                        value = "*",
-                        combinator = CssCombinator.DescendantCombinator,
-                    ),
-                    CssComponent.Single(
-                        type = CssComponentType.Class,
-                        value = "my-second-class",
-                    ),
+            listOf(
+                Selector.Type(
+                    location = CssLocation.Undefined,
+                    name = "ol",
+                    combinator = CssCombinator.DescendantCombinator,
                 ),
-                declarations = listOf(),
+                Selector.Type(
+                    location = CssLocation.Undefined,
+                    name = "*",
+                    combinator = CssCombinator.DescendantCombinator,
+                ),
+                Selector.Class(location = CssLocation.Undefined, name = "my-second-class"),
             ) to "(0, 1, 1)",
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Multiple(
-                        components = listOf(
-                            CssComponent.Single(
-                                type = CssComponentType.Id,
-                                value = "s12",
-                                combinator = CssCombinator.DescendantCombinator,
-                            ),
-                            CssComponent.Single(
-                                type = CssComponentType.PseudoClass(
-                                    parameters = listOf(
-                                        CssComponent.Single(
-                                            type = CssComponentType.Tag,
-                                            value = "FOO",
-                                        )
-                                    )
-                                ),
-                                value = ":not",
-                            ),
-                        ),
+            listOf(
+                Selector.Id(location = CssLocation.Undefined, name = "s12"),
+                Selector.PseudoClass(
+                    location = CssLocation.Undefined,
+                    name = "not",
+                    parameters = listOf(
+                        Selector.Type(location = CssLocation.Undefined, name = "FOO")
                     ),
                 ),
-                declarations = listOf(),
             ) to "(1, 0, 1)",
-            CssQualifiedRule(
-                components = listOf(
-                    CssComponent.Single(
-                        type = CssComponentType.Class,
-                        value = "foo",
-                        combinator = CssCombinator.DescendantCombinator,
-                    ),
-                    CssComponent.Single(
-                        type = CssComponentType.PseudoClass(
-                            parameters = listOf(
-                                CssComponent.Single(
-                                    type = CssComponentType.Class,
-                                    value = "bar",
-                                ),
-                                CssComponent.Single(
-                                    type = CssComponentType.Id,
-                                    value = "baz",
-                                )
-                            )
-                        ),
-                        value = ":is",
-                    ),
-                ),
-                declarations = listOf(),
+            listOf(
+                Selector.Class(location = CssLocation.Undefined, name = "bar"),
+                Selector.Id(location = CssLocation.Undefined, name = "baz"),
             ) to "(1, 1, 0)",
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "*"),
+            ) to "(0, 0, 0)",
+            listOf(
+                Selector.Type(location = CssLocation.Undefined, name = "h1", combinator = CssCombinator.SubsequentSiblingCombinator),
+                Selector.Type(location = CssLocation.Undefined, name = "*"),
+                Selector.Attribute(
+                    location = CssLocation.Undefined,
+                    name = "rel",
+                    matcher = "=",
+                    value = "up",
+                ),
+            ) to "(0, 1, 1)",
         )
     ) {
         // Arrange (cont.)
-        val (rule, expected) = rules
+        val (selectors, expected) = rules
+        val rule = QualifiedRule(
+            location = location,
+            prelude = Prelude.Selector(
+                components = listOf(
+                    SelectorListItem(
+                        location = location,
+                        selectors = selectors,
+                    ),
+                ),
+            ),
+            block = Block.EmptyDeclarationBlock,
+        )
         // Act
         val actual = CssSpecificity(rule)
         // Assert
