@@ -145,6 +145,8 @@ class SvgRootNode(
      */
     val gradients: HashMap<String, SvgGradient<*>> = hashMapOf()
 
+    val styles: MutableList<SvgStyleNode> = mutableListOf()
+
     /**
      * The transform applied to the entire SVG.
      * If the SVG has a viewBox with an offset (x or y not 0), a translation
