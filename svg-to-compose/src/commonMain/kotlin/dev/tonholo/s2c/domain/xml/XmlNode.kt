@@ -93,6 +93,17 @@ abstract class XmlChildNode(
     }
 }
 
+class XmlTextNode(
+    parent: XmlParentNode,
+    val content: String,
+) : XmlChildNode(parent) {
+    override val tagName: String = parent.tagName
+    override val attributes: MutableMap<String, String> = parent.attributes
+    override fun toString(): String = toJsString {
+        append("\"content\": $content")
+    }
+}
+
 data class XmlRootNode(
     override val tagName: String = "#root",
     override val children: MutableSet<XmlNode>,
