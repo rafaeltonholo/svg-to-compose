@@ -1,12 +1,7 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_HEIGHT
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_TRANSFORM
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_VIEW_BOX
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_WIDTH
-import dev.tonholo.s2c.domain.svg.gradient.SvgGradient
 import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
@@ -23,11 +18,13 @@ sealed interface SvgNode : XmlNode {
     val transform: SvgTransform?
 
     /**
-     * Normalizes an id by removing prefixes and suffixes.
+     * Normalizes an id by removing prefixes and suffixes commonly used in SVGs.
+     *
+     * For example:
+     * - `#someId` becomes `someId`
+     * - `url(#someId)` becomes `someId`
      */
-    fun String.normalizedId(): String = with(SvgNode) {
-        normalizedId()
-    }
+    fun String.normalizedId(): String = normalizeId(id = this)
 
     companion object {
         const val XLINK_NS = "xlink"
@@ -38,10 +35,17 @@ sealed interface SvgNode : XmlNode {
         const val ATTR_VIEW_BOX = "viewBox"
         const val ATTR_TRANSFORM = "transform"
 
-        // Wouldn't need to set this as a function of the companion
-        // object if context receiver works on KMP.
-        fun String.normalizedId(): String =
-            removePrefix("#").removePrefix("url(#").removeSuffix(")")
+        /**
+         * Normalizes an id by removing prefixes and suffixes commonly used in SVGs.
+         *
+         * For example:
+         * - `#someId` becomes `someId`
+         * - `url(#someId)` becomes `someId`
+         */
+        fun String.normalizedId(): String = normalizeId(this)
+
+        private fun normalizeId(id: String): String =
+            id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
     }
 }
 
