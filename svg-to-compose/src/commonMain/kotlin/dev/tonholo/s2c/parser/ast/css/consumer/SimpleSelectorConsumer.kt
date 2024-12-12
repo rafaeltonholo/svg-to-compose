@@ -31,7 +31,7 @@ internal class SimpleSelectorConsumer(
             )
 
             CssTokenKind.Hash -> {
-                val next = iterator.expectNextToken<CssTokenKind.Ident>()
+                val next = iterator.expectNextToken(kind = CssTokenKind.Ident)
                 Selector.Id(
                     location = calculateLocation(current, next),
                     name = content.substring(next.startOffset, endIndex = next.endOffset),
@@ -40,7 +40,7 @@ internal class SimpleSelectorConsumer(
             }
 
             CssTokenKind.Dot -> {
-                val next = iterator.expectNextToken<CssTokenKind.Ident>()
+                val next = iterator.expectNextToken(kind = CssTokenKind.Ident)
                 Selector.Class(
                     location = calculateLocation(current, next),
                     name = content.substring(next.startOffset, endIndex = next.endOffset),
@@ -49,7 +49,7 @@ internal class SimpleSelectorConsumer(
             }
 
             CssTokenKind.OpenSquareBracket -> {
-                val next = iterator.expectNextToken<CssTokenKind.Ident>()
+                val next = iterator.expectNextToken(kind = CssTokenKind.Ident)
                 Selector.Attribute(
                     location = calculateLocation(current, next),
                     name = content.substring(next.startOffset, endIndex = next.endOffset),
@@ -60,7 +60,7 @@ internal class SimpleSelectorConsumer(
             }
 
             CssTokenKind.DoubleColon -> {
-                val next = iterator.expectNextToken<CssTokenKind.Ident>()
+                val next = iterator.expectNextToken(kind = CssTokenKind.Ident)
                 val parameters = buildParameters(iterator)
                 val endOffset = if (parameters.isEmpty()) {
                     next.endOffset
@@ -76,7 +76,7 @@ internal class SimpleSelectorConsumer(
             }
 
             CssTokenKind.Colon -> {
-                val next = iterator.expectNextToken<CssTokenKind.Ident>()
+                val next = iterator.expectNextToken(kind = CssTokenKind.Ident)
                 val parameters = buildParameters(iterator)
                 val endOffset = if (parameters.isEmpty()) {
                     next.endOffset

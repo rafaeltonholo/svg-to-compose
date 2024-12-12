@@ -27,7 +27,7 @@ internal class AtRuleConsumer(
         checkNotNull(current) {
             "Expected @rule but got null"
         }
-        check(current.kind is CssTokenKind.AtKeyword) {
+        check(current.kind == CssTokenKind.AtKeyword) {
             "Expected @rule but got ${current.kind}"
         }
         val preludeStartOffset = current.endOffset + 1
@@ -43,10 +43,10 @@ internal class AtRuleConsumer(
         while (iterator.hasNext()) {
             val next = checkNotNull(iterator.next())
             when (next.kind) {
-                is CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> break
+                CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> break
 
-                is CssTokenKind.EndOfFile -> iterator.parserError(content, "Incomplete @rule.")
-                is CssTokenKind.OpenCurlyBrace -> {
+                CssTokenKind.EndOfFile -> iterator.parserError(content, "Incomplete @rule.")
+                CssTokenKind.OpenCurlyBrace -> {
                     val block = blockConsumer.consume(iterator)
                     atRule = atRule.copy(
                         location = CssLocation(

@@ -133,7 +133,7 @@ class StyleSheetConsumerTest {
             Token(kind = CssTokenKind.Colon, startOffset = 28, endOffset = 29),              // ':'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 29, endOffset = 30),         // ' '
             Token(
-                kind = CssTokenKind.Dimension(unit = "px"),
+                kind = CssTokenKind.Dimension,
                 startOffset = 30,
                 endOffset = 35,
             ),          // '768px'
@@ -216,13 +216,13 @@ class StyleSheetConsumerTest {
             Token(kind = CssTokenKind.Number, startOffset = 266, endOffset = 267),           // '0'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 267, endOffset = 268),       // ' '
             Token(
-                kind = CssTokenKind.Dimension(unit = "px"),
+                kind = CssTokenKind.Dimension,
                 startOffset = 268,
                 endOffset = 271,
             ),                                                                               // '4px'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 271, endOffset = 272),       // ' '
             Token(
-                kind = CssTokenKind.Dimension(unit = "px"),
+                kind = CssTokenKind.Dimension,
                 startOffset = 272,
                 endOffset = 275,
             ),                                                                               // '6px'
@@ -528,7 +528,7 @@ class StyleSheetConsumerTest {
             Token(kind = CssTokenKind.Ident, startOffset = 89, endOffset = 102),
             Token(kind = CssTokenKind.Colon, startOffset = 102, endOffset = 103),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 103, endOffset = 104),
-            Token(kind = CssTokenKind.Dimension("px"), startOffset = 104, endOffset = 107),
+            Token(kind = CssTokenKind.Dimension, startOffset = 104, endOffset = 107),
             Token(kind = CssTokenKind.Semicolon, startOffset = 107, endOffset = 108),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 108, endOffset = 109),
             Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 109, endOffset = 110),

@@ -1,13 +1,76 @@
 package dev.tonholo.s2c.lexer.css
 
 import dev.tonholo.s2c.lexer.TokenKind
+import dev.tonholo.s2c.lexer.css.CssTokenKind.entries
 
-sealed class CssTokenKind(
-    override val representation: kotlin.String,
+/**
+ * Represents the different kinds of tokens that can be encountered
+ * in a CSS document.
+ *
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">CSS Syntax Token Definition</a>
+ */
+enum class CssTokenKind(
+    override val representation: Set<Char> = emptySet(),
 ) : TokenKind {
-    data object EndOfFile : CssTokenKind(representation = "")
-    data object WhiteSpace : CssTokenKind(representation = " \n\t") {
-        val significantAdjacentTokens = setOf(
+    EndOfFile,
+    WhiteSpace(representation = setOf(' ', '\n', '\t')),
+    AtKeyword(representation = setOf('@')),
+    Dot(representation = setOf('.')),
+    Asterisk(representation = setOf('*')),
+    Tilde(representation = setOf('~')),
+    Plus(representation = setOf('+')),
+    Colon(representation = setOf(':')),
+    Semicolon(representation = setOf(';')),
+    Comma(representation = setOf(',')),
+    Greater(representation = setOf('>')),
+    Percent(representation = setOf('%')),
+    Bang(representation = setOf('!')),
+    Ident,
+    Hash(representation = setOf('#')),
+
+    // Decimal or float
+    Number,
+    Dimension,
+    Percentage(representation = setOf('%')),
+    HexDigit,
+    String,
+
+    // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
+    InvalidString,
+
+    // "URL(" string  - note that space between URL and ( is not allowed
+    Url,
+    BadUrl,
+
+    DoubleColon,
+    OpenCurlyBrace(representation = setOf('{')),
+    CloseCurlyBrace(representation = setOf('}')),
+    OpenSquareBracket(representation = setOf('[')),
+    CloseSquareBracket(representation = setOf(']')),
+    OpenParenthesis(representation = setOf('(')),
+    CloseParenthesis(representation = setOf(')')),
+    HtmlComment,
+    MultilineComment,
+    SingleComment,
+    Function,
+    Quote(representation = setOf('\'')),
+    DoubleQuote(representation = setOf('"')),
+    ;
+
+    companion object {
+        /**
+         * A set of significant adjacent token types where [WhiteSpace] is
+         * between.
+         *
+         * This means that adding or removing whitespace between two tokens
+         * of these types can change the meaning of the CSS.
+         *
+         * For example, `div.class` is different from `div .class`.
+         *
+         * This set is used to determine when whitespace should be preserved or
+         * removed during CSS parsing.
+         */
+        val WhiteSpaceSignificantAdjacentTokens = setOf(
             Ident,
             Hash,
             Dot,
@@ -20,56 +83,20 @@ sealed class CssTokenKind(
             OpenSquareBracket,
             CloseSquareBracket,
         )
-    }
 
-    data object AtKeyword : CssTokenKind(representation = "@")
-    data object Dot : CssTokenKind(representation = ".")
-    data object Asterisk : CssTokenKind(representation = "*")
-    data object Tilde : CssTokenKind(representation = "~")
-    data object Plus : CssTokenKind(representation = "+")
-    data object Colon : CssTokenKind(representation = ":")
-    data object Semicolon : CssTokenKind(representation = ";")
-    data object Comma : CssTokenKind(representation = ",")
-    data object Greater : CssTokenKind(representation = ">")
-    data object Percent : CssTokenKind(representation = "%")
-    data object Bang : CssTokenKind(representation = "!")
-    data object Ident : CssTokenKind(representation = "")
-    data object Hash : CssTokenKind(representation = "#")
-
-    // Decimal or float
-    data object Number : CssTokenKind(representation = "")
-    data class Dimension(
-        val unit: kotlin.String,
-    ) : CssTokenKind(representation = "px|em|rem|cm|mm|in|pt|pc|vh|vw|vmin|vmax|ch|ex") {
-        companion object {
-            override fun toString(): kotlin.String {
-                return "Dimension"
-            }
+        /**
+         * Retrieves the [CssTokenKind] associated with the given character.
+         *
+         * This function searches through the entries of the enum class [CssTokenKind]
+         * and returns the first entry where the given [Char] is contained within the
+         * entry's [CssTokenKind.representation].
+         *
+         * @param char The character to find the corresponding [CssTokenKind] for.
+         * @return The [CssTokenKind] associated with the given [char], or `null` if no
+         * match is found.
+         */
+        fun fromChar(char: Char): CssTokenKind? {
+            return entries.firstOrNull { char in it }
         }
     }
-
-    data object Percentage : CssTokenKind(representation = "%")
-    data object HexDigit : CssTokenKind(representation = "")
-    data object String : CssTokenKind(representation = "")
-
-    // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
-    data object InvalidString : CssTokenKind(representation = "")
-
-    // "URL(" string  - note that space between URL and ( is not allowed
-    data object Url : CssTokenKind(representation = "url")
-    data object BadUrl : CssTokenKind(representation = "")
-
-    data object DoubleColon : CssTokenKind(representation = "::")
-    data object OpenCurlyBrace : CssTokenKind(representation = "{")
-    data object CloseCurlyBrace : CssTokenKind(representation = "}")
-    data object OpenSquareBracket : CssTokenKind(representation = "[")
-    data object CloseSquareBracket : CssTokenKind(representation = "]")
-    data object OpenParenthesis : CssTokenKind(representation = "(")
-    data object CloseParenthesis : CssTokenKind(representation = ")")
-    data object HtmlComment : CssTokenKind(representation = "")
-    data object MultilineComment : CssTokenKind(representation = "")
-    data object SingleComment : CssTokenKind(representation = "")
-    data object Function : CssTokenKind(representation = "")
-    data object Quote : CssTokenKind(representation = "'")
-    data object DoubleQuote : CssTokenKind(representation = "\"")
 }

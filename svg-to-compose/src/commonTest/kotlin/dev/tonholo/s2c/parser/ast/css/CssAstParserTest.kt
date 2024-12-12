@@ -312,7 +312,7 @@ class CssAstParserTest {
             Token(kind = CssTokenKind.Ident, startOffset = 90, endOffset = 103),
             Token(kind = CssTokenKind.Colon, startOffset = 103, endOffset = 104),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 104, endOffset = 105),
-            Token(kind = CssTokenKind.Dimension("px"), startOffset = 105, endOffset = 108),
+            Token(kind = CssTokenKind.Dimension, startOffset = 105, endOffset = 108),
             Token(kind = CssTokenKind.Semicolon, startOffset = 108, endOffset = 109),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 109, endOffset = 110),
             Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 110, endOffset = 111),

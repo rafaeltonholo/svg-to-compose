@@ -34,7 +34,7 @@ internal class ValueConsumer(
 
             CssTokenKind.Ident -> iterator.parseIdentToken()
             CssTokenKind.Number -> iterator.parseNumberToken()
-            is CssTokenKind.Dimension -> iterator.parseDimensionToken()
+            CssTokenKind.Dimension -> iterator.parseDimensionToken()
             CssTokenKind.Percentage -> iterator.parsePercentageToken()
             CssTokenKind.String -> iterator.parseStringToken()
             CssTokenKind.Function -> iterator.parseFunction()
@@ -53,7 +53,7 @@ internal class ValueConsumer(
      * Consumes an identifier value.
      */
     private fun Iterator.parseIdentToken(): Value.Identifier {
-        val current = expectToken<CssTokenKind.Ident>()
+        val current = expectToken(kind = CssTokenKind.Ident)
         return Value.Identifier(
             location = CssLocation(
                 source = content.substring(startIndex = current.startOffset, endIndex = current.endOffset),
@@ -68,7 +68,7 @@ internal class ValueConsumer(
      * Consumes a number value.
      */
     private fun Iterator.parseNumberToken(): Value {
-        val current = expectToken<CssTokenKind.Number>()
+        val current = expectToken(kind = CssTokenKind.Number)
         return Value.Number(
             location = CssLocation(
                 source = content.substring(startIndex = current.startOffset, endIndex = current.endOffset),
@@ -83,16 +83,17 @@ internal class ValueConsumer(
      * Consumes a dimension value.
      */
     private fun Iterator.parseDimensionToken(): Value.Dimension {
-        val current = expectToken<CssTokenKind.Dimension>()
+        val current = expectToken(kind = CssTokenKind.Dimension)
         val value = content.substring(startIndex = current.startOffset, endIndex = current.endOffset)
+        var unit = value.takeLastWhile { char -> char.isLetter() }
         return Value.Dimension(
             location = CssLocation(
                 source = value,
                 start = current.startOffset,
                 end = current.endOffset,
             ),
-            value = value.removeSuffix(current.kind.unit),
-            unit = current.kind.unit,
+            value = value.removeSuffix(unit),
+            unit = unit,
         )
     }
 
@@ -100,7 +101,7 @@ internal class ValueConsumer(
      * Consumes a percentage value.
      */
     private fun Iterator.parsePercentageToken(): Value.Percentage {
-        val current = expectToken<CssTokenKind.Percentage>()
+        val current = expectToken(kind = CssTokenKind.Percentage)
         return Value.Percentage(
             location = CssLocation(
                 source = content.substring(startIndex = current.startOffset, endIndex = current.endOffset),
@@ -115,7 +116,7 @@ internal class ValueConsumer(
      * Consumes a string value.
      */
     private fun Iterator.parseStringToken(): Value.String {
-        val current = expectToken<CssTokenKind.String>()
+        val current = expectToken(kind = CssTokenKind.String)
         return Value.String(
             location = CssLocation(
                 source = content.substring(startIndex = current.startOffset, endIndex = current.endOffset),
@@ -130,16 +131,16 @@ internal class ValueConsumer(
      * Consumes a function value.
      */
     private fun Iterator.parseFunction(): Value {
-        val current = expectToken<CssTokenKind.Function>()
+        val current = expectToken(kind = CssTokenKind.Function)
         val name = content.substring(startIndex = current.startOffset, endIndex = current.endOffset)
         if (name in colorFunctions) {
             return parseColor()
-        } else if (name == CssTokenKind.Url.representation) {
+        } else if (name == "url") {
             return parseUrl()
         }
 
         val arguments = mutableListOf<Value>()
-        expectNextToken<CssTokenKind.OpenParenthesis>()
+        expectNextToken(kind = CssTokenKind.OpenParenthesis)
         do {
             val next = expectNextTokenNotNull()
             if (next.kind == CssTokenKind.Comma || next.kind == CssTokenKind.WhiteSpace) {
@@ -181,7 +182,7 @@ internal class ValueConsumer(
             )
         }
 
-        expectToken<CssTokenKind.Function>()
+        expectToken(kind = CssTokenKind.Function)
 
         var endUrlOffset = current.endOffset
         var steps = 1
@@ -222,7 +223,7 @@ internal class ValueConsumer(
         val current = expectTokenNotNull()
         return when (current.kind) {
             CssTokenKind.Hash -> {
-                val next = expectNextToken<CssTokenKind.HexDigit>()
+                val next = expectNextToken(kind = CssTokenKind.HexDigit)
                 Value.Color(
                     location = CssLocation(
                         source = content.substring(startIndex = current.startOffset, endIndex = next.endOffset),
@@ -234,7 +235,7 @@ internal class ValueConsumer(
             }
 
             CssTokenKind.Function -> {
-                expectNextToken<CssTokenKind.OpenParenthesis>()
+                expectNextToken(kind = CssTokenKind.OpenParenthesis)
                 var colorEndOffset = current.endOffset
                 while (hasNext()) {
                     val next = expectNextTokenNotNull()

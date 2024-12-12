@@ -30,35 +30,33 @@ internal abstract class Consumer<out T : CssNode>(
     /**
      * Expects the current token to be of the given type.
      */
-    protected inline fun <reified T : CssTokenKind> Iterator.expectToken(): Token<out T> {
+    protected fun Iterator.expectToken(kind: CssTokenKind): Token<out CssTokenKind> {
         val current = current()
         checkNotNull(current) {
-            "Expected ${T::class} but got null"
+            "Expected $kind but got null"
         }
 
-        check(current.kind is T) {
-            "Expected ${T::class} but got ${current.kind}"
+        check(current.kind == kind) {
+            "Expected $kind but got ${current.kind}"
         }
 
-        @Suppress("UNCHECKED_CAST")
-        return current as Token<out T>
+        return current
     }
 
     /**
      * Expects the next token to be of the given type.
      */
-    protected inline fun <reified T : CssTokenKind> Iterator.expectNextToken(): Token<out T> {
+    protected fun Iterator.expectNextToken(kind: CssTokenKind): Token<out CssTokenKind> {
         val next = next()
         checkNotNull(next) {
-            "Expected ${T::class} but got null"
+            "Expected $kind but got null"
         }
 
-        check(next.kind is T) {
-            "Expected ${T::class} but got ${next.kind}"
+        check(next.kind == kind) {
+            "Expected $kind but got ${next.kind}"
         }
 
-        @Suppress("UNCHECKED_CAST")
-        return next as Token<out T>
+        return next
     }
 
     /**
