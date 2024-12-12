@@ -132,9 +132,7 @@ class CssTokenizerTest {
             Token(kind = CssTokenKind.Colon, startOffset = 103, endOffset = 104),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 104, endOffset = 105),
             Token(
-                kind = CssTokenKind.Dimension(
-                    unit = "px",
-                ),
+                kind = CssTokenKind.Dimension,
                 startOffset = 105,
                 endOffset = 108,
             ),
@@ -369,11 +367,7 @@ class CssTokenizerTest {
             Token(kind = CssTokenKind.Ident, startOffset = 19, endOffset = 28),         // 'min-width'
             Token(kind = CssTokenKind.Colon, startOffset = 28, endOffset = 29),              // ':'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 29, endOffset = 30),         // ' '
-            Token(
-                kind = CssTokenKind.Dimension(unit = "px"),
-                startOffset = 30,
-                endOffset = 35,
-            ),          // '768px'
+            Token(kind = CssTokenKind.Dimension, startOffset = 30, endOffset = 35),          // '768px'
             Token(kind = CssTokenKind.CloseParenthesis, startOffset = 35, endOffset = 36),   // ')'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 36, endOffset = 37),         // ' '
             Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 37, endOffset = 38),     // '{'
@@ -453,17 +447,13 @@ class CssTokenizerTest {
             Token(kind = CssTokenKind.Number, startOffset = 266, endOffset = 267),           // '0'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 267, endOffset = 268),       // ' '
             Token(
-                kind = CssTokenKind.Dimension(
-                    unit = "px",
-                ),
+                kind = CssTokenKind.Dimension,
                 startOffset = 268,
                 endOffset = 271,
             ),        // '4px'
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 271, endOffset = 272),       // ' '
             Token(
-                kind = CssTokenKind.Dimension(
-                    unit = "px",
-                ),
+                kind = CssTokenKind.Dimension,
                 startOffset = 272,
                 endOffset = 275,
             ),        // '6px'
@@ -649,7 +639,7 @@ class CssTokenizerTest {
 
     private fun assertTokens(content: String, tokens: List<Token<out CssTokenKind>>) {
         val lexer = CssTokenizer()
-        val actual = lexer.tokenize(content).toList()
+        val actual = lexer.tokenize(content)
         assertEquals(expected = tokens, actual = actual)
     }
 }

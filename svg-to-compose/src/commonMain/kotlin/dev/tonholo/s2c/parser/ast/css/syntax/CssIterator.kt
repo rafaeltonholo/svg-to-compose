@@ -48,18 +48,18 @@ internal class CssIterator(
                 val next = tokens.getOrNull(i + 1)
                 when {
                     // trim leading or trailing whitespaces
-                    (prev == null && token.kind is CssTokenKind.WhiteSpace) || next == null -> {
+                    (prev == null && token.kind == CssTokenKind.WhiteSpace) || next == null -> {
                         removeLast()
                         i++
                     }
 
                     (
-                        token.kind is CssTokenKind.WhiteSpace &&
-                            prev?.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens &&
-                            next.kind in CssTokenKind.WhiteSpace.significantAdjacentTokens
+                        token.kind == CssTokenKind.WhiteSpace &&
+                            prev?.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens &&
+                            next.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens
                         ) -> i++
 
-                    token.kind is CssTokenKind.WhiteSpace -> {
+                    token.kind == CssTokenKind.WhiteSpace -> {
                         removeLast()
                         i++
                     }

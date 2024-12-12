@@ -22,7 +22,7 @@ internal class DeclarationConsumer(
     private val valueConsumer: Consumer<Value>,
 ) : Consumer<Declaration>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Declaration {
-        val current = iterator.expectToken<CssTokenKind.Ident>()
+        val current = iterator.expectToken(kind = CssTokenKind.Ident)
         val property = content.substring(startIndex = current.startOffset, endIndex = current.endOffset)
         val values = mutableListOf<Value>()
         var important = false
