@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.lexer.css
 
 import app.cash.burst.Burst
-import app.cash.burst.burstValues
 import dev.tonholo.s2c.lexer.Token
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -487,14 +486,7 @@ class CssTokenizerTest {
     @Burst
     fun `when url is incomplete - then should create a BadUrl token`(
         // Arrange
-        url: String = burstValues(
-            "",
-            "(",
-            "#abc",
-            "https://example.com",
-            " https://example.com",
-            "               https://example.com",
-        )
+        url: BadUrlTokenParam,
     ) {
         println("url: '$url'")
         // Arrange (cont.)
@@ -523,20 +515,7 @@ class CssTokenizerTest {
     @Burst
     fun `when next non-whitespace token after url is quote or double-quote - then should create a Function token`(
         // Arrange
-        url: String = burstValues(
-            "\"\"",
-            "\"#abc\"",
-            "\"https://example.com\"",
-            " \"https://example.com\"",
-            "               \"https://example.com\"",
-            "               \"https://example.com\"            ",
-            "''",
-            "'#abc'",
-            "'https://example.com'",
-            " 'https://example.com'",
-            "               'https://example.com'",
-            "               'https://example.com'            ",
-        )
+        url: UrlAsFunctionParam,
     ) {
         println("url: '$url'")
         // Arrange (cont.)
@@ -637,9 +616,123 @@ class CssTokenizerTest {
         assertTokens(content, tokens)
     }
 
+    @Test
+    fun `create tokens for a rule with String`() {
+        val content = """
+            |div {
+            |    content: "this is a string";
+            |}
+        """.trimMargin()
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 4, endOffset = 5),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 5, endOffset = 10),
+            Token(kind = CssTokenKind.Ident, startOffset = 10, endOffset = 17),
+            Token(kind = CssTokenKind.Colon, startOffset = 17, endOffset = 18),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 18, endOffset = 19),
+            Token(kind = CssTokenKind.String, startOffset = 19, endOffset = 37),
+            Token(kind = CssTokenKind.Semicolon, startOffset = 37, endOffset = 38),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 38, endOffset = 39),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 39, endOffset = 40),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 40, endOffset = 40),
+        )
+        assertTokens(content, tokens)
+    }
+
+    @Test
+    fun `create tokens for a rule with String with escaped sequences`() {
+        val content = """div { content: "this is a string with \"escaped sequences\""; }"""
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 4, endOffset = 5),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 5, endOffset = 6),
+            Token(kind = CssTokenKind.Ident, startOffset = 6, endOffset = 13),
+            Token(kind = CssTokenKind.Colon, startOffset = 13, endOffset = 14),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15),
+            Token(kind = CssTokenKind.String, startOffset = 15, endOffset = 60),
+            Token(kind = CssTokenKind.Semicolon, startOffset = 60, endOffset = 61),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 61, endOffset = 62),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 62, endOffset = 63),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 63, endOffset = 63),
+        )
+        assertTokens(content, tokens)
+    }
+
+    @Test
+    @Burst
+    fun `create tokens for a rule with BadUrl with `(badString: BadStringParams) {
+        val content = """div { content: $badString; }"""
+        println(content)
+        val badStringStartOffset = 15
+        var badStringEndOffset = badStringStartOffset + badString.length + 4
+        val tokens = listOf(
+            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 4, endOffset = 5),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 5, endOffset = 6),
+            Token(kind = CssTokenKind.Ident, startOffset = 6, endOffset = 13),
+            Token(kind = CssTokenKind.Colon, startOffset = 13, endOffset = 14),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15),
+            Token(kind = CssTokenKind.BadString, startOffset = badStringStartOffset, endOffset = content.length),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = content.length, endOffset = content.length),
+        )
+        assertTokens(content, tokens)
+    }
+
     private fun assertTokens(content: String, tokens: List<Token<out CssTokenKind>>) {
         val lexer = CssTokenizer()
         val actual = lexer.tokenize(content)
         assertEquals(expected = tokens, actual = actual)
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class BadUrlTokenParam(private val value: String) {
+        `with an empty url`(""),
+        `with an open parenthesis url`("("),
+        `with a hashed url`("#abc"),
+        `with an unquoted url`("https://example.com"),
+        `with a spaced url`(" https://example.com "),
+        `with a leading spaced url`("               https://example.com"),
+        ;
+
+        override fun toString(): String = value
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class UrlAsFunctionParam(private val value: String) : CharSequence by value {
+        `with a double quotes empty url`("\"\""),
+        `with a double quotes hashed url`("\"#abc\""),
+        `with a double quotes url`("\"https://example.com\""),
+        `with a double quotes leading spaced url`("               \"https://example.com\""),
+        `with a double quotes trailing spaced url`("\"https://example.com\"           "),
+        `with a double quotes spaced url`("               \"https://example.com\"            "),
+        `with a single quotes empty url`("''"),
+        `with a single quotes hashed url`("'#abc'"),
+        `with a single quotes url`("'https://example.com'"),
+        `with a single quotes leading spaced url`("               'https://example.com'"),
+        `with a single quotes trailing spaced url`("'https://example.com'             "),
+        `with a single quotes spaced url`("               'https://example.com'            "),
+        ;
+
+        override fun toString(): String = value
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class BadStringParams(private val value: String): CharSequence by value {
+        `with incomplete double-quoted string`("\"incomplete string"),
+        `with incomplete double-quoted string with escaped quote`("\"incomplete string with \\\"escaped quote\\\""),
+        `with incomplete double-quoted string with symbols`(
+            "\"incomplete string with symbols: !@#$%^&*()_+-=[]{}|;:,.<>/?`~",
+        ),
+        `with incomplete single-quoted string`("'incomplete string"),
+        `with incomplete single-quoted string with escaped quote`("'incomplete string with \\'escaped quote\\'"),
+        `with incomplete single-quoted string with symbols`(
+            "'incomplete string with symbols: !@#$%^&*()_+-=[]{}|;:,.<>/?`~",
+        ),
+        ;
+
+        override fun toString(): String = value
     }
 }

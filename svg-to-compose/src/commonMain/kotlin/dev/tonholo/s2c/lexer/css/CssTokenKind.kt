@@ -36,7 +36,7 @@ enum class CssTokenKind(
     String,
 
     // Missing end quote, mismatched quotes (missing start quote will yield one or more identifiers)
-    InvalidString,
+    BadString,
 
     // "URL(" string  - note that space between URL and ( is not allowed
     Url,
@@ -49,9 +49,9 @@ enum class CssTokenKind(
     CloseSquareBracket(representation = setOf(']')),
     OpenParenthesis(representation = setOf('(')),
     CloseParenthesis(representation = setOf(')')),
-    HtmlComment,
-    MultilineComment,
-    SingleComment,
+    CDO,
+    CDC,
+    Comment,
     Function,
     Quote(representation = setOf('\'')),
     DoubleQuote(representation = setOf('"')),
