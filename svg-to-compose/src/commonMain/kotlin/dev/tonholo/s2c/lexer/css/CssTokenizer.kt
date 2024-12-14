@@ -4,6 +4,7 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.Tokenizer
 import dev.tonholo.s2c.lexer.css.token.consumer.AtKeywordTokenConsumer
+import dev.tonholo.s2c.lexer.css.token.consumer.CommentTokenConsumer
 import dev.tonholo.s2c.lexer.css.token.consumer.DirectTokenConsumer
 import dev.tonholo.s2c.lexer.css.token.consumer.HashTokenConsumer
 import dev.tonholo.s2c.lexer.css.token.consumer.IdentTokenConsumer
@@ -30,6 +31,7 @@ internal class CssTokenizer(
         StringTokenConsumer(iterator),
         UrlTokenConsumer(iterator),
         NumberTokenConsumer(iterator),
+        CommentTokenConsumer(iterator),
         IdentTokenConsumer(iterator),
     ),
 ) : Tokenizer<CssTokenKind> {

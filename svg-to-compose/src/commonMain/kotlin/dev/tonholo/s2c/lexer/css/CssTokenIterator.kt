@@ -22,6 +22,10 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
                 CssTokenKind.Number
             }
 
+            char == '/' && peek(1) == '*' -> CssTokenKind.Comment
+            char == '<' && peek(1) == '!' && peek(2) == '-' && peek(3) == '-' -> CssTokenKind.CDO
+            char == '-' && peek(1) == '-' && peek(2) == '!' && peek(3) == '>' -> CssTokenKind.CDC
+
             else -> {
                 CssTokenKind.fromChar(char) ?: CssTokenKind.Ident
             }

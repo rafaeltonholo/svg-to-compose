@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.parser.ast.css
 
 import app.cash.burst.Burst
-import app.cash.burst.burstValues
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.syntax.CssParserException
@@ -1638,15 +1637,7 @@ class CssAstParserTest {
     @Burst
     fun `throw CssParserException when a BadUrl token is present`(
         // Arrange
-        url: String = burstValues(
-            "",
-            "#abc",
-            "\"https://example.com\"",
-            " \"https://example.com\" ",
-            "https://example.com",
-            " https://example.com",
-            "               https://example.com",
-        )
+        url: BadUrlParam,
     ) {
         println("url: $url")
         // Arrange (cont.)
@@ -1688,5 +1679,19 @@ class CssAstParserTest {
         val astParser = CssParser(content)
         val actual = astParser.parse(tokens)
         assertEquals(expected, actual)
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class BadUrlParam(private val value: String) {
+        `with an empty url`(""),
+        `with a hashed url`("#abc"),
+        `with a quoted url`("\"https://example.com\""),
+        `with a space and quoted url`(" \"https://example.com\" "),
+        `with an unquoted url`("https://example.com"),
+        `with a spaced and unquoted url`(" https://example.com"),
+        `with a leading spaced unquote url`("               https://example.com"),
+        ;
+
+        override fun toString(): String = value
     }
 }
