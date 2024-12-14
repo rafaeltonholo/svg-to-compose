@@ -13,13 +13,11 @@ internal class WhitespaceTokenConsumer(
 
     override fun consume(kind: CssTokenKind): List<Token<out CssTokenKind>> {
         val start = iterator.offset
-        iterator.nextOffset()
         while (iterator.hasNext()) {
-            val char = iterator.get()
+            val char = iterator.next()
             if (char !in CssTokenKind.WhiteSpace) {
                 break
             }
-            iterator.nextOffset()
         }
 
         return listOf(Token(CssTokenKind.WhiteSpace, start, iterator.offset))

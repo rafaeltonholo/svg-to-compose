@@ -27,6 +27,7 @@ internal abstract class TokenIterator<out T : TokenKind> {
      * The current offset within the content string.
      */
     var offset = 0
+        get() = field.coerceIn(0, content.length)
         private set
 
     /**
@@ -96,17 +97,17 @@ internal abstract class TokenIterator<out T : TokenKind> {
 
     /** Advances the offset by the specified number of steps. */
     fun nextOffset(steps: Int = 1): Int {
-        offset += steps
+        offset = (offset + steps).coerceIn(0, content.length)
         return offset
     }
 
     /** Moves the offset to the specified position. */
     fun moveTo(offset: Int) {
-        this.offset = offset
+        this.offset = offset.coerceIn(0, content.length)
     }
 
     /** Rewinds the offset by the specified number of steps. */
     fun rewind(steps: Int = 1) {
-        offset -= steps
+        offset = (offset - steps).coerceIn(0, content.length)
     }
 }
