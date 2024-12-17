@@ -11,7 +11,6 @@ class SvgMaskNode(
 ) : SvgElementNode<SvgMaskNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
     override val constructor = ::SvgMaskNode
     override val id: String by attribute()
-    val style: String? by attribute()
     val maskContentUnits: String? by attribute() // <userSpaceOnUse | objectBoundingBox>; default: userSpaceOnUse
     val maskUnits: String? by attribute() // <userSpaceOnUse | objectBoundingBox>; default: objectBoundingBox
     val x: Int? by attribute()

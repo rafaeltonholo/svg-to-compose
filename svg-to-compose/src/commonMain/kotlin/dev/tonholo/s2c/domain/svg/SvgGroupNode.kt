@@ -16,7 +16,6 @@ class SvgGroupNode(
     val filterId: String? by attribute("filter")
     val opacity: Float? by attribute()
     val fillOpacity: Float? by attribute("fill-opacity")
-    val style: String? by attribute()
     val clipPath: SvgClipPath? by lazy {
         children.firstInstanceOfOrNull()
     }
