@@ -86,6 +86,11 @@ class Client : CliktCommand(name = "s2c") {
         help = "Enable verbose log.",
     ).flag()
 
+    private val stackTrace by option(
+        names = arrayOf("--stacktrace"),
+        help = "Print the stacktrace when an error happens.",
+    ).flag()
+
     private val noPreview by option(
         names = arrayOf("-np", "--no-preview"),
         help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
@@ -158,6 +163,7 @@ class Client : CliktCommand(name = "s2c") {
         logger.verbose("   addToMaterial = $addToMaterial")
         logger.verbose("   debug = $debug")
         logger.verbose("   verbose = $verbose")
+        logger.verbose("   stackTrace = $stackTrace")
         logger.verbose("   noPreview = $noPreview")
         logger.verbose("   isKmp = $isKmp")
         logger.verbose("   makeInternal = $makeInternal")
@@ -170,7 +176,7 @@ class Client : CliktCommand(name = "s2c") {
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
-        AppConfig.stackTrace = AppConfig.debug
+        AppConfig.stackTrace = stackTrace || AppConfig.debug
         AppConfig.silent = silent
 
         try {
@@ -202,7 +208,11 @@ class Client : CliktCommand(name = "s2c") {
             )
         } catch (e: ExitProgramException) {
             printEmpty()
-            logger.output(e.message.orEmpty())
+            if (AppConfig.stackTrace) {
+                logger.error(e.message.orEmpty(), e)
+            } else {
+                logger.output(e.message.orEmpty())
+            }
             exit(e.errorCode.code)
         }
     }
