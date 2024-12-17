@@ -34,8 +34,10 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import javax.inject.Inject
 
@@ -78,21 +80,22 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         get() = configurations
             .associate { configuration ->
                 val destination = configuration.destinationPackage.get().replace(".", "/")
-                val outputFolder = if (configuration.iconConfiguration.orNull?.isCodeGenerationPersistent?.orNull == true) {
-                    project.layout.projectDirectory.dir(
-                        buildString {
-                            append(
-                                if (isKmp) {
-                                    "src/commonMain/kotlin"
-                                } else {
-                                    "src/main/kotlin"
-                                },
-                            )
-                        },
-                    ).asFile.toOkioPath()
-                } else {
-                    sourceDirectory.toOkioPath()
-                }
+                val outputFolder =
+                    if (configuration.iconConfiguration.orNull?.isCodeGenerationPersistent?.orNull == true) {
+                        project.layout.projectDirectory.dir(
+                            buildString {
+                                append(
+                                    if (isKmp) {
+                                        "src/commonMain/kotlin"
+                                    } else {
+                                        "src/main/kotlin"
+                                    },
+                                )
+                            },
+                        ).asFile.toOkioPath()
+                    } else {
+                        sourceDirectory.toOkioPath()
+                    }
                 val configurationDestination = outputFolder / destination
 
                 configuration.name to configurationDestination.toFile()
@@ -232,7 +235,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
                     exclude = iconConfiguration.exclude.orNull,
                     kmpPreview = isKmp,
-                    silent = true, // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration is done.
+                    // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration
+                    //  is done.
+                    silent = true,
                     keepTempFolder = true,
                 ),
                 recursive = false, // recursive search is handled by the plugin.
@@ -314,6 +319,11 @@ internal fun Project.registerParseSvgToComposeIconTask(
         isKmp = kmpExtension != null
         configurations = extension.configurations
         maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
+    }
+
+    // Register this task as a dependency of KotlinCompile
+    tasks.withType<KotlinCompile> {
+        dependsOn(task)
     }
 
     val outputDirectories = task.map { it.sourceDirectory }
