@@ -82,7 +82,7 @@ private fun SvgGroupNode.createGroupClipPath(
         ?.flatten()
         ?.filterIsInstance<ImageVectorNode.Path>()
         ?.map { it.wrapper }
-        ?.reduce { acc, imageVectorNode ->
+        ?.reduceOrNull { acc, imageVectorNode ->
             acc + imageVectorNode
         }
 
