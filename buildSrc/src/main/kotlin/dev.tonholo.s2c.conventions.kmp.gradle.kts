@@ -14,6 +14,10 @@ plugins {
 kotlin {
     useNative()
     useJvm()
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xwhen-guards")
+    }
 }
 
 buildConfig {
