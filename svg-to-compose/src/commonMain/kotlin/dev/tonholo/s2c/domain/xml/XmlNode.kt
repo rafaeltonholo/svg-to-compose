@@ -7,6 +7,8 @@ import dev.tonholo.s2c.logger.warn
 interface XmlNode {
     val tagName: String
     val id: String?
+    val className: String?
+    val style: String?
     val attributes: MutableMap<String, String>
 
     override fun toString(): String
@@ -19,6 +21,8 @@ sealed interface XmlParentNode : XmlNode {
 data object XmlPendingParentElement : XmlParentNode {
     override val tagName: String = "pending-parent"
     override val id: String? = null
+    override val className: String? = null
+    override val style: String? = null
     override val attributes: MutableMap<String, String> = mutableMapOf()
     override val children: MutableSet<XmlNode> = mutableSetOf()
 }
@@ -49,6 +53,8 @@ abstract class XmlChildNode(
     }
 
     override val id: String? by attribute()
+    override val className: String? by attribute(name = "class")
+    override val style: String? by attribute()
 
     open fun toJsString(extra: (StringBuilder.() -> Unit)? = null): String = buildString {
         append("{")
@@ -109,6 +115,8 @@ data class XmlRootNode(
     override val children: MutableSet<XmlNode>,
 ) : XmlParentNode {
     override val id: String? = null
+    override val className: String? = null
+    override val style: String? = null
     override val attributes: MutableMap<String, String> = mutableMapOf()
     override fun toString(): String {
         return "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
