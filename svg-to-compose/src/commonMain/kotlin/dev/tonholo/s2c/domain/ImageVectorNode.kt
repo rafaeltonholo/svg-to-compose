@@ -347,10 +347,19 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         override fun materialize(): String = "$functionName()"
     }
 
+    // Support class to Paths. It should not be inherited from ImageVectorNode
     data class NodeWrapper(
         val normalizedPath: String,
         val nodes: List<PathNodes>,
-    ) // Support class to Paths. It should not be inherited from ImageVectorNode
+    ) {
+        operator fun plus(other: NodeWrapper): NodeWrapper {
+            return NodeWrapper(
+                normalizedPath = "$normalizedPath ${other.normalizedPath}",
+                // Handle auto close if last command isn't closing path.
+                nodes = nodes + other.nodes,
+            )
+        }
+    }
 }
 
 fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {

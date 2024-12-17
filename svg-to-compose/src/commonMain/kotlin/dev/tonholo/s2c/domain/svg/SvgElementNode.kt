@@ -54,7 +54,17 @@ abstract class SvgElementNode<out T>(
         val resolvedChildren = buildSet {
             for (child in children) {
                 when (child) {
-                    is SvgDefsNode -> Unit // remove Defs from the tree since there is no utility anymore.
+                    // remove <use> nodes from the tree since there is no utility anymore.
+                    is SvgDefsNode -> add(
+                        child.copy(
+                            children = child
+                                .children
+                                .asSequence()
+                                .filterIsInstance<SvgNode>()
+                                .filterNot { node -> node is SvgUseNode }
+                                .toMutableSet(),
+                        ),
+                    )
 
                     is SvgUseNode -> {
                         val replacement = child.resolve()
@@ -82,7 +92,10 @@ fun <T> SvgElementNode<T>.asNodes(
     minified: Boolean,
 ): List<ImageVectorNode>
     where T : SvgNode, T : XmlParentNode {
-    val masks = children.filterIsInstance<SvgMaskNode>()
+    val defsMasks = children
+        .filterIsInstance<SvgDefsNode>()
+        .flatMap { defs -> defs.children.filterIsInstance<SvgMaskNode>() }
+    val masks = defsMasks + children.filterIsInstance<SvgMaskNode>()
     return children
         .asSequence()
         .mapNotNull { node -> (node as? SvgNode)?.asNodes(masks, minified) }

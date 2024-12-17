@@ -166,17 +166,22 @@ class SvgRootNode(
     }
 }
 
-inline fun SvgNode.asNodes(
+fun SvgNode.asNodes(
     masks: List<SvgMaskNode>,
     minified: Boolean,
-): List<ImageVectorNode>? = when (this) {
-    is SvgRootNode -> asNodes(minified = minified)
-    is SvgGroupNode -> flatNode(masks, minified)
-    is SvgCircleNode -> listOf(asNode(minified = minified))
-    is SvgPathNode -> listOf(asNode(minified = minified))
-    is SvgRectNode -> listOf(asNode(minified = minified))
-    is SvgPolygonNode -> listOf(asNode(minified = minified))
-    is SvgPolylineNode -> listOf(asNode(minified = minified))
-    is SvgEllipseNode -> listOf(asNode(minified = minified))
-    else -> null
+): List<ImageVectorNode>? {
+    return when (this) {
+        is SvgRootNode -> asNodes(minified = minified)
+        is SvgGraphicNode<*> if maskId != null ->
+            asMaskGroup().flatNode(masks, minified)
+
+        is SvgGroupNode -> flatNode(masks, minified)
+        is SvgCircleNode -> listOf(asNode(minified = minified))
+        is SvgPathNode -> listOf(asNode(minified = minified))
+        is SvgRectNode -> listOf(asNode(minified = minified))
+        is SvgPolygonNode -> listOf(asNode(minified = minified))
+        is SvgPolylineNode -> listOf(asNode(minified = minified))
+        is SvgEllipseNode -> listOf(asNode(minified = minified))
+        else -> null
+    }
 }

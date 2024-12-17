@@ -170,6 +170,7 @@ class Client : CliktCommand(name = "s2c") {
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
+        AppConfig.stackTrace = AppConfig.debug
         AppConfig.silent = silent
 
         try {
