@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.lexer.css
 
+import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.lexer.TokenIterator
 
 /**
@@ -18,9 +19,7 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
                 CssTokenKind.Url
             }
 
-            isNumber(char) -> {
-                CssTokenKind.Number
-            }
+            isNumber(char) -> CssTokenKind.Number
 
             char == '/' && peek(1) == '*' -> CssTokenKind.Comment
             char == '<' && peek(1) == '!' && peek(2) == '-' && peek(3) == '-' -> CssTokenKind.CDO
@@ -33,8 +32,23 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
     }
 
     private fun isNumber(char: Char): Boolean {
-        return char in '0'..'9' ||
-                (char == '.' && (peek(-1) == ':' || peek(-1).isWhitespace()) &&
-                        peek(1) in '0'..'9')
+        val next = peek(1)
+        return when (char) {
+            in '0'..'9' -> true
+            '.' -> {
+                var prevIndex = -1
+                var prevNonWhitespace = ' '
+                while (prevNonWhitespace.isWhitespace()) {
+                    prevNonWhitespace = peek(--prevIndex)
+                    if (prevNonWhitespace == Char.EMPTY) {
+                        break
+                    }
+                }
+                next.isDigit() && prevNonWhitespace == ':'
+            }
+
+            '+', '-' -> next.isDigit() || next == '.'
+            else -> false
+        }
     }
 }

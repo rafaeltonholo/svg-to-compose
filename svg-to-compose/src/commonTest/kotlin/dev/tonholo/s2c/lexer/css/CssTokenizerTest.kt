@@ -662,6 +662,24 @@ class CssTokenizerTest {
 
     @Test
     @Burst
+    fun `create tokens for css property for numbers`(param: NumberOrDimensionTokenParam) {
+        val property = "margin: ${param.value};"
+        val valueStartOffset = 8
+        val valueEndOffset = valueStartOffset + param.value.length
+        val expected = listOf(
+            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 6),
+            Token(kind = CssTokenKind.Colon, startOffset = 6, endOffset = 7),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 7, endOffset = 8),
+            Token(kind = param.tokenKind, startOffset = valueStartOffset, endOffset = valueEndOffset),
+            Token(kind = CssTokenKind.Semicolon, startOffset = valueEndOffset, endOffset = valueEndOffset + 1),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = valueEndOffset + 1, endOffset = valueEndOffset + 1),
+        )
+
+        assertTokens(property, expected)
+    }
+
+    @Test
+    @Burst
     fun `create tokens for a rule with BadUrl with `(badString: BadStringParams) {
         val content = """div { content: $badString; }"""
         println(content)
@@ -720,7 +738,7 @@ class CssTokenizerTest {
     }
 
     @Suppress("unused", "EnumEntryName")
-    enum class BadStringParams(private val value: String): CharSequence by value {
+    enum class BadStringParams(private val value: String) : CharSequence by value {
         `with incomplete double-quoted string`("\"incomplete string"),
         `with incomplete double-quoted string with escaped quote`("\"incomplete string with \\\"escaped quote\\\""),
         `with incomplete double-quoted string with symbols`(
@@ -734,5 +752,30 @@ class CssTokenizerTest {
         ;
 
         override fun toString(): String = value
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class NumberOrDimensionTokenParam(val value: String, val tokenKind: CssTokenKind) {
+        `with a number starting with dot`(".5", CssTokenKind.Number),
+        `with a number starting with plus`("+5", CssTokenKind.Number),
+        `with a number starting with minus`("-5", CssTokenKind.Number),
+        `with a number starting with dot and a plus`("+.5", CssTokenKind.Number),
+        `with a number starting with dot and a minus`("-.5", CssTokenKind.Number),
+        `with a number with scientific notation`("5e-3", CssTokenKind.Number),
+        `with a number with scientific notation and a plus`("5e+3", CssTokenKind.Number),
+        `with a number with scientific notation starting with a plus`("+5e-3", CssTokenKind.Number),
+        `with a number with scientific notation starting with a minus`("-5e-3", CssTokenKind.Number),
+        `with a number with scientific notation starting with a dot`(".5e-3", CssTokenKind.Number),
+        `with a dimension starting with a dot`(".5px", CssTokenKind.Dimension),
+        `with a dimension starting with a plus`("+5px", CssTokenKind.Dimension),
+        `with a dimension starting with a minus`("-5px", CssTokenKind.Dimension),
+        `with a dimension starting with a dot and a plus`("+.5px", CssTokenKind.Dimension),
+        `with a dimension starting with a dot and a minus`("-.5px", CssTokenKind.Dimension),
+        `with a dimension with scientific notation`("5e-3px", CssTokenKind.Dimension),
+        `with a dimension with scientific notation and a plus`("5e+3px", CssTokenKind.Dimension),
+        `with a dimension with scientific notation starting with a plus`("+5e-3px", CssTokenKind.Dimension),
+        `with a dimension with scientific notation starting with a minus`("-5e-3px", CssTokenKind.Dimension),
+        `with a dimension with scientific notation starting with a dot`(".5e-3px", CssTokenKind.Dimension),
+        ;
     }
 }
