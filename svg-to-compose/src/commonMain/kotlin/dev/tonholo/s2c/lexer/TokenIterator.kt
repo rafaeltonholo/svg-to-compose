@@ -62,7 +62,7 @@ internal abstract class TokenIterator<out T : TokenKind> {
      *
      * @return The character at the current offset before advancing.
      */
-    fun next(): Char = content[++offset]
+    fun next(): Char = content.getOrElse(++offset) { Char.EMPTY }
 
     /**
      * Abstract method to determine the token kind at the current offset.
