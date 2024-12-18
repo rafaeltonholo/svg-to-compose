@@ -18,7 +18,7 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
                 CssTokenKind.Url
             }
 
-            char in '0'..'9' -> {
+            isNumber(char) -> {
                 CssTokenKind.Number
             }
 
@@ -30,5 +30,11 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
                 CssTokenKind.fromChar(char) ?: CssTokenKind.Ident
             }
         }
+    }
+
+    private fun isNumber(char: Char): Boolean {
+        return char in '0'..'9' ||
+                (char == '.' && (peek(-1) == ':' || peek(-1).isWhitespace()) &&
+                        peek(1) in '0'..'9')
     }
 }

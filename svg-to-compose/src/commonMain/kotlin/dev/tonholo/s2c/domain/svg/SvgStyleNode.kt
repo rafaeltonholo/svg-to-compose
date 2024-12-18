@@ -22,17 +22,18 @@ class SvgStyleNode(
             .content
     }
     private var _tree: StyleSheet? = null
-    val tree: StyleSheet
-        get() = checkNotNull(_tree) {
-            "Css tree is not resolved. Did you forget to call `resolveTree()`?"
-        }
 
     override fun toString(): String = toJsString {
     }
 
-    internal fun resolveTree(parser: AstParser<CssTokenKind, StyleSheet>) {
-        val tokens = CssTokenizer().tokenize(content).toList()
-        _tree = parser.parse(tokens)
+    internal fun resolveTree(parser: AstParser<CssTokenKind, StyleSheet>): StyleSheet {
+        val current = _tree
+        return if (current != null) {
+            current
+        } else {
+            val tokens = CssTokenizer().tokenize(content).toList()
+            parser.parse(tokens).also { _tree = it }
+        }
     }
 
     companion object {
