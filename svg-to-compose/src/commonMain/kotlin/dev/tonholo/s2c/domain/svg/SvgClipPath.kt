@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 class SvgClipPath(
     parent: XmlParentNode,
@@ -17,12 +18,13 @@ class SvgClipPath(
 }
 
 fun SvgClipPath.asNodeWrapper(
+    computedRules: List<ComputedRule> = emptyList(),
     minified: Boolean = false,
 ): ImageVectorNode.NodeWrapper {
     val nodes = children
         .asSequence()
         .filterNot { it is SvgGroupNode }
-        .mapNotNull { (it as? SvgNode)?.asNodes(masks = listOf(), minified) }
+        .mapNotNull { (it as? SvgNode)?.asNodes(computedRules, masks = listOf(), minified) }
         .flatten()
         .filterIsInstance<ImageVectorNode.Path>()
         .flatMap { it.wrapper.nodes }

@@ -7,6 +7,8 @@ import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
 
 /**
  * Represents a node in the SVG tree.
@@ -46,6 +48,65 @@ sealed interface SvgNode : XmlNode {
 
         private fun normalizeId(id: String): String =
             id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
+    }
+
+    fun resolveAttributesFromStyle(computedRules: List<ComputedRule>) {
+        val attributes = buildMap<String, String> {
+            resolveAttributesByStyleAttribute()
+
+            id?.let { id ->
+                resolveAttributesBySelector(computedRules, selector = id)
+            }
+
+            className?.let { className ->
+                resolveAttributesBySelector(computedRules, selector = className)
+            }
+        }
+
+        for ((key, value) in attributes) {
+            // Declared attributes have precedence over computed attributes.
+            if (this.attributes.contains(key).not()) {
+                this.attributes[key] = value
+            }
+        }
+    }
+
+    private fun MutableMap<String, String>.resolveAttributesByStyleAttribute() {
+        style?.let { style ->
+            val parts = style.split(";")
+            for (part in parts) {
+                val (property, value) = part.split(":")
+                if (attributes.containsKey(property).not()) {
+                    put(property.trim(), value.trim())
+                }
+            }
+        }
+    }
+
+    private fun MutableMap<String, String>.resolveAttributesBySelector(
+        computedRules: List<ComputedRule>,
+        selector: String,
+    ) {
+        val rulesPerSelector = computedRules
+            .filter { it.selector.endsWith(selector) }
+            .sortedDescending()
+        for (rule in rulesPerSelector) {
+            for (declaration in rule.declarations) {
+                when {
+                    attributes.containsKey(declaration.property) || containsKey(declaration.property) -> Unit
+                    else -> put(
+                        declaration.property,
+                        declaration.values.joinToString(" ") { value -> resolveAttributeValue(value) })
+                }
+            }
+        }
+    }
+
+    private fun resolveAttributeValue(value: Value): String {
+        return when (value) {
+            is Value.Url -> "url(${value.value})"
+            else -> value.location.source
+        }
     }
 }
 
@@ -88,15 +149,17 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
  * Returns `null` if the node is not supported.
  */
 fun SvgNode.asNodes(
+    computedRules: List<ComputedRule>,
     masks: List<SvgMaskNode>,
     minified: Boolean,
 ): List<ImageVectorNode>? {
+    resolveAttributesFromStyle(computedRules)
     return when (this) {
-        is SvgRootNode -> asNodes(minified = minified)
+        is SvgRootNode -> asNodes(computedRules, minified = minified)
         is SvgGraphicNode<*> if maskId != null ->
-            asMaskGroup().flatNode(masks, minified)
+            asMaskGroup().flatNode(masks, computedRules, minified)
 
-        is SvgGroupNode -> flatNode(masks, minified)
+        is SvgGroupNode -> flatNode(masks, computedRules, minified)
         is SvgCircleNode -> listOf(asNode(minified = minified))
         is SvgPathNode -> listOf(asNode(minified = minified))
         is SvgRectNode -> listOf(asNode(minified = minified))

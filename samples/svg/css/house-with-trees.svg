@@ -1,0 +1,96 @@
+<svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sky {
+    fill: url(#skyGradient);
+    }
+
+    .ground {
+    fill: #6b8e23;
+    }
+
+    .sun {
+    fill: url(#sunGradient);
+    stroke: #f39c12;
+    stroke-width: 2px;
+    }
+
+    .house-body {
+    fill: #d35400;
+    stroke: #8e4400;
+    stroke-width: 2px;
+    }
+
+    .house-roof {
+    fill: #c0392b;
+    stroke: #7b241c;
+    stroke-width: 2px;
+    }
+
+    .tree-trunk {
+    fill: #8e4400;
+    stroke: #5e3000;
+    stroke-width: 2px;
+    }
+
+    .tree-leaf {
+    fill: #27ae60;
+    stroke: #145a32;
+    stroke-width: 2px;
+    }
+
+    /* Hover states (just for interaction) */
+    .sun:hover {
+    fill: #f1c40f;
+    }
+
+    .house-body:hover {
+    fill: #e67e22;
+    }
+
+    .house-roof:hover {
+    fill: #e74c3c;
+    }
+
+    .tree-leaf:hover {
+    fill: #2ecc71;
+    }
+  </style>
+
+  <defs>
+    <!-- Sky gradient -->
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#87CEFA"/>
+      <stop offset="100%" stop-color="#b3ecff"/>
+    </linearGradient>
+
+    <!-- Sun gradient -->
+    <radialGradient id="sunGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f1c40f"/>
+      <stop offset="100%" stop-color="#f39c12"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky background -->
+  <rect class="sky" x="0" y="0" width="500" height="300" />
+
+  <!-- Ground -->
+  <rect class="ground" x="0" y="220" width="500" height="80" />
+
+  <!-- Sun -->
+  <circle class="sun" cx="70" cy="70" r="40" />
+
+  <!-- House Body -->
+  <rect class="house-body" x="200" y="140" width="100" height="80" />
+
+  <!-- House Roof -->
+  <polygon class="house-roof" points="200,140 250,100 300,140" />
+
+  <!-- Left Tree -->
+  <rect class="tree-trunk" x="100" y="180" width="10" height="40" />
+  <circle class="tree-leaf" cx="105" cy="165" r="20" />
+
+  <!-- Right Tree -->
+  <rect class="tree-trunk" x="390" y="180" width="10" height="40" />
+  <circle class="tree-leaf" cx="395" cy="165" r="20" />
+
+</svg>

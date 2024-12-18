@@ -7,11 +7,13 @@ import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
 import com.fleeksoft.ksoup.parser.Parser
 import dev.tonholo.s2c.domain.FileType
+import dev.tonholo.s2c.domain.svg.SvgStyleNode
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.domain.xml.XmlTextNode
 import dev.tonholo.s2c.logger.verbose
 import dev.tonholo.s2c.logger.verboseSection
 import dev.tonholo.s2c.logger.warn
@@ -211,7 +213,7 @@ abstract class XmlParser {
      */
     private fun processElement(
         node: Node,
-        parent: XmlParentNode
+        parent: XmlParentNode,
     ): XmlNode? {
         val preProcessedElement = getPreProcessedElement(node, parent)
 
@@ -223,8 +225,13 @@ abstract class XmlParser {
                 )
             }
 
+            is TextNode -> if (parent.tagName == SvgStyleNode.TAG_NAME) {
+                XmlTextNode(parent, content = node.text())
+            } else {
+                null
+            }
+
             // Ignored elements
-            is TextNode,
             is Comment,
             -> null
 

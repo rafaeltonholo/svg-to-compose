@@ -7,6 +7,7 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 class SvgPathNode(
     parent: XmlParentNode,
@@ -57,7 +58,8 @@ class SvgPathNode(
 }
 
 fun SvgPathNode.asNode(
-    minified: Boolean,
+    computedRules: List<ComputedRule> = emptyList(),
+    minified: Boolean = false,
 ): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -83,7 +85,7 @@ fun SvgPathNode.asNode(
         clipPath?.let {
             ImageVectorNode.Group(
                 params = ImageVectorNode.Group.Params(
-                    clipPath = it.asNodeWrapper(minified),
+                    clipPath = it.asNodeWrapper(computedRules, minified),
                 ),
                 commands = listOf(path),
                 minified = minified,

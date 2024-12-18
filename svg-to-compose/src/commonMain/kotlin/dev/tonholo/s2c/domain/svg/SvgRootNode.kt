@@ -5,6 +5,8 @@ import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_HEIGHT
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_TRANSFORM
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_VIEW_BOX
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_WIDTH
+import dev.tonholo.s2c.domain.svg.SvgRootNode.Companion.SVG_DEFAULT_HEIGHT
+import dev.tonholo.s2c.domain.svg.SvgRootNode.Companion.SVG_DEFAULT_WIDTH
 import dev.tonholo.s2c.domain.svg.gradient.SvgGradient
 import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlNode
@@ -146,6 +148,8 @@ class SvgRootNode(
     val gradients: HashMap<String, SvgGradient<*>> = hashMapOf()
 
     val styles: MutableList<SvgStyleNode> = mutableListOf()
+
+    val clipPaths: MutableMap<String, SvgClipPath> = mutableMapOf()
 
     /**
      * The transform applied to the entire SVG.
