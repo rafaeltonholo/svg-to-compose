@@ -3,11 +3,9 @@ package dev.tonholo.s2c.parser.ast.css.elements
 import app.cash.burst.Burst
 import app.cash.burst.burstValues
 import dev.tonholo.s2c.parser.ast.css.CssCombinator
-import dev.tonholo.s2c.parser.ast.css.CssSpecificity
-import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
+import dev.tonholo.s2c.parser.ast.css.calculateSelectorsSpecificity
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
-import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
 import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 import kotlin.test.Test
@@ -19,26 +17,22 @@ class CssSpecificityTest {
     @Test
     fun `when single universal selector then specificity is 0 0 0`() {
         // Arrange
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = listOf(
-                            Selector.Type(
-                                location = location,
-                                name = "*",
-                            ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = listOf(
+                        Selector.Type(
+                            location = location,
+                            name = "*",
                         ),
                     ),
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
-        val expected = "(0, 0, 0)"
+        val expected = "[(0, 0, 0)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -46,26 +40,22 @@ class CssSpecificityTest {
     @Test
     fun `when single id selector then specificity is 1 0 0`() {
         // Arrange
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = listOf(
-                            Selector.Id(
-                                location = location,
-                                name = "my-id",
-                            ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = listOf(
+                        Selector.Id(
+                            location = location,
+                            name = "my-id",
                         ),
                     ),
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
-        val expected = "(1, 0, 0)"
+        val expected = "[(1, 0, 0)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -73,26 +63,22 @@ class CssSpecificityTest {
     @Test
     fun `when single class selector then specificity is 0 1 0`() {
         // Arrange
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = listOf(
-                            Selector.Class(
-                                location = location,
-                                name = "my-class",
-                            ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = listOf(
+                        Selector.Class(
+                            location = location,
+                            name = "my-class",
                         ),
                     ),
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
-        val expected = "(0, 1, 0)"
+        val expected = "[(0, 1, 0)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -100,26 +86,22 @@ class CssSpecificityTest {
     @Test
     fun `when single tag selector then specificity is 0 0 1`() {
         // Arrange
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = listOf(
-                            Selector.Type(
-                                location = location,
-                                name = "div",
-                            ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = listOf(
+                        Selector.Type(
+                            location = location,
+                            name = "div",
                         ),
                     ),
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
-        val expected = "(0, 0, 1)"
+        val expected = "[(0, 0, 1)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -147,22 +129,18 @@ class CssSpecificityTest {
         )
     ) {
         // Arrange (cont.)
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = selectors,
-                    ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = selectors,
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
         val n = selectors.size
-        val expected = "($n, 0, 0)"
+        val expected = "[($n, 0, 0)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -190,22 +168,18 @@ class CssSpecificityTest {
         )
     ) {
         // Arrange (cont.)
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = selectors,
-                    ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = selectors,
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
         val n = selectors.size
-        val expected = "(0, $n, 0)"
+        val expected = "[(0, $n, 0)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -233,22 +207,18 @@ class CssSpecificityTest {
         )
     ) {
         // Arrange (cont.)
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = selectors,
-                    ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = selectors,
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
         val n = selectors.size
-        val expected = "(0, 0, $n)"
+        val expected = "[(0, 0, $n)]"
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }
@@ -262,7 +232,7 @@ class CssSpecificityTest {
                 Selector.Type(location = CssLocation.Undefined, name = "li"),
                 Selector.Class(location = CssLocation.Undefined, name = "my-class"),
                 Selector.Class(location = CssLocation.Undefined, name = "my-second-class"),
-            ) to "(0, 2, 1)",
+            ) to "[(0, 2, 1)]",
             listOf(
                 Selector.Type(
                     location = CssLocation.Undefined,
@@ -275,7 +245,7 @@ class CssSpecificityTest {
                     combinator = CssCombinator.DescendantCombinator,
                 ),
                 Selector.Class(location = CssLocation.Undefined, name = "my-second-class"),
-            ) to "(0, 1, 1)",
+            ) to "[(0, 1, 1)]",
             listOf(
                 Selector.Id(location = CssLocation.Undefined, name = "s12"),
                 Selector.PseudoClass(
@@ -285,16 +255,20 @@ class CssSpecificityTest {
                         Selector.Type(location = CssLocation.Undefined, name = "FOO")
                     ),
                 ),
-            ) to "(1, 0, 1)",
+            ) to "[(1, 0, 1)]",
             listOf(
                 Selector.Class(location = CssLocation.Undefined, name = "bar"),
                 Selector.Id(location = CssLocation.Undefined, name = "baz"),
-            ) to "(1, 1, 0)",
+            ) to "[(1, 1, 0)]",
             listOf(
                 Selector.Type(location = CssLocation.Undefined, name = "*"),
-            ) to "(0, 0, 0)",
+            ) to "[(0, 0, 0)]",
             listOf(
-                Selector.Type(location = CssLocation.Undefined, name = "h1", combinator = CssCombinator.SubsequentSiblingCombinator),
+                Selector.Type(
+                    location = CssLocation.Undefined,
+                    name = "h1",
+                    combinator = CssCombinator.SubsequentSiblingCombinator
+                ),
                 Selector.Type(location = CssLocation.Undefined, name = "*"),
                 Selector.Attribute(
                     location = CssLocation.Undefined,
@@ -302,25 +276,21 @@ class CssSpecificityTest {
                     matcher = "=",
                     value = "up",
                 ),
-            ) to "(0, 1, 1)",
+            ) to "[(0, 1, 1)]",
         )
     ) {
         // Arrange (cont.)
         val (selectors, expected) = rules
-        val rule = QualifiedRule(
-            location = location,
-            prelude = Prelude.Selector(
-                components = listOf(
-                    SelectorListItem(
-                        location = location,
-                        selectors = selectors,
-                    ),
+        val prelude = Prelude.Selector(
+            components = listOf(
+                SelectorListItem(
+                    location = location,
+                    selectors = selectors,
                 ),
             ),
-            block = Block.EmptyDeclarationBlock,
         )
         // Act
-        val actual = CssSpecificity(rule)
+        val actual = calculateSelectorsSpecificity(prelude).values
         // Assert
         assertEquals(expected, actual.toString())
     }

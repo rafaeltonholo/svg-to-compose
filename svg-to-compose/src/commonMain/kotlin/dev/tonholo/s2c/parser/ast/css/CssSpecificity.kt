@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.parser.ast.css
 
-import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
 import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 
@@ -63,16 +63,13 @@ data class CssSpecificity(
  *
  * It is calculated based on the selectors in the rule's prelude.
  *
- * @param rule The [QualifiedRule] for which to calculate the specificity.
- * @return The [CssSpecificity] of the rule.
+ * @param prelude The prelude of the CSS rule.
+ * @return A map where the keys are the selector list items and the values
+ * are the [CssSpecificity] of each selector in the rule's prelude.
  */
-fun CssSpecificity(rule: QualifiedRule): CssSpecificity {
-    return rule.prelude.components.calculateSpecificity()
-}
-
-private fun List<SelectorListItem>.calculateSpecificity(): CssSpecificity {
-    return fold(CssSpecificity()) { specificity, item ->
-        specificity + item.selectors.fold(CssSpecificity()) { selectorSpecificity, selector ->
+fun calculateSelectorsSpecificity(prelude: Prelude.Selector): Map<SelectorListItem, CssSpecificity> {
+    return prelude.components.associateWith { selector ->
+        selector.selectors.fold(CssSpecificity()) { selectorSpecificity, selector ->
             selectorSpecificity + selector.calculateSpecificity()
         }
     }

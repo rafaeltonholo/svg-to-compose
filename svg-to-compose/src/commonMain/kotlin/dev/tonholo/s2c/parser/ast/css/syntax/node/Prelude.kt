@@ -1,6 +1,8 @@
 package dev.tonholo.s2c.parser.ast.css.syntax.node
 
 import dev.tonholo.s2c.extensions.prependIndent
+import dev.tonholo.s2c.parser.ast.css.CssSpecificity
+import dev.tonholo.s2c.parser.ast.css.calculateSelectorsSpecificity
 
 /**
  * Represents the prelude of a [Rule], which can be either
@@ -20,6 +22,10 @@ sealed interface Prelude<T : CssComponentValueNode> {
     data class Selector(
         override val components: List<SelectorListItem>,
     ) : Prelude<SelectorListItem> {
+        val specificities: Map<SelectorListItem, CssSpecificity> by lazy {
+            calculateSelectorsSpecificity(this)
+        }
+
         override fun toString(): String {
             return buildString {
                 appendLine("Selector(")
