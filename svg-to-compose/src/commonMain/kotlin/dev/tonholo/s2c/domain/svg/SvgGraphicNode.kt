@@ -64,6 +64,8 @@ abstract class SvgGraphicNode<out T>(
         strokeDashArray?.let(::StrokeDashArray)
     }
 
+    val maskId: String? by attribute("mask")
+
     fun graphicNodeParams(): String = buildString {
         fill?.let { append("fill=\"${it.value}\" ") }
         opacity?.let { append("opacity=\"$it\" ") }
@@ -122,4 +124,16 @@ abstract class SvgGraphicNode<out T>(
     }
 
     override fun toString(): String = toJsString()
+}
+
+fun <T> SvgGraphicNode<T>.asMaskGroup(): SvgGroupNode where T : SvgNode, T : XmlChildNode {
+    val maskId = checkNotNull(maskId)
+    attributes.remove("mask")
+    return SvgGroupNode(
+        parent = parent,
+        children = mutableSetOf(this),
+        attributes = mutableMapOf(
+            "mask" to maskId,
+        ),
+    )
 }

@@ -74,6 +74,10 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
+        wasmJsMain.dependencies {
+            implementation(devNpm("webpack", "^5.94.0"))
+            implementation(devNpm("path-to-regexp", "^0.1.12"))
+        }
     }
 }
 

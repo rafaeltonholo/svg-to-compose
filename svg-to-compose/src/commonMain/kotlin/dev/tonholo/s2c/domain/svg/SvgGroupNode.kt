@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
@@ -70,9 +69,22 @@ fun SvgGroupNode.flatNode(
 private fun SvgGroupNode.createGroupClipPath(
     masks: List<SvgMaskNode>,
     minified: Boolean,
-): ImageVectorNode.NodeWrapper? = masks
-    .firstOrNull { it.id == maskId?.normalizedId() }
-    ?.path
-    ?.d
-    ?.asNodeWrapper(minified)
-    ?: clipPath?.asNodeWrapper(minified = true)
+): ImageVectorNode.NodeWrapper? {
+    val mask = masks
+        .firstOrNull { it.id == maskId?.normalizedId() }
+
+    val children = mask
+        ?.children
+        ?.filterIsInstance<SvgNode>()
+
+    val paths = children
+        ?.mapNotNull { node -> node.asNodes(masks, minified) }
+        ?.flatten()
+        ?.filterIsInstance<ImageVectorNode.Path>()
+        ?.map { it.wrapper }
+        ?.reduceOrNull { acc, imageVectorNode ->
+            acc + imageVectorNode
+        }
+
+    return paths ?: clipPath?.asNodeWrapper(minified = true)
+}
