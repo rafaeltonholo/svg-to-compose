@@ -14,16 +14,15 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
     override fun getTokenKind(): CssTokenKind {
         val char = get()
         return when {
-            char == 'u' && peek(1) == 'r' && peek(2) == 'l' && peek(offset = 3) == '(' -> {
+            isUrlToken(char) -> {
                 nextOffset(steps = 4)
                 CssTokenKind.Url
             }
 
-            isNumber(char) -> CssTokenKind.Number
-
-            char == '/' && peek(1) == '*' -> CssTokenKind.Comment
-            char == '<' && peek(1) == '!' && peek(2) == '-' && peek(3) == '-' -> CssTokenKind.CDO
-            char == '-' && peek(1) == '-' && peek(2) == '!' && peek(3) == '>' -> CssTokenKind.CDC
+            char.isNumber() -> CssTokenKind.Number
+            char.isCommentStart() -> CssTokenKind.Comment
+            char.isCDOToken() -> CssTokenKind.CDO
+            char.isCDCToken() -> CssTokenKind.CDC
 
             else -> {
                 CssTokenKind.fromChar(char) ?: CssTokenKind.Ident
@@ -31,9 +30,9 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
         }
     }
 
-    private fun isNumber(char: Char): Boolean {
+    private fun Char.isNumber(): Boolean {
         val next = peek(1)
-        return when (char) {
+        return when (this) {
             in '0'..'9' -> true
             '.' -> {
                 var prevIndex = -1
@@ -51,4 +50,13 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
             else -> false
         }
     }
+
+    private fun Char.isCommentStart(): Boolean = this == '/' && peek(1) == '*'
+
+    private fun Char.isCDOToken(): Boolean = this == '<' && peek(1) == '!' && peek(2) == '-' && peek(3) == '-'
+
+    private fun Char.isCDCToken(): Boolean = this == '-' && peek(1) == '-' && peek(2) == '!' && peek(3) == '>'
+
+    private fun isUrlToken(char: Char): Boolean =
+        char == 'u' && peek(1) == 'r' && peek(2) == 'l' && peek(offset = 3) == '('
 }
