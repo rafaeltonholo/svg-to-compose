@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 typealias SvgElementNodeConstructorFn<T> = (
     parent: XmlParentNode,
@@ -89,6 +90,7 @@ abstract class SvgElementNode<out T>(
 }
 
 fun <T> SvgElementNode<T>.asNodes(
+    computedRules: List<ComputedRule>,
     minified: Boolean,
 ): List<ImageVectorNode>
     where T : SvgNode, T : XmlParentNode {
@@ -98,7 +100,7 @@ fun <T> SvgElementNode<T>.asNodes(
     val masks = defsMasks + children.filterIsInstance<SvgMaskNode>()
     return children
         .asSequence()
-        .mapNotNull { node -> (node as? SvgNode)?.asNodes(masks, minified) }
+        .mapNotNull { node -> (node as? SvgNode)?.asNodes(computedRules, masks, minified) }
         .flatten()
         .toList()
 }

@@ -29,8 +29,6 @@ abstract class SvgGraphicNode<out T>(
 
     val fillOpacity: Float? by attribute(name = "fill-opacity", inherited = true)
 
-    val style: String? by attribute()
-
     val stroke: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
     val strokeWidth: Float? by attribute<String?, _>(name = "stroke-width", inherited = true) {
