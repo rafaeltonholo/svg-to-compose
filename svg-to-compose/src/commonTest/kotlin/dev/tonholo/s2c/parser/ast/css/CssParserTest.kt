@@ -3,7 +3,7 @@ package dev.tonholo.s2c.parser.ast.css
 import app.cash.burst.Burst
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
-import dev.tonholo.s2c.parser.ast.css.syntax.CssParserException
+import dev.tonholo.s2c.parser.ast.css.syntax.AstParserException
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
@@ -1661,7 +1661,7 @@ class CssAstParserTest {
         val parser = CssParser(content)
 
         // Act
-        val exception = assertFailsWith<CssParserException> {
+        val exception = assertFailsWith<AstParserException> {
             parser.parse(tokens)
         }
 

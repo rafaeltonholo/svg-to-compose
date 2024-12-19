@@ -5,8 +5,8 @@ import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.CssCombinator
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
-import dev.tonholo.s2c.parser.ast.css.syntax.parserError
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
+import dev.tonholo.s2c.parser.ast.iterator.parserError
 
 /**
  * Consumes a simple CSS selectors from the given iterator and builds a [Selector] object.

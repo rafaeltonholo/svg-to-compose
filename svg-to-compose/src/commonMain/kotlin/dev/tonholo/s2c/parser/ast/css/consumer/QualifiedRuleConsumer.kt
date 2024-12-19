@@ -7,8 +7,9 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
 import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
-import dev.tonholo.s2c.parser.ast.css.syntax.parserError
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
+import dev.tonholo.s2c.parser.ast.iterator.parserCheckNotNull
+import dev.tonholo.s2c.parser.ast.iterator.parserError
 
 /**
  * Consumes a qualified rule from the given iterator and builds a [QualifiedRule]
@@ -41,7 +42,7 @@ internal class QualifiedRuleConsumer(
 ) : Consumer<QualifiedRule>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): QualifiedRule {
         val current = iterator.current()
-        checkNotNull(current) {
+        iterator.parserCheckNotNull(value = current, content = content) {
             "Expected qualified rule but got null"
         }
         val selectors = mutableListOf<SelectorListItem>()

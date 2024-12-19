@@ -3,7 +3,7 @@ package dev.tonholo.s2c.parser.ast.css.consumer
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
-import dev.tonholo.s2c.parser.ast.css.syntax.parserError
+import dev.tonholo.s2c.parser.ast.iterator.parserError
 
 private val colorFunctions = setOf(
     "rgb",
@@ -256,7 +256,7 @@ internal class ValueConsumer(
                 )
             }
 
-            else -> error("Unexpected token: $current")
+            else -> parserError(content = content, message = "Unexpected token: $current")
         }
     }
 }

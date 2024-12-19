@@ -7,8 +7,13 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Rule
-import dev.tonholo.s2c.parser.ast.css.syntax.parserError
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
+import dev.tonholo.s2c.parser.ast.iterator.parserCheck
+import dev.tonholo.s2c.parser.ast.iterator.parserCheckNotNull
+import dev.tonholo.s2c.parser.ast.iterator.parserError
+import dev.tonholo.s2c.parser.ast.iterator.parserRequire
+
+private val validAtRules = setOf("media", "keyframes", "import", "charset", "supports", "page", "font-face")
 
 /**
  * Consumes an at-rule from the given iterator and builds a [AtRule] object.
@@ -24,10 +29,10 @@ internal class AtRuleConsumer(
 ) : Consumer<AtRule>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): AtRule {
         val current = iterator.current()
-        checkNotNull(current) {
+        iterator.parserCheckNotNull(value = current, content = content) {
             "Expected @rule but got null"
         }
-        check(current.kind == CssTokenKind.AtKeyword) {
+        iterator.parserCheck(predicate = current.kind == CssTokenKind.AtKeyword, content = content) {
             "Expected @rule but got ${current.kind}"
         }
         val preludeStartOffset = current.endOffset + 1

@@ -6,8 +6,10 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.CssComponentValueNode
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Rule
-import dev.tonholo.s2c.parser.ast.css.syntax.parserError
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
+import dev.tonholo.s2c.parser.ast.iterator.parserCheck
+import dev.tonholo.s2c.parser.ast.iterator.parserCheckNotNull
+import dev.tonholo.s2c.parser.ast.iterator.parserError
 
 private val blockOpeningTokens = mapOf(
     CssTokenKind.OpenParenthesis to CssTokenKind.CloseParenthesis,
@@ -27,10 +29,10 @@ internal abstract class SimpleBlockConsumer<T : CssComponentValueNode>(
 ) : Consumer<Block.SimpleBlock<T>>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Block.SimpleBlock<T> {
         val prev = iterator.peek(steps = -1)
-        checkNotNull(prev) {
+        iterator.parserCheckNotNull(value = prev, content = content) {
             "Expected Component value but got null"
         }
-        check(prev.kind in blockOpeningTokens) {
+        iterator.parserCheck(predicate = prev.kind in blockOpeningTokens, content = content) {
             "Expected block opening token but got ${prev.kind}"
         }
         val closingToken = blockOpeningTokens.getValue(prev.kind)

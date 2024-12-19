@@ -15,56 +15,37 @@ import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
  */
 internal class CssIterator(
     tokens: List<Token<out CssTokenKind>>,
-) : AstParserIterator<CssTokenKind> {
-    internal val tokens: List<Token<out CssTokenKind>> = tokens.trim()
-    internal var offset = 0
-        private set
+) : AstParserIterator<CssTokenKind>(tokens.trim()) {
+    companion object {
+        private fun List<Token<out CssTokenKind>>.trim(): List<Token<out CssTokenKind>> {
+            val tokens = this
+            var i = 0
+            return buildList {
+                while (i < tokens.size) {
+                    val token = tokens[i]
+                    add(token)
+                    val prev = tokens.getOrNull(i - 1)
+                    val next = tokens.getOrNull(i + 1)
+                    when {
+                        // trim leading or trailing whitespaces
+                        (prev == null && token.kind == CssTokenKind.WhiteSpace) || next == null -> {
+                            removeLast()
+                            i++
+                        }
 
-    override fun hasNext(): Boolean {
-        return offset < tokens.size
-    }
+                        (
+                            token.kind == CssTokenKind.WhiteSpace &&
+                                prev?.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens &&
+                                next.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens
+                            ) -> i++
 
-    override fun next(): Token<out CssTokenKind>? = if (offset < tokens.size) {
-        tokens[offset++]
-    } else {
-        null
-    }
+                        token.kind == CssTokenKind.WhiteSpace || token.kind == CssTokenKind.Comment -> {
+                            removeLast()
+                            i++
+                        }
 
-    override fun peek(steps: Int): Token<out CssTokenKind>? =
-        tokens.getOrNull(offset + steps)
-
-    override fun rewind(steps: Int) {
-        offset -= steps
-    }
-
-    private fun List<Token<out CssTokenKind>>.trim(): List<Token<out CssTokenKind>> {
-        val tokens = this
-        var i = 0
-        return buildList {
-            while (i < tokens.size) {
-                val token = tokens[i]
-                add(token)
-                val prev = tokens.getOrNull(i - 1)
-                val next = tokens.getOrNull(i + 1)
-                when {
-                    // trim leading or trailing whitespaces
-                    (prev == null && token.kind == CssTokenKind.WhiteSpace) || next == null -> {
-                        removeLast()
-                        i++
+                        else -> i++
                     }
-
-                    (
-                        token.kind == CssTokenKind.WhiteSpace &&
-                            prev?.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens &&
-                            next.kind in CssTokenKind.WhiteSpaceSignificantAdjacentTokens
-                        ) -> i++
-
-                    token.kind == CssTokenKind.WhiteSpace || token.kind == CssTokenKind.Comment -> {
-                        removeLast()
-                        i++
-                    }
-
-                    else -> i++
                 }
             }
         }

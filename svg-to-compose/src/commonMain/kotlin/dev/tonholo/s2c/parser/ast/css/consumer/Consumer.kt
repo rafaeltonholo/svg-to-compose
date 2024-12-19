@@ -3,8 +3,9 @@ package dev.tonholo.s2c.parser.ast.css.consumer
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssNode
-import dev.tonholo.s2c.parser.ast.css.syntax.parserCheck
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
+import dev.tonholo.s2c.parser.ast.iterator.parserCheck
+import dev.tonholo.s2c.parser.ast.iterator.parserCheckNotNull
 
 /**
  * Typealias for the iterator used by the consumers.
@@ -32,11 +33,11 @@ internal abstract class Consumer<out T : CssNode>(
      */
     protected fun Iterator.expectToken(kind: CssTokenKind): Token<out CssTokenKind> {
         val current = current()
-        checkNotNull(current) {
+        parserCheckNotNull(value = current, content = content) {
             "Expected $kind but got null"
         }
 
-        check(current.kind == kind) {
+        parserCheck(predicate = current.kind == kind, content) {
             "Expected $kind but got ${current.kind}"
         }
 
@@ -48,11 +49,11 @@ internal abstract class Consumer<out T : CssNode>(
      */
     protected fun Iterator.expectNextToken(kind: CssTokenKind): Token<out CssTokenKind> {
         val next = next()
-        checkNotNull(next) {
+        parserCheckNotNull(value = next, content = content) {
             "Expected $kind but got null"
         }
 
-        check(next.kind == kind) {
+        parserCheck(predicate = next.kind == kind, content) {
             "Expected $kind but got ${next.kind}"
         }
 
@@ -66,11 +67,11 @@ internal abstract class Consumer<out T : CssNode>(
         kinds: Set<CssTokenKind>
     ): Token<out CssTokenKind> {
         val current = current()
-        checkNotNull(current) {
+        parserCheckNotNull(value = current, content = content) {
             "Expected one of $kinds but got null"
         }
 
-        parserCheck(value = current.kind in kinds, content = content) {
+        parserCheck(predicate = current.kind in kinds, content = content) {
             "Expected one of $kinds but got ${current.kind}"
         }
         return current
@@ -81,7 +82,7 @@ internal abstract class Consumer<out T : CssNode>(
      */
     protected fun Iterator.expectTokenNotNull(): Token<out CssTokenKind> {
         val current = current()
-        checkNotNull(current) {
+        parserCheckNotNull(value = current, content = content) {
             "Expected token but got null"
         }
         return current
@@ -92,7 +93,7 @@ internal abstract class Consumer<out T : CssNode>(
      */
     protected fun Iterator.expectNextTokenNotNull(): Token<out CssTokenKind> {
         val next = next()
-        checkNotNull(next) {
+        parserCheckNotNull(value = next, content = content) {
             "Expected token but got null"
         }
         return next
