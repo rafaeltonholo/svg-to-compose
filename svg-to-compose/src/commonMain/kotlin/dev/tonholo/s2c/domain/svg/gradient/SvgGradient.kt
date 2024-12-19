@@ -45,7 +45,7 @@ sealed class SvgGradient<out T>(
                 .unzip()
         }
 
-    internal inline fun calculateGradientXCoordinate(
+    internal fun calculateGradientXCoordinate(
         length: SvgLength,
         target: List<PathNodes> = emptyList(),
     ): Float {
@@ -60,7 +60,7 @@ sealed class SvgGradient<out T>(
         }
     }
 
-    internal inline fun calculateGradientYCoordinate(
+    internal fun calculateGradientYCoordinate(
         length: SvgLength,
         target: List<PathNodes> = emptyList(),
     ): Float {
@@ -75,7 +75,7 @@ sealed class SvgGradient<out T>(
         }
     }
 
-    internal inline fun calculateGradientXYCoordinate(
+    internal fun calculateGradientXYCoordinate(
         length: SvgLength,
         target: List<PathNodes> = emptyList(),
     ): Float {
