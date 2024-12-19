@@ -3,7 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlTextNode
-import dev.tonholo.s2c.extensions.firstInstanceOf
+import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.lexer.css.CssTokenizer
 import dev.tonholo.s2c.parser.ast.AstParser
@@ -18,8 +18,9 @@ class SvgStyleNode(
     override val tagName: String = TAG_NAME
     val content: String by lazy {
         children
-            .firstInstanceOf<XmlTextNode>()
-            .content
+            .firstInstanceOfOrNull<XmlTextNode>()
+            ?.content
+            .orEmpty()
     }
     private var _tree: StyleSheet? = null
 
@@ -27,6 +28,7 @@ class SvgStyleNode(
     }
 
     internal fun resolveTree(parser: AstParser<CssTokenKind, StyleSheet>): StyleSheet {
+        check(content.isNotEmpty()) { "Style node content is empty." }
         val current = _tree
         return if (current != null) {
             current

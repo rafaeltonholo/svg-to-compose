@@ -1673,7 +1673,7 @@ class CssParserTest {
     }
 
     @Test
-    fun `when invalid at-rule is present, throw CssParserException`() {
+    fun `when invalid at-rule is present - throw CssParserException`() {
         // Arrange
         val content = """
             |@invalid-rule {
