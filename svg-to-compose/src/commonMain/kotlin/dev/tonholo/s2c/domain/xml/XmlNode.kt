@@ -104,7 +104,7 @@ class XmlTextNode(
     val content: String,
 ) : XmlChildNode(parent) {
     override val tagName: String = parent.tagName
-    override val attributes: MutableMap<String, String> = parent.attributes
+    override val attributes: MutableMap<String, String> = parent.attributes.toMutableMap()
     override fun toString(): String = toJsString {
         append("\"content\": $content")
     }

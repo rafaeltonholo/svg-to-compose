@@ -96,7 +96,8 @@ sealed interface SvgNode : XmlNode {
                     attributes.containsKey(declaration.property) || containsKey(declaration.property) -> Unit
                     else -> put(
                         declaration.property,
-                        declaration.values.joinToString(" ") { value -> resolveAttributeValue(value) })
+                        declaration.values.joinToString(" ") { value -> resolveAttributeValue(value) },
+                    )
                 }
             }
         }

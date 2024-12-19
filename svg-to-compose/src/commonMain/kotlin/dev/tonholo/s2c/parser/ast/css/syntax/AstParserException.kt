@@ -3,7 +3,6 @@ package dev.tonholo.s2c.parser.ast.css.syntax
 import dev.tonholo.s2c.extensions.prependIndent
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenKind
-import dev.tonholo.s2c.lexer.css.CssTokenKind
 
 /**
  * An exception thrown when an error occurs during AST parsing.
