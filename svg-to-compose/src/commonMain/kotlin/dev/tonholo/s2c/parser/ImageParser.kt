@@ -17,6 +17,7 @@ import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.parser.ast.css.CssParser
 import dev.tonholo.s2c.parser.ast.css.CssSpecificity
+import dev.tonholo.s2c.parser.ast.css.consumer.CssConsumers
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 import okio.Path
@@ -205,7 +206,7 @@ sealed class ImageParser(
         private fun SvgRootNode.resolveStyleTags() {
             rules = styles
                 .flatMap { style ->
-                    val parser = CssParser(content = style.content)
+                    val parser = CssParser(consumers = CssConsumers(style.content))
                     style
                         .resolveTree(parser)
                         .children
@@ -220,9 +221,6 @@ sealed class ImageParser(
                             }
                         }
                 }
-
-            println(rules)
-//                .sorted()
         }
     }
 

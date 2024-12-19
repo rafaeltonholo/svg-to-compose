@@ -3,6 +3,7 @@ package dev.tonholo.s2c.parser.ast.css
 import app.cash.burst.Burst
 import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.css.CssTokenKind
+import dev.tonholo.s2c.parser.ast.css.consumer.CssConsumers
 import dev.tonholo.s2c.parser.ast.css.syntax.AstParserException
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
@@ -1658,7 +1659,7 @@ class CssParserTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = content.length, endOffset = content.length),
         )
 
-        val parser = CssParser(content)
+        val parser = CssParser(consumers = CssConsumers(content))
 
         // Act
         val exception = assertFailsWith<AstParserException> {
@@ -1694,7 +1695,7 @@ class CssParserTest {
             Token(kind = CssTokenKind.EndOfFile, startOffset = 37, endOffset = 37),
         )
 
-        val parser = CssParser(content)
+        val parser = CssParser(consumers = CssConsumers(content))
 
         // Act
         val exception = assertFailsWith<AstParserException> {
@@ -1712,7 +1713,7 @@ class CssParserTest {
         tokens: List<Token<out CssTokenKind>>,
         expected: StyleSheet,
     ) {
-        val astParser = CssParser(content)
+        val astParser = CssParser(consumers = CssConsumers(content))
         val actual = astParser.parse(tokens)
         assertEquals(expected, actual)
     }
