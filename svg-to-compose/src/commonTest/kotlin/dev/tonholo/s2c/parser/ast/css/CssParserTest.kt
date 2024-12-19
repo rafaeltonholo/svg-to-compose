@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class CssAstParserTest {
+class CssParserTest {
     @Test
     fun `parse css class rule to StyleSheet`() {
         val content = """
@@ -1669,6 +1669,42 @@ class CssAstParserTest {
         val message = exception.message
         assertNotNull(message)
         assertContains(message, "Incomplete URL value: missing closing ')' in 'url(...)")
+    }
+
+    @Test
+    fun `when invalid at-rule is present, throw CssParserException`() {
+        // Arrange
+        val content = """
+            |@invalid-rule {
+            |    display: none;
+            |}
+            """.trimMargin()
+        val tokens = listOf(
+            Token(kind = CssTokenKind.AtKeyword, startOffset = 0, endOffset = 14),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15),
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 15, endOffset = 16),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 16, endOffset = 21),
+            Token(kind = CssTokenKind.Ident, startOffset = 21, endOffset = 28),
+            Token(kind = CssTokenKind.Colon, startOffset = 28, endOffset = 29),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 29, endOffset = 30),
+            Token(kind = CssTokenKind.Ident, startOffset = 30, endOffset = 34),
+            Token(kind = CssTokenKind.Semicolon, startOffset = 34, endOffset = 35),
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 35, endOffset = 36),
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 36, endOffset = 37),
+            Token(kind = CssTokenKind.EndOfFile, startOffset = 37, endOffset = 37),
+        )
+
+        val parser = CssParser(content)
+
+        // Act
+        val exception = assertFailsWith<AstParserException> {
+            parser.parse(tokens)
+        }
+
+        // Assert
+        val message = exception.message
+        assertNotNull(message)
+        assertContains(message, "Invalid at-rule: @invalid-rule")
     }
 
     private fun assert(

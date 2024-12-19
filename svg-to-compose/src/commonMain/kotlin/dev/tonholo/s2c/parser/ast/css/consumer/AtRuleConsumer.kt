@@ -39,7 +39,12 @@ internal class AtRuleConsumer(
         var preludeContentEndOffset = current.endOffset
         var atRule = AtRule(
             location = CssLocation.Undefined,
-            name = content.substring(current.startOffset, current.endOffset),
+            name = content.substring(current.startOffset, current.endOffset).also {
+                iterator.parserRequire(
+                    predicate = it.substring(1) in validAtRules,
+                    content = content,
+                ) { "Invalid at-rule: $it" }
+            },
             prelude = Prelude.AtRule(
                 components = emptyList(),
             ),
