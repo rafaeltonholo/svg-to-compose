@@ -46,8 +46,9 @@ internal class CssTokenizer(
         while (iterator.hasNext()) {
             val kind = iterator.getTokenKind() ?: CssTokenKind.Ident
             val token = consumers
-                .first { consumer -> consumer.accept(kind) }
-                .consume(kind)
+                .firstOrNull { consumer -> consumer.accept(kind) }
+                ?.consume(kind)
+                ?: error("Unsupported token kind: $kind at position ${iterator.offset}")
 
             addAll(token)
         }
