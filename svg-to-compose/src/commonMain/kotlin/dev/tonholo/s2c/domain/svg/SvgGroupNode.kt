@@ -95,8 +95,8 @@ private fun SvgGroupNode.createGroupClipPath(
         clipPath != null -> clipPath?.asNodeWrapper(computedRules, minified = true)
         clipPathAttribute?.startsWith("url") == true -> {
             val clipPathId = clipPathAttribute.normalizedId()
-            return (rootParent as SvgRootNode)
-                .clipPaths[clipPathId]
+            return (rootParent as? SvgRootNode)
+                ?.clipPaths[clipPathId]
                 ?.asNodeWrapper(computedRules)
         }
 
