@@ -796,7 +796,7 @@ class CssTokenizerTest {
 
     @Test
     @Burst
-    fun `create tokens for a rule with BadUrl with `(badString: BadStringParams) {
+    fun `create tokens for a rule with BadUrl`(badString: BadStringParams) {
         val content = """div { content: $badString; }"""
         println(content)
         val badStringStartOffset = 15
