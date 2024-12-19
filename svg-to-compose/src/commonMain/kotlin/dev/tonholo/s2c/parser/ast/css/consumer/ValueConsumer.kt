@@ -193,7 +193,7 @@ internal class ValueConsumer(
                 CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> {
                     parserError(
                         content = content,
-                        message = "Incomplete URL. A URL must have",
+                        message = "Incomplete URL. A URL must have a closing parenthesis",
                         backtrack = steps,
                         forward = 0
                     )
