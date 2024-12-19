@@ -16,12 +16,12 @@ internal class HashTokenConsumer(
         val next = iterator.peek(1)
         return if (next != Char.EMPTY && next.isHexDigit()) {
             var backwardLookupOffset = 0
-            do {
+            while (true) {
                 val prev = iterator.peek(--backwardLookupOffset)
-                if (prev == Char.EMPTY || prev != ' ') {
+                if (prev == Char.EMPTY || prev.isWhitespace().not()) {
                     break
                 }
-            } while (prev == ' ')
+            }
 
             if (iterator.peek(backwardLookupOffset) in CssTokenKind.Colon) {
                 listOf(

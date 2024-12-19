@@ -6,7 +6,7 @@ import dev.tonholo.s2c.extensions.prependIndent
  * Represents a block of CSS component values, like a rule block or a declaration block.
  * @param T The type of the children nodes.
  */
-sealed class Block<T : CssComponentValueNode>(
+sealed class Block<T : CssNode>(
     open val children: List<T>,
 ) : CssComponentValueNode {
     override fun toString(indent: Int): String {
@@ -17,7 +17,7 @@ sealed class Block<T : CssComponentValueNode>(
      * A simple block with a location and children.
      * @param T The type of the children nodes.
      */
-    data class SimpleBlock<T : CssComponentValueNode>(
+    data class SimpleBlock<T : CssNode>(
         override val location: CssLocation,
         override val children: List<T>,
     ) : Block<T>(children) {

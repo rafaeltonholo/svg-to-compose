@@ -21,7 +21,7 @@ sealed interface CssComponentValueNode : CssNode
  * A CSS node that represents a statement.
  * Statements are the top-level constructs in CSS, such as rulesets and at-rules.
  */
-sealed interface CssStatementNode : CssComponentValueNode
+sealed interface CssStatementNode : CssNode
 
 /**
  * Represents a location in a CSS source file.

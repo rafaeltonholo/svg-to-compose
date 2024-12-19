@@ -8,7 +8,7 @@ import dev.tonholo.s2c.extensions.prependIndent
 sealed interface Rule : CssStatementNode {
     override val location: CssLocation
     val prelude: Prelude<*>
-    val block: Block<out CssComponentValueNode>
+    val block: Block<out CssNode>
 
     override fun toString(indent: Int): String {
         return buildString {

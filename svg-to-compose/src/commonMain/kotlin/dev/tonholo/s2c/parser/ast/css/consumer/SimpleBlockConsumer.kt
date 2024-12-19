@@ -2,8 +2,8 @@ package dev.tonholo.s2c.parser.ast.css.consumer
 
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
-import dev.tonholo.s2c.parser.ast.css.syntax.node.CssComponentValueNode
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
+import dev.tonholo.s2c.parser.ast.css.syntax.node.CssNode
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Rule
 import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
@@ -23,7 +23,7 @@ private val blockOpeningTokens = mapOf(
  * object.
  * @param T The type of the children of the block.
  */
-internal abstract class SimpleBlockConsumer<T : CssComponentValueNode>(
+internal abstract class SimpleBlockConsumer<T : CssNode>(
     content: String,
     private val consumer: Consumer<T>,
 ) : Consumer<Block.SimpleBlock<T>>(content) {
