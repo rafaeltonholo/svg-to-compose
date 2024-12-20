@@ -12,6 +12,9 @@ import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.parser.ast.css.CssParser
+import dev.tonholo.s2c.parser.ast.css.consumer.CssConsumers
+import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 
 /**
  * Represents the root node of an SVG document.
@@ -91,7 +94,7 @@ class SvgRootNode(
      *          The viewBox attribute on SVG
      *     </a>
      */
-    private val viewportX: Float by lazy {
+    val viewportX: Float by lazy {
         getDimensionFromViewBox(SVG_VIEW_BOX_X_POSITION) ?: 0f
     }
 
@@ -101,7 +104,7 @@ class SvgRootNode(
      *          The viewBox attribute on SVG
      *     </a>
      */
-    private val viewportY: Float by lazy {
+    val viewportY: Float by lazy {
         getDimensionFromViewBox(SVG_VIEW_BOX_Y_POSITION) ?: 0f
     }
 
@@ -194,6 +197,8 @@ class SvgRootNode(
             ?.let(::SvgLength)
             ?.toFloat(baseDimension = SVG_DEFAULT_HEIGHT)
 
+    val rules: List<ComputedRule> by lazy(::resolveStyleTags)
+
     /**
      * Parses the viewBox attribute string into a [FloatArray].
      *
@@ -232,6 +237,26 @@ class SvgRootNode(
 
     private fun getDimensionFromViewBox(dimensionIndex: Int): Float? =
         parseViewBox(attributes[ATTR_VIEW_BOX]).getOrNull(dimensionIndex)
+
+    private fun resolveStyleTags(): List<ComputedRule> {
+        return styles
+            .flatMap { style ->
+                val parser = CssParser(consumers = CssConsumers(style.content))
+                style
+                    .resolveTree(parser)
+                    .children
+                    .filterIsInstance<QualifiedRule>()
+                    .flatMap { rule ->
+                        rule.prelude.specificities.map { (selector, specificity) ->
+                            ComputedRule(
+                                selector = selector.location.source,
+                                specificity = specificity,
+                                declarations = rule.block.children,
+                            )
+                        }
+                    }
+            }
+    }
 
     companion object {
         const val TAG_NAME = "svg"

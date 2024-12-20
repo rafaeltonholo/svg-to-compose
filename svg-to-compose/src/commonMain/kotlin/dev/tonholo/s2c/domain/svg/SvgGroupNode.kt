@@ -5,7 +5,6 @@ import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
-import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 class SvgGroupNode(
     parent: XmlParentNode,

@@ -5,7 +5,6 @@ import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 typealias SvgElementNodeConstructorFn<T> = (
     parent: XmlParentNode,

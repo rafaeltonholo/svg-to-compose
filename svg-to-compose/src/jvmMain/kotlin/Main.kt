@@ -19,8 +19,8 @@ private fun main() {
     AppConfig.debug = true
     AppConfig.stackTrace = true
     AppConfig.silent = false
-    val suffix = "101"
-    val (pkg, path, output) = SampleFile.Svg.GithubIssue(
+    val suffix = "css/flower.svg"
+    val (pkg, path, output) = SampleFile.Svg.File(
         SampleAppPackage("dev.tonholo.svg_to_compose.playground.ui.icon.jvm"),
         suffix,
     )

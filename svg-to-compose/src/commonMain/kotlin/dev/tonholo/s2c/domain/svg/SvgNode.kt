@@ -7,7 +7,8 @@ import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
-import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
+import dev.tonholo.s2c.parser.ast.css.CssSpecificity
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
 
 /**
@@ -140,6 +141,16 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
         }
     }
     return stacked?.let(::SvgTransform)
+}
+
+data class ComputedRule(
+    val selector: String,
+    val specificity: CssSpecificity,
+    val declarations: List<Declaration>,
+) : Comparable<ComputedRule> {
+    override fun compareTo(other: ComputedRule): Int {
+        return specificity.compareTo(other.specificity)
+    }
 }
 
 /**

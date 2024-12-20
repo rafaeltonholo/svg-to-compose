@@ -25,7 +25,7 @@ abstract class SvgGraphicNode<out T>(
     where T : SvgNode, T : XmlChildNode {
     val fill: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
-    val opacity: Float? by attribute()
+    val opacity: Float? by attribute(inherited = true)
 
     val fillOpacity: Float? by attribute(name = "fill-opacity", inherited = true)
 

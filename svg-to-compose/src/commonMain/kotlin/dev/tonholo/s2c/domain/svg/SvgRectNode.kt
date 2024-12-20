@@ -50,10 +50,10 @@ fun SvgRectNode.asNode(
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush(wrapper.nodes),
-            fillAlpha = fillOpacity,
+            fillAlpha = fillOpacity ?: opacity,
             pathFillType = fillRule,
             stroke = strokeBrush(wrapper.nodes),
-            strokeAlpha = strokeOpacity,
+            strokeAlpha = strokeOpacity ?: opacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,
             strokeMiterLimit = strokeMiterLimit,
