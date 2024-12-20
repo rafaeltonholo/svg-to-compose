@@ -2,7 +2,7 @@
   <configuration default="false" name="svg-to-compose [allTests]" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/svg-to-compose" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/.." />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">

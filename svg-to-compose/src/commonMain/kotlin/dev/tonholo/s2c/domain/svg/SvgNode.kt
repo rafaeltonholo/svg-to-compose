@@ -1,23 +1,32 @@
 package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
-import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_HEIGHT
 import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_TRANSFORM
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_VIEW_BOX
-import dev.tonholo.s2c.domain.svg.SvgNode.Companion.ATTR_WIDTH
-import dev.tonholo.s2c.domain.svg.gradient.SvgGradient
 import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
+import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
 
+/**
+ * Represents a node in the SVG tree.
+ */
 sealed interface SvgNode : XmlNode {
+    /**
+     * The transform attribute of the node.
+     */
     val transform: SvgTransform?
-    fun String.normalizedId(): String = with(SvgNode) {
-        normalizedId()
-    }
+
+    /**
+     * Normalizes an id by removing prefixes and suffixes commonly used in SVGs.
+     *
+     * For example:
+     * - `#someId` becomes `someId`
+     * - `url(#someId)` becomes `someId`
+     */
+    fun String.normalizedId(): String = normalizeId(id = this)
 
     companion object {
         const val XLINK_NS = "xlink"
@@ -28,13 +37,86 @@ sealed interface SvgNode : XmlNode {
         const val ATTR_VIEW_BOX = "viewBox"
         const val ATTR_TRANSFORM = "transform"
 
-        // Wouldn't need to set this as a function of the companion
-        // object if context receiver works on KMP.
-        fun String.normalizedId(): String =
-            removePrefix("#").removePrefix("url(#").removeSuffix(")")
+        /**
+         * Normalizes an id by removing prefixes and suffixes commonly used in SVGs.
+         *
+         * For example:
+         * - `#someId` becomes `someId`
+         * - `url(#someId)` becomes `someId`
+         */
+        fun String.normalizedId(): String = normalizeId(this)
+
+        private fun normalizeId(id: String): String =
+            id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
+    }
+
+    fun resolveAttributesFromStyle(computedRules: List<ComputedRule>) {
+        val attributes = buildMap<String, String> {
+            resolveAttributesByStyleAttribute()
+
+            id?.let { id ->
+                resolveAttributesBySelector(computedRules, selector = id)
+            }
+
+            className?.let { className ->
+                resolveAttributesBySelector(computedRules, selector = className)
+            }
+        }
+
+        for ((key, value) in attributes) {
+            // Declared attributes have precedence over computed attributes.
+            if (this.attributes.contains(key).not()) {
+                this.attributes[key] = value
+            }
+        }
+    }
+
+    private fun MutableMap<String, String>.resolveAttributesByStyleAttribute() {
+        style?.let { style ->
+            val parts = style.split(";")
+            for (part in parts) {
+                val (property, value) = part.split(":")
+                if (attributes.containsKey(property).not()) {
+                    put(property.trim(), value.trim())
+                }
+            }
+        }
+    }
+
+    private fun MutableMap<String, String>.resolveAttributesBySelector(
+        computedRules: List<ComputedRule>,
+        selector: String,
+    ) {
+        val rulesPerSelector = computedRules
+            .filter { it.selector.endsWith(selector) }
+            .sortedDescending()
+        for (rule in rulesPerSelector) {
+            for (declaration in rule.declarations) {
+                when {
+                    attributes.containsKey(declaration.property) || containsKey(declaration.property) -> Unit
+                    else -> put(
+                        declaration.property,
+                        declaration.values.joinToString(" ") { value -> resolveAttributeValue(value) },
+                    )
+                }
+            }
+        }
+    }
+
+    private fun resolveAttributeValue(value: Value): String {
+        return when (value) {
+            is Value.Url -> "url(${value.value})"
+            else -> value.location.source
+        }
     }
 }
 
+/**
+ * Calculates the stacked transform of the node by traversing up the tree
+ * and concatenating the transform attributes of the ancestors.
+ * @param parent The parent node of the current node.
+ * @return The stacked transform of the node.
+ */
 fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
     var stacked = attributes[ATTR_TRANSFORM]
     if (parent !is SvgDefsNode) {
@@ -60,122 +142,25 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
     return stacked?.let(::SvgTransform)
 }
 
-class SvgRootNode(
-    parent: XmlParentNode,
-    override val children: MutableSet<XmlNode>,
-    attributes: MutableMap<String, String>,
-) : SvgElementNode<SvgRootNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
-    override val constructor = ::SvgRootNode
-    val width: Float by attribute<SvgLength?, Float> { width ->
-        width?.toFloat(baseDimension = viewportWidth)
-            ?: viewportWidth
-    }
-    val height: Float by attribute<SvgLength?, Float> { height ->
-        height?.toFloat(baseDimension = viewportHeight)
-            ?: viewportHeight
-    }
-    var viewBox: FloatArray by attribute<String?, _> { viewBox ->
-        parseViewBox(viewBox) ?: floatArrayOf(0f, 0f, width, height)
-    }
-    var fill: String? by attribute()
-
-    private val viewportX: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_X_POSITION) ?: 0f
-    }
-
-    private val viewportY: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_Y_POSITION) ?: 0f
-    }
-
-    val viewportWidth: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_WIDTH_POSITION) ?: safeWidth ?: SVG_DEFAULT_WIDTH
-    }
-
-    val viewportHeight: Float by lazy {
-        getDimensionFromViewBox(SVG_VIEW_BOX_HEIGHT_POSITION) ?: safeHeight ?: SVG_DEFAULT_HEIGHT
-    }
-
-    val defs: HashMap<String, SvgUseNode> = hashMapOf()
-    val gradients: HashMap<String, SvgGradient<*>> = hashMapOf()
-
-    override val transform: SvgTransform? by attribute<String?, SvgTransform?> {
-        var transform = it
-        if (viewportX != 0f || viewportY != 0f) {
-            transform = "translate(${-viewportX}, ${-viewportY})"
-            attributes[ATTR_TRANSFORM] = transform
-        }
-        transform?.let(::SvgTransform)
-    }
-
-    /**
-     * Checks if width is present in the attribute map.
-     * If it is the case, return the [width] property which
-     * calculates the correct width based on a [SvgLength],
-     * otherwise null.
-     *
-     * This is required since both width and viewBox attributes
-     * can be omitted.
-     */
-    private val safeWidth: Float?
-        inline get() = attributes[ATTR_WIDTH]
-            ?.let(::SvgLength)
-            ?.toFloat(baseDimension = SVG_DEFAULT_WIDTH)
-
-    /**
-     * Checks if width is present in the attribute map.
-     * If it is the case, return the [height] property which
-     * calculates the correct height based on a [SvgLength],
-     * otherwise null.
-     *
-     * This is required since both height and viewBox attributes
-     * can be omitted.
-     */
-    private val safeHeight: Float?
-        inline get() = attributes[ATTR_HEIGHT]
-            ?.let(::SvgLength)
-            ?.toFloat(baseDimension = SVG_DEFAULT_HEIGHT)
-
-    private inline fun parseViewBox(viewBox: String?): FloatArray? =
-        viewBox?.split(", ", ",", " ")?.map { it.toFloat() }?.toFloatArray()
-
-    private inline fun getDimensionFromViewBox(dimensionIndex: Int): Float? =
-        parseViewBox(attributes[ATTR_VIEW_BOX])?.getOrNull(dimensionIndex)
-
-    companion object {
-        const val TAG_NAME = "svg"
-
-        /**
-         * The default value if both width and viewBox are omitted.
-         * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/width#svg">
-         *          Width attribute on SVG
-         *      </a>
-         */
-        private const val SVG_DEFAULT_WIDTH = 300f
-
-        /**
-         * The default value if both height and viewBox are omitted.
-         * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/height#svg">
-         *          Height attribute on SVG
-         *     </a>
-         */
-        private const val SVG_DEFAULT_HEIGHT = 150f
-        const val SVG_VIEW_BOX_X_POSITION = 0
-        const val SVG_VIEW_BOX_Y_POSITION = 1
-        const val SVG_VIEW_BOX_WIDTH_POSITION = 2
-        const val SVG_VIEW_BOX_HEIGHT_POSITION = 3
-    }
-}
-
+/**
+ * Converts the SVG node to a list of [ImageVectorNode].
+ * @param masks The list of masks defined in the SVG.
+ * @param minified Whether to minify the output.
+ * @return A list of [ImageVectorNode] representing the SVG node.
+ * Returns `null` if the node is not supported.
+ */
 fun SvgNode.asNodes(
+    computedRules: List<ComputedRule>,
     masks: List<SvgMaskNode>,
     minified: Boolean,
 ): List<ImageVectorNode>? {
+    resolveAttributesFromStyle(computedRules)
     return when (this) {
-        is SvgRootNode -> asNodes(minified = minified)
+        is SvgRootNode -> asNodes(computedRules, minified = minified)
         is SvgGraphicNode<*> if maskId != null ->
-            asMaskGroup().flatNode(masks, minified)
+            asMaskGroup().flatNode(masks, computedRules, minified)
 
-        is SvgGroupNode -> flatNode(masks, minified)
+        is SvgGroupNode -> flatNode(masks, computedRules, minified)
         is SvgCircleNode -> listOf(asNode(minified = minified))
         is SvgPathNode -> listOf(asNode(minified = minified))
         is SvgRectNode -> listOf(asNode(minified = minified))

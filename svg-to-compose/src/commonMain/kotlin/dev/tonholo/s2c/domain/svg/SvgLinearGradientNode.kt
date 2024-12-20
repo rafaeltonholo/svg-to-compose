@@ -16,7 +16,27 @@ class SvgLinearGradientNode(
 
     override fun toBrush(
         target: List<PathNodes>,
-    ): ComposeBrush.Gradient.Linear {
+    ): ComposeBrush.Gradient {
+        if (href != null) {
+            val root = rootParent as SvgRootNode
+            val attrX1 = attributes["x1"]
+            val attrX2 = attributes["x2"]
+            val attrY1 = attributes["y1"]
+            val attrY2 = attributes["y2"]
+            val mutatedGradient = root
+                .gradients[href!!.normalizedId()]!!
+                .copy(
+                    attributes = attributes.toMutableMap().apply {
+                        remove(SvgUseNode.HREF_ATTR_KEY)
+                        attrX1?.let { put("x1", it) }
+                        attrX2?.let { put("x2", it) }
+                        attrY1?.let { put("y1", it) }
+                        attrY2?.let { put("y2", it) }
+                    }
+                ) as SvgLinearGradientNode
+
+            return mutatedGradient.toBrush(target)
+        }
         val (colors, stops) = colorStops
 
         val startOffset = ComposeOffset(

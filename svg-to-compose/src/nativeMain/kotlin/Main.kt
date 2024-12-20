@@ -1,10 +1,15 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
+import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.core.installMordantMarkdown
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.output.MordantHelpFormatter
+import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
@@ -21,14 +26,26 @@ import dev.tonholo.s2c.parser.ParserConfig
 import okio.FileSystem
 import platform.posix.exit
 
+private const val MANUAL_LINE_BREAK = "\u0085"
+
 fun main(args: Array<String>) = Client()
     .main(args)
 
 class Client : CliktCommand(name = "s2c") {
 
     init {
-        eagerOption("-v", "--version", help = "Show this CLI version") {
+        eagerOption("-v", "--version", help = "Show this CLI version and exit") {
             throw PrintMessage("SVG to Compose version: ${BuildConfig.VERSION}")
+        }
+
+        context {
+            helpFormatter = { context ->
+                MordantMarkdownHelpFormatter(
+                    context = context,
+                    showDefaultValues = true,
+                    requiredOptionMarker = "*",
+                )
+            }
         }
     }
 
@@ -62,14 +79,13 @@ class Client : CliktCommand(name = "s2c") {
 
     private val receiverType by option(
         names = arrayOf("-rt", "--receiver-type"),
-        help = """
+    ).help {
+        """
         |Adds a receiver type to the Icon definition. This will generate the Icon as a extension of the passed argument.
-        |
-        |E.g.: `s2c <args> -o MyIcon.kt -rt Icons.Filled my-icon.svg` will creates the Compose Icon:
-        |
-        |`val Icons.Filled.MyIcon: ImageVector`.
-        """.trimMargin(),
-    )
+        |${MANUAL_LINE_BREAK}E.g.: `s2c <args> -o MyIcon.kt -rt Icons.Filled my-icon.svg` will creates the Compose Icon:
+        |$MANUAL_LINE_BREAK`val Icons.Filled.MyIcon: ImageVector`.
+        """.trimMargin()
+    }
 
     private val addToMaterial by option(
         names = arrayOf("--add-to-material"),
@@ -93,14 +109,13 @@ class Client : CliktCommand(name = "s2c") {
 
     private val noPreview by option(
         names = arrayOf("-np", "--no-preview"),
-        help = "Removes the preview function from the file. It is very useful if you are generating the icons for " +
-            "KMP, since KMP doesn't support previews yet.",
+        help = "Removes the preview function from the file.",
     ).flag()
 
     private val isKmp by option(
         names = arrayOf("--kmp"),
-        help = "Ensures the output is compatible with KMP. Default: false",
-    ).flag()
+        help = "Ensures the output is compatible with KMP.",
+    ).boolean().default(false)
 
     private val makeInternal by option(
         names = arrayOf("--make-internal"),
@@ -139,7 +154,7 @@ class Client : CliktCommand(name = "s2c") {
         help = """Replace the icon's name first value of this parameter with the second. 
             |This is useful when you want to remove part of the icon's name from the output icon.
             |
-            |Example:
+            |For example, running the following command:
             |```
             |    s2c <args> \
             |        -o ./my-app/src/my/pkg/icons \
@@ -147,6 +162,8 @@ class Client : CliktCommand(name = "s2c") {
             |        --map-icon-name-from-to "_filled" ""
             |        ./my-app/assets/svgs
             |```
+            |
+            |An icon named `bright_sun_filled.svg` will create a `ImageVector` named `BrightSun`.
         """.trimMargin(),
     ).pair()
 

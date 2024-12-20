@@ -14,6 +14,7 @@ import kotlin.system.exitProcess
  * This is only for debugging purposes.
  * Should never be used in production.
  */
+@Suppress("UnusedPrivateMember")
 private fun main() {
     AppConfig.debug = true
     AppConfig.stackTrace = true
@@ -30,7 +31,7 @@ private fun main() {
         // When enabling the optimize flag,
         // make sure your default node has installed
         // svgo and avocado.
-        optimize = true,
+        optimize = false,
         receiverType = null,
         addToMaterial = false,
         noPreview = false,

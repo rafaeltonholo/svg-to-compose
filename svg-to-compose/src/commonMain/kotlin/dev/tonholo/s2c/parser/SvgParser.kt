@@ -21,6 +21,7 @@ import dev.tonholo.s2c.domain.svg.SvgPolylineNode
 import dev.tonholo.s2c.domain.svg.SvgRadialGradientNode
 import dev.tonholo.s2c.domain.svg.SvgRectNode
 import dev.tonholo.s2c.domain.svg.SvgRootNode
+import dev.tonholo.s2c.domain.svg.SvgStyleNode
 import dev.tonholo.s2c.domain.svg.SvgSymbolNode
 import dev.tonholo.s2c.domain.svg.SvgUseNode
 import dev.tonholo.s2c.domain.svg.gradient.SvgLinearGradient
@@ -122,7 +123,7 @@ class SvgParser : XmlParser() {
             parent = parent,
             children = mutableSetOf(),
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-        )
+        ).also { it.id?.let { id -> root?.clipPaths?.put(id, it) } }
 
         SvgDefsNode.TAG_NAME -> SvgDefsNode(
             parent = parent,
@@ -188,6 +189,12 @@ class SvgParser : XmlParser() {
             parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
+
+        SvgStyleNode.TAG_NAME -> SvgStyleNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+            children = mutableSetOf(),
+        ).also { root?.styles?.add(it) }
 
         else -> createDefaultElement(nodeName, attributes, parent)
     }
