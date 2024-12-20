@@ -3,7 +3,6 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 class SvgClipPath(
     parent: XmlParentNode,

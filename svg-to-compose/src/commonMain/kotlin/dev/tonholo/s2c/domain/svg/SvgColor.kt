@@ -8,7 +8,7 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class SvgColor private constructor(val value: String) {
     companion object {
-        val Default = SvgColor("#FF000000")
+        val Default = SvgColor("Color.Transparent")
         operator fun invoke(value: String): SvgColor = SvgColor(
             namedColors[value] ?: value
         )

@@ -15,11 +15,6 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
-import dev.tonholo.s2c.parser.ast.css.CssParser
-import dev.tonholo.s2c.parser.ast.css.CssSpecificity
-import dev.tonholo.s2c.parser.ast.css.consumer.CssConsumers
-import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
-import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 import okio.Path
 
 /**
@@ -134,18 +129,6 @@ sealed class ImageParser(
     class SvgParser(
         fileManager: FileManager,
     ) : ImageParser(fileManager) {
-        data class ComputedRule(
-            val selector: String,
-            val specificity: CssSpecificity,
-            val declarations: List<Declaration>,
-        ) : Comparable<ComputedRule> {
-            override fun compareTo(other: ComputedRule): Int {
-                return specificity.compareTo(other.specificity)
-            }
-        }
-
-        private var rules: List<ComputedRule> = emptyList<ComputedRule>()
-
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -176,12 +159,11 @@ sealed class ImageParser(
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
             val svg = root.children.single { it is SvgRootNode } as SvgRootNode
-            svg.resolveStyleTags()
             svg.resolveUseNodes()
 
             val (_, _, viewportWidth, viewportHeight) = svg.viewBox
             val nodes = svg
-                .asNodes(computedRules = rules, minified = config.minified)
+                .asNodes(computedRules = svg.rules, minified = config.minified)
                 .map {
                     it.applyTransformation()
                 }
@@ -201,26 +183,6 @@ sealed class ImageParser(
                 makeInternal = config.makeInternal,
                 imports = createImports(nodes, config),
             )
-        }
-
-        private fun SvgRootNode.resolveStyleTags() {
-            rules = styles
-                .flatMap { style ->
-                    val parser = CssParser(consumers = CssConsumers(style.content))
-                    style
-                        .resolveTree(parser)
-                        .children
-                        .filterIsInstance<QualifiedRule>()
-                        .flatMap { rule ->
-                            rule.prelude.specificities.map { (selector, specificity) ->
-                                ComputedRule(
-                                    selector = selector.location.source,
-                                    specificity = specificity,
-                                    declarations = rule.block.children,
-                                )
-                            }
-                        }
-                }
         }
     }
 
@@ -307,9 +269,6 @@ sealed class ImageParser(
         /**
          * A part of the sealed [ImageParser] companion object, [parse] is a function
          * that parses a [file] to a [String], with the help of a specified [ParserConfig].
-         *
-         * Before calling this function, you should initialize the ImageParse by calling
-         * the [ImageParser.invoke] first.
          *
          * Supported extensions: `.xml`, `.svg`
          *

@@ -7,7 +7,6 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.parser.ImageParser.SvgParser.ComputedRule
 
 class SvgPathNode(
     parent: XmlParentNode,
@@ -64,10 +63,10 @@ fun SvgPathNode.asNode(
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush,
-            fillAlpha = fillOpacity,
+            fillAlpha = fillOpacity ?: opacity,
             pathFillType = fillRule,
             stroke = strokeBrush,
-            strokeAlpha = strokeOpacity,
+            strokeAlpha = strokeOpacity ?: opacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,
             strokeMiterLimit = strokeMiterLimit,

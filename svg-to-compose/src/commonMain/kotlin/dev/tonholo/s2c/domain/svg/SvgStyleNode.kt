@@ -3,7 +3,6 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlTextNode
-import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 import dev.tonholo.s2c.lexer.css.CssTokenizer
 import dev.tonholo.s2c.parser.ast.AstParser
@@ -18,9 +17,8 @@ class SvgStyleNode(
     override val tagName: String = TAG_NAME
     val content: String by lazy {
         children
-            .firstInstanceOfOrNull<XmlTextNode>()
-            ?.content
-            .orEmpty()
+            .filterIsInstance<XmlTextNode>()
+            .fold("") { acc, node -> acc + node.content }
     }
     private var _tree: StyleSheet? = null
 

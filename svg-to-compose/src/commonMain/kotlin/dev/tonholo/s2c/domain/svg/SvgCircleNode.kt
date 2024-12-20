@@ -87,10 +87,10 @@ private fun SvgCircleNode.createSimpleCircle(
     return ImageVectorNode.Path(
         params = override ?: ImageVectorNode.Path.Params(
             fill = fillBrush(wrapper.nodes),
-            fillAlpha = fillOpacity,
+            fillAlpha = fillOpacity ?: opacity,
             pathFillType = fillRule,
             stroke = strokeBrush(wrapper.nodes),
-            strokeAlpha = strokeOpacity,
+            strokeAlpha = strokeOpacity ?: opacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,
             strokeMiterLimit = strokeMiterLimit,
@@ -169,7 +169,7 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
                         minified = minified,
                         override = ImageVectorNode.Path.Params(
                             fill = fillBrush(nodes),
-                            fillAlpha = fillOpacity,
+                            fillAlpha = fillOpacity ?: opacity,
                             pathFillType = fillRule,
                         )
                     ),

@@ -41,6 +41,7 @@ sealed class SvgGradient<out T>(
 
             return children
                 .filterIsInstance<SvgGradientStopNode>()
+                .onEach { it.resolveAttributesFromStyle((rootParent as SvgRootNode).rules) }
                 .map { it.gradientColor to it.offset }
                 .unzip()
         }
@@ -55,8 +56,9 @@ sealed class SvgGradient<out T>(
             val boundingBox = target.boundingBox()
             length.toFloat(boundingBox.width.toFloat()) + boundingBox.x.toFloat()
         } else {
+            val translateX = -root.viewportX
             val baseDimension = root.viewportWidth
-            length.toFloat(baseDimension)
+            translateX + length.toFloat(baseDimension)
         }
     }
 
@@ -70,8 +72,9 @@ sealed class SvgGradient<out T>(
             val boundingBox = target.boundingBox()
             length.toFloat(boundingBox.height.toFloat()) + boundingBox.y.toFloat()
         } else {
+            val translateY = -root.viewportY
             val baseDimension = root.viewportHeight
-            length.toFloat(baseDimension)
+            translateY + length.toFloat(baseDimension)
         }
     }
 

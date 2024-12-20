@@ -49,10 +49,10 @@ fun SvgPolygonNode.asNode(
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush(nodes),
-            fillAlpha = fillOpacity,
+            fillAlpha = fillOpacity ?: opacity,
             pathFillType = fillRule,
             stroke = strokeBrush(nodes),
-            strokeAlpha = strokeOpacity,
+            strokeAlpha = strokeOpacity ?: opacity,
             strokeLineCap = strokeLineCap,
             strokeLineJoin = strokeLineJoin,
             strokeMiterLimit = strokeMiterLimit,
