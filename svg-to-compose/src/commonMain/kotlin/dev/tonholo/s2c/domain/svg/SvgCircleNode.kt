@@ -186,7 +186,7 @@ private fun SvgCircleNode.createDashedCircle(minified: Boolean): ImageVectorNode
                         // as the dash is a path now, all the stroke parameters
                         // are used inside the fill parameters instead.
                         fill = strokeBrush(dashedCircleNodes),
-                        fillAlpha = strokeOpacity,
+                        fillAlpha = strokeOpacity ?: opacity,
                     ),
                     wrapper = ImageVectorNode.NodeWrapper(
                         normalizedPath = buildNormalizedPath(),
