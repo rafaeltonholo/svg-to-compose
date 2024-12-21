@@ -32,8 +32,8 @@ import kotlin.time.measureTimedValue
 abstract class XmlParser {
     companion object {
         private val parsers = setOf(
-            AvgParser(),
-            SvgParser(),
+            { AvgParser() },
+            { SvgParser() },
         )
 
         /**
@@ -46,6 +46,7 @@ abstract class XmlParser {
          * @throws IllegalStateException If no parser is found for the given file type.
          */
         fun parse(content: String, fileType: FileType): XmlRootNode = parsers
+            .map { it() }
             .firstOrNull { it.accept(fileType) }
             ?.parse(content)
             ?: error("No parser for $fileType")
