@@ -27,7 +27,7 @@ import okio.Path
  * @property fileManager a [FileManager] instance that allows reading from the file system.
  * @constructor Creates an [ImageParser] object with the specified [FileManager].
  *
- * @see [ImageParser.SvgParser]
+ * @see [ImageParser.SvgImageParser]
  * @see [ImageParser.AndroidVectorParser]
  */
 sealed class ImageParser(
@@ -116,7 +116,7 @@ sealed class ImageParser(
     }
 
     /**
-     * [SvgParser] is a subclass of [ImageParser].
+     * [SvgImageParser] is a subclass of [ImageParser].
      *
      * This class is responsible for parsing an SVG file type and creates
      * all the required information to generate a Jetpack Compose Icon.
@@ -126,7 +126,7 @@ sealed class ImageParser(
      * @param fileManager The Main tool that helps to manage files and allows
      *  reading data from the file system.
      */
-    class SvgParser(
+    class SvgImageParser(
         fileManager: FileManager,
     ) : ImageParser(fileManager) {
         /**
@@ -254,16 +254,16 @@ sealed class ImageParser(
      *
      * The function accepts a [FileManager] parameter for file management and
      * then employs it in the creation of specific parser objects:
-     * SVG ([SvgParser]) and Android Vector ([AndroidVectorParser]). Upon populating
+     * SVG ([SvgImageParser]) and Android Vector ([AndroidVectorParser]). Upon populating
      * the parsers object, the method returns the singleton instance of [ImageParser]
      * to enable a sequence of operations.
      *
      * @param fileManager a [FileManager] instance that allows reading from the file system.
      */
     class Factory(fileManager: FileManager) {
-        private val parsers: Map<String, ImageParser> = mapOf(
-            FileType.Svg.extension to SvgParser(fileManager),
-            FileType.Avg.extension to AndroidVectorParser(fileManager),
+        private val parsers: Map<String, () -> ImageParser> = mapOf(
+            FileType.Svg.extension to { SvgImageParser(fileManager) },
+            FileType.Avg.extension to { AndroidVectorParser(fileManager) },
         )
 
         /**
@@ -287,7 +287,7 @@ sealed class ImageParser(
             config: ParserConfig,
         ): String {
             val extension = file.extension
-            return parsers[extension]?.parse(
+            return parsers[extension]?.invoke()?.parse(
                 file = file,
                 iconName = iconName,
                 config = config,
