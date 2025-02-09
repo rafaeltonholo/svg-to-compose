@@ -2,7 +2,7 @@
 agp = "8.7.3"
 burst = "2.2.0"
 kotlin = "2.1.0"
-clikt = "5.0.2"
+clikt = "5.0.3"
 okio = "3.9.1"
 detekt = "1.23.7"
 ksoup = "0.2.1"
