@@ -110,4 +110,14 @@ internal abstract class TokenIterator<out T : TokenKind> {
     fun rewind(steps: Int = 1) {
         offset = (offset - steps).coerceIn(0, content.length)
     }
+
+    /**
+     * Returns a substring of the content from the specified start index to the end index.
+     *
+     * @param start The start index of the substring.
+     * @param end The end index of the substring.
+     * @return The substring from start to end index.
+     */
+    fun partialContent(start: Int, end: Int): String =
+        content.substring(start, end.coerceAtMost(content.length))
 }

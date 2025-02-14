@@ -2,6 +2,7 @@ package dev.tonholo.s2c.lexer.css
 
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.lexer.TokenIterator
+import dev.tonholo.s2c.lexer.css.constants.CssFunctionConstants
 
 /**
  * Iterator for CSS tokens.
@@ -23,6 +24,7 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
             char.isCommentStart() -> CssTokenKind.Comment
             char.isCDOToken() -> CssTokenKind.CDO
             char.isCDCToken() -> CssTokenKind.CDC
+            char.isFunction() -> CssTokenKind.Function
 
             else -> {
                 CssTokenKind.fromChar(char) ?: CssTokenKind.Ident
@@ -62,4 +64,16 @@ internal class CssTokenIterator : TokenIterator<CssTokenKind>() {
 
     private fun isUrlToken(char: Char): Boolean =
         char == 'u' && peek(1) == 'r' && peek(2) == 'l' && peek(offset = 3) == '('
+
+    private fun Char.isFunction(): Boolean {
+        val prev = peek(-1)
+        if (prev !in CssTokenKind.WhiteSpace && prev !in CssTokenKind.Colon) {
+            return false
+        }
+
+        return CssFunctionConstants.AllFunctions
+            .any { fnName ->
+                partialContent(offset, offset + fnName.length) == fnName
+            }
+    }
 }

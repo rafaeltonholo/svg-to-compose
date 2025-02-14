@@ -870,6 +870,14 @@ class CssTokenizerTest {
         assertTokens(content, expected)
     }
 
+    @Test
+    @Burst
+    fun `given a minified style - when creating tokens - then should create a valid token list`(
+        params: MinifiedCssParams,
+    ) {
+        assertTokens(params.content, params.tokens)
+    }
+
     private fun assertTokens(content: String, tokens: List<Token<out CssTokenKind>>) {
         val lexer = CssTokenizer()
         val actual = lexer.tokenize(content)
@@ -993,5 +1001,101 @@ class CssTokenizerTest {
         ;
 
         override fun toString(): String = value
+    }
+
+    enum class MinifiedCssParams(
+        val content: String,
+        val tokens: List<Token<out CssTokenKind>>,
+    ) {
+        `no spaces`(
+            content = ".segment-fill{fill:azure;stroke:#b0c4de;stroke-width:1}.segment-edge{fill:none;stroke:#00bfff;stroke-width:3}",
+            tokens = listOf(
+                Token(kind = CssTokenKind.Dot, startOffset = 0, endOffset = 1),
+                Token(kind = CssTokenKind.Ident, startOffset = 1, endOffset = 13),
+                Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 13, endOffset = 14),
+                Token(kind = CssTokenKind.Ident, startOffset = 14, endOffset = 18),
+                Token(kind = CssTokenKind.Colon, startOffset = 18, endOffset = 19),
+                Token(kind = CssTokenKind.Ident, startOffset = 19, endOffset = 24),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 24, endOffset = 25),
+                Token(kind = CssTokenKind.Ident, startOffset = 25, endOffset = 31),
+                Token(kind = CssTokenKind.Colon, startOffset = 31, endOffset = 32),
+                Token(kind = CssTokenKind.Hash, startOffset = 32, endOffset = 33),
+                Token(kind = CssTokenKind.HexDigit, startOffset = 33, endOffset = 39),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 39, endOffset = 40),
+                Token(kind = CssTokenKind.Ident, startOffset = 40, endOffset = 52),
+                Token(kind = CssTokenKind.Colon, startOffset = 52, endOffset = 53),
+                Token(kind = CssTokenKind.Number, startOffset = 53, endOffset = 54),
+                Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 54, endOffset = 55),
+                Token(kind = CssTokenKind.Dot, startOffset = 55, endOffset = 56),
+                Token(kind = CssTokenKind.Ident, startOffset = 56, endOffset = 68),
+                Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 68, endOffset = 69),
+                Token(kind = CssTokenKind.Ident, startOffset = 69, endOffset = 73),
+                Token(kind = CssTokenKind.Colon, startOffset = 73, endOffset = 74),
+                Token(kind = CssTokenKind.Ident, startOffset = 74, endOffset = 78),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 78, endOffset = 79),
+                Token(kind = CssTokenKind.Ident, startOffset = 79, endOffset = 85),
+                Token(kind = CssTokenKind.Colon, startOffset = 85, endOffset = 86),
+                Token(kind = CssTokenKind.Hash, startOffset = 86, endOffset = 87),
+                Token(kind = CssTokenKind.HexDigit, startOffset = 87, endOffset = 93),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 93, endOffset = 94),
+                Token(kind = CssTokenKind.Ident, startOffset = 94, endOffset = 106),
+                Token(kind = CssTokenKind.Colon, startOffset = 106, endOffset = 107),
+                Token(kind = CssTokenKind.Number, startOffset = 107, endOffset = 108),
+                Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 108, endOffset = 109),
+                Token(kind = CssTokenKind.EndOfFile, startOffset = 109, endOffset = 109),
+            ),
+        ),
+        `no spaces and dimensions starting with dot`(
+            content = ".cloud{fill:#fff;stroke:#d3d3d3;stroke-width:2;opacity:.8}.cloud-shadow{fill:rgba(0,0,0,.2);transform:translate(5,5)}",
+            tokens = listOf(
+                Token(kind = CssTokenKind.Dot, startOffset = 0, endOffset = 1),
+                Token(kind = CssTokenKind.Ident, startOffset = 1, endOffset = 6),
+                Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 6, endOffset = 7),
+                Token(kind = CssTokenKind.Ident, startOffset = 7, endOffset = 11),
+                Token(kind = CssTokenKind.Colon, startOffset = 11, endOffset = 12),
+                Token(kind = CssTokenKind.Hash, startOffset = 12, endOffset = 13),
+                Token(kind = CssTokenKind.HexDigit, startOffset = 13, endOffset = 16),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 16, endOffset = 17),
+                Token(kind = CssTokenKind.Ident, startOffset = 17, endOffset = 23),
+                Token(kind = CssTokenKind.Colon, startOffset = 23, endOffset = 24),
+                Token(kind = CssTokenKind.Hash, startOffset = 24, endOffset = 25),
+                Token(kind = CssTokenKind.HexDigit, startOffset = 25, endOffset = 31),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 31, endOffset = 32),
+                Token(kind = CssTokenKind.Ident, startOffset = 32, endOffset = 44),
+                Token(kind = CssTokenKind.Colon, startOffset = 44, endOffset = 45),
+                Token(kind = CssTokenKind.Number, startOffset = 45, endOffset = 46),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 46, endOffset = 47),
+                Token(kind = CssTokenKind.Ident, startOffset = 47, endOffset = 54),
+                Token(kind = CssTokenKind.Colon, startOffset = 54, endOffset = 55),
+                Token(kind = CssTokenKind.Number, startOffset = 55, endOffset = 57),
+                Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 57, endOffset = 58),
+                Token(kind = CssTokenKind.Dot, startOffset = 58, endOffset = 59),
+                Token(kind = CssTokenKind.Ident, startOffset = 59, endOffset = 71),
+                Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 71, endOffset = 72),
+                Token(kind = CssTokenKind.Ident, startOffset = 72, endOffset = 76),
+                Token(kind = CssTokenKind.Colon, startOffset = 76, endOffset = 77),
+                Token(kind = CssTokenKind.Function, startOffset = 77, endOffset = 81),
+                Token(kind = CssTokenKind.OpenParenthesis, startOffset = 81, endOffset = 82),
+                Token(kind = CssTokenKind.Number, startOffset = 82, endOffset = 83),
+                Token(kind = CssTokenKind.Comma, startOffset = 83, endOffset = 84),
+                Token(kind = CssTokenKind.Number, startOffset = 84, endOffset = 85),
+                Token(kind = CssTokenKind.Comma, startOffset = 85, endOffset = 86),
+                Token(kind = CssTokenKind.Number, startOffset = 86, endOffset = 87),
+                Token(kind = CssTokenKind.Comma, startOffset = 87, endOffset = 88),
+                Token(kind = CssTokenKind.Number, startOffset = 88, endOffset = 90),
+                Token(kind = CssTokenKind.CloseParenthesis, startOffset = 90, endOffset = 91),
+                Token(kind = CssTokenKind.Semicolon, startOffset = 91, endOffset = 92),
+                Token(kind = CssTokenKind.Ident, startOffset = 92, endOffset = 101),
+                Token(kind = CssTokenKind.Colon, startOffset = 101, endOffset = 102),
+                Token(kind = CssTokenKind.Function, startOffset = 102, endOffset = 111),
+                Token(kind = CssTokenKind.OpenParenthesis, startOffset = 111, endOffset = 112),
+                Token(kind = CssTokenKind.Number, startOffset = 112, endOffset = 113),
+                Token(kind = CssTokenKind.Comma, startOffset = 113, endOffset = 114),
+                Token(kind = CssTokenKind.Number, startOffset = 114, endOffset = 115),
+                Token(kind = CssTokenKind.CloseParenthesis, startOffset = 115, endOffset = 116),
+                Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 116, endOffset = 117),
+                Token(kind = CssTokenKind.EndOfFile, startOffset = 117, endOffset = 117),
+            ),
+        ),
     }
 }
