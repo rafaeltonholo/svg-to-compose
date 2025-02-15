@@ -18,7 +18,7 @@ internal class FunctionTokenConsumer(
             if (char in CssTokenKind.OpenParenthesis) {
                 break
             }
-            if (char.isLetter().not() && char != '-') {
+            if (char.isLetterOrDigit().not() && char != '-' && char != '_') {
                 error("Invalid function name: ${iterator.partialContent(start, iterator.offset)}")
             }
         }
