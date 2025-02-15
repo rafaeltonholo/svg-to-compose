@@ -40,14 +40,7 @@ internal class NumberTokenConsumer(
         while (iterator.hasNext()) {
             val char = iterator.get()
             iterator.nextOffset()
-            if (
-                char in CssTokenKind.OpenParenthesis ||
-                char in CssTokenKind.CloseParenthesis ||
-                char in CssTokenKind.WhiteSpace ||
-                char in CssTokenKind.Comma ||
-                char in CssTokenKind.Semicolon ||
-                char in CssTokenKind.CloseCurlyBrace
-            ) {
+            if (isEndOfNumber(char)) {
                 iterator.rewind()
                 break
             }
@@ -66,4 +59,11 @@ internal class NumberTokenConsumer(
             },
         )
     }
+
+    private fun isEndOfNumber(char: Char): Boolean = char in CssTokenKind.OpenParenthesis ||
+        char in CssTokenKind.CloseParenthesis ||
+        char in CssTokenKind.WhiteSpace ||
+        char in CssTokenKind.Comma ||
+        char in CssTokenKind.Semicolon ||
+        char in CssTokenKind.CloseCurlyBrace
 }

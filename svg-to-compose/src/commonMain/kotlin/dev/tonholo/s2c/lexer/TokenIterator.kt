@@ -85,16 +85,6 @@ internal abstract class TokenIterator<out T : TokenKind> {
     fun peek(offset: Int): Char =
         content.getOrElse(this.offset + offset) { Char.EMPTY }
 
-    /**
-     * Looks up the character at the given absolute offset.
-     *
-     * @param offset The absolute offset within the content string.
-     * @return The character at the specified offset, or [EMPTY] if the offset
-     * is out of bounds.
-     */
-    fun lookup(offset: Int): Char =
-        content.getOrElse(offset) { Char.EMPTY }
-
     /** Advances the offset by the specified number of steps. */
     fun nextOffset(steps: Int = 1): Int {
         offset = (offset + steps).coerceIn(0, content.length)
