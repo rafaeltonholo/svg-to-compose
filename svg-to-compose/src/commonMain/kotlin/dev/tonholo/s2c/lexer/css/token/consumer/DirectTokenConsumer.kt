@@ -19,6 +19,16 @@ internal class DirectTokenConsumer(
         CssTokenKind.CloseParenthesis,
     )
 
+    override fun accept(kind: CssTokenKind): Boolean {
+        return when {
+            kind == CssTokenKind.Dot -> {
+                val next = iterator.peek(offset = 1)
+                !next.isDigit()
+            }
+            else -> super.accept(kind)
+        }
+    }
+
     override fun consume(kind: CssTokenKind): List<Token<out CssTokenKind>> {
         val start = iterator.offset
         val end = iterator.nextOffset()

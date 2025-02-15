@@ -85,16 +85,6 @@ internal abstract class TokenIterator<out T : TokenKind> {
     fun peek(offset: Int): Char =
         content.getOrElse(this.offset + offset) { Char.EMPTY }
 
-    /**
-     * Looks up the character at the given absolute offset.
-     *
-     * @param offset The absolute offset within the content string.
-     * @return The character at the specified offset, or [EMPTY] if the offset
-     * is out of bounds.
-     */
-    fun lookup(offset: Int): Char =
-        content.getOrElse(offset) { Char.EMPTY }
-
     /** Advances the offset by the specified number of steps. */
     fun nextOffset(steps: Int = 1): Int {
         offset = (offset + steps).coerceIn(0, content.length)
@@ -110,4 +100,14 @@ internal abstract class TokenIterator<out T : TokenKind> {
     fun rewind(steps: Int = 1) {
         offset = (offset - steps).coerceIn(0, content.length)
     }
+
+    /**
+     * Returns a substring of the content from the specified start index to the end index.
+     *
+     * @param start The start index of the substring.
+     * @param end The end index of the substring.
+     * @return The substring from start to end index.
+     */
+    fun partialContent(start: Int, end: Int): String =
+        content.substring(start, end.coerceAtMost(content.length))
 }

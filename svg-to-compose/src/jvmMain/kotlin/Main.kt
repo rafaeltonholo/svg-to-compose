@@ -19,7 +19,7 @@ private fun main() {
     AppConfig.debug = true
     AppConfig.stackTrace = true
     AppConfig.silent = false
-    val suffix = "css/flower.svg"
+    val suffix = "css/mountain-with-clouds.svg"
     val (pkg, path, output) = SampleFile.Svg.File(
         SampleAppPackage("dev.tonholo.svg_to_compose.playground.ui.icon.jvm"),
         suffix,
@@ -31,7 +31,7 @@ private fun main() {
         // When enabling the optimize flag,
         // make sure your default node has installed
         // svgo and avocado.
-        optimize = false,
+        optimize = true,
         receiverType = null,
         addToMaterial = false,
         noPreview = false,

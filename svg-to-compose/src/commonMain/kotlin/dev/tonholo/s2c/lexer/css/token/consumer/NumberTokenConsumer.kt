@@ -11,6 +11,10 @@ internal class NumberTokenConsumer(
         CssTokenKind.Number,
     )
 
+    override fun accept(kind: CssTokenKind): Boolean {
+        return super.accept(kind) || kind == CssTokenKind.Dot && iterator.peek(1).isDigit()
+    }
+
     override fun consume(kind: CssTokenKind): List<Token<out CssTokenKind>> {
         val start = iterator.offset
         while (iterator.hasNext()) {
@@ -36,13 +40,7 @@ internal class NumberTokenConsumer(
         while (iterator.hasNext()) {
             val char = iterator.get()
             iterator.nextOffset()
-            if (
-                char in CssTokenKind.OpenParenthesis ||
-                char in CssTokenKind.CloseParenthesis ||
-                char in CssTokenKind.WhiteSpace ||
-                char in CssTokenKind.Comma ||
-                char in CssTokenKind.Semicolon
-            ) {
+            if (isEndOfNumber(char)) {
                 iterator.rewind()
                 break
             }
@@ -61,4 +59,11 @@ internal class NumberTokenConsumer(
             },
         )
     }
+
+    private fun isEndOfNumber(char: Char): Boolean = char in CssTokenKind.OpenParenthesis ||
+        char in CssTokenKind.CloseParenthesis ||
+        char in CssTokenKind.WhiteSpace ||
+        char in CssTokenKind.Comma ||
+        char in CssTokenKind.Semicolon ||
+        char in CssTokenKind.CloseCurlyBrace
 }

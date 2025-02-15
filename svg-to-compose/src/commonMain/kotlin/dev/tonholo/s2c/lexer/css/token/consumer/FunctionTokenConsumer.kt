@@ -4,35 +4,26 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 
-internal class IdentTokenConsumer(
+internal class FunctionTokenConsumer(
     iterator: TokenIterator<CssTokenKind>,
 ) : TokenConsumer(iterator) {
     override val supportedTokenKinds: Set<CssTokenKind> = setOf(
-        CssTokenKind.Ident,
+        CssTokenKind.Function,
     )
 
     override fun consume(kind: CssTokenKind): List<Token<out CssTokenKind>> {
         val start = iterator.offset
         while (iterator.hasNext()) {
-            val char = iterator.get()
-
-            when (char) {
-                in '0'..'9',
-                in 'a'..'z',
-                in 'A'..'Z',
-                '-',
-                '_' -> {
-                    iterator.nextOffset()
-                }
-
-                else -> {
-                    break
-                }
+            val char = iterator.next()
+            if (char in CssTokenKind.OpenParenthesis) {
+                break
+            }
+            if (char.isLetterOrDigit().not() && char != '-' && char != '_') {
+                error("Invalid function name: ${iterator.partialContent(start, iterator.offset)}")
             }
         }
-
         return listOf(
-            Token(CssTokenKind.Ident, start, iterator.offset)
+            Token(CssTokenKind.Function, start, iterator.offset)
         )
     }
 }
