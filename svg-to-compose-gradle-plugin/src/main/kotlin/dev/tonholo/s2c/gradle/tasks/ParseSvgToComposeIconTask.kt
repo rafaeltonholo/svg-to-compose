@@ -23,6 +23,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
@@ -54,7 +55,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val processor: Processor = dependencies.get()
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob())
     private val logLevel: LogLevel by lazy { project.gradle.startParameter.logLevel }
 
     init {
@@ -208,7 +209,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
-    private fun Path.process(
+    private suspend fun Path.process(
         configuration: ProcessorConfiguration,
         recursive: Boolean,
         parent: Path,
@@ -221,29 +222,32 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             buildDestinationPackage(configuration, recursive, this, parent)
         return try {
             logger.debug("Parsing $path.")
-            processor.run(
-                path = toFile().absolutePath,
-                output = output.toFile().absolutePath,
-                config = ParserConfig(
-                    pkg = destinationPackage,
-                    optimize = configuration.optimize.get(),
-                    minified = iconConfiguration.minified.get(),
-                    theme = iconConfiguration.theme.get(),
-                    receiverType = iconConfiguration.receiverType.orNull,
-                    addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                    noPreview = iconConfiguration.noPreview.get(),
-                    makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                    exclude = iconConfiguration.exclude.orNull,
-                    kmpPreview = isKmp,
-                    // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration
-                    //  is done.
-                    silent = true,
-                    keepTempFolder = true,
-                ),
-                recursive = false, // recursive search is handled by the plugin.
-                maxDepth = configuration.maxDepth.get(),
-                mapIconName = iconConfiguration.mapIconNameTo.orNull,
-            ).singleOrNull()?.let { this to it }
+            val processedFiles = withContext(Dispatchers.IO) {
+                processor.run(
+                    path = toFile().absolutePath,
+                    output = output.toFile().absolutePath,
+                    config = ParserConfig(
+                        pkg = destinationPackage,
+                        optimize = configuration.optimize.get(),
+                        minified = iconConfiguration.minified.get(),
+                        theme = iconConfiguration.theme.get(),
+                        receiverType = iconConfiguration.receiverType.orNull,
+                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
+                        noPreview = iconConfiguration.noPreview.get(),
+                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
+                        exclude = iconConfiguration.exclude.orNull,
+                        kmpPreview = isKmp,
+                        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration
+                        //  is done.
+                        silent = true,
+                        keepTempFolder = true,
+                    ),
+                    recursive = false, // recursive search is handled by the plugin.
+                    maxDepth = configuration.maxDepth.get(),
+                    mapIconName = iconConfiguration.mapIconNameTo.orNull,
+                )
+            }
+            processedFiles.singleOrNull()?.let { this to it }
         } catch (e: ExitProgramException) {
             errors += this to requireNotNull(e.cause)
             null
