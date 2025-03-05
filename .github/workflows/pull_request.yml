@@ -53,10 +53,15 @@ jobs:
             job-id: ${{ matrix.os }}
             arguments: releaseLinux
 
-        - name: Running Detekt
+        - name: Running Detekt on svg-to-compose
           shell: bash
           run: |
               ./gradlew detektMetadataCommonMain
+
+        - name: Running Detekt on svg-to-compose-gradle-plugin
+          shell: bash
+          run: |
+              ./gradlew detekt
 
         - name: Verify unit tests
           shell: bash
