@@ -27,8 +27,8 @@ private enum class StrokeDashDrawDirection(
 }
 
 fun StrokeDashArray.createDashedPathForRect(
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     width: Int,
     height: Int,
     strokeWidth: Int,
