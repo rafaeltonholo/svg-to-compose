@@ -16,8 +16,8 @@ class SvgRectNodeTests : BaseSvgTest() {
         val attributes = mutableMapOf("x" to "10", "y" to "20", "width" to "30", "height" to "40")
         val rect = SvgRectNode(root, attributes)
 
-        assertEquals(expected = 10, actual = rect.x)
-        assertEquals(expected = 20, actual = rect.y)
+        assertEquals(expected = 10f, actual = rect.x)
+        assertEquals(expected = 20f, actual = rect.y)
         assertEquals(expected = 30, actual = rect.width)
         assertEquals(expected = 40, actual = rect.height)
     }

@@ -25,15 +25,15 @@ class SvgRectNode(
         val baseDimension = root.viewportHeight
         height.toIntOrNull(baseDimension) ?: error("Invalid height '$height'")
     }
-    val x: Int? by attribute<SvgLength?, Int?> { x ->
+    val x: Float? by attribute<SvgLength?, Float?> { x ->
         val root = rootParent as SvgRootNode
         val baseDimension = root.viewportWidth
-        x?.toIntOrNull(baseDimension)
+        x?.toFloatOrNull(baseDimension)
     }
-    val y: Int? by attribute<SvgLength?, Int?> { y ->
+    val y: Float? by attribute<SvgLength?, Float?> { y ->
         val root = rootParent as SvgRootNode
         val baseDimension = root.viewportHeight
-        y?.toIntOrNull(baseDimension)
+        y?.toFloatOrNull(baseDimension)
     }
     val rx: Double? by attribute()
     val ry: Double? by attribute()
@@ -68,8 +68,8 @@ fun SvgRectNode.asNode(
 private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val xCornerSize = rx ?: ry ?: 0.0
     val yCornerSize = ry ?: rx ?: 0.0
-    val x = x ?: 0
-    val y = y ?: 0
+    val x = x ?: 0f
+    val y = y ?: 0f
     val strokeDashArray = strokeDashArray
 
     return ImageVectorNode.NodeWrapper(
@@ -89,8 +89,8 @@ private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWra
 
 private fun SvgRectNode.createDashedRect(
     strokeDashArray: StrokeDashArray,
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     isMinified: Boolean,
 ): List<PathNodes> {
     warn(
@@ -108,8 +108,8 @@ private fun SvgRectNode.createDashedRect(
 }
 
 private fun SvgRectNode.createRegularRect(
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     isMinified: Boolean,
 ) = listOf(
     pathNode(command = PathCommand.MoveTo) {
@@ -135,8 +135,8 @@ private fun SvgRectNode.createRegularRect(
 )
 
 private fun SvgRectNode.createRoundedCornerRect(
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     xCornerSize: Double,
     yCornerSize: Double,
     isMinified: Boolean,
