@@ -8,7 +8,7 @@ detekt = "1.23.8"
 ksoup = "0.2.2"
 maven-publish = "0.31.0"
 buildconfig = "5.6.5"
-kotlinx-coroutines = "1.10.1"
+kotlinx-coroutines = "1.10.2"
 dokka = "1.9.20"
 
 [libraries]
