@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.1"
+agp = "8.11.0"
 burst = "2.5.0"
 kotlin = "2.1.20"
 clikt = "5.0.3"
