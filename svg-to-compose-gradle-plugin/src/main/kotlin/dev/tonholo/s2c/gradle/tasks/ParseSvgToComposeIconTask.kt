@@ -29,11 +29,16 @@ import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.impldep.kotlinx.serialization.Transient
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -45,18 +50,35 @@ import javax.inject.Inject
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
-    objectFactory: ObjectFactory,
+    private val objectFactory: ObjectFactory,
+    providerFactory: ProviderFactory,
+    private val projectLayout: ProjectLayout,
+    private val gradle: Gradle,
 ) : DefaultTask() {
+    @Transient
     private val dependencies: DependencyModule = objectFactory
         .property(DependencyModule::class.java)
-        .convention(DependencyModule(project))
+        .convention(
+            DependencyModule(
+                objectFactory = objectFactory,
+                providerFactory = providerFactory,
+                logger = Logging.getLogger("ParseSvgToComposeIconTask"),
+                buildDirectory = projectLayout.buildDirectory,
+            ),
+        )
         .get()
+
+    @Transient
     private val logger: Logger = dependencies.get()
     private val processor: Processor = dependencies.get()
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
+
+    @Transient
     private val scope = CoroutineScope(SupervisorJob())
-    private val logLevel: LogLevel by lazy { project.gradle.startParameter.logLevel }
+
+    @Transient
+    private val logLevel: LogLevel by lazy { gradle.startParameter.logLevel }
 
     init {
         group = "svg-to-compose"
@@ -83,7 +105,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 val destination = configuration.destinationPackage.get().replace(".", "/")
                 val outputFolder =
                     if (configuration.iconConfiguration.orNull?.isCodeGenerationPersistent?.orNull == true) {
-                        project.layout.projectDirectory.dir(
+                        projectLayout.projectDirectory.dir(
                             buildString {
                                 append(
                                     if (isKmp) {
@@ -104,8 +126,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @get:OutputDirectory
     val sourceDirectory: File
-        get() = project.objects.directoryProperty().convention(
-            project.layout.buildDirectory.dir(
+        get() = objectFactory.directoryProperty().convention(
+            projectLayout.buildDirectory.dir(
                 buildString {
                     append(GENERATED_FOLDER)
                     append(

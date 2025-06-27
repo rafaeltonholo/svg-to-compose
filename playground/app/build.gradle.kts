@@ -73,7 +73,7 @@ svgToCompose {
             from(layout.projectDirectory.dir("../../samples/svg"))
             destinationPackage("$basePackage.svg")
             icons {
-                optimize(enabled = true)
+                optimize(enabled = false)
                 minify()
             }
         }

@@ -7,11 +7,17 @@ import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
 import okio.FileSystem
-import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.logging.Logger as GradleLogger
 
 internal class DependencyModule(
-    private val project: Project,
+    private val objectFactory: ObjectFactory,
+    private val providerFactory: ProviderFactory,
+    private val logger: GradleLogger,
+    private val buildDirectory: DirectoryProperty,
 ) {
     val providers = mapOf<Class<*>, () -> Provider<out Any>>(
         Logger::class.java to ::provideLogger,
@@ -22,25 +28,21 @@ internal class DependencyModule(
     )
 
     private fun provideLogger(): Provider<Logger> {
-        return project
-            .providers
-            .provider { dev.tonholo.s2c.gradle.internal.logger.Logger(project.logger) }
+        return providerFactory
+            .provider { dev.tonholo.s2c.gradle.internal.logger.Logger(logger) }
     }
 
     private fun provideFileSystem(): Provider<FileSystem> =
-        project
-            .providers
+        providerFactory
             .provider { FileSystem.SYSTEM }
 
     private fun provideFileManager(): Provider<FileManager> =
-        project
-            .providers
+        providerFactory
             .provider {
                 FileManager(get(), get())
             }
 
-    private fun provideProcessor(): Provider<Processor> = project
-        .providers
+    private fun provideProcessor(): Provider<Processor> = providerFactory
         .provider {
             Processor(
                 logger = get(),
@@ -50,18 +52,16 @@ internal class DependencyModule(
             )
         }
 
-    private fun provideCacheManager(): Provider<CacheManager> = project
-        .providers
+    private fun provideCacheManager(): Provider<CacheManager> = providerFactory
         .provider {
             CacheManager(
                 logger = get(),
                 fileManager = get(),
-                project = project,
+                buildDirectory = buildDirectory,
             )
         }
 
-    inline fun <reified T> get(): T = project
-        .objects
+    inline fun <reified T> get(): T = objectFactory
         .property(T::class.java)
         .apply {
             if (!isPresent) {

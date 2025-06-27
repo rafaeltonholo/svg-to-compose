@@ -6,7 +6,7 @@ import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import okio.Path
 import okio.Path.Companion.toPath
-import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
@@ -17,9 +17,9 @@ import java.io.ObjectOutputStream
 internal class CacheManager(
     private val logger: Logger,
     private val fileManager: FileManager,
-    private val project: Project,
+    private val buildDirectory: DirectoryProperty,
 ) {
-    private val cacheFile by lazy { project.layout.buildDirectory.file("$GENERATED_FOLDER/cache.bin").get().asFile }
+    private val cacheFile by lazy { buildDirectory.file("$GENERATED_FOLDER/cache.bin").get().asFile }
     private val fileHashMap = mutableListOf<IconCacheData>()
     private lateinit var configurations: Map<String, ProcessorConfiguration>
 
