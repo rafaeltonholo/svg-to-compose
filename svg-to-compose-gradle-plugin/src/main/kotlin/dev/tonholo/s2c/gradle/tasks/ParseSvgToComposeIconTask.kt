@@ -249,7 +249,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             }
             processedFiles.singleOrNull()?.let { this to it }
         } catch (e: ExitProgramException) {
-            errors += this to requireNotNull(e.cause)
+            errors += this to requireNotNull(e.cause ?: e)
             null
         } catch (e: ParserException) {
             errors += this to e
