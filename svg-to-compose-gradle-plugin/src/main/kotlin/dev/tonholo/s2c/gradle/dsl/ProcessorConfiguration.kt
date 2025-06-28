@@ -9,34 +9,32 @@ import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.Action
-import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 abstract class ProcessorConfiguration @Inject constructor(
-    project: Project,
+    private val objectFactory: ObjectFactory,
 ) : SourceConfiguration, Cacheable {
     override val parentName: String = "svgToCompose.processor"
-    internal val origin: DirectoryProperty = project.objects.directoryProperty()
-    internal val destinationPackage: Property<String> = project.objects.property()
-    internal val recursive: Property<Boolean> = project
-        .objects
-        .property<Boolean>()
-    internal val maxDepth: Property<Int> = project
-        .objects
-        .property<Int>()
-    internal val optimize: Property<Boolean> = project
-        .objects
-        .property<Boolean>()
+    internal val origin: DirectoryProperty = objectFactory.directoryProperty()
+    internal val destinationPackage: Property<String> = objectFactory.property()
+    internal val recursive: Property<Boolean> = objectFactory.property<Boolean>()
+    internal val maxDepth: Property<Int> = objectFactory.property<Int>()
+    internal val optimize: Property<Boolean> = objectFactory.property<Boolean>()
 
     internal val iconConfiguration: Property<IconParserConfigurationImpl> by lazy {
-        project
-            .objects
+        objectFactory
             .property<IconParserConfigurationImpl>()
-            .convention(IconParserConfigurationImpl(project, fullName))
+            .convention(
+                IconParserConfigurationImpl(
+                    objectFactory = objectFactory,
+                    parentName = fullName,
+                ),
+            )
     }
 
     override fun from(origin: Directory) {

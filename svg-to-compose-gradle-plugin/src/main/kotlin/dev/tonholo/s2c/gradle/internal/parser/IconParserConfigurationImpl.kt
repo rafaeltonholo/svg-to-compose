@@ -9,52 +9,34 @@ import dev.tonholo.s2c.gradle.internal.cache.Cacheable
 import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
 import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
-import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 
 private typealias IconMapper = (String) -> String
 
 internal class IconParserConfigurationImpl(
-    project: Project,
+    objectFactory: ObjectFactory,
     override val parentName: String,
 ) : IconParserConfiguration, Configuration, Cacheable {
     override val name: String = "icons"
-    override val iconVisibility: Property<IconVisibility> = project
-        .objects
-        .property<IconVisibility>()
+    override val iconVisibility: Property<IconVisibility> = objectFactory.property<IconVisibility>()
 
-    internal val receiverType: Property<String?> = project
-        .objects
-        .property<String?>()
+    internal val receiverType: Property<String?> = objectFactory.property<String?>()
 
-    internal val addToMaterialIcons: Property<Boolean> = project
-        .objects
-        .property<Boolean>()
+    internal val addToMaterialIcons: Property<Boolean> = objectFactory.property<Boolean>()
 
-    internal val minified: Property<Boolean> = project
-        .objects
-        .property<Boolean>()
+    internal val minified: Property<Boolean> = objectFactory.property<Boolean>()
 
-    internal val noPreview: Property<Boolean> = project
-        .objects
-        .property<Boolean>()
+    internal val noPreview: Property<Boolean> = objectFactory.property<Boolean>()
 
-    internal val theme: Property<String> = project
-        .objects
-        .property<String>()
+    internal val theme: Property<String> = objectFactory.property<String>()
 
-    internal val mapIconNameTo: Property<IconMapper?> = project
-        .objects
-        .property<IconMapper?>()
+    internal val mapIconNameTo: Property<IconMapper?> = objectFactory.property<IconMapper?>()
 
-    internal val exclude: Property<Regex?> = project
-        .objects
-        .property<Regex?>()
+    internal val exclude: Property<Regex?> = objectFactory.property<Regex?>()
 
-    internal val isCodeGenerationPersistent: Property<Boolean?> = project
-        .objects
-        .property<Boolean?>()
+    internal val isCodeGenerationPersistent: Property<Boolean?> = objectFactory.property<Boolean?>()
 
     override fun makeInternal() {
         iconVisibility.set(IconVisibility.Internal)
