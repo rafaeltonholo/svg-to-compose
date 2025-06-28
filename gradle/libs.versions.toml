@@ -1,6 +1,6 @@
 [versions]
 agp = "8.11.0"
-burst = "2.5.0"
+burst = "2.6.0"
 kotlin = "2.1.20"
 clikt = "5.0.3"
 okio = "3.10.2"
