@@ -74,7 +74,7 @@ sealed interface SvgNode : XmlNode {
 
     private fun MutableMap<String, String>.resolveAttributesByStyleAttribute() {
         style?.let { style ->
-            val parts = style.split(";")
+            val parts = style.split(";").filter { it.isNotEmpty() }
             for (part in parts) {
                 val (property, value) = part.split(":")
                 if (attributes.containsKey(property).not()) {
