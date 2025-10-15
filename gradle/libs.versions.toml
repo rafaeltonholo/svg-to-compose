@@ -9,7 +9,7 @@ ksoup = "0.2.2"
 maven-publish = "0.31.0"
 buildconfig = "5.6.8"
 kotlinx-coroutines = "1.10.2"
-dokka = "1.9.20"
+dokka = "2.1.0"
 
 [libraries]
 com-github-ajalt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
