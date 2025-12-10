@@ -140,8 +140,9 @@ sealed class Optimizer(
             val svgoConfigFile = tempFolder / svgoConfigFilename
 
             try {
-                // Create temp directory in case of not having it yet.
-                fileManager.createDirectory(tempFolder)
+                // Create temp directory if missing. Use idempotent creation to avoid races
+                // when multiple workers try to create it concurrently.
+                fileManager.createDirectories(tempFolder, mustCreate = false)
 
                 if (!fileManager.exists(svgoConfigFile)) {
                     logger.output("⚙️ writing svgo config file")

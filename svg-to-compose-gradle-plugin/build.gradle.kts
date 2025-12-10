@@ -43,7 +43,6 @@ mavenPublishing {
 dependencies {
     compileOnly(libs.com.android.tools.build.gradle)
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
-    implementation(libs.org.jetbrains.kotlinx.coroutines.core)
     implementation(libs.com.squareup.okio)
     implementation(projects.svgToCompose)
 }
