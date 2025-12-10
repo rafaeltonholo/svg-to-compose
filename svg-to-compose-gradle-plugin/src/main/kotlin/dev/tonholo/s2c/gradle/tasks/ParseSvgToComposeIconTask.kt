@@ -4,7 +4,7 @@ import com.android.build.gradle.BaseExtension
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.error.ParserException
+import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
@@ -12,20 +12,17 @@ import dev.tonholo.s2c.gradle.internal.cache.CacheManager
 import dev.tonholo.s2c.gradle.internal.inject.DependencyModule
 import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
+import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
+import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
+import dev.tonholo.s2c.gradle.tasks.worker.toResult
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.parser.ParserConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.Properties
+import javax.inject.Inject
 import okio.Path
 import okio.Path.Companion.toOkioPath
+import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -35,20 +32,22 @@ import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.impldep.kotlinx.serialization.Transient
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
+import org.gradle.workers.WorkQueue
+import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
-import javax.inject.Inject
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 
+@CacheableTask
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     providerFactory: ProviderFactory,
@@ -74,8 +73,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val fileManager: FileManager by lazy { dependencies.get() }
     private val cacheManager: CacheManager by lazy { dependencies.get() }
 
-    @Transient
-    private val scope = CoroutineScope(SupervisorJob())
+    @get:Inject
+    protected abstract val workerExecutor: WorkerExecutor
 
     @Transient
     private val logLevel: LogLevel by lazy { gradle.startParameter.logLevel }
@@ -83,6 +82,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     init {
         group = "svg-to-compose"
         description = "Parse svg or avg to compose icons"
+        // Keep Gradle task cache conservative; internal CacheManager ensures correctness.
         outputs.upToDateWhen { false }
     }
 
@@ -143,7 +143,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         ).get().asFile
 
     @TaskAction
-    fun run() = runBlocking {
+    fun run() {
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
             cacheManager.initialize(configurations.asMap)
@@ -188,7 +188,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
-    private suspend fun processFiles(
+    private fun processFiles(
         filesToProcess: List<Path>,
         configuration: ProcessorConfiguration,
         recursive: Boolean,
@@ -197,85 +197,87 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         errors: MutableMap<Path, Throwable>,
         outputFiles: MutableMap<Path, Path>
     ) {
-        if (maxParallelExecutions > 1) {
-            filesToProcess
-                .chunked(size = maxParallelExecutions)
-                .forEach { files ->
-                    logger.debug("Processing ${files.size} files")
-                    val operations = files.map { path ->
-                        scope.async {
-                            path.process(configuration, recursive, parent, iconConfiguration, errors)
-                        }
-                    }
-                    val processedFiles = operations.awaitAll()
-                    logger.debug("End processing ${files.size} files.")
-                    outputFiles.putAll(processedFiles.filterNotNull())
+        // Prepare worker queue
+        var queue: WorkQueue
+
+        // Directory to store per-work-item result files
+        val resultsDir = projectLayout
+            .buildDirectory
+            .dir("$GENERATED_FOLDER/worker-results/${configuration.name}")
+            .get()
+            .asFile
+        if (!resultsDir.exists()) resultsDir.mkdirs()
+
+        // Concurrency is controlled by chunking based on maxParallelExecutions and Gradle's max workers.
+        val chunkSize = if (maxParallelExecutions > 1) maxParallelExecutions else 1
+        filesToProcess
+            .chunked(chunkSize)
+            .forEachIndexed { chunkIndex, chunk ->
+                queue = workerExecutor.noIsolation()
+                chunk.forEachIndexed { index, path ->
+                    val globalIndex = chunkIndex * chunkSize + index
+                    val output = buildOutput(configuration, recursive, path, parent)
+                    val destinationPackage = buildDestinationPackage(configuration, recursive, path, parent)
+                    val resultFile = File(resultsDir, "result-$globalIndex.properties")
+                    // Pre-compute file output to avoid passing non-serializable icon name mapper to workers
+                    queue.submit(path, iconConfiguration, output, destinationPackage, configuration, resultFile)
                 }
-        } else {
-            val processedFiles = filesToProcess.map { files ->
-                files.process(
-                    configuration,
-                    recursive,
-                    parent,
-                    iconConfiguration,
-                    errors,
-                )
+                queue.await()
             }
-            outputFiles.putAll(processedFiles.filterNotNull())
+
+        // Collect results
+        resultsDir.listFiles()?.forEach { file ->
+            val props = Properties()
+            file.inputStream().use { props.load(it) }
+            val result = props.toResult()
+            when (result.status) {
+                Status.Ok -> {
+                    val origin = result.origin.toPath()
+                    val output = result.output.toPath()
+                    outputFiles[origin] = output
+                }
+
+                Status.Error -> {
+                    val origin = result.origin.toPath()
+                    val errorMessage = result.message
+                    errors[origin] = RuntimeException(errorMessage)
+                }
+
+                Status.Unknown -> {
+                    errors[file.toOkioPath()] = RuntimeException("Unexpected error while processing $file")
+                }
+            }
         }
+        resultsDir.parentFile.deleteRecursively()
     }
 
-    internal fun dispose() {
-        if (scope.isActive) {
-            scope.cancel()
-        }
-    }
-
-    private suspend fun Path.process(
-        configuration: ProcessorConfiguration,
-        recursive: Boolean,
-        parent: Path,
+    private fun WorkQueue.submit(
+        path: Path,
         iconConfiguration: IconParserConfigurationImpl,
-        errors: MutableMap<Path, Throwable>,
-    ): Pair<Path, Path>? {
-        logger.debug("Enqueued $path to parse.")
-        val output = buildOutput(configuration, recursive, this, parent)
-        val destinationPackage =
-            buildDestinationPackage(configuration, recursive, this, parent)
-        return try {
-            logger.debug("Parsing $path.")
-            val processedFiles = withContext(Dispatchers.IO) {
-                processor.run(
-                    path = toFile().absolutePath,
-                    output = output.toFile().absolutePath,
-                    config = ParserConfig(
-                        pkg = destinationPackage,
-                        optimize = configuration.optimize.get(),
-                        minified = iconConfiguration.minified.get(),
-                        theme = iconConfiguration.theme.get(),
-                        receiverType = iconConfiguration.receiverType.orNull,
-                        addToMaterial = iconConfiguration.addToMaterialIcons.get(),
-                        noPreview = iconConfiguration.noPreview.get(),
-                        makeInternal = iconConfiguration.iconVisibility.get() == IconVisibility.Internal,
-                        exclude = iconConfiguration.exclude.orNull,
-                        kmpPreview = isKmp,
-                        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): remove when logger migration
-                        //  is done.
-                        silent = true,
-                        keepTempFolder = true,
-                    ),
-                    recursive = false, // recursive search is handled by the plugin.
-                    maxDepth = configuration.maxDepth.get(),
-                    mapIconName = iconConfiguration.mapIconNameTo.orNull,
-                )
-            }
-            processedFiles.singleOrNull()?.let { this to it }
-        } catch (e: ExitProgramException) {
-            errors += this to requireNotNull(e.cause ?: e)
-            null
-        } catch (e: ParserException) {
-            errors += this to e
-            null
+        output: Path,
+        destinationPackage: String,
+        configuration: ProcessorConfiguration,
+        resultFile: File
+    ) {
+        val baseName = path.name.substringBeforeLast('.')
+        val mappedName = iconConfiguration.mapIconNameTo.orNull?.invoke(baseName) ?: baseName
+        val finalFile = (output / "${mappedName.pascalCase()}.kt").toFile()
+        submit(IconParsingWorkAction::class.java) {
+            inputFilePath.set(path.toFile().absolutePath)
+            outputDirPath.set(finalFile.absolutePath)
+            this.destinationPackage.set(destinationPackage)
+            this.recursive.set(false) // recursive handled at plugin level
+            maxDepth.set(configuration.maxDepth.get())
+            optimize.set(configuration.optimize.get())
+            minified.set(iconConfiguration.minified.get())
+            theme.set(iconConfiguration.theme.get())
+            receiverType.set(iconConfiguration.receiverType.orNull)
+            addToMaterial.set(iconConfiguration.addToMaterialIcons.get())
+            noPreview.set(iconConfiguration.noPreview.get())
+            makeInternal.set(iconConfiguration.iconVisibility.get() == IconVisibility.Internal)
+            excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
+            kmpPreview.set(isKmp)
+            resultFilePath.set(resultFile.absolutePath)
         }
     }
 
@@ -331,7 +333,6 @@ internal fun Project.registerParseSvgToComposeIconTask(
         "parseSvgToComposeIcon",
         ParseSvgToComposeIconTask::class.java,
     ) {
-        doLast { dispose() }
         extension.applyCommonIfDefined()
         val errors = extension.validate()
         logger.debug("errors = {}", errors)

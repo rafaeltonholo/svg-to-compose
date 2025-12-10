@@ -9,8 +9,9 @@ import okio.Path.Companion.toPath
 class TempFileWriter(
     private val logger: Logger,
     private val fileManager: FileManager,
+    baseDirectory: Path? = null,
 ) {
-    private val tempFolder = S2C_TEMP_FOLDER.toPath()
+    private val tempFolder: Path = (baseDirectory ?: S2C_TEMP_FOLDER.toPath())
 
     fun create(
         file: Path,
