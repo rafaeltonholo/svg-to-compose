@@ -34,6 +34,7 @@ refer to the full documentation:
 - [Usage](#usage)
     - [Using the Command-line Tool](#using-the-command-line-tool)
     - [Using the Gradle Plugin](#using-the-gradle-plugin)
+- [Contributing & Community](#contributing--community)
 - [License](#license)
 
 ## Why?
@@ -346,6 +347,17 @@ s2c -o <app path>/app/src/main/java/dev/tonholo/composeicons/ui/icon/Illustratio
 Input file: ![illustration.svg](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/svg/illustration.svg)
 
 Output file: [Illustration.svg.optimized.kt](https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/refs/heads/main/samples/Illustration.svg.optimized.kt)
+
+## Contributing & Community
+
+Contributions are welcome! Please read the
+[CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, coding standards,
+branching and PR guidelines, and the PR checklist. By participating in this
+project, you agree to abide by our
+[Code of Conduct](./CODE_OF_CONDUCT.md).
+
+Have an idea or found a bug? Open an issue:
+https://github.com/rafaeltonholo/svg-to-compose/issues/new/choose
 
 ## License
 

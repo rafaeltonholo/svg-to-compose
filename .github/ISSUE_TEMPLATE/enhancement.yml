@@ -1,0 +1,36 @@
+name: Enhancement suggestion
+description: Suggest an idea for this project
+title: "[Enhancement]: "
+labels: ["enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an enhancement! Please fill out the form below to help us understand your idea.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Use case / problem
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when [...]
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the solution you'd like.
+      placeholder: I would like to have [...]
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any alternative solutions or features you've considered.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
