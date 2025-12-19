@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.gradle.dsl
 
-import dev.tonholo.s2c.annotations.ExperimentalParallelProcessing
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.provider.Property
@@ -50,7 +49,6 @@ abstract class SvgToComposeExtension {
      *                     A value of 0 or 1 disables parallel processing.
      */
     @Suppress("UnusedReceiverParameter")
-    @ExperimentalParallelProcessing
     fun NamedDomainObjectContainer<ProcessorConfiguration>.useParallelism(parallelism: Int) {
         require(parallelism >= 0) { "Parallelism must be non-negative, got: $parallelism" }
         maxParallelExecutions.set(parallelism)

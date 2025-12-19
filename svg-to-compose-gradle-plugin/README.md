@@ -206,21 +206,25 @@ Within the `icons` block, you can customize how icons are processed:
 - **exclude(vararg Regex)**: Excludes icons based on filename patterns.
 - **persist()**: Persists generated files in the source set (use with caution).
 
-### Enabling Parallel Processing (Experimental)
+### Parallel Processing
 
-You can enable experimental parallel processing to speed up icon generation:
+You can enable parallel processing to speed up icon generation. The Gradle 
+plugin uses the Gradle Worker API under the hood.
 
 ```kotlin
 svgToCompose {
     processor {
-        @OptIn(dev.tonholo.s2c.annotations.ExperimentalParallelProcessing)
+        // Process up to 4 icons in parallel (per task chunk)
         useParallelism(parallelism = 4)
         // Processor configurations...
     }
 }
 ```
 
-**Note**: This feature is experimental and may have unexpected behavior.
+Notes:
+- The effective parallelism is bounded by Gradle's global `--max-workers`.
+- If `parallelism` is `0` or `1` (default), processing runs sequentially.
+- Caching is preserved by the plugin's internal cache; unchanged icons are skipped.
 
 ### Persistent Generation
 

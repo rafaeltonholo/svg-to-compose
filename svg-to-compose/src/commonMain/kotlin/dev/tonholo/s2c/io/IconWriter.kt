@@ -29,7 +29,10 @@ class IconWriter(
                     logger.verbose("Checking if parent directory exists.")
                     if (fileManager.exists(parent).not()) {
                         logger.output("Output parent's directory doesn't exists. Creating.")
-                        fileManager.createDirectories(parent, mustCreate = true)
+                        // Use idempotent directory creation to avoid races under parallel workers
+                        // If another worker creates the directory between the exists() check
+                        // and this call, createDirectories with mustCreate=false is a no-op.
+                        fileManager.createDirectories(parent, mustCreate = false)
                     }
                 }
             }
