@@ -180,7 +180,7 @@ Once it's filed:
   well as possibly other tags (such as `critical`), and the issue will be left
   to be [implemented by someone](#working-on-code).
 
-<!-- You might want to create an issue template for bugs and errors that can be used as a guide and that defines the structure of the information to be included. If you do so, reference it here in the description. -->
+You can use our [bug report template](.github/ISSUE_TEMPLATE/bug_report.yml) to help you structure your report.
 
 ## Suggesting Enhancements
 
@@ -227,7 +227,7 @@ as [GitHub issues](https://github.com/rafaeltonholo/svg-to-compose/issues).
   You may also want to point out the other projects that solved it better and
   which could serve as inspiration.
 
-<!-- You might want to create an issue template for enhancement suggestions that can be used as a guide and that defines the structure of the information to be included. If you do so, reference it here in the description. -->
+You can use our [enhancement suggestion template](.github/ISSUE_TEMPLATE/enhancement.yml) to help you structure your request.
 
 ## Working on Code
 

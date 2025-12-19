@@ -1,0 +1,64 @@
+name: Bug report
+description: Create a report to help us improve
+title: "[Bug]: "
+labels: [ "bug" ]
+assignees: [ ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the form below to help us understand and reproduce the issue.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug description
+      description: Clear and concise description of what the bug is.
+      placeholder: I'm seeing [...]
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Reproduction steps
+      description: How do we reproduce the bug?
+      placeholder: |
+        1. Run s2c with [...]
+        2. See error [...]
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: I expected [...]
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        - OS: [e.g. macOS 14.2]
+        - svg-to-compose version: [e.g. 2.1.0]
+        - Android SDK version (if applicable): [e.g. 34]
+        - CLI command (if applicable): [e.g. ./s2c -p my.pkg -t my.pk.theme.Theme -o output.kt input.svg ]
+        - Gradle Plugin configuration (if applicable):
+      placeholder: |
+        - OS: 
+        - svg-to-compose version: 
+        - Android SDK version: 
+        - CLI command (if applicable):
+        - Gradle Plugin configuration (if applicable):
+    validations:
+      required: true
+  - type: textarea
+    id: input-output
+    attributes:
+      label: Input and Output
+      description: Please provide your input SVG/AVG and the output/error log if possible.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the bug report here.
