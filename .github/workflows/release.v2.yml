@@ -71,7 +71,7 @@ jobs:
         continue-on-error: false
 
       - name: Uploading macos Arm64 binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: matrix.os == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosArm64-binaries # add tag to file name.
@@ -79,7 +79,7 @@ jobs:
           if-no-files-found: error
 
       - name: Uploading macos x64 binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: matrix.os == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
@@ -87,7 +87,7 @@ jobs:
           if-no-files-found: error
 
       - name: Uploading Linux binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: matrix.os == 'ubuntu-latest'
         with:
           name: ${{ env.file-name }}-linuxX64-binaries # add tag to file name.
@@ -95,7 +95,7 @@ jobs:
           if-no-files-found: error
 
       - name: Uploading Windows binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: matrix.os == 'windows-latest'
         with:
           name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
@@ -103,7 +103,7 @@ jobs:
           if-no-files-found: error
 
       - name: Uploading script
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: matrix.os == 'ubuntu-latest' # should only run once.
         with:
           name: s2c
