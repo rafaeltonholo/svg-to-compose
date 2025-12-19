@@ -123,13 +123,13 @@ jobs:
     needs: create-release-binaries
     steps:
       - name: Download release artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           pattern: ${{ env.file-name }}-*-binaries
           merge-multiple: false
       - name: Download script artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           name: s2c
