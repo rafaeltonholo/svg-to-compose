@@ -5,7 +5,7 @@ androidxComposeCompiler = "1.5.10"
 compose-bom = "2025.09.00"
 core-ktx = "1.17.0"
 googleMaterial = "1.13.0"
-kotlin = "2.1.20"
+kotlin = "2.3.0"
 lifecycle-runtime-ktx = "2.9.4"
 s2c = "2.1.2"
 
