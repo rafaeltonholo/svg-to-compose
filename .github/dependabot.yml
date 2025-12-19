@@ -1,0 +1,41 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "type: dependency"
+      - "type: gradle"
+
+  - package-ecosystem: "gradle"
+    directory: "/playground"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "type: dependency"
+      - "type: gradle"
+    groups:
+      android-playground-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "gradle"
+    directory: "/playground-kmp"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "type: dependency"
+      - "type: gradle"
+    groups:
+      kmp-playground-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels:
+      - "type: dependency"
+      - "type: gradle"
+    schedule:
+      interval: "monthly"
