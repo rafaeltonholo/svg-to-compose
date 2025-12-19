@@ -39,14 +39,13 @@ abstract class SvgToComposeExtension {
     }
 
     /**
-     * Enables experimental parallel processing of SVG/XML icons.
+     * Configure the maximum number of simultaneous icon-processing threads.
      *
-     * When enabled, icons are processed in parallel, limited by the specified [parallelism] level.
-     * This can significantly speed up the conversion process, especially for large projects with
-     * many icons.
+     * When set to 0 or 1, parallel processing is effectively disabled; values greater than 1
+     * allow multiple icons to be processed concurrently up to the specified limit.
      *
-     * @param parallelism The maximum number of threads to use for parallel processing.
-     *                     A value of 0 or 1 disables parallel processing.
+     * @param parallelism The maximum number of threads to use for processing icons.
+     * @throws IllegalArgumentException if [parallelism] is negative.
      */
     @Suppress("UnusedReceiverParameter")
     fun NamedDomainObjectContainer<ProcessorConfiguration>.useParallelism(parallelism: Int) {

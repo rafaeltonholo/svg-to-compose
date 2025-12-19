@@ -134,6 +134,13 @@ sealed class Optimizer(
         override val command: String = "svgo"
         override val allowedExtension: String = FileType.Svg.extension
 
+        /**
+         * Optimize the given SVG file using the SVGO CLI and return the path to the created optimized file.
+         *
+         * @param file Path to the SVG file to optimize.
+         * @return Path to the optimized SVG file placed next to the original file (filename suffixed with `.optimized.svg`).
+         * @throws OptimizationException if SVGO configuration cannot be created or written, if the file's parent directory cannot be determined, or if the SVGO CLI fails to perform the optimization.
+         */
         override fun run(file: Path): Path {
             val svgoConfigFilename = "svgo-config.mjs"
             val tempFolder = S2C_TEMP_FOLDER.toPath()

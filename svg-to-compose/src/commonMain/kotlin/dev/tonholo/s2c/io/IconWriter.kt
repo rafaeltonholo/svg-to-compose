@@ -10,6 +10,18 @@ class IconWriter(
     private val logger: Logger,
     private val fileManager: FileManager,
 ) {
+    /**
+     * Writes an icon Kotlin file to the given output path, creating missing directories as needed.
+     *
+     * If `output` is a directory, the file named "<IconNameInPascalCase>.kt" will be created inside it;
+     * if `output` is a file, that path will be used directly. Missing directories are created (idempotently
+     * for parent creation to tolerate concurrent workers).
+     *
+     * @param iconName The icon name; converted to PascalCase and used as the file name when `output` is a directory.
+     * @param fileContents The Kotlin source content to write into the target file.
+     * @param output The target file or directory path. If a directory, the final file will be created inside it.
+     * @return The path of the file that was written.
+     */
     fun write(
         iconName: String,
         fileContents: String,
