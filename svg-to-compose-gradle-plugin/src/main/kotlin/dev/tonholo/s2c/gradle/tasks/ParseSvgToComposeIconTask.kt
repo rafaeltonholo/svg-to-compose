@@ -142,6 +142,13 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             )
         ).get().asFile
 
+    /**
+     * Executes the task: processes SVG files for each configured processor, updates the cache, and fails the build if parsing errors occur.
+     *
+     * The task initializes the cache, processes files for each configuration (collecting produced outputs and any errors), persists the updated cache, and throws an ExitProgramException when one or more icons fail to parse. The processor is disposed when execution finishes.
+     *
+     * @throws ExitProgramException when one or more icons fail to parse; the exception contains the original causes. 
+     */
     @TaskAction
     fun run() {
         try {
@@ -188,6 +195,20 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
+    /**
+     * Processes the given SVG files by delegating parsing tasks to Gradle workers and collecting their results.
+     *
+     * Submits a work item for each input path using the provided processor and icon parsing configuration,
+     * then reads per-item result files and records produced outputs or errors into the supplied maps.
+     *
+     * @param filesToProcess The list of input file paths to process.
+     * @param configuration The processor configuration that determines output directory and processing flags.
+     * @param recursive Whether processing should preserve subdirectory structure relative to [parent].
+     * @param parent The base input directory used to compute mirrored output paths when [recursive] is true.
+     * @param iconConfiguration Icon parser-specific options that affect generation (e.g., name mapping, themes).
+     * @param errors Mutable map populated with a Throwable for each input path that failed processing.
+     * @param outputFiles Mutable map populated with the generated output file path for each successfully processed input path.
+     */
     private fun processFiles(
         filesToProcess: List<Path>,
         configuration: ProcessorConfiguration,
@@ -251,6 +272,20 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         resultsDir.parentFile.deleteRecursively()
     }
 
+    /**
+     * Enqueues a worker task to parse a single SVG file into a generated Kotlin icon file.
+     *
+     * Configures and submits an IconParsingWorkAction with all parsing and generation options derived
+     * from the provided configuration and iconConfiguration, and writes the work result to the
+     * provided resultFile.
+     *
+     * @param path The path to the source SVG file to parse.
+     * @param iconConfiguration Icon-specific parsing options and name-mapping.
+     * @param output Directory where the generated Kotlin file should be placed.
+     * @param destinationPackage Base Kotlin package for the generated file; may be extended by the task.
+     * @param configuration Processor-level options that affect parsing behavior.
+     * @param resultFile File where the worker action must write its result properties for later collection.
+     */
     private fun WorkQueue.submit(
         path: Path,
         iconConfiguration: IconParserConfigurationImpl,
@@ -325,6 +360,13 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     }
 }
 
+/**
+ * Registers and configures the "parseSvgToComposeIcon" Gradle task and wires its generated sources into the project's Kotlin source sets.
+ *
+ * Validates the provided extension configuration, registers the ParseSvgToComposeIconTask with values from the extension (including KMP mode and parallelism), makes the task a dependency of Kotlin compilation, and adds the task's output directory to either the common Kotlin source set (for Kotlin Multiplatform projects) or the Android main Kotlin source set.
+ *
+ * @param extension The SvgToComposeExtension providing plugin configuration and processor configurations to use for the task.
+ */
 internal fun Project.registerParseSvgToComposeIconTask(
     extension: SvgToComposeExtension,
 ) {

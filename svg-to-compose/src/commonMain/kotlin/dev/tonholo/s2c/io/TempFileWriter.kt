@@ -13,6 +13,12 @@ class TempFileWriter(
 ) {
     private val tempFolder: Path = (baseDirectory ?: S2C_TEMP_FOLDER.toPath())
 
+    /**
+     * Creates a temporary copy of the given file inside the writer's temp folder and returns the created file path.
+     *
+     * @param file The source file to copy into the temporary folder.
+     * @return The path to the copied temporary file.
+     */
     fun create(
         file: Path,
     ): Path = logger.debugSection("Creating temporary file") {

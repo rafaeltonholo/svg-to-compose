@@ -35,6 +35,14 @@ import org.gradle.workers.WorkAction
  * @see IconParsingWorkActionResult for the structure of the output result.
  */
 internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters> {
+    /**
+     * Executes the work action to parse a single SVG/XML icon into a Compose ImageVector and persist the result.
+     *
+     * Sets up the per-work-item environment (logger, file manager, isolated temporary folder, and processor),
+     * runs the processor for the input file configured from task parameters, and writes an IconParsingWorkActionResult
+     * to the configured result file. Ensures processor resources are disposed and maps processing outcomes and
+     * exceptions into success or error results referencing the original input path.
+     */
     override fun execute() {
         val gradleLogger = Logging.getLogger(IconParsingWorkAction::class.simpleName)
         val logger = Logger(gradleLogger)
@@ -84,6 +92,15 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         result.store(resultFilePath = parameters.resultFilePath)
     }
 
+    /**
+     * Builds a ParserConfig from the current IconParsingParameters for use by the processor.
+     *
+     * The resulting config mirrors the parameter values; `excludePattern` is converted to a `Regex`
+     * if present, `receiverType` is taken as nullable, and `silent` and `keepTempFolder` are set to
+     * `true`.
+     *
+     * @return A ParserConfig populated from these IconParsingParameters.
+     */
     private fun IconParsingParameters.toConfig(): ParserConfig = ParserConfig(
         pkg = destinationPackage.get(),
         optimize = optimize.get(),
