@@ -7,10 +7,12 @@ import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
 import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import java.io.File
 import org.gradle.api.logging.Logger as GradleLogger
 
 internal class DependencyModule(
@@ -18,6 +20,7 @@ internal class DependencyModule(
     private val providerFactory: ProviderFactory,
     private val logger: GradleLogger,
     private val buildDirectory: DirectoryProperty,
+    private val tempDirectory: File,
 ) {
     val providers = mapOf<Class<*>, () -> Provider<out Any>>(
         Logger::class.java to ::provideLogger,
@@ -48,7 +51,7 @@ internal class DependencyModule(
                 logger = get(),
                 fileManager = get(),
                 iconWriter = IconWriter(get(), get()),
-                tempFileWriter = TempFileWriter(get(), get()),
+                tempFileWriter = TempFileWriter(get(), get(), tempDirectory.toOkioPath()),
             )
         }
 

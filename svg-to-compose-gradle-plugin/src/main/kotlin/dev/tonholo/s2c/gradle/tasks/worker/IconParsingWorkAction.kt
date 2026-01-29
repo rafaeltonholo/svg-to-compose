@@ -40,7 +40,8 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         val logger = Logger(gradleLogger)
         val fileManager = FileManager(okio.FileSystem.SYSTEM, logger)
         // Use an isolated temp directory per work item to avoid races between workers
-        val isolatedTempRoot = (".s2c/temp/gradle-worker/" + UUID.randomUUID().toString()).toPath()
+        val isolatedTempRoot = parameters.tempDirPath.get().toPath() /
+            (".s2c/temp/gradle-worker/" + UUID.randomUUID().toString()).toPath()
         val processor = Processor(
             logger = logger,
             fileManager = fileManager,
