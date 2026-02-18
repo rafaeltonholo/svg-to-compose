@@ -11,6 +11,7 @@ import org.gradle.workers.WorkParameters
 internal interface IconParsingParameters : WorkParameters {
     val inputFilePath: Property<String>
     val outputDirPath: Property<String>
+    val tempDirPath: Property<String>
     val destinationPackage: Property<String>
     val optimize: Property<Boolean>
     val minified: Property<Boolean>

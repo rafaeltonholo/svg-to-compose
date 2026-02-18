@@ -62,6 +62,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 providerFactory = providerFactory,
                 logger = Logging.getLogger("ParseSvgToComposeIconTask"),
                 buildDirectory = projectLayout.buildDirectory,
+                tempDirectory = temporaryDir,
             ),
         )
         .get()
@@ -274,6 +275,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         submit(IconParsingWorkAction::class.java) {
             inputFilePath.set(path.toFile().absolutePath)
             outputDirPath.set(finalFile.absolutePath)
+            tempDirPath.set(temporaryDir.absolutePath)
             this.destinationPackage.set(destinationPackage)
             this.recursive.set(false) // recursive handled at plugin level
             maxDepth.set(configuration.maxDepth.get())
