@@ -1,0 +1,8 @@
+name: Gradle Plugin Integrity check
+description: Runs functional tests to verify the Gradle plugin converts SVG/AVG correctly
+runs:
+  using: composite
+  steps:
+    - name: Run Gradle Plugin functional tests
+      shell: bash
+      run: ./gradlew :svg-to-compose-gradle-plugin:test

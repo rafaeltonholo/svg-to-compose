@@ -9,7 +9,7 @@ jobs:
     steps:
         - name: Checkout the repo
           uses: actions/checkout@v6
-  
+
         - name: Prepares environment for building
           uses: ./.github/actions/setup
   
@@ -76,4 +76,9 @@ jobs:
           uses: ./.github/actions/cli-integrity-check
           with:
             type: xml
+          continue-on-error: false
+
+        - name: Gradle Plugin Integrity check
+          if: matrix.os == 'ubuntu-latest'
+          uses: ./.github/actions/gradle-plugin-integrity-check
           continue-on-error: false
