@@ -1,14 +1,14 @@
 package dev.tonholo.s2c.gradle
 
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
 
 class Svg2ComposePluginFunctionalTest {
     private val projectRoot = File(System.getProperty("user.dir")).parentFile
@@ -64,9 +64,11 @@ class Svg2ComposePluginFunctionalTest {
     private fun copyIconsToProject(projectDir: File, type: String) {
         val iconsDir = projectDir.resolve("icons")
         iconsDir.mkdirs()
-        val resourceDir = File(requireNotNull(javaClass.classLoader.getResource(type)) {
-            "Test resource directory not found: $type"
-        }.toURI())
+        val resourceDir = File(
+            requireNotNull(javaClass.classLoader.getResource(type)) {
+                "Test resource directory not found: $type"
+            }.toURI()
+        )
         resourceDir.listFiles().orEmpty().forEach { file ->
             file.copyTo(iconsDir.resolve(file.name))
         }
