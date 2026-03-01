@@ -14,4 +14,7 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
     compileOnly(gradleApi())
     compileOnly(gradleKotlinDsl())
+
+    testImplementation(gradleTestKit())
+    testImplementation(kotlin("test"))
 }

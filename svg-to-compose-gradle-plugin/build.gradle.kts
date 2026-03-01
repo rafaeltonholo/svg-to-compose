@@ -20,6 +20,25 @@ gradlePlugin {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+    }
+
+    sourceSets {
+        test {
+            resources.srcDirs(rootProject.layout.projectDirectory.dir("samples"))
+        }
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
+        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
+    }
+}
+
 mavenPublishing {
     configure(
         GradlePlugin(
