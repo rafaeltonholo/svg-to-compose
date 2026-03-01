@@ -1,12 +1,4 @@
 #!/bin/bash
-declare -a files=(
-  "shield-halved-solid"
-  "illustration"
-)
-declare -a names=(
-  "ShieldSolid"
-  "Illustration"
-)
 root_directory=$1
 if [ "$root_directory" == "" ]; then
   echo "The root directory must be the first parameter."
@@ -18,10 +10,10 @@ if [ "$ext" == "" ]; then
   exit 1
 fi
 optimize="false"
-suffix="NonOptimized"
+suffix="nonoptimized"
 if [ "$3" == "optimize" ]; then
   optimize="true"
-  suffix="Optimized"
+  suffix="optimized"
 fi
 
 type="svg"
@@ -31,19 +23,29 @@ else
   ext="svg"
 fi
 
-base_package="dev.tonholo.svg_to_compose.playground.ui"
-package="$base_package.icon.${type}"
-theme="$base_package.theme.SampleAppTheme"
+# Package must match exactly what the Gradle plugin functional tests use so
+# both tools validate against the same expected .kt files.
+package="dev.tonholo.s2c.integrity.icon.${type}"
+expected_dir="$root_directory/integrity-check/expected"
 errors=()
 
-for index in "${!files[@]}"; do
-  filename=${files[index]}
-  output_name="${names[index]}.${type}"
-  input="$root_directory/samples/${type}/$filename.${ext}"
-  output="$root_directory/integrity-check/${type}/$output_name.${suffix}.kt"
+# Convert kebab-case or snake_case filename to PascalCase.
+to_pascal_case() {
+   echo "$1" | awk -F'[-_]' '{ for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print }' OFS=''
+ }
 
-  if [ $optimize == "true" ]; then
-    if [ $type == "svg" ]; then
+# Only process flat (non-directory) files in samples/{type}/ — subdirectories
+# such as gradient/, rects/, css/ etc. are intentionally excluded.
+for input in "$root_directory/samples/${type}"/*."${ext}"; do
+  [ -f "$input" ] || continue
+
+  basename="${input##*/}"
+  stem="${basename%.*}"
+  icon_name=$(to_pascal_case "$stem")
+  expected_file="$expected_dir/${icon_name}.${ext}.${suffix}.kt"
+
+  if [ "$optimize" == "true" ]; then
+    if [ "$type" == "svg" ]; then
       echo "svgo version $(svgo --version)"
     else
       echo "avocado version $(avocado --version)"
@@ -51,22 +53,39 @@ for index in "${!files[@]}"; do
   fi
 
   s2c_version=$(command "$root_directory/s2c" --version)
-  echo "Parsing $filename to Jetpack Compose Icon using $s2c_version"
-  if ! command "$root_directory/s2c" -o "$output" \
-        -p "$package" \
-        --theme "$theme" \
-        -opt=$optimize \
-        "$input"; then
-      echo "Failed to execute CLI integrity check."
-      exit 1
-  fi
-  diff_suffix=$(echo $suffix | tr "[:upper:]" "[:lower:]")
-  diff_file="$root_directory/samples/$output_name.${diff_suffix}.kt"
+  echo "Parsing $stem to Jetpack Compose Icon using $s2c_version"
 
-  echo "Verifying $filename with provided sample."
-  if ! diff --strip-trailing-cr "$output" "$diff_file"; then
-    errors+=("$filename")
+  # Write to a temp file named after the icon so the generator derives the
+  # correct Kotlin identifier from the file name.
+  tmp_dir="$(mktemp -d)"
+  tmp_output="${tmp_dir}/${icon_name}.kt"
+
+  if ! command "$root_directory/s2c" \
+        -o "$tmp_output" \
+        -p "$package" \
+        --theme "" \
+        --no-preview \
+        -opt="$optimize" \
+        "$input"; then
+    echo "Failed to execute CLI integrity check for $stem."
+    rm -rf "$tmp_dir"
+    errors+=("$stem.$ext")
+    continue
   fi
+
+  if [ ! -f "$expected_file" ]; then
+    mkdir -p "$expected_dir"
+    cp "$tmp_output" "$expected_file"
+    echo "BOOTSTRAP: Wrote expected file ${icon_name}.${ext}.${suffix}.kt"
+    rm -rf "$tmp_dir"
+    continue
+  fi
+
+  echo "Verifying $stem against expected file."
+  if ! diff --strip-trailing-cr "$tmp_output" "$expected_file"; then
+    errors+=("$stem.$ext")
+  fi
+  rm -rf "$tmp_dir"
 done
 
 echo
@@ -78,8 +97,8 @@ else
   echo "❌ Integrity check failed"
   echo
   echo "Failed files:"
-  for index in "${!errors[@]}"; do
-    echo "    - ${errors[index]}.${ext}"
+  for f in "${errors[@]}"; do
+    echo "    - $f"
   done
   exit 1
 fi

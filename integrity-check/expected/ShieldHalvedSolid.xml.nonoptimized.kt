@@ -1,37 +1,27 @@
-package dev.tonholo.svg_to_compose.playground.ui.icon.svg
+package dev.tonholo.s2c.integrity.icon.avg
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val ShieldSolidSvgNonOptimized: ImageVector
+val ShieldHalvedSolid: ImageVector
     get() {
-        val current = _shieldSolidSvgNonOptimized
+        val current = _shieldHalvedSolid
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme.ShieldSolidSvgNonOptimized",
+            name = ".ShieldHalvedSolid",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
             viewportHeight = 512.0f,
         ).apply {
-            // M256 0 c4.6 0 9.2 1 13.4 2.9 L457.7 82.8 c22 9.3 38.4 31 38.3 57.2 c-.5 99.2 -41.3 280.7 -213.6 363.2 c-16.7 8 -36.1 8 -52.8 0 C57.3 420.7 16.5 239.2 16 140 c-.1 -26.2 16.3 -47.9 38.3 -57.2 L242.7 2.9 C246.8 1 251.4 0 256 0z m0 66.8 V444.8 C394 378 431.1 230.1 432 141.4 L256 66.8 l0 0z
+            // M256 0 c4.6 0 9.2 1 13.4 2.9 L457.7 82.8 c22 9.3 38.4 31 38.3 57.2 -0.5 99.2 -41.3 280.7 -213.6 363.2 -16.7 8 -36.1 8 -52.8 0 C57.3 420.7 16.5 239.2 16 140 c-0.1 -26.2 16.3 -47.9 38.3 -57.2 L242.7 2.9 C246.8 1 251.4 0 256 0z m0 66.8 V444.8 C394 378 431.1 230.1 432 141.4 L256 66.8 l0 0z
             path(
                 fill = SolidColor(Color(0xFF1E3050)),
                 fillAlpha = 1.0f,
-                strokeAlpha = 1.0f,
             ) {
                 // M 256 0
                 moveTo(x = 256.0f, y = 0.0f)
@@ -122,27 +112,8 @@ val ShieldSolidSvgNonOptimized: ImageVector
                 lineToRelative(dx = 0.0f, dy = 0.0f)
                 close()
             }
-        }.build().also { _shieldSolidSvgNonOptimized = it }
+        }.build().also { _shieldHalvedSolid = it }
     }
-
-@Preview
-@Composable
-private fun IconPreview() {
-    dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                imageVector = ShieldSolidSvgNonOptimized,
-                contentDescription = null,
-                modifier = Modifier
-                    .width((512.0).dp)
-                    .height((512.0).dp),
-            )
-        }
-    }
-}
 
 @Suppress("ObjectPropertyName")
-private var _shieldSolidSvgNonOptimized: ImageVector? = null
+private var _shieldHalvedSolid: ImageVector? = null
