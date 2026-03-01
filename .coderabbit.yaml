@@ -11,6 +11,7 @@ reviews:
     - "!**/samples/**"
     - "!**/sampleApp/**"
     - "!**/sample-app/**"
+    - "!**/integrity-check/expected/**"
     - "!**/playground/**"
     - "!**/playground-kmp/**"
     - "!*.xml"
