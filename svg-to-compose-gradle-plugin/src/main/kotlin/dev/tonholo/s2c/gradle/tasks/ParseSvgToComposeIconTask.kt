@@ -27,10 +27,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -54,7 +55,6 @@ internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
-    private val gradle: Gradle,
 ) : DefaultTask() {
     @Transient
     private val graph: GradlePluginGraph by lazy {
@@ -76,8 +76,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
 
-    @Transient
-    private val logLevel: LogLevel by lazy { gradle.startParameter.logLevel }
+    @get:Input
+    internal abstract val logLevel: Property<LogLevel>
 
     init {
         group = "svg-to-compose"
@@ -148,7 +148,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
-            logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
+            logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
             cacheManager.initialize(configurations.asMap)
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
@@ -381,6 +381,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         isKmp = kmpExtension != null
         configurations = extension.configurations
         maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
+        logLevel.set(project.gradle.startParameter.logLevel)
     }
 
     // Register this task as a dependency of KotlinCompile
