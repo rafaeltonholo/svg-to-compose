@@ -1,0 +1,4 @@
+interface:
+  display_name: "SVG Spec & Transforms"
+  short_description: "Resolve SVG/AVG spec and transform issues"
+  default_prompt: "Use $svg-spec to resolve spec-compliant SVG/AVG parsing, path, transform, gradient, or CSS behavior."

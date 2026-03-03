@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unit Test Author"
+  short_description: "Write reliable Kotlin unit tests fast"
+  default_prompt: "Use $unit-test-author to add focused unit tests for this change."
