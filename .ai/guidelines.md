@@ -203,6 +203,41 @@ Before modifying code in a module, read its `AGENTS.md`:
   configuration, not by the release workflows above.
 - All CI checks must pass before merging.
 
+## Golden Samples
+
+The `samples/` directory contains reference ("golden") files for regression testing.
+
+### Structure
+
+- **Source inputs**: `samples/svg/` (SVG files) and `samples/avg/` (AVG/XML files)
+- **Golden outputs**: `samples/*.kt` files
+
+### Naming Convention
+
+```
+<IconName>.<format>.<optimized|nonoptimized>.kt
+```
+
+Examples: `Illustration.svg.optimized.kt`, `ShieldSolid.avg.nonoptimized.kt`
+
+### Comparing Against Golden Files
+
+After modifying the parser or generator, regenerate output and diff against golden files:
+
+```bash
+./s2c -o /tmp/Test.kt -p dev.test samples/svg/attention-filled.svg
+diff /tmp/Test.kt samples/AttentionFilled.svg.nonoptimized.kt
+```
+
+### Updating Golden Files
+
+When a change intentionally alters output, regenerate and commit:
+
+```bash
+./s2c -o samples/Illustration.svg.nonoptimized.kt -p dev.tonholo.s2c.parser.ast samples/svg/illustration.svg
+# Review the diff, then commit the updated .kt file
+```
+
 ## Prerequisites
 
 - JDK 11+ (17 recommended)

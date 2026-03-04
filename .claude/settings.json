@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "svg-to-compose-tools": {
+      "command": ".ai/tools/mcp-vector-server/.venv/bin/s2c-mcp-vector-server"
+    }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -q '\\.kt$'; then ./gradlew detekt --quiet 2>/dev/null; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

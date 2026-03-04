@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(bash:*)",
+      "Bash(timeout 10 .ai/tools/mcp-vector-server/.venv/bin/s2c-mcp-vector-server:*)",
+      "Bash(printf:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}
