@@ -52,3 +52,9 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Python (for local MCP server) ###
+*/**/__pycache__/
+*/**/*.py[cod]
+*.egg-info/
+.venv/

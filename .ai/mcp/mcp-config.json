@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "svg-to-compose-tools": {
+      "command": ".ai/tools/mcp-vector-server/.venv/bin/s2c-mcp-vector-server"
+    }
+  }
+}
