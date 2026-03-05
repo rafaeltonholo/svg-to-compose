@@ -21,7 +21,7 @@ runs:
       with:
         path: |
           ~/.npm/**/*
-        key: npm-cache-${{ inputs.os }}
+        key: npm-cache-${{ inputs.os }}-svgo-${{ inputs.svgo-version }}-avocado-${{ inputs.avocado-version }}
     - uses: actions/setup-node@v4
       with:
         node-version: 20
