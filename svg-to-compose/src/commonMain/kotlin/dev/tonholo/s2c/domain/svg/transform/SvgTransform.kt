@@ -4,33 +4,33 @@ import dev.tonholo.s2c.geom.AffineTransformation
 import kotlin.jvm.JvmInline
 
 private val transformsMap = mapOf(
-    "matrix" to { args: List<Float> ->
+    "matrix" to { args: List<Double> ->
         @Suppress("MagicNumber")
         AffineTransformation.Matrix(
-            floatArrayOf(args[0], args[2], args[4]),
-            floatArrayOf(args[1], args[3], args[5]),
-            floatArrayOf(0f, 0f, 1f),
+            doubleArrayOf(args[0], args[2], args[4]),
+            doubleArrayOf(args[1], args[3], args[5]),
+            doubleArrayOf(0.0, 0.0, 1.0),
         )
     },
-    "translate" to { args: List<Float> ->
-        AffineTransformation.Translate(tx = args[0], ty = args.getOrElse(1) { 0f })
+    "translate" to { args: List<Double> ->
+        AffineTransformation.Translate(tx = args[0], ty = args.getOrElse(1) { 0.0 })
     },
-    "scale" to { args: List<Float> ->
+    "scale" to { args: List<Double> ->
         AffineTransformation.Scale(sx = args[0], sy = args.getOrElse(index = 1, defaultValue = { args[0] }))
     },
-    "rotate" to { args: List<Float> ->
+    "rotate" to { args: List<Double> ->
         AffineTransformation.Rotate(
             angle = args[0],
-            centerX = args.getOrElse(index = 1, defaultValue = { 0f }),
-            centerY = args.getOrElse(index = 2, defaultValue = { 0f }),
+            centerX = args.getOrElse(index = 1, defaultValue = { 0.0 }),
+            centerY = args.getOrElse(index = 2, defaultValue = { 0.0 }),
         )
     },
-    "skewX" to { args: List<Float> ->
+    "skewX" to { args: List<Double> ->
         AffineTransformation.SkewX(
             angle = args[0],
         )
     },
-    "skewY" to { args: List<Float> ->
+    "skewY" to { args: List<Double> ->
         AffineTransformation.SkewY(
             angle = args[0],
         )
@@ -46,7 +46,7 @@ value class SvgTransform(val value: String) {
             }
     }
 
-    private inline fun transforms(): List<Pair<String, List<Float>>> = value
+    private fun transforms(): List<Pair<String, List<Double>>> = value
         .split(REGEX_TRANSFORM_SPLIT.toRegex())
         .mapNotNull { transform ->
             if (transform.isBlank()) {
@@ -59,8 +59,8 @@ value class SvgTransform(val value: String) {
                     .removeSuffix(")")
                     .split(", ", ", ", " ", ",")
                     .map {
-                        requireNotNull(it.toFloatOrNull()) {
-                            "unable to parse value $it to Float. transform = $value"
+                        requireNotNull(it.toDoubleOrNull()) {
+                            "unable to parse value $it to Double. transform = $value"
                         }
                     }
 

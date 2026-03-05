@@ -1,7 +1,7 @@
 package dev.tonholo.s2c.geom.bounds
 
 import dev.tonholo.s2c.domain.PathNodes
-import dev.tonholo.s2c.geom.PrecisePoint2D
+import dev.tonholo.s2c.geom.Point2D
 import dev.tonholo.s2c.geom.bounds.BoundingBox.NoBoundingBox
 import kotlin.math.max
 import kotlin.math.min
@@ -134,26 +134,26 @@ fun List<PathNodes>.boundingBox(): BoundingBox {
         node.calculateBoundingBox(box, current[0], current[1]).also {
             when (node) {
                 is PathNodes.CurveTo -> {
-                    current[0] = node.x3.toDouble()
-                    current[1] = node.y3.toDouble()
+                    current[0] = node.x3
+                    current[1] = node.y3
                 }
 
                 is PathNodes.HorizontalLineTo -> {
-                    current[0] = node.x.toDouble()
+                    current[0] = node.x
                 }
 
                 is PathNodes.LineTo, is PathNodes.MoveTo, is PathNodes.ArcTo -> {
-                    current[0] = node.x.toDouble()
-                    current[1] = node.y.toDouble()
+                    current[0] = node.x
+                    current[1] = node.y
                 }
 
                 is PathNodes.QuadTo -> {
-                    current[0] = node.x2.toDouble()
-                    current[1] = node.y2.toDouble()
+                    current[0] = node.x2
+                    current[1] = node.y2
                 }
 
                 is PathNodes.VerticalLineTo -> {
-                    current[1] = node.y.toDouble()
+                    current[1] = node.y
                 }
 
                 // Ignore ReflectiveCurveTo and ReflectiveQuadTo since they were removed.
@@ -171,12 +171,12 @@ private fun PathNodes.calculateBoundingBox(
     return when (this) {
         is PathNodes.ArcTo -> ArcBoundingBoxCalculator(
             boundingBox = boundingBox,
-            current = PrecisePoint2D(x = currentX, y = currentY),
-            x = x.toDouble(),
-            y = y.toDouble(),
-            rx = a.toDouble(),
-            ry = b.toDouble(),
-            phi = theta.toDouble(),
+            current = Point2D(x = currentX, y = currentY),
+            x = x,
+            y = y,
+            rx = a,
+            ry = b,
+            phi = theta,
             largeArcFlag = isMoreThanHalf,
             sweepFlag = isPositiveArc,
         ).calculate()
@@ -186,25 +186,25 @@ private fun PathNodes.calculateBoundingBox(
                 initialBoundingBox = boundingBox,
                 currentX = currentX,
                 currentY = currentY,
-                controlPoint1x = x1.toDouble(),
-                controlPoint1y = y1.toDouble(),
-                controlPoint2x = x2.toDouble(),
-                controlPoint2y = y2.toDouble(),
-                endX = x3.toDouble(),
-                endY = y3.toDouble(),
+                controlPoint1x = x1,
+                controlPoint1y = y1,
+                controlPoint2x = x2,
+                controlPoint2y = y2,
+                endX = x3,
+                endY = y3,
             ).calculate()
         }
 
         is PathNodes.HorizontalLineTo -> boundingBox.copy(
-            minX = min(boundingBox.minX, x.toDouble()),
-            maxX = max(boundingBox.maxX, x.toDouble()),
+            minX = min(boundingBox.minX, x),
+            maxX = max(boundingBox.maxX, x),
         )
 
         is PathNodes.LineTo, is PathNodes.MoveTo -> boundingBox.copy(
-            minX = min(boundingBox.minX, x.toDouble()),
-            minY = min(boundingBox.minY, y.toDouble()),
-            maxX = max(boundingBox.maxX, x.toDouble()),
-            maxY = max(boundingBox.maxY, y.toDouble()),
+            minX = min(boundingBox.minX, x),
+            minY = min(boundingBox.minY, y),
+            maxX = max(boundingBox.maxX, x),
+            maxY = max(boundingBox.maxY, y),
         )
 
         is PathNodes.QuadTo -> {
@@ -227,14 +227,14 @@ private fun PathNodes.calculateBoundingBox(
                 controlPoint1y = controlPoint1[1],
                 controlPoint2x = controlPoint2[0],
                 controlPoint2y = controlPoint2[1],
-                endX = x2.toDouble(),
-                endY = y2.toDouble(),
+                endX = x2,
+                endY = y2,
             ).calculate()
         }
 
         is PathNodes.VerticalLineTo -> boundingBox.copy(
-            minY = min(boundingBox.minY, y.toDouble()),
-            maxY = max(boundingBox.maxY, y.toDouble()),
+            minY = min(boundingBox.minY, y),
+            maxY = max(boundingBox.maxY, y),
         )
 
         // Ignore ReflectiveCurveTo and ReflectiveQuadTo since they were removed.
