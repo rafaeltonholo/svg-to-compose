@@ -124,10 +124,15 @@ def _parse_svg(path: Path) -> VectorSummary:
         if len(parts) == 4:
             viewport = {"width": float(parts[2]), "height": float(parts[3])}
 
-    bounds = {
-        "width": _strip_unit(root.attrib.get("width")) or 0.0,
-        "height": _strip_unit(root.attrib.get("height")) or 0.0,
-    }
+    width = _strip_unit(root.attrib.get("width"))
+    height = _strip_unit(root.attrib.get("height"))
+    if width is None and height is None:
+        bounds = None
+    else:
+        bounds = {
+            "width": width,
+            "height": height,
+        }
 
     path_count = sum(1 for node in root.iter() if _local_name(node.tag) == "path")
     colors = sorted(_extract_svg_colors(root, xml_text))
