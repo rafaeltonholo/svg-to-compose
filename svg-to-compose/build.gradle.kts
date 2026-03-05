@@ -11,6 +11,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.com.squareup.okio)
             implementation(libs.com.fleeksoft.ksoup)
+            implementation(libs.org.jetbrains.annotations)
             implementation(kotlin("reflect"))
         }
 

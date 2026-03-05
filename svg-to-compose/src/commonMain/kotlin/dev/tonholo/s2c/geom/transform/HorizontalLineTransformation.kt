@@ -6,8 +6,8 @@ import dev.tonholo.s2c.geom.AffineTransformation
 
 internal data object HorizontalLineTransformation : PathTransformation<PathNodes.HorizontalLineTo>() {
     override fun PathNodes.HorizontalLineTo.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray,
+        cursor: DoubleArray,
+        start: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes {
         // convert to lineTo to handle two-dimensional transforms
@@ -15,7 +15,7 @@ internal data object HorizontalLineTransformation : PathTransformation<PathNodes
             new(
                 args = listOf(
                     x,
-                    0f,
+                    0.0,
                 ),
                 command = PathCommand.LineTo,
             )

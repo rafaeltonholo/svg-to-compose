@@ -53,8 +53,8 @@ private fun unshortReflectiveCurveTo(
     previousNode: PathNodes?,
 ): PathNodes {
     val previousControlPoint = calculatePreviousControlPoint(
-        x = node.x2.toDouble(),
-        y = node.y2.toDouble(),
+        x = node.x2,
+        y = node.y2,
         currentX = current[0],
         currentY = current[1],
     ) { previousNode is PathNodes.CurveTo }
@@ -79,8 +79,8 @@ private fun unshortReflectiveQuadTo(
     previousNode: PathNodes?,
 ): PathNodes {
     val previousControlPoint = calculatePreviousControlPoint(
-        x = node.x1.toDouble(),
-        y = node.y1.toDouble(),
+        x = node.x1,
+        y = node.y1,
         currentX = current[0],
         currentY = current[1],
     ) { previousNode is PathNodes.QuadTo }
@@ -100,31 +100,31 @@ private fun unshortReflectiveQuadTo(
 private fun computeCurrentPosition(node: PathNodes, current: DoubleArray) {
     when (node) {
         is PathNodes.CurveTo -> {
-            current[0] = node.x3.toDouble()
-            current[1] = node.y3.toDouble()
+            current[0] = node.x3
+            current[1] = node.y3
         }
 
         is PathNodes.HorizontalLineTo -> {
-            current[0] = node.x.toDouble()
+            current[0] = node.x
         }
 
         is PathNodes.LineTo, is PathNodes.MoveTo, is PathNodes.ArcTo -> {
-            current[0] = node.x.toDouble()
-            current[1] = node.y.toDouble()
+            current[0] = node.x
+            current[1] = node.y
         }
 
         is PathNodes.QuadTo, is PathNodes.ReflectiveCurveTo -> {
-            current[0] = node.x2.toDouble()
-            current[1] = node.y2.toDouble()
+            current[0] = node.x2
+            current[1] = node.y2
         }
 
         is PathNodes.ReflectiveQuadTo -> {
-            current[0] = node.x1.toDouble()
-            current[1] = node.y1.toDouble()
+            current[0] = node.x1
+            current[1] = node.y1
         }
 
         is PathNodes.VerticalLineTo -> {
-            current[1] = node.y.toDouble()
+            current[1] = node.y
         }
     }
 }

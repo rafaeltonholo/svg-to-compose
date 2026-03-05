@@ -6,21 +6,20 @@ import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.Point2D
 
-// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44): migrate from FloatArray to DoubleArray
 internal sealed class PathTransformation<T : PathNodes> {
     abstract fun T.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray = floatArrayOf(),
+        cursor: DoubleArray,
+        start: DoubleArray = doubleArrayOf(),
         transformation: AffineTransformation = AffineTransformation.Identity,
     ): PathNodes
 
-    protected fun transformAbsolutePoint(matrix: Array<out FloatArray>, x: Float, y: Float): Point2D {
+    protected fun transformAbsolutePoint(matrix: Array<out DoubleArray>, x: Double, y: Double): Point2D {
         val newX = matrix[0][0] * x + matrix[0][1] * y + matrix[0][2]
         val newY = matrix[1][0] * x + matrix[1][1] * y + matrix[1][2]
         return Point2D(newX, newY)
     }
 
-    protected fun transformRelativePoint(matrix: Array<out FloatArray>, x: Float, y: Float): Point2D {
+    protected fun transformRelativePoint(matrix: Array<out DoubleArray>, x: Double, y: Double): Point2D {
         val newX = matrix[0][0] * x + matrix[0][1] * y
         val newY = matrix[1][0] * x + matrix[1][1] * y
         return Point2D(newX, newY)

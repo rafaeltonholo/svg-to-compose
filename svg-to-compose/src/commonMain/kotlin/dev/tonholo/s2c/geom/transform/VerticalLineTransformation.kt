@@ -6,15 +6,15 @@ import dev.tonholo.s2c.geom.AffineTransformation
 
 internal data object VerticalLineTransformation : PathTransformation<PathNodes.VerticalLineTo>() {
     override fun PathNodes.VerticalLineTo.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray,
+        cursor: DoubleArray,
+        start: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes {
         // convert to lineTo to handle two-dimensional transforms
         return if (isRelative) {
             new(
                 args = listOf(
-                    0f,
+                    0.0,
                     y,
                 ),
                 command = PathCommand.LineTo,

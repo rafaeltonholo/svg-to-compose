@@ -5,8 +5,8 @@ import dev.tonholo.s2c.geom.AffineTransformation
 
 internal data object ReflectiveQuadTransformation : PathTransformation<PathNodes.ReflectiveQuadTo>() {
     override fun PathNodes.ReflectiveQuadTo.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray,
+        cursor: DoubleArray,
+        start: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes {
         val (x1, y1) = if (isRelative) {

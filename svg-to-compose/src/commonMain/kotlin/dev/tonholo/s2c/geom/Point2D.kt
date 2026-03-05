@@ -7,49 +7,32 @@ import kotlin.math.round
 import kotlin.math.sign
 import kotlin.math.sqrt
 
-data class Point2D(val x: Float, val y: Float) {
-    operator fun plus(other: Point2D): FloatArray = floatArrayOf(x, y, other.x, other.y)
-
-    operator fun plus(other: PrecisePoint2D): DoubleArray =
-        doubleArrayOf(x.toDouble(), y.toDouble(), other.x, other.y)
-}
-
-operator fun FloatArray.plus(other: Point2D): FloatArray = this + floatArrayOf(other.x, other.y)
-
-// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44):
-//  consider migrating Point2D to use Double instead and removing PrecisePoint2D.
-/**
- * A class representing a 2D point with double precision.
- *
- * @param x The x-coordinate of the point.
- * @param y The y-coordinate of the point.
- *
- * @remarks inspired on https://github.com/svgdotjs/svgdom/blob/0cf61d3d3d8be88c69304ec589ea035e606071f4/src/other/Point.js#L3
- */
-data class PrecisePoint2D(val x: Double, val y: Double) {
+data class Point2D(val x: Double, val y: Double) {
     /**
-     * Returns a double array containing the [x] and [y] coordinates
-     * of this point and the [x] and [y] coordinates of the other point.
+     * Combines the coordinates of this point and another point into a single array.
+     * The resulting array contains the x and y coordinates of this point followed by
+     * the x and y coordinates of the other point, in that order.
      *
-     * @param other the other point
-     * @return a double array containing the coordinates of both points
+     * @param other The other point whose coordinates will be combined with this point's coordinates.
+     * @return A DoubleArray containing [x, y, other.x, other.y].
      */
-    operator fun plus(other: Point2D): DoubleArray =
-        doubleArrayOf(x, y, other.x.toDouble(), other.y.toDouble())
+    infix fun coordinatesWith(other: Point2D): DoubleArray = doubleArrayOf(
+        x,
+        y,
+        other.x,
+        other.y
+    )
 
     /**
-     * Adds two [PrecisePoint2D] instances together, returning a new
-     * [PrecisePoint2D] instance.
+     * Adds the coordinates of this point and the other point,
+     * returning a new [Point2D].
      *
-     * The resulting [PrecisePoint2D] will have the sum of the [x]
-     * and [y] coordinates of the two input points.
-     *
-     * @param other The other [PrecisePoint2D] to add.
-     * @return A new [PrecisePoint2D] instance with the sum of the
+     * @param other The other [Point2D] to add.
+     * @return A new [Point2D] instance with the sum of the
      *  coordinates of the two input points.
      */
-    operator fun plus(other: PrecisePoint2D): PrecisePoint2D =
-        PrecisePoint2D(x + other.x, y + other.y)
+    operator fun plus(other: Point2D): Point2D =
+        Point2D(x + other.x, y + other.y)
 
     /**
      * Multiplies the coordinates of this point by the given factor.
@@ -57,8 +40,8 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
      * @param factor the factor to multiply the coordinates by
      * @return a new point with the multiplied coordinates
      */
-    operator fun times(factor: Double): PrecisePoint2D =
-        PrecisePoint2D(x = x * factor, y = y * factor)
+    operator fun times(factor: Double): Point2D =
+        Point2D(x = x * factor, y = y * factor)
 
     /**
      * Multiplies the coordinates of this point by the given factor.
@@ -66,8 +49,8 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
      * @param factor the factor to multiply the coordinates by
      * @return a new point with the multiplied coordinates
      */
-    operator fun times(factor: Int): PrecisePoint2D =
-        PrecisePoint2D(x = x * factor, y = y * factor)
+    operator fun times(factor: Int): Point2D =
+        Point2D(x = x * factor, y = y * factor)
 
     /**
      * Returns the angle formed by the vector from the origin to this
@@ -77,7 +60,7 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
      * @param point the point to compute the angle to
      * @return the angle in radians
      */
-    infix fun angleTo(point: PrecisePoint2D): Double {
+    infix fun angleTo(point: Point2D): Double {
         val sign = sign(x * point.y - y * point.x).takeIf { it != 0.0 } ?: 1.0
 
         val dividend = this dot point
@@ -93,7 +76,7 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
      * @param point the other point
      * @return the dot product of this point with the given point
      */
-    private infix fun dot(point: PrecisePoint2D): Double =
+    private infix fun dot(point: Point2D): Double =
         x * point.x + y * point.y
 
     /**
@@ -104,11 +87,24 @@ data class PrecisePoint2D(val x: Double, val y: Double) {
     private fun norm(): Double = sqrt(abs(x).pow(2) + abs(y).pow(2))
 }
 
-operator fun DoubleArray.plus(other: PrecisePoint2D): DoubleArray =
+/**
+ * Combines this [DoubleArray] with a [Point2D] by appending the point's x and y coordinates.
+ *
+ * @param other the [Point2D] whose coordinates will be appended to this array
+ * @return a new [DoubleArray] containing all elements of this array followed by the x and y coordinates of the point
+ */
+infix fun DoubleArray.combineWith(other: Point2D): DoubleArray =
     this + doubleArrayOf(other.x, other.y)
 
-fun PrecisePoint2D.transform(matrix: AffineTransformation.Matrix): PrecisePoint2D =
-    PrecisePoint2D(
-        x = matrix[0][0] * x + matrix[0][1] * y + matrix[0][2] * 1,
-        y = matrix[1][0] * x + matrix[1][1] * y + matrix[1][2] * 1,
-    )
+/**
+ * Transforms this point by applying the given affine transformation matrix.
+ * The transformation applies the matrix multiplication to the point's coordinates
+ * treating the point as a homogeneous coordinate vector `[x, y, 1]`.
+ *
+ * @param matrix the affine transformation matrix to apply to this point
+ * @return a new [Point2D] with the transformed coordinates
+ */
+fun Point2D.transform(matrix: AffineTransformation.Matrix): Point2D = Point2D(
+    x = matrix[0][0] * x + matrix[0][1] * y + matrix[0][2] * 1,
+    y = matrix[1][0] * x + matrix[1][1] * y + matrix[1][2] * 1,
+)

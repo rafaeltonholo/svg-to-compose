@@ -64,23 +64,23 @@ class SvgRectNodeTests : BaseSvgTest() {
         assertEquals(expected = 4, actual = nodes.size)
         nodes[0].let {
             assertIs<PathNodes.MoveTo>(it)
-            assertEquals(expected = 10f, actual = it.x)
-            assertEquals(expected = 20f, actual = it.y)
+            assertEquals(expected = 10.0, actual = it.x)
+            assertEquals(expected = 20.0, actual = it.y)
             assertFalse(it.isRelative)
         }
         nodes[1].let {
             assertIs<PathNodes.HorizontalLineTo>(it)
-            assertEquals(expected = 30f, actual = it.x)
+            assertEquals(expected = 30.0, actual = it.x)
             assertTrue(it.isRelative)
         }
         nodes[2].let {
             assertIs<PathNodes.VerticalLineTo>(it)
-            assertEquals(expected = 40f, actual = it.y)
+            assertEquals(expected = 40.0, actual = it.y)
             assertTrue(it.isRelative)
         }
         nodes[3].let {
             assertIs<PathNodes.HorizontalLineTo>(it)
-            assertEquals(expected = -30f, actual = it.x)
+            assertEquals(expected = -30.0, actual = it.x)
             assertTrue(it.isRelative)
             assertTrue(it.shouldClose)
         }
@@ -106,67 +106,67 @@ class SvgRectNodeTests : BaseSvgTest() {
         assertEquals(expected = 8, actual = nodes.size)
         nodes[0].let {
             assertIs<PathNodes.MoveTo>(it)
-            assertEquals(expected = 10f, actual = it.x)
-            assertEquals(expected = 30f, actual = it.y)
+            assertEquals(expected = 10.0, actual = it.x)
+            assertEquals(expected = 30.0, actual = it.y)
             assertFalse(it.isRelative)
         }
         nodes[1].let {
             assertIs<PathNodes.ArcTo>(it)
-            assertEquals(expected = 10f, actual = it.a)
-            assertEquals(expected = 10f, actual = it.b)
-            assertEquals(expected = 0f, actual = it.theta)
+            assertEquals(expected = 10.0, actual = it.a)
+            assertEquals(expected = 10.0, actual = it.b)
+            assertEquals(expected = 0.0, actual = it.theta)
             assertFalse(it.isMoreThanHalf)
             assertTrue(it.isPositiveArc)
-            assertEquals(expected = 10f, actual = it.x)
-            assertEquals(expected = -10f, actual = it.y)
+            assertEquals(expected = 10.0, actual = it.x)
+            assertEquals(expected = -10.0, actual = it.y)
             assertTrue(it.isRelative)
         }
         nodes[2].let {
             assertIs<PathNodes.HorizontalLineTo>(it)
-            assertEquals(expected = 10f, actual = it.x)
+            assertEquals(expected = 10.0, actual = it.x)
             assertTrue(it.isRelative)
         }
         nodes[3].let {
             assertIs<PathNodes.ArcTo>(it)
-            assertEquals(expected = 10f, actual = it.a)
-            assertEquals(expected = 10f, actual = it.b)
-            assertEquals(expected = 0f, actual = it.theta)
+            assertEquals(expected = 10.0, actual = it.a)
+            assertEquals(expected = 10.0, actual = it.b)
+            assertEquals(expected = 0.0, actual = it.theta)
             assertFalse(it.isMoreThanHalf)
             assertTrue(it.isPositiveArc)
-            assertEquals(expected = 10f, actual = it.x)
-            assertEquals(expected = 10f, actual = it.y)
+            assertEquals(expected = 10.0, actual = it.x)
+            assertEquals(expected = 10.0, actual = it.y)
             assertTrue(it.isRelative)
         }
         nodes[4].let {
             assertIs<PathNodes.VerticalLineTo>(it)
-            assertEquals(expected = 20f, actual = it.y)
+            assertEquals(expected = 20.0, actual = it.y)
             assertTrue(it.isRelative)
         }
         nodes[5].let {
             assertIs<PathNodes.ArcTo>(it)
-            assertEquals(expected = 10f, actual = it.a)
-            assertEquals(expected = 10f, actual = it.b)
-            assertEquals(expected = 0f, actual = it.theta)
+            assertEquals(expected = 10.0, actual = it.a)
+            assertEquals(expected = 10.0, actual = it.b)
+            assertEquals(expected = 0.0, actual = it.theta)
             assertFalse(it.isMoreThanHalf)
             assertTrue(it.isPositiveArc)
-            assertEquals(expected = -10f, actual = it.x)
-            assertEquals(expected = 10f, actual = it.y)
+            assertEquals(expected = -10.0, actual = it.x)
+            assertEquals(expected = 10.0, actual = it.y)
             assertTrue(it.isRelative)
         }
         nodes[6].let {
             assertIs<PathNodes.HorizontalLineTo>(it)
-            assertEquals(expected = -10f, actual = it.x)
+            assertEquals(expected = -10.0, actual = it.x)
             assertTrue(it.isRelative)
         }
         nodes[7].let {
             assertIs<PathNodes.ArcTo>(it)
-            assertEquals(expected = 10f, actual = it.a)
-            assertEquals(expected = 10f, actual = it.b)
-            assertEquals(expected = 0f, actual = it.theta)
+            assertEquals(expected = 10.0, actual = it.a)
+            assertEquals(expected = 10.0, actual = it.b)
+            assertEquals(expected = 0.0, actual = it.theta)
             assertFalse(it.isMoreThanHalf)
             assertTrue(it.isPositiveArc)
-            assertEquals(expected = -10f, actual = it.x)
-            assertEquals(expected = -10f, actual = it.y)
+            assertEquals(expected = -10.0, actual = it.x)
+            assertEquals(expected = -10.0, actual = it.y)
             assertTrue(it.isRelative)
             assertTrue(it.shouldClose)
         }

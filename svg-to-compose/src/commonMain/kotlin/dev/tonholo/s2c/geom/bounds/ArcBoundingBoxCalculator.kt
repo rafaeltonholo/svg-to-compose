@@ -1,8 +1,9 @@
 package dev.tonholo.s2c.geom.bounds
 
 import dev.tonholo.s2c.geom.AffineTransformation
-import dev.tonholo.s2c.geom.PrecisePoint2D
+import dev.tonholo.s2c.geom.Point2D
 import dev.tonholo.s2c.geom.transform
+import org.jetbrains.annotations.VisibleForTesting
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan
@@ -14,7 +15,8 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
-private const val DOUBLE_ZERO_TOLERANCE = 1e-15
+@VisibleForTesting
+internal const val DOUBLE_ZERO_TOLERANCE = 1e-15
 private const val ANGLE_90 = 90
 private const val ANGLE_180 = 180
 private const val ANGLE_270 = 270
@@ -39,7 +41,7 @@ private const val ANGLE_360 = 360
  */
 internal class ArcBoundingBoxCalculator(
     private val boundingBox: BoundingBox,
-    private val current: PrecisePoint2D,
+    private val current: Point2D,
     private val x: Double,
     private val y: Double,
     private var rx: Double,
@@ -53,19 +55,19 @@ internal class ArcBoundingBoxCalculator(
     private val sinPhi = sin(x = phi / ANGLE_180 * PI)
 
     // (eq. 5.1)
-    private val primedCoordinates = PrecisePoint2D(
+    private val primedCoordinates = Point2D(
         x = (current.x - x) / 2,
         y = (current.y - y) / 2,
     ).transform(
         AffineTransformation.Matrix(
-            floatArrayOf(cosPhi.toFloat(), sinPhi.toFloat(), 0f),
-            floatArrayOf(-sinPhi.toFloat(), cosPhi.toFloat(), 0f),
-            floatArrayOf(0f, 0f, 0f),
+            doubleArrayOf(cosPhi, sinPhi, 0.0),
+            doubleArrayOf(-sinPhi, cosPhi, 0.0),
+            doubleArrayOf(0.0, 0.0, 0.0),
         )
     )
 
-    private lateinit var primedCenter: PrecisePoint2D
-    private lateinit var center: PrecisePoint2D
+    private lateinit var primedCenter: Point2D
+    private lateinit var center: Point2D
     private var theta by Delegates.notNull<Double>()
     private var theta2 by Delegates.notNull<Double>()
     private var delta by Delegates.notNull<Double>()
@@ -101,8 +103,8 @@ internal class ArcBoundingBoxCalculator(
             }
             .plus(
                 listOf(
-                    PrecisePoint2D(current.x, current.y),
-                    PrecisePoint2D(x, y),
+                    Point2D(current.x, current.y),
+                    Point2D(x, y),
                 )
             )
             .fold(
@@ -118,7 +120,7 @@ internal class ArcBoundingBoxCalculator(
     }
 
     private fun correctOutOfRangeRadii(
-        primedCoordinates: PrecisePoint2D,
+        primedCoordinates: Point2D,
     ) {
         // eq. 6.1
         rx = abs(rx)
@@ -147,16 +149,16 @@ internal class ArcBoundingBoxCalculator(
         val multiplier = if (largeArcFlag == sweepFlag) -1 else 1
 
         primedCenter = if (abs(dividend) < DOUBLE_ZERO_TOLERANCE) {
-            PrecisePoint2D(x = 0.0, y = 0.0)
+            Point2D(x = 0.0, y = 0.0)
         } else {
             val sqrt = sqrt(
                 dividend / (divisor1 + divisor2)
             )
 
             if (sqrt.isNaN()) {
-                PrecisePoint2D(x = 0.0, y = 0.0)
+                Point2D(x = 0.0, y = 0.0)
             } else {
-                PrecisePoint2D(
+                Point2D(
                     rx * primedCoordinates.y / ry,
                     -ry * primedCoordinates.x / rx
                 ) * sqrt
@@ -166,28 +168,28 @@ internal class ArcBoundingBoxCalculator(
         // (eq. 5.3)
         center = primedCenter.transform(
             AffineTransformation.Matrix(
-                floatArrayOf(cosPhi.toFloat(), sinPhi.toFloat(), 0f),
-                floatArrayOf(-sinPhi.toFloat(), cosPhi.toFloat(), 0f),
-                floatArrayOf(0f, 0f, 0f),
+                doubleArrayOf(cosPhi, sinPhi, 0.0),
+                doubleArrayOf(-sinPhi, cosPhi, 0.0),
+                doubleArrayOf(0.0, 0.0, 0.0),
             )
-        ) + PrecisePoint2D(
+        ) + Point2D(
             x = (current.x + x) / 2,
             y = (current.y + y) / 2,
         )
     }
 
     private fun computeThetasAndDelta() {
-        val anglePoint = PrecisePoint2D(
+        val anglePoint = Point2D(
             x = (primedCoordinates.x - primedCenter.x) / rx,
             y = (primedCoordinates.y - primedCenter.y) / ry,
         )
 
         // (eq. 5.5)
         // For eq. 5.4 see angleTo function
-        val thetaAngle = PrecisePoint2D(1.0, 0.0) angleTo anglePoint
+        val thetaAngle = Point2D(1.0, 0.0) angleTo anglePoint
         // (eq. 5.6)
         var deltaTheta = anglePoint.angleTo(
-            PrecisePoint2D(
+            Point2D(
                 x = (-primedCoordinates.x - primedCenter.x) / rx,
                 y = (-primedCoordinates.y - primedCenter.y) / ry,
             ),
@@ -235,12 +237,12 @@ internal class ArcBoundingBoxCalculator(
         )
     }
 
-    private fun pointAt(t: Double): PrecisePoint2D {
-        if (current.x == x && current.y == y) return PrecisePoint2D(x = x, y = y)
+    private fun pointAt(t: Double): Point2D {
+        if (current.x == x && current.y == y) return Point2D(x = x, y = y)
         val tInAngle = (theta + t * delta) / ANGLE_180 * PI
         val sinTheta = sin(tInAngle)
         val cosTheta = cos(tInAngle)
-        return PrecisePoint2D(
+        return Point2D(
             x = cosPhi * rx * cosTheta - sinPhi * ry * sinTheta + center.x,
             y = sinPhi * ry * cosTheta + cosPhi * rx * sinTheta + center.y
         )

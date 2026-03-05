@@ -157,11 +157,11 @@ sealed class PathNodes(
         minified = minified,
     ),
         CoordinatePoint {
-        override val x = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val x = values.first().lowercase().removePrefix(command.toString()).toDouble()
         override val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -193,8 +193,8 @@ sealed class PathNodes(
          * @return A new [MoveTo] instance with the updated properties.
          */
         fun copy(
-            x: Float = this.x,
-            y: Float = this.y,
+            x: Double = this.x,
+            y: Double = this.y,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -250,17 +250,17 @@ sealed class PathNodes(
         /**
          * rx
          */
-        val a = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        val a = values.first().lowercase().removePrefix(command.toString()).toDouble()
 
         /**
          * ry
          */
-        val b = values[1].toFloat()
+        val b = values[1].toDouble()
 
         /**
          * x-axis-rotation
          */
-        val theta = values[2].toFloat()
+        val theta = values[2].toDouble()
 
         /**
          * large-arc-flag
@@ -271,11 +271,11 @@ sealed class PathNodes(
          * sweep flag
          */
         val isPositiveArc = values[4] == "1"
-        override val x = values[5].toFloat()
+        override val x = values[5].toDouble()
         override val y = values[6]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         /**
          * Calculates the approximate bytecode size of the path nodes.
@@ -338,13 +338,13 @@ sealed class PathNodes(
          * @return A new [ArcTo] instance with the specified values.
          */
         fun copy(
-            a: Float = this.a,
-            b: Float = this.b,
-            theta: Float = this.theta,
+            a: Double = this.a,
+            b: Double = this.b,
+            theta: Double = this.theta,
             isMoreThanHalf: Boolean = this.isMoreThanHalf,
             isPositiveArc: Boolean = this.isPositiveArc,
-            x: Float = this.x,
-            y: Float = this.y,
+            x: Double = this.x,
+            y: Double = this.y,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -408,7 +408,7 @@ sealed class PathNodes(
             .lowercase()
             .removePrefix(command.toString())
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -438,7 +438,7 @@ sealed class PathNodes(
          * @return a new [VerticalLineTo] command with the updated parameters.
          */
         fun copy(
-            y: Float = this.y,
+            y: Double = this.y,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -491,7 +491,7 @@ sealed class PathNodes(
             .lowercase()
             .removePrefix(command.toString())
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -521,7 +521,7 @@ sealed class PathNodes(
          * @return a copy of the current [HorizontalLineTo] command
          */
         fun copy(
-            x: Float = this.x,
+            x: Double = this.x,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -579,11 +579,11 @@ sealed class PathNodes(
             .first()
             .lowercase()
             .removePrefix(command.toString())
-            .toFloat()
+            .toDouble()
         override val y = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -616,8 +616,8 @@ sealed class PathNodes(
          * @return a new [LineTo] command with the specified changes
          */
         fun copy(
-            x: Float = this.x,
-            y: Float = this.y,
+            x: Double = this.x,
+            y: Double = this.y,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -672,15 +672,15 @@ sealed class PathNodes(
         ControlPoint1,
         ControlPoint2,
         ControlPoint3 {
-        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        override val y1 = values[1].toFloat()
-        override val x2 = values[2].toFloat()
-        override val y2 = values[3].toFloat()
-        override val x3 = values[4].toFloat()
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
+        override val y1 = values[1].toDouble()
+        override val x2 = values[2].toDouble()
+        override val y2 = values[3].toDouble()
+        override val x3 = values[4].toDouble()
         override val y3 = values[5]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -721,12 +721,12 @@ sealed class PathNodes(
          * @return A new [CurveTo] command.
          */
         fun copy(
-            x1: Float = this.x1,
-            y1: Float = this.y1,
-            x2: Float = this.x2,
-            y2: Float = this.y2,
-            x3: Float = this.x3,
-            y3: Float = this.y3,
+            x1: Double = this.x1,
+            y1: Double = this.y1,
+            x2: Double = this.x2,
+            y2: Double = this.y2,
+            x3: Double = this.x3,
+            y3: Double = this.y3,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -787,13 +787,13 @@ sealed class PathNodes(
     ),
         ControlPoint1,
         ControlPoint2 {
-        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        override val y1 = values[1].toFloat()
-        override val x2 = values[2].toFloat()
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
+        override val y1 = values[1].toDouble()
+        override val x2 = values[2].toDouble()
         override val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -829,10 +829,10 @@ sealed class PathNodes(
          * @return a new [ReflectiveCurveTo] object
          */
         fun copy(
-            x1: Float = this.x1,
-            y1: Float = this.y1,
-            x2: Float = this.x2,
-            y2: Float = this.y2,
+            x1: Double = this.x1,
+            y1: Double = this.y1,
+            x2: Double = this.x2,
+            y2: Double = this.y2,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -889,13 +889,13 @@ sealed class PathNodes(
     ),
         ControlPoint1,
         ControlPoint2 {
-        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
-        override val y1 = values[1].toFloat()
-        override val x2 = values[2].toFloat()
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
+        override val y1 = values[1].toDouble()
+        override val x2 = values[2].toDouble()
         override val y2 = values[3]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -932,10 +932,10 @@ sealed class PathNodes(
          * @return a copy of the [QuadTo] command.
          */
         fun copy(
-            x1: Float = this.x1,
-            y1: Float = this.y1,
-            x2: Float = this.x2,
-            y2: Float = this.y2,
+            x1: Double = this.x1,
+            y1: Double = this.y1,
+            x2: Double = this.x2,
+            y2: Double = this.y2,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -993,11 +993,11 @@ sealed class PathNodes(
         minified = minified,
     ),
         ControlPoint1 {
-        override val x1 = values.first().lowercase().removePrefix(command.toString()).toFloat()
+        override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
         override val y1 = values[1]
             .lowercase()
             .removeSuffix(PathCommand.Close)
-            .toFloat()
+            .toDouble()
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
@@ -1031,8 +1031,8 @@ sealed class PathNodes(
          * @return A new [ReflectiveQuadTo] with the updated values.
          */
         fun copy(
-            x1: Float = this.x1,
-            y1: Float = this.y1,
+            x1: Double = this.x1,
+            y1: Double = this.y1,
             isRelative: Boolean = this.isRelative,
             minified: Boolean = this.minified,
             shouldClose: Boolean = this.shouldClose,
@@ -1065,7 +1065,7 @@ internal interface CoordinateX {
     /**
      * The x-coordinate value.
      */
-    val x: Float
+    val x: Double
 }
 
 /**
@@ -1075,7 +1075,7 @@ internal interface CoordinateY {
     /**
      * The y-coordinate value.
      */
-    val y: Float
+    val y: Double
 }
 
 /**
@@ -1094,7 +1094,7 @@ internal interface ControlPointX1 {
     /**
      * The x-coordinate value of the first control point.
      */
-    val x1: Float
+    val x1: Double
 }
 
 /**
@@ -1108,7 +1108,7 @@ internal interface ControlPointY1 {
     /**
      * The y-coordinate value of the first control point.
      */
-    val y1: Float
+    val y1: Double
 }
 
 /**
@@ -1131,7 +1131,7 @@ internal interface ControlPointX2 {
     /**
      * The x-coordinate value of the second control point.
      */
-    val x2: Float
+    val x2: Double
 }
 
 /**
@@ -1145,7 +1145,7 @@ internal interface ControlPointY2 {
     /**
      * The y-coordinate value of the second control point.
      */
-    val y2: Float
+    val y2: Double
 }
 
 /**
@@ -1169,7 +1169,7 @@ internal interface ControlPointX3 {
     /**
      * The x-coordinate value of the third control point.
      */
-    val x3: Float
+    val x3: Double
 }
 
 /**
@@ -1184,7 +1184,7 @@ internal interface ControlPointY3 {
     /**
      * The y-coordinate value of the third control point.
      */
-    val y3: Float
+    val y3: Double
 }
 
 /**

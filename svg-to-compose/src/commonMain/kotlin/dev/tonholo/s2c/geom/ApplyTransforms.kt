@@ -17,11 +17,10 @@ import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
 
-// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44): migrate from FloatArray to DoubleArray
 sealed class AffineTransformation(
-    vararg matrix: FloatArray,
+    vararg matrix: DoubleArray,
 ) {
-    val matrix: Array<out FloatArray>
+    val matrix: Array<out DoubleArray>
 
     init {
         check(matrix.size == MATRIX_SIZE && matrix.all { it.size == MATRIX_SIZE }) {
@@ -34,25 +33,25 @@ sealed class AffineTransformation(
         fun calculateMatrixElement(
             row: Int,
             column: Int,
-            original: Array<out FloatArray>,
-            other: Array<out FloatArray>,
-        ): Float {
+            original: Array<out DoubleArray>,
+            other: Array<out DoubleArray>,
+        ): Double {
             return (original[row][0] * other[0][column]) +
                 (original[row][1] * other[1][column]) +
                 (original[row][2] * other[2][column])
         }
         return Matrix(
-            floatArrayOf(
+            doubleArrayOf(
                 calculateMatrixElement(row = 0, column = 0, matrix, other.matrix),
                 calculateMatrixElement(row = 0, column = 1, matrix, other.matrix),
                 calculateMatrixElement(row = 0, column = 2, matrix, other.matrix),
             ),
-            floatArrayOf(
+            doubleArrayOf(
                 calculateMatrixElement(row = 1, column = 0, matrix, other.matrix),
                 calculateMatrixElement(row = 1, column = 1, matrix, other.matrix),
                 calculateMatrixElement(row = 1, column = 2, matrix, other.matrix),
             ),
-            floatArrayOf(
+            doubleArrayOf(
                 calculateMatrixElement(row = 2, column = 0, matrix, other.matrix),
                 calculateMatrixElement(row = 2, column = 1, matrix, other.matrix),
                 calculateMatrixElement(row = 2, column = 2, matrix, other.matrix),
@@ -61,59 +60,59 @@ sealed class AffineTransformation(
     }
 
     companion object {
-        private inline val Float.rad: Float get() = this * PI.toFloat() / 180f
+        private inline val Double.rad: Double get() = this * PI / 180.0
     }
 
     class Matrix(
-        vararg matrix: FloatArray,
+        vararg matrix: DoubleArray,
     ) : AffineTransformation(matrix = matrix) {
-        operator fun get(index: Int): FloatArray = matrix[index]
+        operator fun get(index: Int): DoubleArray = matrix[index]
     }
 
     data object Identity : AffineTransformation(
-        floatArrayOf(1f, 0f, 0f),
-        floatArrayOf(0f, 1f, 0f),
-        floatArrayOf(0f, 0f, 1f),
+        doubleArrayOf(1.0, 0.0, 0.0),
+        doubleArrayOf(0.0, 1.0, 0.0),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 
-    data class Translate(val tx: Float, val ty: Float) : AffineTransformation(
-        floatArrayOf(1f, 0f, tx),
-        floatArrayOf(0f, 1f, ty),
-        floatArrayOf(0f, 0f, 1f),
+    data class Translate(val tx: Double, val ty: Double) : AffineTransformation(
+        doubleArrayOf(1.0, 0.0, tx),
+        doubleArrayOf(0.0, 1.0, ty),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 
     data class Rotate(
-        val angle: Float,
-        val centerX: Float = 0f,
-        val centerY: Float = 0f,
+        val angle: Double,
+        val centerX: Double = 0.0,
+        val centerY: Double = 0.0,
     ) : AffineTransformation(
         matrix = run {
             val cos = cos(angle.rad)
             val sin = sin(angle.rad)
             arrayOf(
-                floatArrayOf(cos, -sin, (1 - cos) * centerX + sin * centerY),
-                floatArrayOf(sin, cos, (1 - cos) * centerY - sin * centerX),
-                floatArrayOf(0f, 0f, 1f),
+                doubleArrayOf(cos, -sin, (1 - cos) * centerX + sin * centerY),
+                doubleArrayOf(sin, cos, (1 - cos) * centerY - sin * centerX),
+                doubleArrayOf(0.0, 0.0, 1.0),
             )
         },
     )
 
-    data class Scale(val sx: Float, val sy: Float = sx) : AffineTransformation(
-        floatArrayOf(sx, 0f, 0f),
-        floatArrayOf(0f, sy, 0f),
-        floatArrayOf(0f, 0f, 1f),
+    data class Scale(val sx: Double, val sy: Double = sx) : AffineTransformation(
+        doubleArrayOf(sx, 0.0, 0.0),
+        doubleArrayOf(0.0, sy, 0.0),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 
-    data class SkewX(val angle: Float) : AffineTransformation(
-        floatArrayOf(1f, tan(angle.rad), 0f),
-        floatArrayOf(0f, 1f, 0f),
-        floatArrayOf(0f, 0f, 1f),
+    data class SkewX(val angle: Double) : AffineTransformation(
+        doubleArrayOf(1.0, tan(angle.rad), 0.0),
+        doubleArrayOf(0.0, 1.0, 0.0),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 
-    data class SkewY(val angle: Float) : AffineTransformation(
-        floatArrayOf(1f, 0f, 0f),
-        floatArrayOf(tan(angle.rad), 1f, 0f),
-        floatArrayOf(0f, 0f, 1f),
+    data class SkewY(val angle: Double) : AffineTransformation(
+        doubleArrayOf(1.0, 0.0, 0.0),
+        doubleArrayOf(tan(angle.rad), 1.0, 0.0),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 }
 
@@ -128,8 +127,8 @@ fun List<PathNodes>.applyTransformations(
 fun List<PathNodes>.applyTransformation(
     transformation: AffineTransformation,
 ): Sequence<PathNodes> = sequence {
-    val start = floatArrayOf(0f, 0f)
-    val cursor = floatArrayOf(0f, 0f)
+    val start = doubleArrayOf(0.0, 0.0)
+    val cursor = doubleArrayOf(0.0, 0.0)
 
     for (node in this@applyTransformation) {
         val newNode = node.transform(cursor, start, transformation).let { transformed ->
@@ -152,8 +151,8 @@ fun List<PathNodes>.applyTransformation(
 }
 
 private fun PathNodes.transform(
-    cursor: FloatArray,
-    start: FloatArray,
+    cursor: DoubleArray,
+    start: DoubleArray,
     transformation: AffineTransformation,
 ) = when (this) {
     is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
