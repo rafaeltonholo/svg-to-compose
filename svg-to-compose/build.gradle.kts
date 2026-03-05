@@ -4,6 +4,7 @@ import com.vanniktech.maven.publish.KotlinMultiplatform
 plugins {
     dev.tonholo.s2c.conventions.kmp
     dev.tonholo.s2c.conventions.testing
+    alias(libs.plugins.app.cash.burst)
 }
 
 kotlin {
