@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 plugins {
     id("dev.tonholo.s2c.conventions.kmp")
     org.jetbrains.kotlin.plugin.`power-assert`
-    app.cash.burst
 }
 
 dependencies {
