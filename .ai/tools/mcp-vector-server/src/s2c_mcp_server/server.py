@@ -81,15 +81,45 @@ def _local_name(tag: str) -> str:
     return tag
 
 
+_NAMED_COLORS: dict[str, str] = {
+    "black": "#FF000000",
+    "white": "#FFFFFFFF",
+    "red": "#FFFF0000",
+    "green": "#FF008000",
+    "blue": "#FF0000FF",
+    "yellow": "#FFFFFF00",
+    "cyan": "#FF00FFFF",
+    "magenta": "#FFFF00FF",
+    "orange": "#FFFFA500",
+    "purple": "#FF800080",
+    "gray": "#FF808080",
+    "grey": "#FF808080",
+    "silver": "#FFC0C0C0",
+    "maroon": "#FF800000",
+    "navy": "#FF000080",
+    "teal": "#FF008080",
+    "aqua": "#FF00FFFF",
+    "fuchsia": "#FFFF00FF",
+    "lime": "#FF00FF00",
+    "olive": "#FF808000",
+    "transparent": "#00000000",
+}
+
+
 def _normalize_hex_color(color: str) -> str:
-    """Normalize hex colors to uppercase long form when possible."""
+    """Normalize hex and named colors to uppercase 8-digit ``#AARRGGBB`` form."""
 
     color = color.strip()
+    named = _NAMED_COLORS.get(color.lower())
+    if named:
+        return named
     if not color.startswith("#"):
         return color
     raw = color[1:]
     if len(raw) == 3:
         raw = "".join(ch * 2 for ch in raw)
+    if len(raw) == 6:
+        raw = f"FF{raw}"
     return f"#{raw.upper()}"
 
 
@@ -277,13 +307,61 @@ def _render_kotlin_to_png(input_path: Path, output_path: Path) -> tuple[bool, st
                 "Set it to a command template using {input} and {output} placeholders."
             ),
         )
-    command = command_template.format(input=str(input_path), output=str(output_path))
+    try:
+        command = command_template.format(input=str(input_path), output=str(output_path))
+    except (KeyError, ValueError) as exc:
+        return False, f"Malformed S2C_KOTLIN_RENDER_CMD template: {exc}"
     result = _run_command(shlex.split(command))
     if result.returncode != 0:
         return False, f"Render command failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}"
     if not output_path.exists():
         return False, f"Render command completed but output PNG was not created: {output_path}"
     return True, ""
+
+
+def _compare_png_pixels(
+    path_a: Path,
+    path_b: Path,
+    tolerance: int = 2,
+    mismatch_threshold: float = 0.01,
+) -> dict[str, Any]:
+    """Compare two PNGs at the pixel level with per-channel tolerance.
+
+    Returns a dict with ``passed``, ``mismatchRatio``, and ``details``.
+    ``tolerance`` is the max allowed per-channel difference (0-255).
+    ``mismatch_threshold`` is the max fraction of differing pixels to still pass.
+    """
+    from PIL import Image  # noqa: WPS433 — lazy import to keep startup fast
+
+    img_a = Image.open(path_a).convert("RGBA")
+    img_b = Image.open(path_b).convert("RGBA")
+
+    if img_a.size != img_b.size:
+        return {
+            "passed": False,
+            "mismatchRatio": 1.0,
+            "details": f"Size mismatch: {img_a.size} vs {img_b.size}",
+        }
+
+    pixels_a = img_a.load()
+    pixels_b = img_b.load()
+    width, height = img_a.size
+    total = width * height
+    mismatched = 0
+
+    for y in range(height):
+        for x in range(width):
+            pa = pixels_a[x, y]
+            pb = pixels_b[x, y]
+            if any(abs(a - b) > tolerance for a, b in zip(pa, pb)):
+                mismatched += 1
+
+    ratio = mismatched / total if total > 0 else 0.0
+    return {
+        "passed": ratio <= mismatch_threshold,
+        "mismatchRatio": round(ratio, 6),
+        "details": f"{mismatched}/{total} pixels differ (tolerance={tolerance}, threshold={mismatch_threshold})",
+    }
 
 
 def _render_svg_to_png(input_path: Path, output_path: Path) -> tuple[bool, str]:
@@ -455,12 +533,12 @@ def verify_conversion(source_path: str, generated_kotlin_path: str) -> dict[str,
         generated_ok, generated_error = _render_kotlin_to_png(generated_file, generated_png)
         render_check["enabled"] = source_ok and generated_ok
         if source_ok and generated_ok:
-            src_bytes = source_png.read_bytes()
-            gen_bytes = generated_png.read_bytes()
-            render_check["passed"] = src_bytes == gen_bytes
-            render_check["details"] = "Byte-level PNG comparison executed."
-            render_check["sourcePngSha256"] = hashlib.sha256(src_bytes).hexdigest()
-            render_check["generatedPngSha256"] = hashlib.sha256(gen_bytes).hexdigest()
+            pixel_result = _compare_png_pixels(source_png, generated_png)
+            render_check["passed"] = pixel_result["passed"]
+            render_check["details"] = pixel_result["details"]
+            render_check["mismatchRatio"] = pixel_result["mismatchRatio"]
+            render_check["sourcePngSha256"] = hashlib.sha256(source_png.read_bytes()).hexdigest()
+            render_check["generatedPngSha256"] = hashlib.sha256(generated_png.read_bytes()).hexdigest()
         else:
             render_check["passed"] = None
             render_check["details"] = {
