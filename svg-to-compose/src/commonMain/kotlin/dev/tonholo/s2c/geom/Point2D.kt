@@ -17,8 +17,10 @@ data class Point2D(val x: Double, val y: Double) {
      * @return A DoubleArray containing [x, y, other.x, other.y].
      */
     infix fun coordinatesWith(other: Point2D): DoubleArray = doubleArrayOf(
-        x, y,
-        other.x, other.y
+        x,
+        y,
+        other.x,
+        other.y
     )
 
     /**
