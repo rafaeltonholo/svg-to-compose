@@ -3,6 +3,7 @@ package dev.tonholo.s2c.geom.bounds
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.Point2D
 import dev.tonholo.s2c.geom.transform
+import org.jetbrains.annotations.VisibleForTesting
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan
@@ -14,7 +15,8 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
-private const val DOUBLE_ZERO_TOLERANCE = 1e-15
+@VisibleForTesting
+internal const val DOUBLE_ZERO_TOLERANCE = 1e-15
 private const val ANGLE_90 = 90
 private const val ANGLE_180 = 180
 private const val ANGLE_270 = 270
