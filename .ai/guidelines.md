@@ -19,7 +19,7 @@ ships as:
 
 ```
 .
-├── AGENTS.md                          # This file (root)
+├── AGENTS.md                          # Root repository agent context
 ├── .ai/
 │   ├── guidelines.md                  # AI agent guidelines (you are here)
 │   └── skills/                        # Reusable AI skill definitions
