@@ -25,7 +25,7 @@ abstract class SvgGraphicNodeWithListOfPoints<T>(
                 .findAll(points)
                 .map { it.value }
                 .windowed(size = 2, step = 2)
-                .map { (x, y) -> Point2D(x.toFloat(), y.toFloat()) }
+                .map { (x, y) -> Point2D(x.toDouble(), y.toDouble()) }
                 .toList()
         }
     }
