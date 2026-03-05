@@ -54,8 +54,8 @@ bin/
 .DS_Store
 
 ### Python (for local MCP server) ###
-*/**/__pycache__/
-*/**/*.py[cod]
+**/__pycache__/
+**/*.py[cod]
 *.egg-info/
 .venv/
 
