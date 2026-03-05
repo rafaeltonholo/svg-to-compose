@@ -15,12 +15,12 @@ import kotlin.math.sqrt
 @Suppress("MagicNumber")
 internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
     override fun PathNodes.ArcTo.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray,
+        cursor: DoubleArray,
+        start: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes {
         val newNode = if (isRelative) {
-            val transformedNode = transformArc(cursor = floatArrayOf(0f, 0f), transformation)
+            val transformedNode = transformArc(cursor = doubleArrayOf(0.0, 0.0), transformation)
             cursor[0] += transformedNode.x
             cursor[1] += transformedNode.y
             transformArc(transformedNode, matrix = transformation.matrix, transform = ::transformRelativePoint)
@@ -35,17 +35,17 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
 
     private fun transformArc(
         node: PathNodes.ArcTo,
-        matrix: Array<out FloatArray>,
-        transform: (matrix: Array<out FloatArray>, x: Float, y: Float) -> Point2D,
+        matrix: Array<out DoubleArray>,
+        transform: (matrix: Array<out DoubleArray>, x: Double, y: Double) -> Point2D,
     ): PathNodes {
         // reduce the number of digits in rotation angle
         val (a, b, theta) = if (abs(node.theta) > 80) {
             val newA = node.b
             val newB = node.a
             val newTheta = node.theta + (if (node.theta > 0) -90 else 90)
-            floatArrayOf(newA, newB, newTheta)
+            doubleArrayOf(newA, newB, newTheta)
         } else {
-            floatArrayOf(node.a, node.b, node.theta)
+            doubleArrayOf(node.a, node.b, node.theta)
         }
         val (x, y) = transform(matrix, node.x, node.y)
         return node.new(
@@ -74,12 +74,12 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
      * @see <a href="https://github.com/svg/svgo/blob/main/plugins/applyTransforms.js">SVGO apply transform plugin</a>
      */
     private fun PathNodes.ArcTo.transformArc(
-        cursor: FloatArray,
+        cursor: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes.ArcTo {
         val x = x - cursor[0]
         val y = y - cursor[1]
-        val theta = (theta * PI.toFloat()) / 180f
+        val theta = (theta * PI) / 180.0
         val cos = cos(theta)
         val sin = sin(theta)
         // skip if radius is 0
@@ -115,62 +115,55 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
         ) as PathNodes.ArcTo
     }
 
-    private fun decomposeEllipseMatrix(matrix: Array<out FloatArray>): FloatArray {
-        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/44):
-        //  consider using DoubleArray instead of FloatArray.
-        //  While using Float, we are loosing precision on decimals and the calculation of
-        //  majorAxisSqr - lastColumn is getting different then the expected.
-        //  Should consider using Double for all transformations instead.
-        val m = matrix.map { row ->
-            row.map { it.toDouble() }
-        }
-        val lastColumn = m[0][1] * m[0][1] + m[1][1] * m[1][1]
-        val squareSum = m[0][0] * m[0][0] + m[1][0] * m[1][0] + lastColumn
+    private fun decomposeEllipseMatrix(matrix: Array<out DoubleArray>): DoubleArray {
+        val lastColumn = matrix[0][1] * matrix[0][1] + matrix[1][1] * matrix[1][1]
+        val squareSum = matrix[0][0] * matrix[0][0] + matrix[1][0] * matrix[1][0] + lastColumn
         val root =
-            hypot(m[0][0] - m[1][1], m[1][0] + m[0][1]) * hypot(m[0][0] + m[1][1], m[1][0] - m[0][1])
+            hypot(matrix[0][0] - matrix[1][1], matrix[1][0] + matrix[0][1]) *
+                hypot(matrix[0][0] + matrix[1][1], matrix[1][0] - matrix[0][1])
 
         return if (root == 0.0) {
             // circle
-            floatArrayOf(
-                sqrt(squareSum / 2).toFloat(),
-                sqrt(squareSum / 2).toFloat(),
-                0f
+            doubleArrayOf(
+                sqrt(squareSum / 2),
+                sqrt(squareSum / 2),
+                0.0,
             )
         } else {
             val majorAxisSqr = (squareSum + root) / 2
             val minorAxisSqr = (squareSum - root) / 2
             val major = abs(majorAxisSqr - lastColumn) > 1e-6
             val sub = (if (major) majorAxisSqr else minorAxisSqr) - lastColumn
-            val rowsSum = m[0][0] * m[0][1] + m[1][0] * m[1][1]
-            val term1 = m[0][0] * sub + m[0][1] * rowsSum
-            val term2 = m[1][0] * sub + m[1][1] * rowsSum
+            val rowsSum = matrix[0][0] * matrix[0][1] + matrix[1][0] * matrix[1][1]
+            val term1 = matrix[0][0] * sub + matrix[0][1] * rowsSum
+            val term2 = matrix[1][0] * sub + matrix[1][1] * rowsSum
             val isNegative = if (major) term2 < 0 else term1 > 0
             val negativeMultiplier = if (isNegative) -1 else 1
 
-            floatArrayOf(
-                sqrt(majorAxisSqr).toFloat(),
-                sqrt(minorAxisSqr).toFloat(),
-                ((negativeMultiplier * acos((if (major) term1 else term2) / hypot(term1, term2)) * 180) / PI).toFloat()
+            doubleArrayOf(
+                sqrt(majorAxisSqr),
+                sqrt(minorAxisSqr),
+                (negativeMultiplier * acos((if (major) term1 else term2) / hypot(term1, term2)) * 180) / PI,
             )
         }
     }
 
     private fun parseEllipticalArcToEllipseMatrix(
-        a: Float,
-        cos: Float,
-        b: Float,
-        sin: Float,
+        a: Double,
+        cos: Double,
+        b: Double,
+        sin: Double,
     ) = AffineTransformation.Matrix(
-        floatArrayOf(a * cos, -b * sin, 0f),
-        floatArrayOf(a * sin, b * cos, 0f),
-        floatArrayOf(0f, 0f, 1f),
+        doubleArrayOf(a * cos, -b * sin, 0.0),
+        doubleArrayOf(a * sin, b * cos, 0.0),
+        doubleArrayOf(0.0, 0.0, 1.0),
     )
 
     private fun PathNodes.ArcTo.applyOutOfRangeRadiiCorrection(
-        x: Float,
-        cos: Float,
-        y: Float,
-        sin: Float,
+        x: Double,
+        cos: Double,
+        y: Double,
+        sin: Double,
     ) = if (a > 0 && b > 0) {
         val a = a
         val b = b

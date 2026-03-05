@@ -5,8 +5,8 @@ import dev.tonholo.s2c.geom.AffineTransformation
 
 internal data object MoveTransformation : PathTransformation<PathNodes.MoveTo>() {
     override fun PathNodes.MoveTo.applyTransformation(
-        cursor: FloatArray,
-        start: FloatArray,
+        cursor: DoubleArray,
+        start: DoubleArray,
         transformation: AffineTransformation,
     ): PathNodes {
         val (x, y) = if (isRelative) {
