@@ -210,13 +210,13 @@ private fun PathNodes.calculateBoundingBox(
         is PathNodes.QuadTo -> {
             // CP1 = QP0 + 2/3 * (QP1 - QP0)
             val controlPoint1 = doubleArrayOf(
-                currentX + 2 / 3 * (x1 - currentX),
-                currentY + 2 / 3 * (y1 - currentY),
+                currentX + 2.0 / 3.0 * (x1 - currentX),
+                currentY + 2.0 / 3.0 * (y1 - currentY),
             )
             // CP2 = CP1 + 1/3 * (QP2 - QP0)
             val controlPoint2 = doubleArrayOf(
-                currentX + 1 / 3 * (x2 - currentX),
-                currentY + 1 / 3 * (y2 - currentY),
+                currentX + 1.0 / 3.0 * (x2 - currentX),
+                currentY + 1.0 / 3.0 * (y2 - currentY),
             )
 
             BezierBoundingBoxCalculator(
