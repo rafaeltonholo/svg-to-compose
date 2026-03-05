@@ -151,48 +151,48 @@ private fun ImageVector.Builder.brasilChunk1() {
         fill = SolidColor(Color(0xFF009B3A)),
         pathFillType = PathFillType.EvenOdd,
     ) {
-        // M 1473.1268 1255.153
-        moveTo(x = 1473.1268f, y = 1255.153f)
-        // a 31.5 35 -7 0 0 -8.530854 -69.47823
+        // M 1473.1267 1255.153
+        moveTo(x = 1473.1267f, y = 1255.153f)
+        // a 31.5 35 -7 0 0 -8.530855 -69.47823
         arcToRelative(
             a = 31.5f,
             b = 35.0f,
             theta = -7.0f,
             isMoreThanHalf = false,
             isPositiveArc = false,
-            dx1 = -8.530854f,
+            dx1 = -8.530855f,
             dy1 = -69.47823f,
         )
-        // A 31.5 35 -7 0 0 1473.1268 1255.153
+        // A 31.5 35 -7 0 0 1473.1267 1255.153
         arcTo(
             horizontalEllipseRadius = 31.5f,
             verticalEllipseRadius = 35.0f,
             theta = -7.0f,
             isMoreThanHalf = false,
             isPositiveArc = false,
-            x1 = 1473.1268f,
+            x1 = 1473.1267f,
             y1 = 1255.153f,
         )
-        // m -1.5843015 -12.9031
-        moveToRelative(dx = -1.5843015f, dy = -12.9031f)
-        // a 18.5 22 -7 0 0 -5.3622513 -43.67203
+        // m -1.5843016 -12.9031
+        moveToRelative(dx = -1.5843016f, dy = -12.9031f)
+        // a 18.5 22 -7 0 0 -5.3622518 -43.67203
         arcToRelative(
             a = 18.5f,
             b = 22.0f,
             theta = -7.0f,
             isMoreThanHalf = false,
             isPositiveArc = false,
-            dx1 = -5.3622513f,
+            dx1 = -5.3622518f,
             dy1 = -43.67203f,
         )
-        // a 18.5 22 -7 0 0 5.3622513 43.67203
+        // a 18.5 22 -7 0 0 5.3622518 43.67203
         arcToRelative(
             a = 18.5f,
             b = 22.0f,
             theta = -7.0f,
             isMoreThanHalf = false,
             isPositiveArc = false,
-            dx1 = 5.3622513f,
+            dx1 = 5.3622518f,
             dy1 = 43.67203f,
         )
     }
@@ -472,8 +472,8 @@ private fun ImageVector.Builder.brasilChunk1() {
         fill = SolidColor(Color(0xFF009B3A)),
         pathFillType = PathFillType.EvenOdd,
     ) {
-        // M 2160.4062 1311.5933
-        moveTo(x = 2160.4062f, y = 1311.5933f)
+        // M 2160.4063 1311.5933
+        moveTo(x = 2160.4063f, y = 1311.5933f)
         // l 12.39832 3.9091756
         lineToRelative(dx = 12.39832f, dy = 3.9091756f)
         // l 7.8183513 -24.79664
