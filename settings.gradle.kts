@@ -19,7 +19,8 @@ dependencyResolutionManagement {
 }
 
 include(
-//    ":docs",
+    // docs module is currently disabled; uncomment when re-enabled in this build
+    // ":docs",
     ":svg-to-compose",
     ":svg-to-compose-gradle-plugin",
 )

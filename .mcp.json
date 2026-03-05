@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "s2c-vector-tools": {
+      "command": "/home/rtonholo/dev/repositories/svg-to-compose/.ai/tools/mcp-vector-server/.venv/bin/s2c-mcp-vector-server",
+      "type": "stdio"
+    }
+  }
+}

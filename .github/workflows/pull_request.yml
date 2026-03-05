@@ -9,9 +9,6 @@ jobs:
     steps:
         - name: Checkout the repo
           uses: actions/checkout@v6
-
-        - name: Checkout the repo
-          uses: actions/checkout@v6
   
         - name: Prepares environment for building
           uses: ./.github/actions/setup

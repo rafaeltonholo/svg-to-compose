@@ -74,6 +74,24 @@ cd svg-to-compose
 ./gradlew build
 ```
 
+Enable local git hooks (recommended):
+
+```bash
+git config core.hooksPath .githooks
+```
+
+To verify:
+
+```bash
+git config --get core.hooksPath
+```
+
+Expected output:
+
+```text
+.githooks
+```
+
 Modules of interest:
 
 - svg-to-compose — Kotlin Multiplatform CLI library/tooling

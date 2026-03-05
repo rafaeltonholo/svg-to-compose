@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -q '\\.kt$'; then ./gradlew detektMetadataCommonMain --quiet; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "svg-to-compose-tools": {
+      "command": ".ai/tools/mcp-vector-server/.venv/bin/s2c-mcp-vector-server"
+    }
+  },
+  "permissions": {
+    "allow": [
+      "mcp__s2c-vector-tools__*"
+    ]
+  }
+}

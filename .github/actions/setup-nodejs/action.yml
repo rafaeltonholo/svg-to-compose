@@ -4,6 +4,14 @@ inputs:
   os:
     description: The runner os
     required: true
+  svgo-version:
+    description: SVGO major or exact version to install
+    required: false
+    default: "4"
+  avocado-version:
+    description: Avocado major or exact version to install
+    required: false
+    default: "1"
 runs:
   using: 'composite'
   steps:
@@ -13,14 +21,13 @@ runs:
       with:
         path: |
           ~/.npm/**/*
-        key: npm-cache-${{ inputs.os }}
-    - shell: bash
-      run: touch package-lock.json
+        key: npm-cache-${{ inputs.os }}-svgo-${{ inputs.svgo-version }}-avocado-${{ inputs.avocado-version }}
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-        cache: 'npm'
     - name: Install global dependencies
       shell: bash
       run: |
-        npm -g install svgo avocado
+        npm -g install \
+          "svgo@${{ inputs.svgo-version }}" \
+          "avocado@${{ inputs.avocado-version }}"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gradle Plugin Dev (Kotlin)"
+  short_description: "Build standalone Gradle plugins in Kotlin"
+  default_prompt: "Use $kotlin-gradle-standalone-plugin to implement or evolve a standalone Gradle plugin in Kotlin."
