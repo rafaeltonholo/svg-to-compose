@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
   "mcp>=1.12.4,<2",
   "defusedxml>=0.7.1",
+  "Pillow>=10.0",
 ]
 
 [project.scripts]
