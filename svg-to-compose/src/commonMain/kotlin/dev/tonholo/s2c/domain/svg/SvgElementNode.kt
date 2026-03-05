@@ -40,7 +40,6 @@ abstract class SvgElementNode<out T>(
                     when (it) {
                         is SvgChildNode<*> -> it.copy(parent = this)
                         is SvgElementNode<*> -> it.copy(parent = this)
-                        else -> it
                     }
                 }
             )

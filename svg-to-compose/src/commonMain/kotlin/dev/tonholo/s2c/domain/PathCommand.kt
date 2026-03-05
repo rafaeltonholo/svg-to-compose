@@ -32,10 +32,10 @@ enum class PathCommand(
     }
 }
 
-inline fun String.removeSuffix(pathCommand: PathCommand): String =
+fun String.removeSuffix(pathCommand: PathCommand): String =
     removeSuffix(pathCommand.value.toString())
 
-inline fun Char.toPathCommand(): PathCommand? {
+fun Char.toPathCommand(): PathCommand? {
     return when (this) {
         PathCommand.ArcTo.value -> PathCommand.ArcTo
         PathCommand.CurveTo.value -> PathCommand.CurveTo

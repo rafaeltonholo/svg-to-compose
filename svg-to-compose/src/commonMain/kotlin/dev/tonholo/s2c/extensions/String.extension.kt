@@ -32,12 +32,6 @@ fun String.camelCase(): String = replaceDividers()
 fun String.pascalCase(): String = replaceDividers()
     .replaceFirstChar { it.uppercaseChar() }
 
-@Deprecated(
-    message = "Use prependIndent instead",
-    replaceWith = ReplaceWith(expression = "this.prependIndent(indentSize)"),
-)
-fun String.indented(indentSize: Int) = " ".repeat(indentSize) + this
-
 /**
  * Prepends an indent to the string.
  */
@@ -102,4 +96,4 @@ fun String.toPercentage(): Float {
 /**
  * Removes trailing zeros from a string representing a number.
  */
-inline fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
+fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")

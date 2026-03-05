@@ -31,7 +31,7 @@ open class ExitProgramException(
     }
 }
 
-inline fun ExitProgramException(
+fun ExitProgramException(
     errorCode: ErrorCode,
     message: String,
     throwable: Throwable? = null,

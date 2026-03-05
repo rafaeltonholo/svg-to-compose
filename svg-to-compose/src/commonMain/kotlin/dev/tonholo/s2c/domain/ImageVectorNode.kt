@@ -9,7 +9,7 @@ import dev.tonholo.s2c.domain.svg.toBrush
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.extensions.prependIndent
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.applyTransformations
 import dev.tonholo.s2c.logger.debug
@@ -128,7 +128,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
 
             val pathParamsString = if (pathParams.isNotEmpty()) {
                 """(
-                |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".indented(4) }}
+                |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".prependIndent(4) }}
                 |)"""
             } else {
                 ""
@@ -260,8 +260,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                         }
                     val value = """
                         |PathData {
-                        |    ${clipPathData.indented(indentSize = 4)}
-                        |${"}".indented(indentSize)}"""
+                        |    ${clipPathData.prependIndent(indentSize = 4)}
+                        |${"}".prependIndent(indentSize)}"""
                         .trimMargin()
                     add(CLIP_PATH_PARAM_NAME to value)
                 }
@@ -289,10 +289,10 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             val groupParamsString = if (groupParams.isNotEmpty()) {
                 val params = groupParams.joinToString("\n") { (param, value) ->
                     if (param == CLIP_PATH_PARAM_NAME && minified.not() && params.clipPath != null) {
-                        "${"// ${params.clipPath.normalizedPath}".indented(4)}\n"
+                        "${"// ${params.clipPath.normalizedPath}".prependIndent(4)}\n"
                     } else {
                         ""
-                    } + "$param = $value,".indented(indentSize)
+                    } + "$param = $value,".prependIndent(indentSize)
                 }
                 """(
                 |$params
@@ -470,10 +470,10 @@ private fun createNode(
     throw e
 }
 
-private inline fun resetDotCount(current: Char): Int =
+private fun resetDotCount(current: Char): Int =
     if (current == '.') 1 else 0
 
-private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int =
+private fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int =
     if (char == '.') {
         dotCount + 1
     } else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {

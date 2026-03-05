@@ -4,16 +4,7 @@
 
 package dev.tonholo.s2c.domain
 
-import dev.tonholo.s2c.domain.PathNodes.ArcTo
-import dev.tonholo.s2c.domain.PathNodes.CurveTo
-import dev.tonholo.s2c.domain.PathNodes.HorizontalLineTo
-import dev.tonholo.s2c.domain.PathNodes.LineTo
-import dev.tonholo.s2c.domain.PathNodes.MoveTo
-import dev.tonholo.s2c.domain.PathNodes.QuadTo
-import dev.tonholo.s2c.domain.PathNodes.ReflectiveCurveTo
-import dev.tonholo.s2c.domain.PathNodes.ReflectiveQuadTo
-import dev.tonholo.s2c.domain.PathNodes.VerticalLineTo
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.extensions.prependIndent
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
@@ -119,7 +110,7 @@ sealed class PathNodes(
         val separator = if (minified || forceInline) "" else "\n"
         val scape = if (minified || forceInline) " " else "|"
         return joinToString(separator) {
-            "$scape${it.indented(indentSize)},"
+            "$scape${it.prependIndent(indentSize)},"
         }.let {
             if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
         }
