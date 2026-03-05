@@ -11,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -q '\\.kt$'; then ./gradlew detekt --quiet 2>/dev/null; fi"
+            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -q '\\.kt$'; then ./gradlew detektMetadataCommonMain --quiet; fi"
           }
         ]
       }
