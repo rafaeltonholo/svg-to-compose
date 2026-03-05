@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """MCP server that exposes vector-analysis utilities for svg-to-compose workflows.
 
 This module provides three MCP tools:
@@ -17,10 +15,12 @@ import re
 import shlex
 import subprocess
 import tempfile
-import xml.etree.ElementTree as et
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from xml.etree.ElementTree import Element
+
+from defusedxml import ElementTree as et
 
 from mcp.server.fastmcp import FastMCP
 
@@ -93,7 +93,7 @@ def _normalize_hex_color(color: str) -> str:
     return f"#{raw.upper()}"
 
 
-def _extract_svg_colors(root: et.Element, xml_text: str) -> set[str]:
+def _extract_svg_colors(root: Element, xml_text: str) -> set[str]:
     """Collect hex colors from common SVG color attributes and inline styles."""
 
     colors: set[str] = set()
@@ -115,8 +115,10 @@ def _parse_svg(path: Path) -> VectorSummary:
     """Parse a `.svg` file into a normalized `VectorSummary`."""
 
     xml_text = path.read_text(encoding="utf-8")
-    root = et.fromstring(xml_text)
-
+    try:
+        root = et.fromstring(xml_text)
+    except et.ParseError as exc:
+        raise ValueError(f"Invalid SVG/XML content in: {path}") from exc
     view_box = root.attrib.get("viewBox")
     viewport: dict[str, float] | None = None
     if view_box:
@@ -252,12 +254,11 @@ def summarize_vector(path: Path) -> VectorSummary:
     raise ValueError(f"Unsupported file extension: {suffix}. Expected .svg, .xml, or .kt")
 
 
-def _run_command(command: str) -> subprocess.CompletedProcess[str]:
-    """Execute a shell command used by external render adapters."""
+def _run_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+    """Execute a command used by external render adapters."""
 
     return subprocess.run(
         command,
-        shell=True,
         check=False,
         capture_output=True,
         text=True,
@@ -276,8 +277,8 @@ def _render_kotlin_to_png(input_path: Path, output_path: Path) -> tuple[bool, st
                 "Set it to a command template using {input} and {output} placeholders."
             ),
         )
-    command = command_template.format(input=shlex.quote(str(input_path)), output=shlex.quote(str(output_path)))
-    result = _run_command(command)
+    command = command_template.format(input=str(input_path), output=str(output_path))
+    result = _run_command(shlex.split(command))
     if result.returncode != 0:
         return False, f"Render command failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}"
     if not output_path.exists():
