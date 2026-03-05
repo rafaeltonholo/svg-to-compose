@@ -83,10 +83,10 @@ class ListPathNodesBoundingBoxTests {
             ArcTo(listOf("38.463", "38.463", "0", "0", "0", "46.74", "41.353"), isRelative = false, minified = false),
         )
         val boundingBox = nodes.boundingBox()
-        assertEquals(46.7400016784668, boundingBox.x)
-        assertEquals(41.35300064086914, boundingBox.y)
-        assertEquals(3.259998321533203, boundingBox.width)
-        assertEquals(8.64699935913086, boundingBox.height)
+        assertEquals(46.74, boundingBox.x)
+        assertEquals(41.353, boundingBox.y)
+        assertEquals(3.259999999999998, boundingBox.width)
+        assertEquals(8.646999999999998, boundingBox.height)
     }
 
     @Test
