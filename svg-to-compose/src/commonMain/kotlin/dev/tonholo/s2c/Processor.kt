@@ -18,16 +18,18 @@ import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
+import dev.zacsweers.metro.Inject
 import okio.Path
 import okio.Path.Companion.toPath
 
+@Inject
 class Processor(
     private val logger: Logger,
     private val fileManager: FileManager,
-    private val iconWriter: IconWriter = IconWriter(logger, fileManager),
-    private val tempFileWriter: TempFileWriter = TempFileWriter(logger, fileManager),
-    private val optimizers: Optimizer.Factory = Optimizer.Factory(logger, fileManager),
-    private val parser: ImageParser.Factory = ImageParser.Factory(fileManager),
+    private val iconWriter: IconWriter,
+    private val tempFileWriter: TempFileWriter,
+    private val optimizers: Optimizer.Factory,
+    private val parser: ImageParser.Factory,
 ) {
     /**
      * Starts the processor execution.

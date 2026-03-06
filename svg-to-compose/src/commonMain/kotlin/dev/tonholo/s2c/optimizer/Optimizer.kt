@@ -12,6 +12,7 @@ import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.optimizer.svgo.SvgoConfigContent
+import dev.zacsweers.metro.Inject
 import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
@@ -197,6 +198,7 @@ sealed class Optimizer(
         }
     }
 
+    @Inject
     class Factory(
         private val logger: Logger,
         fileManager: FileManager,

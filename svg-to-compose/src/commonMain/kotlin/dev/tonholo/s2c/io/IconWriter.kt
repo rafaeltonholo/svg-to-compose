@@ -4,8 +4,10 @@ import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.printEmpty
+import dev.zacsweers.metro.Inject
 import okio.Path
 
+@Inject
 class IconWriter(
     private val logger: Logger,
     private val fileManager: FileManager,

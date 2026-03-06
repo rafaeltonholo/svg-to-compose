@@ -16,10 +16,9 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import dev.tonholo.s2c.AppDefaults
-import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.logger.CommonLogger
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.parser.ParserConfig
@@ -197,11 +196,11 @@ class Client : CliktCommand(name = "s2c") {
         AppConfig.silent = silent
 
         try {
-            val fileSystem = FileSystem.SYSTEM
-            Processor(
+            val graph = createS2cGraph(
                 logger = logger,
-                fileManager = FileManager(fileSystem, logger),
-            ).run(
+                fileSystem = FileSystem.SYSTEM,
+            )
+            graph.processor.run(
                 path = path,
                 output = output,
                 config = ParserConfig(
