@@ -14,4 +14,6 @@ import dev.zacsweers.metro.Qualifier
  * that the temporary directory is optional and may not be provided in all contexts.
  */
 @Qualifier
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY)
 annotation class TempDirectory
