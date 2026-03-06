@@ -2,11 +2,9 @@ package dev.tonholo.s2c.gradle.tasks.worker
 
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.error.ParserException
-import dev.tonholo.s2c.gradle.internal.logger.Logger
-import dev.tonholo.s2c.inject.createS2cGraph
+import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.parser.ParserConfig
 import okio.Path.Companion.toPath
-import org.gradle.api.logging.Logging
 import org.gradle.workers.WorkAction
 import java.util.UUID
 
@@ -14,36 +12,25 @@ import java.util.UUID
  * A Gradle [WorkAction] responsible for parsing a single SVG/XML icon
  * file and converting it into a Jetpack Compose `ImageVector`.
  *
- * This action is designed to be executed in parallel by Gradle workers,
- * processing one icon file per execution.
- * It utilizes the core `s2c` [Processor] to perform the conversion,
- * configured with parameters provided by [IconParsingParameters].
+ * This action is designed to be executed in parallel by Gradle workers
+ * using [noIsolation][org.gradle.workers.WorkerExecutor.noIsolation] mode.
  *
- * The action handles setting up the necessary environment, including a
- * logger, file manager, and an isolated temporary directory for file
- * operations to prevent conflicts between parallel executions.
- *
- * Upon completion, it writes the result of the operation (either success
- * with the output file path or an error with a message) to a designated
- * result file. This allows the main task to aggregate results from all
- * worker actions.
+ * Each worker obtains a shared [Processor.Factory][dev.tonholo.s2c.Processor.Factory]
+ * from [S2cWorkerBridge] and creates an isolated [Processor][dev.tonholo.s2c.Processor]
+ * with its own temporary directory to avoid file races between parallel executions.
  *
  * @see IconParsingParameters for the input parameters.
  * @see IconParsingWorkActionResult for the structure of the output result.
  */
 internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters> {
     override fun execute() {
-        val gradleLogger = Logging.getLogger(IconParsingWorkAction::class.simpleName)
-        val logger = Logger(gradleLogger)
-        // Use an isolated temp directory per work item to avoid races between workers
         val isolatedTempRoot = parameters.tempDirPath.get().toPath() /
             (".s2c/temp/gradle-worker/" + UUID.randomUUID().toString()).toPath()
-        val graph = createS2cGraph(
-            logger = logger,
-            fileSystem = okio.FileSystem.SYSTEM,
-            tempDirectory = isolatedTempRoot,
-        )
-        val processor = graph.processor
+        val factory = requireNotNull(S2cWorkerBridge.processorFactory) {
+            "S2cWorkerBridge.processorFactory must be set before submitting workers"
+        }
+        val processor = factory.create(tempDirectory = isolatedTempRoot)
+
         val origin = parameters.inputFilePath.get().toPath()
         val outputDir = parameters.outputDirPath.get().toPath()
 

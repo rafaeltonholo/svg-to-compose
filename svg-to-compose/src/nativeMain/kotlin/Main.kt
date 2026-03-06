@@ -200,7 +200,7 @@ class Client : CliktCommand(name = "s2c") {
                 logger = logger,
                 fileSystem = FileSystem.SYSTEM,
             )
-            graph.processor.run(
+            graph.processorFactory.create(tempDirectory = null).run(
                 path = path,
                 output = output,
                 config = ParserConfig(

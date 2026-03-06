@@ -3,10 +3,11 @@ package dev.tonholo.s2c.inject
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import okio.FileSystem
-import okio.Path
 
 /**
  * Dependency graph interface for the S2C (Source-to-Code) processing system.
@@ -19,13 +20,14 @@ import okio.Path
  * graph with the required external dependencies such as logger, file system, and
  * optional temporary directory path.
  */
-@DependencyGraph
-interface S2cGraph {
-    val processor: Processor
+@DependencyGraph(AppScope::class)
+interface SvgToComposeGraph {
+    val processorFactory: Processor.Factory
     val fileManager: FileManager
     val logger: Logger
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideFileManager(
         fileSystem: FileSystem,
         logger: Logger,
@@ -36,7 +38,6 @@ interface S2cGraph {
         fun create(
             @Provides logger: Logger,
             @Provides fileSystem: FileSystem,
-            @Provides @TempDirectory tempDirectory: Path?,
-        ): S2cGraph
+        ): SvgToComposeGraph
     }
 }

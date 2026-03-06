@@ -8,6 +8,7 @@ import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.isFile
 import dev.tonholo.s2c.extensions.pascalCase
+import dev.tonholo.s2c.inject.TempDirectory
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
@@ -18,19 +19,28 @@ import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import okio.Path
 import okio.Path.Companion.toPath
 
-@Inject
+@AssistedInject
 class Processor(
     private val logger: Logger,
     private val fileManager: FileManager,
     private val iconWriter: IconWriter,
-    private val tempFileWriter: TempFileWriter,
+    @Assisted @param:TempDirectory private val tempDirectory: Path?,
     private val optimizers: Optimizer.Factory,
     private val parser: ImageParser.Factory,
 ) {
+    private val tempFileWriter = TempFileWriter(logger, fileManager, tempDirectory)
+
+    @AssistedFactory
+    fun interface Factory {
+        fun create(@TempDirectory tempDirectory: Path?): Processor
+    }
+
     /**
      * Starts the processor execution.
      *

@@ -2,17 +2,14 @@ package dev.tonholo.s2c.io
 
 import AppConfig.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.extensions.encodeToMd5
-import dev.tonholo.s2c.inject.TempDirectory
 import dev.tonholo.s2c.logger.Logger
-import dev.zacsweers.metro.Inject
 import okio.Path
 import okio.Path.Companion.toPath
 
-@Inject
 class TempFileWriter(
     private val logger: Logger,
     private val fileManager: FileManager,
-    @TempDirectory baseDirectory: Path? = null,
+    baseDirectory: Path? = null,
 ) {
     private val tempFolder: Path = (baseDirectory ?: S2C_TEMP_FOLDER.toPath())
 

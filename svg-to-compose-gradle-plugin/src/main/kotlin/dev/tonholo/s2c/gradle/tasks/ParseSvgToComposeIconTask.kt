@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.gradle.tasks
 
 import com.android.build.gradle.BaseExtension
-import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
@@ -9,14 +8,18 @@ import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
 import dev.tonholo.s2c.gradle.internal.cache.CacheManager
-import dev.tonholo.s2c.gradle.internal.inject.DependencyModule
+import dev.tonholo.s2c.gradle.internal.inject.GradlePluginGraph
 import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
+import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
 import dev.tonholo.s2c.gradle.tasks.worker.toResult
+import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
+import dev.zacsweers.metro.createGraphFactory
+import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
@@ -42,6 +45,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.Properties
 import javax.inject.Inject
+import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
@@ -52,17 +56,21 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val gradle: Gradle,
 ) : DefaultTask() {
     @Transient
-    private val dependencies: DependencyModule = DependencyModule(
-        logger = Logging.getLogger("ParseSvgToComposeIconTask"),
-        buildDirectory = projectLayout.buildDirectory,
-        tempDirectory = temporaryDir,
-    )
+    private val graph: GradlePluginGraph by lazy {
+        val s2cGraph = createS2cGraph(
+            logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
+            fileSystem = FileSystem.SYSTEM,
+        )
+        createGraphFactory<GradlePluginGraph.Factory>().create(
+            svgToComposeGraph = s2cGraph,
+            buildDirectory = projectLayout.buildDirectory,
+        )
+    }
 
     @Transient
-    private val logger: Logger = dependencies.s2cLogger
-    private val processor: Processor = dependencies.processor
-    private val fileManager: FileManager by lazy { dependencies.fileManager }
-    private val cacheManager: CacheManager by lazy { dependencies.cacheManager }
+    private val logger: Logger get() = graph.logger
+    private val fileManager: FileManager get() = graph.fileManager
+    private val cacheManager: CacheManager get() = graph.cacheManager
 
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
@@ -135,6 +143,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @TaskAction
     fun run() {
+        val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
+        S2cWorkerBridge.processorFactory = graph.processorFactory
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
             cacheManager.initialize(configurations.asMap)
@@ -177,6 +187,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 )
             }
         } finally {
+            S2cWorkerBridge.processorFactory = null
             processor.dispose()
         }
     }
@@ -266,7 +277,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         submit(IconParsingWorkAction::class.java) {
             inputFilePath.set(path.toFile().absolutePath)
             outputDirPath.set(finalFile.absolutePath)
-            tempDirPath.set(temporaryDir.absolutePath)
             this.destinationPackage.set(destinationPackage)
             this.recursive.set(false) // recursive handled at plugin level
             maxDepth.set(configuration.maxDepth.get())
@@ -280,6 +290,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
             kmpPreview.set(isKmp)
             resultFilePath.set(resultFile.absolutePath)
+            tempDirPath.set(temporaryDir.resolve("worker-${path.name.hashCode()}").absolutePath)
         }
     }
 
