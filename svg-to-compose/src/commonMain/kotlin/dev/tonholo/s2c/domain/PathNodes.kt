@@ -166,8 +166,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x = ${x}f",
-                "${relativePrefix}y = ${y}f",
+                "${relativePrefix}x = ${x.toFloat()}f",
+                "${relativePrefix}y = ${y.toFloat()}f",
             )
         }
 
@@ -178,7 +178,7 @@ sealed class PathNodes(
             )
         }
 
-        override fun toString(): String = "$realCommand $x $y" + super.toString()
+        override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of this [MoveTo] with the given properties.
@@ -293,16 +293,16 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a}f"
-            val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b}f"
+            val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a.toFloat()}f"
+            val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b.toFloat()}f"
             return setOf(
                 a,
                 b,
-                "theta = ${theta}f",
+                "theta = ${theta.toFloat()}f",
                 "isMoreThanHalf = $isMoreThanHalf",
                 "isPositiveArc = $isPositiveArc",
-                "${relativePrefix}x1 = ${x}f",
-                "${relativePrefix}y1 = ${y}f",
+                "${relativePrefix}x1 = ${x.toFloat()}f",
+                "${relativePrefix}y1 = ${y.toFloat()}f",
             )
         }
 
@@ -312,9 +312,11 @@ sealed class PathNodes(
             )
         }
 
-        override fun toString(): String =
-            "$realCommand ${this.a} ${this.b} $theta ${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} $x $y" +
-                super.toString()
+        override fun toString(): String {
+            val arc = "$realCommand ${this.a.toFloat()} ${this.b.toFloat()} ${theta.toFloat()}"
+            val flags = "${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} ${x.toFloat()} ${y.toFloat()}"
+            return "$arc $flags" + super.toString()
+        }
 
         /**
          * Creates a copy of this [ArcTo] instance with the specified values.
@@ -412,7 +414,7 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            return setOf("${relativePrefix}y = ${y}f")
+            return setOf("${relativePrefix}y = ${y.toFloat()}f")
         }
 
         override fun materialize(): String {
@@ -423,7 +425,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $y" + super.toString()
+            return "$realCommand ${y.toFloat()}" + super.toString()
         }
 
         /**
@@ -495,7 +497,7 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            return setOf("${relativePrefix}x = ${x}f")
+            return setOf("${relativePrefix}x = ${x.toFloat()}f")
         }
 
         override fun materialize(): String {
@@ -506,7 +508,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x" + super.toString()
+            return "$realCommand ${x.toFloat()}" + super.toString()
         }
 
         /**
@@ -588,8 +590,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x = ${x}f",
-                "${relativePrefix}y = ${y}f",
+                "${relativePrefix}x = ${x.toFloat()}f",
+                "${relativePrefix}y = ${y.toFloat()}f",
             )
         }
 
@@ -601,7 +603,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x $y" + super.toString()
+            return "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
         }
 
         /**
@@ -685,12 +687,12 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1}f",
-                "${relativePrefix}y1 = ${y1}f",
-                "${relativePrefix}x2 = ${x2}f",
-                "${relativePrefix}y2 = ${y2}f",
-                "${relativePrefix}x3 = ${x3}f",
-                "${relativePrefix}y3 = ${y3}f",
+                "${relativePrefix}x1 = ${x1.toFloat()}f",
+                "${relativePrefix}y1 = ${y1.toFloat()}f",
+                "${relativePrefix}x2 = ${x2.toFloat()}f",
+                "${relativePrefix}y2 = ${y2.toFloat()}f",
+                "${relativePrefix}x3 = ${x3.toFloat()}f",
+                "${relativePrefix}y3 = ${y3.toFloat()}f",
             )
         }
 
@@ -701,7 +703,8 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x1 $y1 $x2 $y2 $x3 $y3" + super.toString()
+            val controls = "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}"
+            return "$controls ${x3.toFloat()} ${y3.toFloat()}" + super.toString()
         }
 
         /**
@@ -798,10 +801,10 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1}f",
-                "${relativePrefix}y1 = ${y1}f",
-                "${relativePrefix}x2 = ${x2}f",
-                "${relativePrefix}y2 = ${y2}f",
+                "${relativePrefix}x1 = ${x1.toFloat()}f",
+                "${relativePrefix}y1 = ${y1.toFloat()}f",
+                "${relativePrefix}x2 = ${x2.toFloat()}f",
+                "${relativePrefix}y2 = ${y2.toFloat()}f",
             )
         }
 
@@ -812,7 +815,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
+            return "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
         }
 
         /**
@@ -900,10 +903,10 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1}f",
-                "${relativePrefix}y1 = ${y1}f",
-                "${relativePrefix}x2 = ${x2}f",
-                "${relativePrefix}y2 = ${y2}f",
+                "${relativePrefix}x1 = ${x1.toFloat()}f",
+                "${relativePrefix}y1 = ${y1.toFloat()}f",
+                "${relativePrefix}x2 = ${x2.toFloat()}f",
+                "${relativePrefix}y2 = ${y2.toFloat()}f",
             )
         }
 
@@ -914,7 +917,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x1 $y1 $x2 $y2" + super.toString()
+            return "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
         }
 
         /**
@@ -1002,8 +1005,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1}f",
-                "${relativePrefix}y1 = ${y1}f",
+                "${relativePrefix}x1 = ${x1.toFloat()}f",
+                "${relativePrefix}y1 = ${y1.toFloat()}f",
             )
         }
 
@@ -1014,7 +1017,7 @@ sealed class PathNodes(
         }
 
         override fun toString(): String {
-            return "$realCommand $x1 $y1" + super.toString()
+            return "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
         }
 
         /**
