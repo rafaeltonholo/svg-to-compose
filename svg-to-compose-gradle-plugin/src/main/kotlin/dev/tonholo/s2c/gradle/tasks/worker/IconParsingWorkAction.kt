@@ -1,12 +1,9 @@
 package dev.tonholo.s2c.gradle.tasks.worker
 
-import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.error.ParserException
 import dev.tonholo.s2c.gradle.internal.logger.Logger
-import dev.tonholo.s2c.io.FileManager
-import dev.tonholo.s2c.io.IconWriter
-import dev.tonholo.s2c.io.TempFileWriter
+import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.parser.ParserConfig
 import okio.Path.Companion.toPath
 import org.gradle.api.logging.Logging
@@ -38,16 +35,15 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
     override fun execute() {
         val gradleLogger = Logging.getLogger(IconParsingWorkAction::class.simpleName)
         val logger = Logger(gradleLogger)
-        val fileManager = FileManager(okio.FileSystem.SYSTEM, logger)
         // Use an isolated temp directory per work item to avoid races between workers
         val isolatedTempRoot = parameters.tempDirPath.get().toPath() /
             (".s2c/temp/gradle-worker/" + UUID.randomUUID().toString()).toPath()
-        val processor = Processor(
+        val graph = createS2cGraph(
             logger = logger,
-            fileManager = fileManager,
-            iconWriter = IconWriter(logger, fileManager),
-            tempFileWriter = TempFileWriter(logger, fileManager, isolatedTempRoot),
+            fileSystem = okio.FileSystem.SYSTEM,
+            tempDirectory = isolatedTempRoot,
         )
+        val processor = graph.processor
         val origin = parameters.inputFilePath.get().toPath()
         val outputDir = parameters.outputDirPath.get().toPath()
 

@@ -2,82 +2,58 @@ package dev.tonholo.s2c.gradle.internal.inject
 
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.gradle.internal.cache.CacheManager
+import dev.tonholo.s2c.gradle.internal.logger.Logger
+import dev.tonholo.s2c.inject.S2cGraph
+import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.io.FileManager
-import dev.tonholo.s2c.io.IconWriter
-import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
 import java.io.File
 import org.gradle.api.logging.Logger as GradleLogger
 
+/**
+ * Internal dependency module that manages and provides access to svg-to-compose processing
+ * components.
+ *
+ * This module acts as a centralized container for dependency injection and management
+ * of core svg-to-compose processing components. It lazily initializes the dependency
+ * graph and provides access to essential processing components such as the processor,
+ * file manager, logger, and cache manager.
+ *
+ * The module bridges Gradle-specific dependencies (like [GradleLogger] and [DirectoryProperty])
+ * with the svg-to-compose processing system's internal dependencies, adapting external
+ * dependencies to the expected internal interfaces.
+ *
+ * @param logger The Gradle logger used for logging operations, which gets adapted to the
+ *  internal Logger interface.
+ * @param buildDirectory The Gradle build directory property used by the cache manager for
+ *  storing cached artifacts.
+ * @param tempDirectory The temporary directory for storing intermediate files during
+ *  processing operations.
+ */
 internal class DependencyModule(
-    private val objectFactory: ObjectFactory,
-    private val providerFactory: ProviderFactory,
     private val logger: GradleLogger,
     private val buildDirectory: DirectoryProperty,
     private val tempDirectory: File,
 ) {
-    val providers = mapOf<Class<*>, () -> Provider<out Any>>(
-        Logger::class.java to ::provideLogger,
-        FileSystem::class.java to ::provideFileSystem,
-        FileManager::class.java to ::provideFileManager,
-        Processor::class.java to ::provideProcessor,
-        CacheManager::class.java to ::provideCacheManager,
-    )
-
-    private fun provideLogger(): Provider<Logger> {
-        return providerFactory
-            .provider { dev.tonholo.s2c.gradle.internal.logger.Logger(logger) }
+    private val graph: S2cGraph by lazy {
+        createS2cGraph(
+            logger = Logger(logger),
+            fileSystem = FileSystem.SYSTEM,
+            tempDirectory = tempDirectory.toOkioPath(),
+        )
     }
 
-    private fun provideFileSystem(): Provider<FileSystem> =
-        providerFactory
-            .provider { FileSystem.SYSTEM }
-
-    private fun provideFileManager(): Provider<FileManager> =
-        providerFactory
-            .provider {
-                FileManager(get(), get())
-            }
-
-    private fun provideProcessor(): Provider<Processor> = providerFactory
-        .provider {
-            Processor(
-                logger = get(),
-                fileManager = get(),
-                iconWriter = IconWriter(get(), get()),
-                tempFileWriter = TempFileWriter(get(), get(), tempDirectory.toOkioPath()),
-            )
-        }
-
-    private fun provideCacheManager(): Provider<CacheManager> = providerFactory
-        .provider {
-            CacheManager(
-                logger = get(),
-                fileManager = get(),
-                buildDirectory = buildDirectory,
-            )
-        }
-
-    inline fun <reified T : Any> get(): T = objectFactory
-        .property(T::class.java)
-        .apply {
-            if (!isPresent) {
-                val provider = providers[T::class.java]
-                    ?: throw IllegalArgumentException("No provider found for ${T::class.java.simpleName}")
-                val instance = provider.invoke().get()
-                if (instance !is T) {
-                    throw ClassCastException(
-                        "Provider returned ${instance::class.java.simpleName} but expected ${T::class.java.simpleName}",
-                    )
-                }
-                set(instance)
-            }
-        }
-        .get()
+    val s2cLogger: Logger get() = graph.logger
+    val processor: Processor get() = graph.processor
+    val fileManager: FileManager get() = graph.fileManager
+    val cacheManager: CacheManager by lazy {
+        CacheManager(
+            logger = graph.logger,
+            fileManager = graph.fileManager,
+            buildDirectory = buildDirectory,
+        )
+    }
 }
