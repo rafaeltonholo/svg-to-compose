@@ -22,7 +22,7 @@ internal class IconParserConfigurationImpl(
     override val name: String = "icons"
     override val iconVisibility: Property<IconVisibility> = objectFactory.property<IconVisibility>()
 
-    internal val receiverType: Property<String?> = objectFactory.property<String?>()
+    internal val receiverType: Property<String> = objectFactory.property<String>()
 
     internal val addToMaterialIcons: Property<Boolean> = objectFactory.property<Boolean>()
 
@@ -32,11 +32,13 @@ internal class IconParserConfigurationImpl(
 
     internal val theme: Property<String> = objectFactory.property<String>()
 
-    internal val mapIconNameTo: Property<IconMapper?> = objectFactory.property<IconMapper?>()
+    @Suppress("UNCHECKED_CAST")
+    internal val mapIconNameTo: Property<IconMapper> =
+        objectFactory.property(IconMapper::class.java) as Property<IconMapper>
 
-    internal val exclude: Property<Regex?> = objectFactory.property<Regex?>()
+    internal val exclude: Property<Regex> = objectFactory.property<Regex>()
 
-    internal val isCodeGenerationPersistent: Property<Boolean?> = objectFactory.property<Boolean?>()
+    internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
 
     override fun makeInternal() {
         iconVisibility.set(IconVisibility.Internal)
@@ -122,10 +124,7 @@ internal class IconParserConfigurationImpl(
                     IconVisibility.Public
                 }
             )
-        receiverType.setIfNotPresent(
-            provider = common.receiverType,
-            defaultValue = null,
-        )
+        receiverType.setIfNotPresent(provider = common.receiverType)
         addToMaterialIcons.setIfNotPresent(
             provider = common.addToMaterialIcons,
             defaultValue = AppDefaults.ADD_TO_MATERIAL_ICONS,
@@ -133,8 +132,8 @@ internal class IconParserConfigurationImpl(
         minified.setIfNotPresent(provider = common.minified, defaultValue = AppDefaults.MINIFIED)
         noPreview.setIfNotPresent(provider = common.noPreview, defaultValue = AppDefaults.NO_PREVIEW)
         theme.setIfNotPresent(provider = common.theme, defaultValue = "")
-        mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo, defaultValue = null)
-        exclude.setIfNotPresent(provider = common.exclude, defaultValue = null)
+        mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo)
+        exclude.setIfNotPresent(provider = common.exclude)
     }
 
     override fun toString(): String {

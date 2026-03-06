@@ -64,7 +64,7 @@ internal class DependencyModule(
             )
         }
 
-    inline fun <reified T> get(): T = objectFactory
+    inline fun <reified T : Any> get(): T = objectFactory
         .property(T::class.java)
         .apply {
             if (!isPresent) {

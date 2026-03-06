@@ -7,6 +7,7 @@ okio = "3.16.4"
 detekt = "1.23.8"
 ksoup = "0.2.6"
 jetbrains-annotation = "26.1.0"
+metro = "0.11.2"
 maven-publish = "0.31.0"
 buildconfig = "5.6.8"
 dokka = "1.9.20"
@@ -30,3 +31,4 @@ com-vanniktech-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-pu
 
 [plugins]
 app-cash-burst = { id = "app.cash.burst", version.ref = "burst" }
+dev-zacsweers-metro = { id = "dev.zacsweers.metro", version.ref = "metro" }

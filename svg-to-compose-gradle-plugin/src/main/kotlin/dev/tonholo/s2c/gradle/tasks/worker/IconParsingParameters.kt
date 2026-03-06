@@ -16,11 +16,11 @@ internal interface IconParsingParameters : WorkParameters {
     val optimize: Property<Boolean>
     val minified: Property<Boolean>
     val theme: Property<String>
-    val receiverType: Property<String?>
+    val receiverType: Property<String>
     val addToMaterial: Property<Boolean>
     val noPreview: Property<Boolean>
     val makeInternal: Property<Boolean>
-    val excludePattern: Property<String?>
+    val excludePattern: Property<String>
     val kmpPreview: Property<Boolean>
     val recursive: Property<Boolean>
     val maxDepth: Property<Int>
