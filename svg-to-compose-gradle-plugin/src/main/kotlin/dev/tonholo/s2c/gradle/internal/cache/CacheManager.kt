@@ -36,7 +36,8 @@ internal class CacheManager(
     fun hasCacheChanged(path: Path): Boolean {
         val currentHash = calculateFileHash(path)
         val prev = fileHashMap.get(origin = path)
-        val hasChanged = prev?.hash != currentHash
+        val outputMissing = prev?.output != null && !fileManager.exists(prev.output.toPath())
+        val hasChanged = prev?.hash != currentHash || outputMissing
         if (hasChanged && prev != null) {
             fileHashMap.remove(prev)
             fileHashMap.add(prev.copy(hash = currentHash))
