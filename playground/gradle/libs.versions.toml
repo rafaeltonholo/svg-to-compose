@@ -1,7 +1,6 @@
 [versions]
 activity-compose = "1.12.4"
-agp = "9.0.1"
-androidxComposeCompiler = "1.5.10"
+agp = "9.1.0"
 compose-bom = "2026.02.00"
 core-ktx = "1.17.0"
 googleMaterial = "1.13.0"
@@ -24,7 +23,6 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dev-tonholo-s2c = { id = "dev.tonholo.s2c", version.ref = "s2c" }
 
