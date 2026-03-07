@@ -26,16 +26,14 @@ abstract class ProcessorConfiguration @Inject constructor(
     internal val maxDepth: Property<Int> = objectFactory.property<Int>()
     internal val optimize: Property<Boolean> = objectFactory.property<Boolean>()
 
-    internal val iconConfiguration: Property<IconParserConfigurationImpl> by lazy {
-        objectFactory
-            .property<IconParserConfigurationImpl>()
-            .convention(
-                IconParserConfigurationImpl(
-                    objectFactory = objectFactory,
-                    parentName = fullName,
-                ),
-            )
-    }
+    internal val iconConfiguration: Property<IconParserConfigurationImpl> = objectFactory
+        .property<IconParserConfigurationImpl>()
+        .convention(
+            IconParserConfigurationImpl(
+                objectFactory = objectFactory,
+                parentName = fullName,
+            ),
+        )
 
     override fun from(origin: Directory) {
         this.origin.set(origin)

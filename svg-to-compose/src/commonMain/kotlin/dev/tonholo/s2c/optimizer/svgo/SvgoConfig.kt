@@ -72,7 +72,6 @@ export default {
       name: "preset-default",
       params: {
         overrides: {
-          removeViewBox: false,
           convertShapeToPath: false,
           convertPathData: false,
         },

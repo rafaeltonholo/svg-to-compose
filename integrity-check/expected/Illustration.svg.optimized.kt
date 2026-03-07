@@ -1,29 +1,20 @@
-package dev.tonholo.svg_to_compose.playground.ui.icon.svg
+package dev.tonholo.s2c.integrity.icon.svg
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val IllustrationSvgOptimized: ImageVector
+val Illustration: ImageVector
     get() {
-        val current = _illustrationSvgOptimized
+        val current = _illustration
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme.IllustrationSvgOptimized",
+            name = ".Illustration",
             defaultWidth = 116.0.dp,
             defaultHeight = 114.0.dp,
             viewportWidth = 116.0f,
@@ -4923,27 +4914,8 @@ val IllustrationSvgOptimized: ImageVector
                     dy3 = -2.06f,
                 )
             }
-        }.build().also { _illustrationSvgOptimized = it }
+        }.build().also { _illustration = it }
     }
-
-@Preview
-@Composable
-private fun IconPreview() {
-    dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                imageVector = IllustrationSvgOptimized,
-                contentDescription = null,
-                modifier = Modifier
-                    .width((116.0).dp)
-                    .height((114.0).dp),
-            )
-        }
-    }
-}
 
 @Suppress("ObjectPropertyName")
-private var _illustrationSvgOptimized: ImageVector? = null
+private var _illustration: ImageVector? = null

@@ -1,27 +1,18 @@
-package dev.tonholo.svg_to_compose.playground.ui.icon.avg
+package dev.tonholo.s2c.integrity.icon.avg
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val ShieldSolidAvgOptimized: ImageVector
+val ShieldHalvedSolid: ImageVector
     get() {
-        val current = _shieldSolidAvgOptimized
+        val current = _shieldHalvedSolid
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme.ShieldSolidAvgOptimized",
+            name = ".ShieldHalvedSolid",
             defaultWidth = 16.0.dp,
             defaultHeight = 16.0.dp,
             viewportWidth = 512.0f,
@@ -118,27 +109,8 @@ val ShieldSolidAvgOptimized: ImageVector
                 lineTo(x = 256.0f, y = 66.8f)
                 close()
             }
-        }.build().also { _shieldSolidAvgOptimized = it }
+        }.build().also { _shieldHalvedSolid = it }
     }
-
-@Preview
-@Composable
-private fun IconPreview() {
-    dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                imageVector = ShieldSolidAvgOptimized,
-                contentDescription = null,
-                modifier = Modifier
-                    .width((512.0).dp)
-                    .height((512.0).dp),
-            )
-        }
-    }
-}
 
 @Suppress("ObjectPropertyName")
-private var _shieldSolidAvgOptimized: ImageVector? = null
+private var _shieldHalvedSolid: ImageVector? = null

@@ -20,6 +20,18 @@ gradlePlugin {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+    }
+
+    sourceSets {
+        test {
+            resources.srcDirs(rootProject.layout.projectDirectory.dir("samples"))
+        }
+    }
+}
+
 mavenPublishing {
     configure(
         GradlePlugin(

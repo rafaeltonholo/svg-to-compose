@@ -27,14 +27,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.impldep.kotlinx.serialization.Transient
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.workers.WorkQueue
@@ -54,30 +54,23 @@ internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
-    private val gradle: Gradle,
 ) : DefaultTask() {
-    @Transient
-    private val graph: GradlePluginGraph by lazy {
+    private fun createGraph(): GradlePluginGraph {
         val s2cGraph = createS2cGraph(
             logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
             fileSystem = FileSystem.SYSTEM,
         )
-        createGraphFactory<GradlePluginGraph.Factory>().create(
+        return createGraphFactory<GradlePluginGraph.Factory>().create(
             svgToComposeGraph = s2cGraph,
             buildDirectory = projectLayout.buildDirectory,
         )
     }
 
-    @Transient
-    private val logger: Logger get() = graph.logger
-    private val fileManager: FileManager get() = graph.fileManager
-    private val cacheManager: CacheManager get() = graph.cacheManager
-
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
 
-    @Transient
-    private val logLevel: LogLevel by lazy { gradle.startParameter.logLevel }
+    @get:Input
+    internal abstract val logLevel: Property<LogLevel>
 
     init {
         group = "svg-to-compose"
@@ -144,16 +137,20 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @TaskAction
     fun run() {
+        val graph = createGraph()
+        val logger = graph.logger
+        val fileManager = graph.fileManager
+        val cacheManager = graph.cacheManager
         val bridgeToken = UUID.randomUUID().toString()
         val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
-            logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
+            logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
             cacheManager.initialize(configurations.asMap)
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
             configurations.forEach { configuration ->
-                val filesToProcess = findFilesToProcess(configuration)
+                val filesToProcess = findFilesToProcess(configuration, fileManager, cacheManager)
 
                 if (filesToProcess.isEmpty()) {
                     logger.info("No files to process for configuration '${configuration.name}'")
@@ -175,6 +172,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     errors,
                     outputFiles,
                     bridgeToken,
+                    logger,
                 )
                 logger.debug("End processing ${filesToProcess.size} files.")
             }
@@ -212,6 +210,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         errors: MutableMap<Path, Throwable>,
         outputFiles: MutableMap<Path, Path>,
         bridgeToken: String,
+        logger: Logger,
     ) {
         // Prepare worker queue
         var queue: WorkQueue
@@ -344,7 +343,11 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
-    private fun findFilesToProcess(configuration: ProcessorConfiguration): List<Path> {
+    private fun findFilesToProcess(
+        configuration: ProcessorConfiguration,
+        fileManager: FileManager,
+        cacheManager: CacheManager,
+    ): List<Path> {
         val iconConfiguration = configuration.iconConfiguration.get()
 
         val files = fileManager.findFilesToProcess(
@@ -381,6 +384,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         isKmp = kmpExtension != null
         configurations = extension.configurations
         maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
+        logLevel.set(project.gradle.startParameter.logLevel)
     }
 
     // Register this task as a dependency of KotlinCompile
