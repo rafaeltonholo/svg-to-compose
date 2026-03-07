@@ -5,9 +5,11 @@ import dev.tonholo.s2c.gradle.internal.cache.CacheManager
 import dev.tonholo.s2c.inject.SvgToComposeGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Includes
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import org.gradle.api.file.DirectoryProperty
 
 /**
@@ -20,7 +22,7 @@ import org.gradle.api.file.DirectoryProperty
  * via [S2cWorkerBridge][dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge]
  * and create isolated [Processor] instances with per-worker temp directories.
  */
-@DependencyGraph
+@DependencyGraph(AppScope::class)
 internal interface GradlePluginGraph {
     val processorFactory: Processor.Factory
     val fileManager: FileManager
@@ -28,6 +30,7 @@ internal interface GradlePluginGraph {
     val cacheManager: CacheManager
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideCacheManager(
         logger: Logger,
         fileManager: FileManager,
