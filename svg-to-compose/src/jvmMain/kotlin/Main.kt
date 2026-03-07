@@ -1,6 +1,5 @@
-import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.logger.CommonLogger
 import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
@@ -40,11 +39,11 @@ private fun main() {
         kmpPreview = false,
     )
     try {
-        val fileSystem = FileSystem.SYSTEM
-        Processor(
+        val graph = createS2cGraph(
             logger = CommonLogger(),
-            fileManager = FileManager(fileSystem, CommonLogger()),
-        ).run(
+            fileSystem = FileSystem.SYSTEM,
+        )
+        graph.processorFactory.create(tempDirectory = null).run(
             path = path,
             output = output,
             config = config,

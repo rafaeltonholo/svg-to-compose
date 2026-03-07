@@ -2,8 +2,9 @@ import com.vanniktech.maven.publish.GradlePlugin
 import com.vanniktech.maven.publish.JavadocJar
 
 plugins {
-    `kotlin-dsl`
+    `java-gradle-plugin`
     dev.tonholo.s2c.conventions.gradle.plugin
+    alias(libs.plugins.dev.zacsweers.metro)
 }
 
 gradlePlugin {
@@ -16,18 +17,6 @@ gradlePlugin {
             displayName = "SVG/AVG to Compose"
             description = "Converts SVG and AVG to Android Jetpack Compose Icons."
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-receivers")
-    }
-}
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions {
-        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
-        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
     }
 }
 
@@ -53,4 +42,5 @@ dependencies {
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
     implementation(libs.com.squareup.okio)
     implementation(projects.svgToCompose)
+    testImplementation(kotlin("test"))
 }

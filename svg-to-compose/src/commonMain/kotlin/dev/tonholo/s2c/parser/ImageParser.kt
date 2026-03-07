@@ -15,6 +15,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
+import dev.zacsweers.metro.Inject
 import okio.Path
 
 /**
@@ -260,6 +261,7 @@ sealed class ImageParser(
      *
      * @param fileManager a [FileManager] instance that allows reading from the file system.
      */
+    @Inject
     class Factory(fileManager: FileManager) {
         private val parsers: Map<String, () -> ImageParser> = mapOf(
             FileType.Svg.extension to { SvgImageParser(fileManager) },

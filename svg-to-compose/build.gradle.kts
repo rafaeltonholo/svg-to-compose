@@ -5,6 +5,7 @@ plugins {
     dev.tonholo.s2c.conventions.kmp
     dev.tonholo.s2c.conventions.testing
     alias(libs.plugins.app.cash.burst)
+    alias(libs.plugins.dev.zacsweers.metro)
 }
 
 kotlin {
