@@ -24,8 +24,8 @@ import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.file.Directory
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
