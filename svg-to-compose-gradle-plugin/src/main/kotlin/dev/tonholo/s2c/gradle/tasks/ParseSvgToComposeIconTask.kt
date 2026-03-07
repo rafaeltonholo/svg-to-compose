@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.gradle.tasks
 
-import com.android.build.gradle.BaseExtension
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
@@ -25,12 +24,14 @@ import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.file.Directory
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -50,6 +51,7 @@ import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
+internal const val COMMON_CONFIGURATION_NAME = "common"
 
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val objectFactory: ObjectFactory,
@@ -94,6 +96,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     private val outputDirectories: Map<String, File>
         get() = configurations
+            .filter { it.name != COMMON_CONFIGURATION_NAME }
             .associate { configuration ->
                 val destination = configuration.destinationPackage.get().replace(".", "/")
                 val outputFolder =
@@ -146,10 +149,12 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
-            cacheManager.initialize(configurations.asMap)
+            val activeConfigurations = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
+            val activeConfigMap = activeConfigurations.associateBy { it.name }
+            cacheManager.initialize(activeConfigMap)
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
-            configurations.forEach { configuration ->
+            activeConfigurations.forEach { configuration ->
                 val filesToProcess = findFilesToProcess(configuration, fileManager, cacheManager)
 
                 if (filesToProcess.isEmpty()) {
@@ -392,7 +397,22 @@ internal fun Project.registerParseSvgToComposeIconTask(
         dependsOn(task)
     }
 
-    val outputDirectories = task.map { it.sourceDirectory }
+    // Compute the output source directory independently to avoid eagerly
+    // realizing the task (which would trigger task configuration before the
+    // DSL has been fully evaluated).
+    val outputSourceDir = layout.buildDirectory.dir(
+        buildString {
+            append(GENERATED_FOLDER)
+            append(
+                if (kmpExtension != null) {
+                    "/commonMain"
+                } else {
+                    "/main"
+                },
+            )
+            append("/kotlin/")
+        },
+    )
 
     if (kmpExtension != null) {
         val sourceSet = kmpExtension.targets
@@ -402,17 +422,39 @@ internal fun Project.registerParseSvgToComposeIconTask(
             .defaultSourceSet
             .kotlin
 
-        sourceSet.srcDirs(outputDirectories)
+        sourceSet.srcDirs(outputSourceDir)
     } else {
-        val androidExtension = project.extensions.findByName("android") as? BaseExtension
+        val androidExtension = project.extensions.findByName("android")
         requireNotNull(androidExtension) {
             "Android plugin must be applied to use this plugin in Android projects"
         }
-        val sourceSet = androidExtension
-            .sourceSets
-            .first { it.name == "main" }
-            .kotlin
-
-        sourceSet.srcDirs(outputDirectories)
+        addAndroidSourceDir(androidExtension, outputSourceDir)
     }
+}
+
+/**
+ * Adds generated source directories to the Android "main" source set.
+ *
+ * Uses reflection to access the source set's kotlin directory configuration,
+ * supporting both AGP 8.x (BaseExtension) and AGP 9+ (CommonExtension)
+ * without a compile-time dependency on a specific AGP version.
+ */
+private fun addAndroidSourceDir(
+    androidExtension: Any,
+    outputSourceDir: Provider<Directory>,
+) {
+    val sourceSets = androidExtension.javaClass
+        .getMethod("getSourceSets")
+        .invoke(androidExtension) as NamedDomainObjectContainer<*>
+    val mainSourceSet = sourceSets.findByName("main")
+        ?: error("Could not find 'main' source set in the Android extension")
+    val kotlinSourceDir = mainSourceSet.javaClass
+        .getMethod("getKotlin")
+        .invoke(mainSourceSet)
+        ?: error("Could not access kotlin source directory set from the Android 'main' source set")
+    // Pass the resolved directory. Using .get().asFile to avoid passing a
+    // Provider (which AGP 9+ source set API does not accept).
+    kotlinSourceDir.javaClass
+        .getMethod("srcDir", Any::class.java)
+        .invoke(kotlinSourceDir, outputSourceDir.get().asFile)
 }
