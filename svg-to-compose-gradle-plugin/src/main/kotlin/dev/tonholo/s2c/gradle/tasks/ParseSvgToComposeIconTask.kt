@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.Properties
+import java.util.UUID
 import javax.inject.Inject
 import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
 
@@ -143,8 +144,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     @TaskAction
     fun run() {
+        val bridgeToken = UUID.randomUUID().toString()
         val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
-        S2cWorkerBridge.processorFactory = graph.processorFactory
+        S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel)
             cacheManager.initialize(configurations.asMap)
@@ -164,7 +166,16 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 val parent = configuration.origin.get().asFile.toOkioPath()
                 val recursive = configuration.recursive.get()
                 logger.debug("Processing ${filesToProcess.size} files")
-                processFiles(filesToProcess, configuration, recursive, parent, iconConfiguration, errors, outputFiles)
+                processFiles(
+                    filesToProcess,
+                    configuration,
+                    recursive,
+                    parent,
+                    iconConfiguration,
+                    errors,
+                    outputFiles,
+                    bridgeToken,
+                )
                 logger.debug("End processing ${filesToProcess.size} files.")
             }
 
@@ -187,7 +198,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 )
             }
         } finally {
-            S2cWorkerBridge.processorFactory = null
+            S2cWorkerBridge.unregister(bridgeToken)
             processor.dispose()
         }
     }
@@ -199,7 +210,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         parent: Path,
         iconConfiguration: IconParserConfigurationImpl,
         errors: MutableMap<Path, Throwable>,
-        outputFiles: MutableMap<Path, Path>
+        outputFiles: MutableMap<Path, Path>,
+        bridgeToken: String,
     ) {
         // Prepare worker queue
         var queue: WorkQueue
@@ -224,7 +236,15 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     val destinationPackage = buildDestinationPackage(configuration, recursive, path, parent)
                     val resultFile = File(resultsDir, "result-$globalIndex.properties")
                     // Pre-compute file output to avoid passing non-serializable icon name mapper to workers
-                    queue.submit(path, iconConfiguration, output, destinationPackage, configuration, resultFile)
+                    queue.submit(
+                        path,
+                        iconConfiguration,
+                        output,
+                        destinationPackage,
+                        configuration,
+                        resultFile,
+                        bridgeToken
+                    )
                 }
                 queue.await()
             }
@@ -269,7 +289,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         output: Path,
         destinationPackage: String,
         configuration: ProcessorConfiguration,
-        resultFile: File
+        resultFile: File,
+        bridgeToken: String,
     ) {
         val baseName = path.name.substringBeforeLast('.')
         val mappedName = iconConfiguration.mapIconNameTo.orNull?.invoke(baseName) ?: baseName
@@ -290,6 +311,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
             kmpPreview.set(isKmp)
             resultFilePath.set(resultFile.absolutePath)
+            this.bridgeToken.set(bridgeToken)
             tempDirPath.set(temporaryDir.resolve("worker-${path.name.hashCode()}").absolutePath)
         }
     }

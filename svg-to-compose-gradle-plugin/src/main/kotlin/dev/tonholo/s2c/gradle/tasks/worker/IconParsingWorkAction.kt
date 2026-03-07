@@ -26,9 +26,7 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
     override fun execute() {
         val isolatedTempRoot = parameters.tempDirPath.get().toPath() /
             (".s2c/temp/gradle-worker/" + UUID.randomUUID().toString()).toPath()
-        val factory = requireNotNull(S2cWorkerBridge.processorFactory) {
-            "S2cWorkerBridge.processorFactory must be set before submitting workers"
-        }
+        val factory = S2cWorkerBridge.get(parameters.bridgeToken.get())
         val processor = factory.create(tempDirectory = isolatedTempRoot)
 
         val origin = parameters.inputFilePath.get().toPath()

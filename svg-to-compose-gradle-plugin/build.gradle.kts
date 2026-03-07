@@ -42,4 +42,5 @@ dependencies {
     implementation(libs.org.jetbrains.kotlin.gradle.plugin)
     implementation(libs.com.squareup.okio)
     implementation(projects.svgToCompose)
+    testImplementation(kotlin("test"))
 }
