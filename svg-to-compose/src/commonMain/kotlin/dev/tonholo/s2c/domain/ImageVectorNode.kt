@@ -23,6 +23,13 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     val transformations: List<AffineTransformation>?
     val imports: Set<String>
 
+    @Deprecated(
+        message = "Use ImageVectorNodeEmitter.emit() instead.",
+        replaceWith = ReplaceWith(
+            expression = "ImageVectorNodeEmitter(logger).emit(this)",
+            imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
+        ),
+    )
     fun materialize(): String
 
     fun applyTransformation(): ImageVectorNode {

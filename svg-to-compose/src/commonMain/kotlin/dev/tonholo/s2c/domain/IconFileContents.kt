@@ -79,6 +79,13 @@ data class IconFileContents(
      *
      * @return The generated Kotlin code.
      */
+    @Deprecated(
+        message = "Use CodeEmitter.emit() instead.",
+        replaceWith = ReplaceWith(
+            expression = "ImageVectorEmitter(logger).emit(this)",
+            imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter"],
+        ),
+    )
     fun materialize(): String = verboseSection("Generating file") {
         verbose(
             """Parameters:
