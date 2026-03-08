@@ -62,6 +62,13 @@ sealed class PathNodes(
      */
     internal abstract fun buildParameters(): Set<String>
 
+    @Deprecated(
+        message = "Use PathNodeEmitter.emit() instead.",
+        replaceWith = ReplaceWith(
+            expression = "PathNodeEmitter(logger).emit(this)",
+            imports = ["dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter"],
+        ),
+    )
     abstract fun materialize(): String
 
     private fun closeCommand(): String = if (shouldClose) {
