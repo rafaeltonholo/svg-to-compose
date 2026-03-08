@@ -8,7 +8,7 @@ import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.createDashedPathForRect
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
-import dev.tonholo.s2c.logger.warn
+import dev.tonholo.s2c.logger.Logger
 
 class SvgRectNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
     SvgGraphicNode<SvgRectNode>(parent, attributes, TAG_NAME),
@@ -42,7 +42,10 @@ class SvgRectNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
     }
 }
 
-fun SvgRectNode.asNode(minified: Boolean): ImageVectorNode.Path {
+context(logger: Logger)
+fun SvgRectNode.asNode(
+    minified: Boolean,
+): ImageVectorNode.Path {
     val wrapper = createPath(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -62,6 +65,7 @@ fun SvgRectNode.asNode(minified: Boolean): ImageVectorNode.Path {
     )
 }
 
+context(logger: Logger)
 private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWrapper {
     val xCornerSize = rx ?: ry ?: 0.0
     val yCornerSize = ry ?: rx ?: 0.0
@@ -84,13 +88,14 @@ private fun SvgRectNode.createPath(isMinified: Boolean): ImageVectorNode.NodeWra
     )
 }
 
+context(logger: Logger)
 private fun SvgRectNode.createDashedRect(
     strokeDashArray: StrokeDashArray,
     x: Float,
     y: Float,
     isMinified: Boolean,
 ): List<PathNodes> {
-    warn(
+    logger.warn(
         "Parsing a `stroke-dasharray` attribute is experimental and " +
             "might differ a little from the original.",
     )

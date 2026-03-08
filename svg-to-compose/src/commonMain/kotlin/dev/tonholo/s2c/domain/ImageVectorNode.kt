@@ -12,11 +12,8 @@ import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.applyTransformations
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.NoOpLogger
-import dev.tonholo.s2c.logger.debug
-import dev.tonholo.s2c.logger.debugSection
-import dev.tonholo.s2c.logger.verbose
-import dev.tonholo.s2c.logger.verboseSection
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
 
@@ -235,14 +232,15 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     }
 }
 
+context(logger: Logger)
 fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
-    val nodes = verboseSection("Starting path") {
+    val nodes = logger.verboseSection("Starting path") {
         val commands = normalizedPath.split(" ").filter { it.isNotEmpty() }.toMutableList()
-        verbose("commands=$commands")
+        logger.verbose("commands=$commands")
         var lastCommand = Char.EMPTY
         val nodes = mutableListOf<PathNodes>()
-        while (commands.size > 0) {
+        while (commands.isNotEmpty()) {
             var current = commands.first()
             var currentCommand = current.first()
             val isContinuation = (currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') &&
@@ -262,8 +260,8 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
                 current = currentCommand + current
             }
 
-            verbose("current commands list=$commands")
-            verbose("current=$current, currentCommand=$currentCommand")
+            logger.verbose("current commands list=$commands")
+            logger.verbose("current=$current, currentCommand=$currentCommand")
 
             val isRelative = isRelativeCommand(nodes, currentCommand)
             current = current.lowercase()
@@ -294,6 +292,7 @@ private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean = c
     node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
     )
 
+context(logger: Logger)
 private fun createNode(
     current: String,
     commands: MutableList<String>,
@@ -311,7 +310,7 @@ private fun createNode(
         )
     }
 } catch (e: NumberFormatException) {
-    debug(
+    logger.debug(
         """
         |Error while parsing Path command. Received parameters:
         |current = $current,
@@ -324,9 +323,9 @@ private fun createNode(
     )
     throw e
 } catch (e: NoSuchElementException) {
-    debug(
+    logger.debug(
         """
-        |Error while parsing Path command. 
+        |Error while parsing Path command.
         |Path string must not be empty.
         |
         |Received parameters:
@@ -357,9 +356,10 @@ private fun StringBuilder.trimWhitespaceBeforeClose(lastChar: Char, current: Cha
     }
 }
 
+context(logger: Logger)
 private fun normalizePath(path: String): String {
-    debugSection("Normalizing path") {
-        debug("Original path value = $path")
+    logger.debugSection("Normalizing path") {
+        logger.debug("Original path value = $path")
     }
 
     val parsedPath = StringBuilder()
@@ -412,8 +412,8 @@ private fun normalizePath(path: String): String {
         lastChar = char
     }
 
-    debugSection("Finished Normalizing") {
-        debug("Normalized path value = $parsedPath")
+    logger.debugSection("Finished Normalizing") {
+        logger.debug("Normalized path value = $parsedPath")
     }
 
     return parsedPath.toString().trimStart()

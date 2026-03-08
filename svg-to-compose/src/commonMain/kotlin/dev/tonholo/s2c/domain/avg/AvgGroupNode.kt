@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
 
 class AvgGroupNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
     AvgElementNode(parent, children, attributes, tagName = TAG_NAME),
@@ -24,7 +25,10 @@ class AvgGroupNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attribu
     }
 }
 
-fun AvgGroupNode.asNode(minified: Boolean): ImageVectorNode.Group = ImageVectorNode.Group(
+context(logger: Logger)
+fun AvgGroupNode.asNode(
+    minified: Boolean,
+): ImageVectorNode.Group = ImageVectorNode.Group(
     params = ImageVectorNode.Group.Params(
         clipPath = clipPath?.pathData?.asNodeWrapper(minified),
         rotate = rotation,

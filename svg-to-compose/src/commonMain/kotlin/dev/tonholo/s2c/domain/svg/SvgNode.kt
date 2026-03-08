@@ -7,6 +7,7 @@ import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.ast.css.CssSpecificity
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
@@ -153,6 +154,7 @@ data class ComputedRule(val selector: String, val specificity: CssSpecificity, v
  * @return A list of [ImageVectorNode] representing the SVG node.
  * Returns `null` if the node is not supported.
  */
+context(logger: Logger)
 fun SvgNode.asNodes(
     computedRules: List<ComputedRule>,
     masks: List<SvgMaskNode>,

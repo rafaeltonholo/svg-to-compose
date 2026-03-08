@@ -23,7 +23,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "h 8"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -41,7 +41,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "H 8"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -65,7 +65,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -105,7 +105,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -147,7 +147,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "H$nonRelative h$relative"),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -179,7 +179,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "H${nonRelative}z h${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

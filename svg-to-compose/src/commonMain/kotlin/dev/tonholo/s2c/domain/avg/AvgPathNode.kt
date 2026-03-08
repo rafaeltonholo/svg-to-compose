@@ -12,6 +12,7 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 import dev.tonholo.s2c.extensions.toLengthFloat
+import dev.tonholo.s2c.logger.Logger
 
 class AvgPathNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
     AvgElementNode(parent, children, attributes, TAG_NAME),
@@ -83,7 +84,10 @@ class AvgPathNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attribut
     }
 }
 
-fun AvgPathNode.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
+context(logger: Logger)
+fun AvgPathNode.asNode(
+    minified: Boolean,
+): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
         fill = fillBrush,
         fillAlpha = fillAlpha,

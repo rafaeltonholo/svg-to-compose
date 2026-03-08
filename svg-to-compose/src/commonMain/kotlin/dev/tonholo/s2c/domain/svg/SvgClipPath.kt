@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
 
 class SvgClipPath(
     parent: XmlParentNode,
@@ -17,6 +18,7 @@ class SvgClipPath(
     }
 }
 
+context(logger: Logger)
 fun SvgClipPath.asNodeWrapper(
     computedRules: List<ComputedRule> = emptyList(),
     minified: Boolean = false,

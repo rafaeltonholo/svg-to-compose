@@ -62,13 +62,15 @@ sealed class Optimizer(private val logger: Logger) {
      * @return A [Boolean], `true` if the required command is available
      * and `false` if it's not.
      */
-    fun verifyDependency() = command(program = command) {
-        args(versionFlag)
-        showStdout = false
-        showStderr = false
-    }.also { (code, _) ->
-        logger.verbose("exit code = $code")
-    }.exitCode == 0
+    fun verifyDependency() = with(logger) {
+        command(program = command) {
+            args(versionFlag)
+            showStdout = false
+            showStderr = false
+        }.also { (code, _) ->
+            logger.verbose("exit code = $code")
+        }.exitCode == 0
+    }
 
     /**
      * Runs the optimization process on the given [file],
@@ -89,7 +91,10 @@ sealed class Optimizer(private val logger: Logger) {
      * @throws OptimizationException when the optimization
      * fails to run.
      */
-    protected fun runOptimization(errorCode: ErrorCode, vararg args: String) {
+    protected fun runOptimization(
+        errorCode: ErrorCode,
+        vararg args: String,
+    ): Unit = with(logger) {
         logger.verbose(
             """
                 |Args:

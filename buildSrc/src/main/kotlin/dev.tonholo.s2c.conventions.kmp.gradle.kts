@@ -15,7 +15,10 @@ kotlin {
     useNative()
     useJvm()
     compilerOptions {
-        freeCompilerArgs.add("-Xwhen-guards")
+        freeCompilerArgs.addAll(
+            "-Xwhen-guards",
+            "-Xcontext-parameters",
+        )
     }
 }
 

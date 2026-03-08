@@ -1,8 +1,10 @@
 package dev.tonholo.s2c.command
 
+import dev.tonholo.s2c.logger.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+context(logger: Logger)
 actual fun executeCommand(command: Command): CommandResult {
     val processBuilder = ProcessBuilder().apply {
         command("bash", "-c", command.commandToExecute)

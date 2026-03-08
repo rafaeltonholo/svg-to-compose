@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
+import dev.tonholo.s2c.logger.Logger
 
 class SvgGroupNode(
     parent: XmlParentNode,
@@ -26,6 +27,7 @@ class SvgGroupNode(
     }
 }
 
+context(logger: Logger)
 private fun SvgGroupNode.asNode(
     masks: List<SvgMaskNode>,
     computedRules: List<ComputedRule> = emptyList(),
@@ -48,6 +50,7 @@ private fun SvgGroupNode.asNode(
     )
 }
 
+context(logger: Logger)
 fun SvgGroupNode.flatNode(
     masks: List<SvgMaskNode>,
     computedRules: List<ComputedRule> = emptyList(),
@@ -68,6 +71,7 @@ fun SvgGroupNode.flatNode(
  * @param minified Whether to minify the output.
  * @return The group clip path, or null if no mask with the given ID is found.
  */
+context(logger: Logger)
 private fun SvgGroupNode.createGroupClipPath(
     computedRules: List<ComputedRule>,
     masks: List<SvgMaskNode>,

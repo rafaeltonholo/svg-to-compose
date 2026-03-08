@@ -23,7 +23,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "m85.122 64.795"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -41,7 +41,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "M85.122 64.795 m-5.122 4.7"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 2, actual = nodes.size)
@@ -59,7 +59,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "M85.122 64.795"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -82,7 +82,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             ),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -125,7 +125,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             ),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -170,7 +170,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             ),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -205,7 +205,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             ),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

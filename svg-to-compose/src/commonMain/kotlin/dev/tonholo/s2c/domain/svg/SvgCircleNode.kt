@@ -7,7 +7,7 @@ import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.toLengthFloat
-import dev.tonholo.s2c.logger.warn
+import dev.tonholo.s2c.logger.Logger
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -37,9 +37,12 @@ class SvgCircleNode(parent: XmlParentNode, attributes: MutableMap<String, String
     }
 }
 
-fun SvgCircleNode.asNode(minified: Boolean): ImageVectorNode = when {
+context(logger: Logger)
+fun SvgCircleNode.asNode(
+    minified: Boolean,
+): ImageVectorNode = when {
     strokeDashArray != null -> {
-        warn(
+        logger.warn(
             "Parsing a `stroke-dasharray` attribute is experimental and " +
                 "might differ a little from the original.",
         )
