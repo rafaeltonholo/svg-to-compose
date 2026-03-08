@@ -67,60 +67,6 @@ interface Logger {
     fun error(message: String, throwable: Throwable? = null)
 }
 
-// TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): Remove after passing logger via dependency.
-private val logger = CommonLogger()
-
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.debug(message)",
-    ),
-)
-internal fun debug(message: Any) = logger.debug(message)
-
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.debugSection(title, block)",
-    ),
-)
-internal fun <T> debugSection(title: String, block: () -> T): T =
-    logger.debugSection(title, block)
-
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.verboseSection(title, block)",
-    ),
-)
-internal fun <T> verboseSection(title: String, block: () -> T) =
-    logger.verboseSection(title, block)
-
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.verbose(message)",
-    ),
-)
-internal fun verbose(message: String) = logger.verbose(message)
-
-@Suppress("ForbiddenComment")
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.warn(message)",
-    ),
-)
-internal fun warn(message: String, throwable: Throwable? = null) = logger.warn(message, throwable)
-
-@Deprecated(
-    "Use logger instead.",
-    replaceWith = ReplaceWith(
-        expression = "logger.output(message)",
-    ),
-)
-internal fun output(message: String) = logger.output(message)
-
 internal fun printEmpty() {
     if (!AppConfig.silent) {
         println()

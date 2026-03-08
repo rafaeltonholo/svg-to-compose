@@ -2,7 +2,6 @@ package dev.tonholo.s2c.domain.xml
 
 import AppConfig
 import dev.tonholo.s2c.domain.delegate.attribute
-import dev.tonholo.s2c.logger.warn
 
 interface XmlNode {
     val tagName: String
@@ -91,10 +90,6 @@ abstract class XmlChildNode(
 
         if (this.parent == XmlPendingParentElement) {
             this.parent = parent
-        } else {
-            warn(
-                "Trying to attach $parent to a node that already has a parent. Current parent: ${this.parent}",
-            )
         }
     }
 }

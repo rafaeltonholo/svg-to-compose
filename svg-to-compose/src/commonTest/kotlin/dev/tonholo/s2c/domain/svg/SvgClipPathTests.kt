@@ -27,7 +27,7 @@ class SvgClipPathTests : BaseSvgTest() {
         val attributes = mutableMapOf<String, String>()
         val clipPath = SvgClipPath(root, children, attributes)
 
-        val nodeWrapper = clipPath.asNodeWrapper(minified = false)
+        val nodeWrapper = with(logger) { clipPath.asNodeWrapper(minified = false) }
 
         assertTrue(nodeWrapper.nodes.isEmpty())
         assertEquals("", nodeWrapper.normalizedPath)
@@ -61,7 +61,7 @@ class SvgClipPathTests : BaseSvgTest() {
         val minified = false
 
         // Act
-        val nodeWrapper = clipPath.asNodeWrapper(minified = minified)
+        val nodeWrapper = with(logger) { clipPath.asNodeWrapper(minified = minified) }
         val expectedWrapper = ImageVectorNode.NodeWrapper(
             normalizedPath = "M 10 10 L 20 20 M 30 30 L 40 40 M 0 0 m -50 0 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0z",
             nodes = listOf(

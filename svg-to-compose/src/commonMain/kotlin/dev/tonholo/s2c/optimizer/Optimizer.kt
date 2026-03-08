@@ -64,7 +64,7 @@ sealed class Optimizer(
      * @return A [Boolean], `true` if the required command is available
      * and `false` if it's not.
      */
-    fun verifyDependency() =
+    fun verifyDependency() = with(logger) {
         command(program = command) {
             args(versionFlag)
             showStdout = false
@@ -72,6 +72,7 @@ sealed class Optimizer(
         }.also { (code, _) ->
             logger.verbose("exit code = $code")
         }.exitCode == 0
+    }
 
     /**
      * Runs the optimization process on the given [file],
@@ -95,7 +96,7 @@ sealed class Optimizer(
     protected fun runOptimization(
         errorCode: ErrorCode,
         vararg args: String,
-    ) {
+    ): Unit = with(logger) {
         logger.verbose(
             """
                 |Args:

@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.command
 
+import dev.tonholo.s2c.logger.Logger
+
 data class CommandOutput(
     val stdout: String?,
     val stderr: String? = null,
@@ -29,6 +31,7 @@ annotation class CommandDsl
 
 @CommandDsl
 class CommandBuilder(
+    private val logger: Logger,
     private var program: String,
 ) {
     private var args: MutableList<String>? = null
@@ -42,20 +45,24 @@ class CommandBuilder(
         this.args!!.addAll(args)
     }
 
-    fun execute(): CommandResult = executeCommand(
-        command = Command(
-            program = program,
-            args = args,
-            showStdout = showStdout,
-            showStderr = showStderr,
-            trim = trim,
+    fun execute(): CommandResult = with(logger) {
+        executeCommand(
+            command = Command(
+                program = program,
+                args = args,
+                showStdout = showStdout,
+                showStderr = showStderr,
+                trim = trim,
+            )
         )
-    )
+    }
 }
 
+context(logger: Logger)
 fun command(program: String, builder: CommandBuilder.() -> Unit): CommandResult =
-    CommandBuilder(program = program).apply(builder).execute()
+    CommandBuilder(logger = logger, program = program).apply(builder).execute()
 
+context(logger: Logger)
 internal expect fun executeCommand(
     command: Command,
 ): CommandResult

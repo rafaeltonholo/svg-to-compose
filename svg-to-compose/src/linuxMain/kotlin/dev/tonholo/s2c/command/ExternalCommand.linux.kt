@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.command
 
-import dev.tonholo.s2c.logger.verbose
+import dev.tonholo.s2c.logger.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.toKStringFromUtf8
@@ -12,9 +12,9 @@ import platform.posix.popen
 import platform.posix.stderr
 
 @OptIn(ExperimentalForeignApi::class)
+context(logger: Logger)
 actual fun executeCommand(command: Command): CommandResult {
     val commandToExecute = command.commandToExecute
-    verbose("Command to execute: $commandToExecute")
     val fp = popen(commandToExecute, "r") ?: error("Failed to run command: $command")
 
     val output = buildString {
