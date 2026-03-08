@@ -6,12 +6,13 @@ import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.StrokeJoin
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
+import dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.EMPTY
-import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.applyTransformations
+import dev.tonholo.s2c.logger.NoOpLogger
 import dev.tonholo.s2c.logger.debug
 import dev.tonholo.s2c.logger.debugSection
 import dev.tonholo.s2c.logger.verbose
@@ -123,68 +124,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 params.approximateByteSize +
                 wrapper.nodes.approximateByteSize
 
-        override fun materialize(): String {
-            val indentSize = 4
-            val pathNodes = wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
-                it.materialize()
-                    .replace("\n", "\n${" ".repeat(indentSize)}") // Fix indent
-                    .trimEnd()
-            }
-
-            val pathParams = buildParameterList()
-
-            val pathParamsString = if (pathParams.isNotEmpty()) {
-                """(
-                |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".indented(4) }}
-                |)"""
-            } else {
-                ""
-            }
-
-            val comment = if (minified) "" else "// ${wrapper.normalizedPath}\n|"
-
-            return """
-                |${comment}path$pathParamsString {
-                |    $pathNodes
-                |}
-            """.trimMargin()
-        }
-
-        private fun buildParameterList(): List<Pair<String, String>> = buildList {
-            with(params) {
-                params.fill?.let { brush ->
-                    brush.toCompose()?.let { add("fill" to it) }
-                }
-                fillAlpha?.let {
-                    add("fillAlpha" to "${it}f")
-                }
-                pathFillType?.let {
-                    add("pathFillType" to "${it.toCompose()}")
-                }
-                stroke?.let { stroke ->
-                    stroke.toCompose()?.let { add("stroke" to it) }
-                }
-                strokeAlpha?.let {
-                    add("strokeAlpha" to "${it}f")
-                }
-                strokeLineCap?.let {
-                    add("strokeLineCap" to "${it.toCompose()}")
-                }
-                strokeLineJoin?.let {
-                    add("strokeLineJoin" to "${it.toCompose()}")
-                }
-                strokeMiterLimit?.let {
-                    add("strokeLineMiter" to "${it}f")
-                }
-                strokeLineWidth?.let {
-                    add("strokeLineWidth" to "${it}f")
-                }
-
-                if (params.fill == null && params.stroke == null) {
-                    add("fill" to requireNotNull(SvgColor.Default.toBrush().toCompose()))
-                }
-            }
-        }
+        @Suppress("DeprecatedCallableAddReplaceWith")
+        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
     }
 
     data class Group(
@@ -196,14 +137,6 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         companion object {
             private const val GROUP_APPROXIMATE_BYTE_SIZE = 90
             private const val CLIP_PATH_APPROXIMATE_BYTE_SIZE = 30
-            private const val CLIP_PATH_PARAM_NAME = "clipPathData"
-            private const val ROTATE_PARAM_NAME = "rotate"
-            private const val PIVOT_X_PARAM_NAME = "pivotX"
-            private const val PIVOT_Y_PARAM_NAME = "pivotY"
-            private const val SCALE_X_PARAM_NAME = "scaleX"
-            private const val SCALE_Y_PARAM_NAME = "scaleY"
-            private const val TRANSLATION_X_PARAM_NAME = "translationX"
-            private const val TRANSLATION_Y_PARAM_NAME = "translationY"
         }
 
         data class Params(
@@ -256,64 +189,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 params.approximateByteSize +
                 commands.sumOf { it.approximateByteSize + 1 }
 
-        private fun buildParameters(indentSize: Int): Set<Pair<String, String>> = with(params) {
-            buildSet {
-                clipPath?.let {
-                    val clipPathData = clipPath.nodes
-                        .joinToString("\n${" ".repeat(indentSize * 2)}") {
-                            it.materialize()
-                                .replace("\n", "\n${" ".repeat(indentSize * 2)}")
-                                .trimEnd()
-                        }
-                    val value = """
-                        |PathData {
-                        |    ${clipPathData.indented(indentSize = 4)}
-                        |${"}".indented(indentSize)}"""
-                        .trimMargin()
-                    add(CLIP_PATH_PARAM_NAME to value)
-                }
-                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
-                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
-                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
-                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
-                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
-                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
-                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
-            }
-        }
-
-        override fun materialize(): String {
-            val indentSize = 4
-            val groupPaths = commands
-                .joinToString("\n${" ".repeat(indentSize)}") {
-                    it.materialize()
-                        .replace("\n", "\n${" ".repeat(indentSize)}")
-                        .trimEnd()
-                }
-
-            val groupParams = buildParameters(indentSize)
-
-            val groupParamsString = if (groupParams.isNotEmpty()) {
-                val params = groupParams.joinToString("\n") { (param, value) ->
-                    if (param == CLIP_PATH_PARAM_NAME && minified.not() && params.clipPath != null) {
-                        "${"// ${params.clipPath.normalizedPath}".indented(4)}\n"
-                    } else {
-                        ""
-                    } + "$param = $value,".indented(indentSize)
-                }
-                """(
-                |$params
-                |)"""
-            } else {
-                ""
-            }
-
-            return """
-                |group$groupParamsString {
-                |    $groupPaths
-                |}
-            """.trimMargin()
-        }
+        @Suppress("DeprecatedCallableAddReplaceWith")
+        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
     }
 
     /**
@@ -337,21 +214,18 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
          * Create the chunk function wrapping the `path`/`group` instructions
          * within a smaller method.
          */
-        fun createChunkFunction(): String {
-            val indentSize = 4
-            val bodyFunction = nodes.joinToString("\n${" ".repeat(indentSize)}") {
-                it.materialize()
-                    .replace("\n", "\n${" ".repeat(indentSize)}") // fix indent
-            }
+        @Deprecated(
+            message = "Use ImageVectorNodeEmitter.emitChunkFunctionDefinition() instead.",
+            replaceWith = ReplaceWith(
+                expression = "ImageVectorNodeEmitter(logger).emitChunkFunctionDefinition(this)",
+                imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
+            ),
+        )
+        fun createChunkFunction(): String =
+            ImageVectorNodeEmitter(NoOpLogger).emitChunkFunctionDefinition(this)
 
-            return """
-                    |private fun ImageVector.Builder.$functionName() {
-                    |    $bodyFunction
-                    |}
-            """.trimMargin()
-        }
-
-        override fun materialize(): String = "$functionName()"
+        @Suppress("DeprecatedCallableAddReplaceWith")
+        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
     }
 
     // Support class to Paths. It should not be inherited from ImageVectorNode
