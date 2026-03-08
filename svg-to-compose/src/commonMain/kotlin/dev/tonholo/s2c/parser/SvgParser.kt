@@ -32,13 +32,15 @@ import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlPendingParentElement
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ParserException
+import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.logger.NoOpLogger
 
 /**
  * A parser for SVG (Scalable Vector Graphics) files.
  *
  * This parser extends the [XmlParser] class and provides custom handling for SVG elements.
  */
-class SvgParser : XmlParser() {
+class SvgParser(logger: Logger = NoOpLogger) : XmlParser(logger) {
     override val fileType: FileType = FileType.Svg
     override fun createElement(node: Element, parent: XmlParentNode): XmlNode = createSvgElement(
         nodeName = node.tagName(),

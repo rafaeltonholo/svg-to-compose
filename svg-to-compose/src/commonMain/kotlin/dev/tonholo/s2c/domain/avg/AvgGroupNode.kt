@@ -5,6 +5,7 @@ import dev.tonholo.s2c.domain.asNodeWrapper
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
 
 class AvgGroupNode(
     parent: XmlParentNode,
@@ -26,6 +27,7 @@ class AvgGroupNode(
     }
 }
 
+context(logger: Logger)
 fun AvgGroupNode.asNode(
     minified: Boolean,
 ): ImageVectorNode.Group = ImageVectorNode.Group(

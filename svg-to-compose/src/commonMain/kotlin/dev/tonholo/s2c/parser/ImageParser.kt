@@ -15,6 +15,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.Logger
 import dev.zacsweers.metro.Inject
 import okio.Path
 
@@ -33,6 +34,7 @@ import okio.Path
  */
 sealed class ImageParser(
     protected val fileManager: FileManager,
+    protected val logger: Logger,
 ) {
     /**
      * Parse a SVG/AVG icon and creates a [IconFileContents] object containing
@@ -129,7 +131,8 @@ sealed class ImageParser(
      */
     class SvgImageParser(
         fileManager: FileManager,
-    ) : ImageParser(fileManager) {
+        logger: Logger,
+    ) : ImageParser(fileManager, logger) {
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -155,7 +158,7 @@ sealed class ImageParser(
             file: Path,
             iconName: String,
             config: ParserConfig,
-        ): IconFileContents {
+        ): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
@@ -169,7 +172,7 @@ sealed class ImageParser(
                     it.applyTransformation()
                 }
 
-            return IconFileContents(
+            IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
@@ -200,7 +203,8 @@ sealed class ImageParser(
      */
     class AndroidVectorParser(
         fileManager: FileManager,
-    ) : ImageParser(fileManager) {
+        logger: Logger,
+    ) : ImageParser(fileManager, logger) {
         /**
          * Parses an AVG file into an [IconFileContents] object.
          *
@@ -224,14 +228,14 @@ sealed class ImageParser(
             file: Path,
             iconName: String,
             config: ParserConfig,
-        ): IconFileContents {
+        ): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Avg)
             val avg = root.children.single { it is AvgRootNode } as AvgRootNode
             val nodes = avg.asNodes(minified = config.minified)
 
-            return IconFileContents(
+            IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
@@ -262,10 +266,10 @@ sealed class ImageParser(
      * @param fileManager a [FileManager] instance that allows reading from the file system.
      */
     @Inject
-    class Factory(fileManager: FileManager) {
+    class Factory(fileManager: FileManager, private val logger: Logger) {
         private val parsers: Map<String, () -> ImageParser> = mapOf(
-            FileType.Svg.extension to { SvgImageParser(fileManager) },
-            FileType.Avg.extension to { AndroidVectorParser(fileManager) },
+            FileType.Svg.extension to { SvgImageParser(fileManager, logger) },
+            FileType.Avg.extension to { AndroidVectorParser(fileManager, logger) },
         )
 
         /**

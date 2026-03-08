@@ -13,13 +13,15 @@ import dev.tonholo.s2c.domain.avg.AvgRootNode
 import dev.tonholo.s2c.domain.avg.gradient.AvgGradient
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.logger.NoOpLogger
 
 /**
  * A parser for AVG (Android Vector Graphics) files.
  *
  * This parser extends the [XmlParser] class and provides custom handling for AVG elements.
  */
-internal class AvgParser : XmlParser() {
+internal class AvgParser(logger: Logger = NoOpLogger) : XmlParser(logger) {
     override val fileType = FileType.Avg
 
     override fun XmlNode.isRootNode(): Boolean =

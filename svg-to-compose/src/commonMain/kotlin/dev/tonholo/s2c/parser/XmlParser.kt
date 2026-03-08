@@ -14,9 +14,8 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.domain.xml.XmlTextNode
-import dev.tonholo.s2c.logger.verbose
-import dev.tonholo.s2c.logger.verboseSection
-import dev.tonholo.s2c.logger.warn
+import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.logger.NoOpLogger
 import kotlin.time.measureTimedValue
 
 /**
@@ -29,11 +28,13 @@ import kotlin.time.measureTimedValue
  * @property elementsPendingParent A set of elements that have not yet been assigned
  * a parent.
  */
-abstract class XmlParser {
+abstract class XmlParser(
+    protected val logger: Logger = NoOpLogger,
+) {
     companion object {
-        private val parsers = setOf(
-            { AvgParser() },
-            { SvgParser() },
+        private val parsers = setOf<(Logger) -> XmlParser>(
+            { logger -> AvgParser(logger) },
+            { logger -> SvgParser(logger) },
         )
 
         /**
@@ -45,8 +46,9 @@ abstract class XmlParser {
          * @return An [XmlRootNode] representing the parsed XML content.
          * @throws IllegalStateException If no parser is found for the given file type.
          */
+        context(logger: Logger)
         fun parse(content: String, fileType: FileType): XmlRootNode = parsers
-            .map { it() }
+            .map { it(logger) }
             .firstOrNull { it.accept(fileType) }
             ?.parse(content)
             ?: error("No parser for $fileType")
@@ -74,7 +76,7 @@ abstract class XmlParser {
      * @return The XML as an object
      */
     fun parse(content: String): XmlRootNode =
-        verboseSection("Parsing $fileType file") {
+        logger.verboseSection("Parsing $fileType file") {
             val strippedXml = content
                 .replace("\\r?\\n".toRegex(), "")
                 .replace("\\s{2,}".toRegex(), " ")
@@ -91,7 +93,7 @@ abstract class XmlParser {
                 val rootNode = node.single()
                 traverseXmlTree(rootNode)
             }
-            verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
+            logger.verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
             node
         }
 
@@ -177,7 +179,7 @@ abstract class XmlParser {
         rootNode.traverse { node, depth ->
             if (currentDepth > depth) {
                 repeat(currentDepth - depth) {
-                    stack.removeLast().also { verbose("removed ${it.tagName} from stack") }
+                    stack.removeLast().also { logger.verbose("removed ${it.tagName} from stack") }
                 }
                 stack.lastOrNull()?.let { current = it }
             }
@@ -237,7 +239,7 @@ abstract class XmlParser {
             -> null
 
             else -> {
-                warn("not supported node '${node.nodeName()}'.")
+                logger.warn("not supported node '${node.nodeName()}'.")
                 null
             }
         }

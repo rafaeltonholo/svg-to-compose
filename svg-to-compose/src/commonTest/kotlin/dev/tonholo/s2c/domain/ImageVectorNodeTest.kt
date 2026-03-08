@@ -5,12 +5,15 @@ import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.logger.NoOpLogger
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class ImageVectorNodeTest {
+    private val logger: Logger = NoOpLogger
     private val root = SvgRootNode(
         parent = XmlRootNode(children = mutableSetOf()),
         children = mutableSetOf(),
@@ -27,7 +30,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -47,7 +50,7 @@ class ImageVectorNodeTest {
             ),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
 
         // Assert
@@ -73,7 +76,7 @@ class ImageVectorNodeTest {
         )
         // Act
         val exception = assertFailsWith<ExitProgramException> {
-            path.asNode(minified = false)
+            with(logger) { path.asNode(minified = false) }
         }
         // Assert
         assertEquals(

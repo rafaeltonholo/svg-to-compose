@@ -70,10 +70,12 @@ class SvgGroupNodeTests : BaseSvgTest() {
         )
 
         // Act
-        val groupNodes = svgGroupNode.flatNode(
-            masks = emptyList(),
-            minified = minified,
-        )
+        val groupNodes = with(logger) {
+            svgGroupNode.flatNode(
+                masks = emptyList(),
+                minified = minified,
+            )
+        }
 
         // Assert
         assertIs<List<ImageVectorNode.Path>>(groupNodes)
@@ -177,7 +179,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
         )
 
         // Act
-        val groupNode = group.flatNode(masks = listOf(mask), minified = false).single()
+        val groupNode = with(logger) { group.flatNode(masks = listOf(mask), minified = false) }.single()
 
         // Assert
         assertIs<ImageVectorNode.Group>(groupNode)

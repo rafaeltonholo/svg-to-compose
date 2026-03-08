@@ -72,7 +72,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
         val attributes = mutableMapOf("cx" to "10", "cy" to "20", "r" to "30")
         val circle = SvgCircleNode(root, attributes)
 
-        val path = circle.asNode(minified = false)
+        val path = with(logger) { circle.asNode(minified = false) }
         assertIs<ImageVectorNode.Path>(path)
 
         assertTrue(path.wrapper.nodes.isNotEmpty()) // Path should have nodes
@@ -90,7 +90,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
         )
         val circle = SvgCircleNode(root, attributes)
 
-        val group = circle.asNode(minified = false)
+        val group = with(logger) { circle.asNode(minified = false) }
         assertIs<ImageVectorNode.Group>(group)
 
         assertEquals(expected = 2, actual = group.commands.size)
@@ -116,7 +116,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
         )
         val circle = SvgCircleNode(root, attributes)
 
-        val group = circle.asNode(minified = false)
+        val group = with(logger) { circle.asNode(minified = false) }
         assertIs<ImageVectorNode.Group>(group)
 
         assertEquals(expected = 1, actual = group.commands.size)
@@ -157,7 +157,7 @@ class SvgCircleNodeTests : BaseSvgTest() {
 
             val circle = SvgCircleNode(root, attributes)
 
-            val group = circle.asNode(minified = false)
+            val group = with(logger) { circle.asNode(minified = false) }
             assertIs<ImageVectorNode.Group>(group)
             assertEquals(expected = 1, group.commands.size)
             val path = group.commands.first()

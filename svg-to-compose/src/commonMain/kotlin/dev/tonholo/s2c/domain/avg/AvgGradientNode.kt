@@ -12,6 +12,7 @@ import dev.tonholo.s2c.domain.compose.GradientTileMode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.NoOpLogger
 
 class AvgGradientNode(
     parent: XmlParentNode,
@@ -29,8 +30,9 @@ class AvgGradientNode(
     override val startY: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val endX: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val endY: Float? by attribute(namespace = AvgNode.NAMESPACE)
+    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val tileMode: AvgGradientTileMode? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
-        tileMode?.let(AvgGradientTileMode::invoke)
+        tileMode?.let { with(NoOpLogger) { AvgGradientTileMode(it) } }
     }
     override val startColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
         it?.let(::AvgColor)
@@ -39,8 +41,9 @@ class AvgGradientNode(
         it?.let(::AvgColor)
     }
     override val endColor: AvgColor? by attribute(namespace = AvgNode.NAMESPACE)
+    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val type: AvgGradientType? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
-        tileMode?.let { AvgGradientType(it) }
+        tileMode?.let { with(NoOpLogger) { AvgGradientType(it) } }
     }
 
     val items: Set<AvgGradientItemNode> by lazy {
