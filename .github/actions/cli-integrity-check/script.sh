@@ -22,6 +22,12 @@ if [ "$ext" == "xml" ]; then
 else
   ext="svg"
 fi
+rebuild="$4"
+if [ "$rebuild" == "--rebuild" ]; then
+  rebuild="--upgrade"
+else
+  rebuild=""
+fi
 
 # Package must match exactly what the Gradle plugin functional tests use so
 # both tools validate against the same expected .kt files.
@@ -66,6 +72,7 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
         --theme "" \
         --no-preview \
         -opt="$optimize" \
+        ${rebuild:+"$rebuild"} \
         "$input"; then
     echo "Failed to execute CLI integrity check for $stem."
     rm -rf "$tmp_dir"
@@ -84,6 +91,8 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
   echo "Verifying $stem against expected file."
   if ! diff --strip-trailing-cr "$tmp_output" "$expected_file"; then
     errors+=("$stem.$ext")
+  else
+    echo "✅ $stem.$ext pass"
   fi
   rm -rf "$tmp_dir"
 done
