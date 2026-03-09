@@ -3,6 +3,7 @@ package dev.tonholo.s2c.emitter.imagevector
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
+import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.logger.Logger
 
@@ -12,12 +13,16 @@ import dev.tonholo.s2c.logger.Logger
  * Delegates path command emission to [PathNodeEmitter].
  *
  * @property logger The logger instance for diagnostic output.
+ * @property formatConfig The formatting configuration to use.
  * @property pathNodeEmitter The emitter for individual path commands.
  */
 internal class ImageVectorNodeEmitter(
     private val logger: Logger,
-    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(logger),
+    private val formatConfig: FormatConfig = FormatConfig(),
+    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(formatConfig),
 ) {
+    private val indent: String get() = formatConfig.indentUnit
+
     /**
      * Emits the Kotlin code for an [ImageVectorNode].
      *
@@ -37,24 +42,21 @@ internal class ImageVectorNodeEmitter(
      * @return The emitted function definition.
      */
     fun emitChunkFunctionDefinition(chunk: ImageVectorNode.ChunkFunction): String {
-        val indentSize = 4
-        val bodyFunction = chunk.nodes.joinToString("\n${" ".repeat(indentSize)}") {
-            emit(it)
-                .replace("\n", "\n${" ".repeat(indentSize)}")
-        }
+        val bodyFunction = chunk.nodes.joinToString("\n") {
+            emit(it).trimEnd()
+        }.prependIndent(indent)
 
         return """
                 |private fun ImageVector.Builder.${chunk.functionName}() {
-                |    $bodyFunction
+                |$bodyFunction
                 |}
         """.trimMargin()
     }
 
     private fun emitPath(path: ImageVectorNode.Path): String {
-        val indentSize = 4
-        val pathNodes = path.wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
+        val pathNodes = path.wrapper.nodes.joinToString("\n$indent") {
             pathNodeEmitter.emit(it)
-                .replace("\n", "\n${" ".repeat(indentSize)}")
+                .replace("\n", "\n$indent")
                 .trimEnd()
         }
 
@@ -62,7 +64,11 @@ internal class ImageVectorNodeEmitter(
 
         val pathParamsString = if (pathParams.isNotEmpty()) {
             """(
-            |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".indented(4) }}
+            |${
+                pathParams.joinToString("\n") { (param, value) ->
+                    "$param = $value,".prependIndent(formatConfig.indentUnit)
+                }
+            }
             |)"""
         } else {
             ""
@@ -72,29 +78,26 @@ internal class ImageVectorNodeEmitter(
 
         return """
             |${comment}path$pathParamsString {
-            |    $pathNodes
+            |$indent$pathNodes
             |}
         """.trimMargin()
     }
 
     private fun emitGroup(group: ImageVectorNode.Group): String {
-        val indentSize = 4
         val groupPaths = group.commands
-            .joinToString("\n${" ".repeat(indentSize)}") {
-                emit(it)
-                    .replace("\n", "\n${" ".repeat(indentSize)}")
-                    .trimEnd()
-            }
+            .joinToString("\n") {
+                emit(it).trimEnd()
+            }.prependIndent(indent)
 
-        val groupParams = buildGroupParameters(group, indentSize)
+        val groupParams = buildGroupParameters(group)
 
         val groupParamsString = if (groupParams.isNotEmpty()) {
             val params = groupParams.joinToString("\n") { (param, value) ->
                 if (param == CLIP_PATH_PARAM_NAME && !group.minified && group.params.clipPath != null) {
-                    "${"// ${group.params.clipPath.normalizedPath}".indented(4)}\n"
+                    "${"// ${group.params.clipPath.normalizedPath}".indented(formatConfig.indentSize)}\n"
                 } else {
                     ""
-                } + "$param = $value,".indented(indentSize)
+                } + "$param = $value,".indented(formatConfig.indentSize)
             }
             """(
             |$params
@@ -105,7 +108,7 @@ internal class ImageVectorNodeEmitter(
 
         return """
             |group$groupParamsString {
-            |    $groupPaths
+            |$groupPaths
             |}
         """.trimMargin()
     }
@@ -154,19 +157,20 @@ internal class ImageVectorNodeEmitter(
     @Suppress("CyclomaticComplexMethod")
     private fun buildGroupParameters(
         group: ImageVectorNode.Group,
-        indentSize: Int,
     ): Set<Pair<String, String>> = with(group.params) {
+        val indentSize = formatConfig.indentSize
         buildSet {
             clipPath?.let {
+                val doubleIndent = " ".repeat(indentSize * 2)
                 val clipPathData = clipPath.nodes
-                    .joinToString("\n${" ".repeat(indentSize * 2)}") {
+                    .joinToString("\n$doubleIndent") {
                         pathNodeEmitter.emit(it)
-                            .replace("\n", "\n${" ".repeat(indentSize * 2)}")
+                            .replace("\n", "\n$doubleIndent")
                             .trimEnd()
                     }
                 val value = """
                     |PathData {
-                    |    ${clipPathData.indented(indentSize = 4)}
+                    |${indent}${clipPathData.indented(indentSize = indentSize)}
                     |${"}".indented(indentSize)}"""
                     .trimMargin()
                 add(CLIP_PATH_PARAM_NAME to value)
