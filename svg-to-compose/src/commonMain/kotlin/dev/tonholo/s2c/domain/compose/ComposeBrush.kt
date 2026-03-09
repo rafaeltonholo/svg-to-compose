@@ -40,7 +40,7 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
                     ComposeColor.IMPORT,
                     "androidx.compose.ui.graphics.$NAME",
                 )
-            private const val INDENT_SIZE = 8
+            private const val INDENT_SIZE = 4
 
             // By calling Brush.linearGradient, Brush.radialGradient or Brush.sweepGradient
             // with no parameters, we add 16 bytes, approximately, to the method size.
@@ -122,7 +122,7 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
                     appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
                 }
-                append(")".indented(INDENT_SIZE / 2))
+                append(")")
             }
         }
 
@@ -161,7 +161,7 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
                     appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
                 }
-                append(")".indented(INDENT_SIZE / 2))
+                append(")")
             }
         }
 
@@ -191,7 +191,7 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
                 if (center != null) {
                     appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
                 }
-                append(")".indented(INDENT_SIZE / 2))
+                append(")")
             }
         }
     }
