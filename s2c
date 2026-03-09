@@ -159,7 +159,7 @@ fn_main() {
 
     build_platform="$(tr '[:lower:]' '[:upper:]' <<< ${PLATFORM:0:1})${PLATFORM:1}"
     build_command="build$build_type$build_platform"
-    build_type_folder="$(tr '[:upper]' '[:lower]' <<< ${build_type:0:1})${build_type:1}"
+    build_type_folder="$(tr '[:upper:]' '[:lower:]' <<< ${build_type:0:1})${build_type:1}"
     bin_folder="svg-to-compose/build/bin/$PLATFORM/${build_type_folder}Executable"
     command ./gradlew "$build_command"
   fi
