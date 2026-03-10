@@ -55,6 +55,13 @@ internal const val COMMON_CONFIGURATION_NAME = "common"
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     private val projectLayout: ProjectLayout,
 ) : DefaultTask() {
+    /**
+     * Creates and configures the GradlePluginGraph used by the task.
+     *
+     * The returned graph is initialized with the plugin's S2C graph and the project's build directory.
+     *
+     * @return The configured GradlePluginGraph instance.
+     */
     private fun createGraph(): GradlePluginGraph {
         val s2cGraph = createS2cGraph(
             logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
@@ -121,6 +128,18 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @get:OutputDirectory
     abstract val sourceDirectory: DirectoryProperty
 
+    /**
+     * Executes the task: parses configured SVG/AVG files into Compose icons, runs
+     * worker actions, and updates the task cache.
+     *
+     * This method initializes the processing graph and related resources, registers
+     * the worker bridge, processes all active configurations (excluding the "common"
+     * configuration), aggregates results, removes temporary worker results, saves the
+     * updated cache, and ensures cleanup of the worker bridge and processor.
+     *
+     * @throws ExitProgramException if one or more icons fail to parse; the exception
+     * contains the underlying causes.
+     */
     @TaskAction
     fun run() {
         val graph = createGraph()
@@ -351,6 +370,17 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     }
 }
 
+/**
+ * Registers the "parseSvgToComposeIcon" Gradle task and wires generated sources into the project's Kotlin source sets.
+ *
+ * Validates the provided extension and fails the build if configuration errors are found. Creates a task
+ * configured from the extension (including max parallelism, log level and source directory convention)
+ * and makes Kotlin compilation tasks depend on it. If the project is Kotlin Multiplatform, adds the
+ * generated directory to the `commonMain` Kotlin source set; otherwise, waits for the Android plugin and
+ * adds the generated directory to the Android `main` source set.
+ *
+ * @param extension The plugin extension containing configuration for parsing SVGs to Compose icons.
+ */
 internal fun Project.registerParseSvgToComposeIconTask(
     extension: SvgToComposeExtension,
 ) {

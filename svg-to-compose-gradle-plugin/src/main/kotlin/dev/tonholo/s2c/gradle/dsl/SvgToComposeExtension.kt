@@ -62,6 +62,12 @@ abstract class SvgToComposeExtension {
         }
     }
 
+    /**
+     * Applies the "common" processor configuration to all other configurations, if present.
+     *
+     * If a configuration named "common" exists in the container, its values are merged into every
+     * other configuration. The "common" configuration itself is not modified or removed.
+     */
     internal fun applyCommonIfDefined() {
         configurations.commonOrNull?.let { common ->
             configurations.forEach {

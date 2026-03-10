@@ -33,6 +33,17 @@ internal class CacheManager(
     private operator fun List<IconCacheData>.get(origin: Path): IconCacheData? =
         firstOrNull { it.origin == origin.toString() }
 
+    /**
+     * Determines whether the cached entry for a given origin file is out of date.
+     *
+     * If the stored hash differs from the current file hash or the previously recorded generated
+     * output is missing, the cache is considered changed. When a previous cache entry exists and
+     * a change is detected, that entry's stored hash is updated to the current hash.
+     *
+     * @param path The origin file path to check.
+     * @return `true` if the cache entry for the path differs from the current file contents or its
+     * generated output is missing, `false` otherwise.
+     */
     fun hasCacheChanged(path: Path): Boolean {
         val currentHash = calculateFileHash(path)
         val prev = fileHashMap.get(origin = path)
