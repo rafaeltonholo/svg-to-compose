@@ -15,8 +15,8 @@ runs:
       shell: bash
       env:
         CMDLINE_TOOLS_URL: https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip
-        ANDROID_HOME: ~/android-sdk
       run: |
+        ANDROID_HOME="$HOME/android-sdk"
         mkdir -p "$ANDROID_HOME/cmdline-tools"
         curl -fsSL "$CMDLINE_TOOLS_URL" -o /tmp/cmdline-tools.zip
         unzip -q /tmp/cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools"
