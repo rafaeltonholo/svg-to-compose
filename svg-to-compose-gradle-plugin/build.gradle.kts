@@ -7,6 +7,24 @@ plugins {
     alias(libs.plugins.dev.zacsweers.metro)
 }
 
+// Functional tests: end-to-end tests that exercise the plugin via GradleRunner.
+val functionalTest: SourceSet = sourceSets.create("functionalTest")
+
+val functionalTestTask = tasks.register<Test>("functionalTest") {
+    description = "Runs functional tests against the plugin using Gradle TestKit."
+    group = "verification"
+    testClassesDirs = functionalTest.output.classesDirs
+    classpath = functionalTest.runtimeClasspath
+    useJUnitPlatform()
+//    // Each test spawns a GradleRunner that loads AGP classes into the test JVM
+//    // via buildscript classpath resolution. Running many tests exhausts Metaspace.
+//    jvmArgs("-XX:MaxMetaspaceSize=4g")
+}
+
+tasks.check {
+    dependsOn(functionalTestTask)
+}
+
 gradlePlugin {
     website.set("https://github.com/rafaeltonholo/svg-to-compose")
     vcsUrl.set("https://github.com/rafaeltonholo/svg-to-compose")
@@ -18,6 +36,7 @@ gradlePlugin {
             description = "Converts SVG and AVG to Android Jetpack Compose Icons."
         }
     }
+    testSourceSets(functionalTest)
 }
 
 kotlin {
@@ -27,6 +46,9 @@ kotlin {
 
     sourceSets {
         test {
+            resources.srcDirs(rootProject.layout.projectDirectory.dir("samples"))
+        }
+        named("functionalTest") {
             resources.srcDirs(rootProject.layout.projectDirectory.dir("samples"))
         }
     }
@@ -41,7 +63,9 @@ mavenPublishing {
     )
     pom {
         name.set("SVG/XML to Compose Gradle Plugin")
-        description.set("A Gradle plugin that converts SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.")
+        description.set(
+            "A Gradle plugin that converts SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.",
+        )
     }
 }
 
@@ -55,4 +79,8 @@ dependencies {
     implementation(libs.com.squareup.okio)
     implementation(projects.svgToCompose)
     testImplementation(kotlin("test"))
+    "functionalTestImplementation"(libs.org.junit.jupiter)
+    "functionalTestImplementation"(kotlin("test"))
+    "functionalTestCompileOnly"(libs.com.android.tools.build.gradle)
+    "functionalTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }

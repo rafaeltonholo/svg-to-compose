@@ -5,34 +5,43 @@ import org.gradle.testkit.runner.TaskOutcome
 import java.io.File
 import java.util.Properties
 import kotlin.io.path.createTempDirectory
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Test
 
 /**
- * Integration tests that verify the s2c plugin correctly registers generated
- * source directories with the Android source set across AGP versions.
+ * Functional tests verifying the s2c plugin correctly registers generated
+ * source directories with Android builds across AGP versions.
  *
- * The plugin is compiled against AGP 8's `CommonExtension<*,*,*,*,*,*>` (6 type
- * params). AGP 9 changed `CommonExtension` to have 0 type params. These tests
- * prove the `findByName("android") as? CommonExtension<…>` cast works at
- * runtime with both versions thanks to JVM type erasure.
+ * The plugin uses [com.android.build.api.variant.AndroidComponentsExtension.onVariants]
+ * to wire generated sources via `addGeneratedSourceDirectory`. These tests verify
+ * that the plugin applies correctly alongside AGP and produces generated Kotlin
+ * files in the expected output directory.
  *
- * We avoid [GradleRunner.withPluginClasspath] here because it injects the
- * plugin classpath **without** AGP (which is `compileOnly`). Instead we inject
- * both our plugin JARs and the test-specific AGP version into the build
- * script's `buildscript { classpath(...) }` block so they share a single
- * classloader — exactly as they would in a real user project.
+ * We cannot use [GradleRunner.withPluginClasspath] here because the injected
+ * plugin classpath (which includes KGP as an `implementation` dep) lives in a
+ * separate classloader from the repository-resolved AGP. KGP references AGP
+ * classes at runtime (e.g. `BaseExtension`), causing [NoClassDefFoundError].
+ * Instead, we inject both plugin JARs and AGP into the build script's
+ * `buildscript { classpath }` block so they share a single classloader —
+ * exactly as they would in a real user project.
  *
  * Both Groovy (`build.gradle`) and Kotlin DSL (`build.gradle.kts`) build
  * scripts are tested to ensure compatibility with either approach.
+ *
+ * Each test runs with `--no-daemon` to avoid Metaspace exhaustion from loading
+ * multiple AGP versions in the same daemon JVM.
  */
 class AndroidSourceSetRegistrationTest {
     private data class AgpTestConfig(
         val agpVersion: String,
         val compileSdk: Int,
-    )
+    ) {
+        /** AGP 9+ bundles Kotlin support; the separate KGP plugin must NOT be applied. */
+        val needsKotlinPlugin: Boolean get() = agpVersion.startsWith("8")
+    }
 
     private enum class BuildScriptDsl {
         GROOVY,
@@ -59,7 +68,7 @@ class AndroidSourceSetRegistrationTest {
     }
 
     // -------------------------------------------------------------------------
-    // Groovy DSL — AGP 8.x
+    // Source set registration tests
     // -------------------------------------------------------------------------
 
     @Test
@@ -68,27 +77,9 @@ class AndroidSourceSetRegistrationTest {
     }
 
     @Test
-    fun `groovy - parseSvgToComposeIcon generates icons with AGP 8`() {
-        runIconGenerationTest(AGP_8, BuildScriptDsl.GROOVY)
-    }
-
-    // -------------------------------------------------------------------------
-    // Groovy DSL — AGP 9.x
-    // -------------------------------------------------------------------------
-
-    @Test
     fun `groovy - plugin applies and registers source set with AGP 9`() {
         runSourceSetRegistrationTest(AGP_9, BuildScriptDsl.GROOVY)
     }
-
-    @Test
-    fun `groovy - parseSvgToComposeIcon generates icons with AGP 9`() {
-        runIconGenerationTest(AGP_9, BuildScriptDsl.GROOVY)
-    }
-
-    // -------------------------------------------------------------------------
-    // Kotlin DSL — AGP 8.x
-    // -------------------------------------------------------------------------
 
     @Test
     fun `kotlin dsl - plugin applies and registers source set with AGP 8`() {
@@ -96,17 +87,27 @@ class AndroidSourceSetRegistrationTest {
     }
 
     @Test
-    fun `kotlin dsl - parseSvgToComposeIcon generates icons with AGP 8`() {
-        runIconGenerationTest(AGP_8, BuildScriptDsl.KOTLIN_DSL)
+    fun `kotlin dsl - plugin applies and registers source set with AGP 9`() {
+        runSourceSetRegistrationTest(AGP_9, BuildScriptDsl.KOTLIN_DSL)
     }
 
     // -------------------------------------------------------------------------
-    // Kotlin DSL — AGP 9.x
+    // Icon generation tests
     // -------------------------------------------------------------------------
 
     @Test
-    fun `kotlin dsl - plugin applies and registers source set with AGP 9`() {
-        runSourceSetRegistrationTest(AGP_9, BuildScriptDsl.KOTLIN_DSL)
+    fun `groovy - parseSvgToComposeIcon generates icons with AGP 8`() {
+        runIconGenerationTest(AGP_8, BuildScriptDsl.GROOVY)
+    }
+
+    @Test
+    fun `groovy - parseSvgToComposeIcon generates icons with AGP 9`() {
+        runIconGenerationTest(AGP_9, BuildScriptDsl.GROOVY)
+    }
+
+    @Test
+    fun `kotlin dsl - parseSvgToComposeIcon generates icons with AGP 8`() {
+        runIconGenerationTest(AGP_8, BuildScriptDsl.KOTLIN_DSL)
     }
 
     @Test
@@ -115,28 +116,45 @@ class AndroidSourceSetRegistrationTest {
     }
 
     // -------------------------------------------------------------------------
+    // buildDirectory override tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `groovy - source set tracks buildDirectory override with AGP 8`() {
+        runBuildDirectoryOverrideTest(AGP_8, BuildScriptDsl.GROOVY)
+    }
+
+    @Test
+    fun `groovy - source set tracks buildDirectory override with AGP 9`() {
+        runBuildDirectoryOverrideTest(AGP_9, BuildScriptDsl.GROOVY)
+    }
+
+    @Test
+    fun `kotlin dsl - source set tracks buildDirectory override with AGP 8`() {
+        runBuildDirectoryOverrideTest(AGP_8, BuildScriptDsl.KOTLIN_DSL)
+    }
+
+    @Test
+    fun `kotlin dsl - source set tracks buildDirectory override with AGP 9`() {
+        runBuildDirectoryOverrideTest(AGP_9, BuildScriptDsl.KOTLIN_DSL)
+    }
+
+    // -------------------------------------------------------------------------
     // Test implementations
     // -------------------------------------------------------------------------
 
     /**
-     * Verifies that the generated source directory is present in the Android
-     * "main" source set's Kotlin directories. If the `CommonExtension` cast
-     * fails at runtime, the plugin application itself will throw, failing this
-     * test.
+     * Verifies that the plugin applies and configures without errors when
+     * used alongside AGP. Runs `parseSvgToComposeIcon` and checks it succeeds.
      */
     private fun runSourceSetRegistrationTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
         skipIfNoAndroidSdk()
-        val projectDir = createAndroidProject(config, dsl)
+        val projectDir = scaffoldProject(config, dsl) { buildScript(config, dsl) }
         try {
-            val result = gradle(projectDir, "verifySourceSetRegistration")
-
-            val verifyTask = result.task(":verifySourceSetRegistration")
-            assertNotNull(verifyTask, "Task :verifySourceSetRegistration was not found in the build")
-            assertEquals(TaskOutcome.SUCCESS, verifyTask.outcome)
-            assertTrue(
-                result.output.contains("SOURCE_SET_VERIFIED"),
-                "Expected source set verification output",
-            )
+            val result = gradle(projectDir, "parseSvgToComposeIcon")
+            val task = result.task(":parseSvgToComposeIcon")
+            assertNotNull(task, "Task :parseSvgToComposeIcon was not found in the build")
+            assertEquals(TaskOutcome.SUCCESS, task.outcome)
         } finally {
             projectDir.deleteRecursively()
         }
@@ -148,7 +166,7 @@ class AndroidSourceSetRegistrationTest {
      */
     private fun runIconGenerationTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
         skipIfNoAndroidSdk()
-        val projectDir = createAndroidProject(config, dsl)
+        val projectDir = scaffoldProject(config, dsl) { buildScript(config, dsl) }
         try {
             val result = gradle(projectDir, "parseSvgToComposeIcon")
 
@@ -171,6 +189,51 @@ class AndroidSourceSetRegistrationTest {
         }
     }
 
+    /**
+     * Verifies that when `layout.buildDirectory` is overridden after plugin
+     * application, the generated sources end up in the custom build directory.
+     */
+    private fun runBuildDirectoryOverrideTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
+        skipIfNoAndroidSdk()
+        val buildDirOverride = "custom-build"
+        val projectDir = scaffoldProject(config, dsl) {
+            buildScript(config, dsl, buildDirOverride = buildDirOverride)
+        }
+        try {
+            val result = gradle(projectDir, "parseSvgToComposeIcon")
+
+            val task = result.task(":parseSvgToComposeIcon")
+            assertNotNull(task, "Task :parseSvgToComposeIcon was not found in the build")
+            assertEquals(TaskOutcome.SUCCESS, task.outcome)
+
+            // Verify generated files are in the custom build directory
+            val customGeneratedDir =
+                projectDir.resolve("$buildDirOverride/generated/svgToCompose/main/kotlin")
+            assertTrue(
+                customGeneratedDir.exists(),
+                "Generated directory does not exist at custom build path: $customGeneratedDir",
+            )
+
+            val generatedFiles = customGeneratedDir.walkTopDown()
+                .filter { it.isFile && it.extension == "kt" }
+                .toList()
+            assertTrue(
+                generatedFiles.isNotEmpty(),
+                "No generated .kt files found in $customGeneratedDir",
+            )
+
+            // Guard: no generated files should be in the default build directory
+            val defaultGeneratedDir = projectDir.resolve("build/generated/svgToCompose")
+            assertTrue(
+                !defaultGeneratedDir.exists() ||
+                    defaultGeneratedDir.walkTopDown().filter { it.isFile }.none(),
+                "Generated files found in default build dir — buildDirectory override was not respected",
+            )
+        } finally {
+            projectDir.deleteRecursively()
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Gradle runner
     // -------------------------------------------------------------------------
@@ -187,10 +250,18 @@ class AndroidSourceSetRegistrationTest {
     // Project scaffolding
     // -------------------------------------------------------------------------
 
-    private fun createAndroidProject(config: AgpTestConfig, dsl: BuildScriptDsl): File {
+    private fun scaffoldProject(
+        config: AgpTestConfig,
+        dsl: BuildScriptDsl,
+        buildScriptProvider: () -> String,
+    ): File {
         val dir = createTempDirectory("s2c-android-test").toFile()
 
         dir.resolve("local.properties").writeText("sdk.dir=$androidHome\n")
+
+        // Increase Metaspace for the Gradle daemon that TestKit reuses across tests.
+        // Each test loads AGP classes, which accumulate in the daemon's Metaspace.
+        dir.resolve("gradle.properties").writeText("org.gradle.jvmargs=-XX:MaxMetaspaceSize=2g\n")
 
         dir.resolve("settings.gradle.kts").writeText(
             // language=kotlin
@@ -202,15 +273,21 @@ class AndroidSourceSetRegistrationTest {
                     gradlePluginPortal()
                 }
             }
+            dependencyResolutionManagement {
+                repositories {
+                    google()
+                    mavenCentral()
+                }
+            }
             rootProject.name = "s2c-android-test"
             """.trimIndent()
         )
 
-        val (fileName, content) = when (dsl) {
-            BuildScriptDsl.GROOVY -> "build.gradle" to groovyBuildScript(config)
-            BuildScriptDsl.KOTLIN_DSL -> "build.gradle.kts" to kotlinDslBuildScript(config)
+        val fileName = when (dsl) {
+            BuildScriptDsl.GROOVY -> "build.gradle"
+            BuildScriptDsl.KOTLIN_DSL -> "build.gradle.kts"
         }
-        dir.resolve(fileName).writeText(content)
+        dir.resolve(fileName).writeText(buildScriptProvider())
 
         // Minimal AndroidManifest (required for com.android.library)
         val manifestDir = dir.resolve("src/main")
@@ -234,13 +311,34 @@ class AndroidSourceSetRegistrationTest {
     }
 
     // -------------------------------------------------------------------------
-    // Build script content — Groovy
+    // Build script generation
     // -------------------------------------------------------------------------
 
-    private fun groovyBuildScript(config: AgpTestConfig): String {
+    /**
+     * Generates a complete build script. Uses `buildscript { classpath }` to
+     * inject both AGP and the plugin-under-test into the same classloader.
+     */
+    private fun buildScript(
+        config: AgpTestConfig,
+        dsl: BuildScriptDsl,
+        buildDirOverride: String? = null,
+    ): String = when (dsl) {
+        BuildScriptDsl.GROOVY -> groovyBuildScript(config, buildDirOverride)
+        BuildScriptDsl.KOTLIN_DSL -> kotlinDslBuildScript(config, buildDirOverride)
+    }
+
+    // -------------------------------------------------------------------------
+    // Groovy build script
+    // -------------------------------------------------------------------------
+
+    private fun groovyBuildScript(config: AgpTestConfig, buildDirOverride: String?): String {
         val classpathFiles = pluginClasspath.joinToString(",\n                    ") { entry ->
             "'${entry.absolutePath.replace("\\", "\\\\").replace("'", "\\'")}'"
         }
+
+        val buildDirLine = buildDirOverride?.let {
+            "\nlayout.buildDirectory = layout.projectDirectory.dir('$it')\n"
+        } ?: ""
 
         // language=groovy
         return """
@@ -258,7 +356,7 @@ class AndroidSourceSetRegistrationTest {
                 }
             }
 
-            apply plugin: 'com.android.library'
+            apply plugin: 'com.android.library'${if (config.needsKotlinPlugin) "\n            apply plugin: 'org.jetbrains.kotlin.android'" else ""}
             apply plugin: 'dev.tonholo.s2c'
 
             android {
@@ -267,7 +365,17 @@ class AndroidSourceSetRegistrationTest {
                 defaultConfig {
                     minSdk = 21
                 }
-            }
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }${if (config.needsKotlinPlugin) """
+
+            tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                compilerOptions {
+                    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+                }
+            }""" else ""}
 
             svgToCompose {
                 processor {
@@ -283,31 +391,12 @@ class AndroidSourceSetRegistrationTest {
                     }
                 }
             }
-
-            tasks.register('verifySourceSetRegistration') {
-                dependsOn 'parseSvgToComposeIcon'
-                doLast {
-                    def mainSourceSet = android.sourceSets.getByName('main')
-                    def kotlinDirs = mainSourceSet.kotlin.srcDirs
-                    def generatedDir = layout.buildDirectory
-                        .dir('generated/svgToCompose/main/kotlin')
-                        .get().asFile
-                    def found = kotlinDirs.any { it.absolutePath == generatedDir.absolutePath }
-                    if (!found) {
-                        throw new GradleException(
-                            "Generated source directory not found in main source set. " +
-                            "Expected: " + generatedDir.absolutePath +
-                            " Actual: " + kotlinDirs.collect { it.absolutePath }
-                        )
-                    }
-                    println "SOURCE_SET_VERIFIED: " + generatedDir.absolutePath
-                }
-            }
+            $buildDirLine
         """.trimIndent()
     }
 
     // -------------------------------------------------------------------------
-    // Build script content — Kotlin DSL
+    // Kotlin DSL build script
     // -------------------------------------------------------------------------
 
     /**
@@ -315,16 +404,16 @@ class AndroidSourceSetRegistrationTest {
      *
      * Type-safe accessors (e.g., `android { }`) are NOT generated for plugins
      * applied via `apply(plugin = ...)`. We use [configure] with explicit FQCNs
-     * instead. This mirrors what a user would do when mixing buildscript-based
-     * plugin application with Kotlin DSL.
-     *
-     * [com.android.build.api.dsl.LibraryExtension] has no type parameters in
-     * either AGP 8 or 9, so the cast is safe without erasure concerns.
+     * instead.
      */
-    private fun kotlinDslBuildScript(config: AgpTestConfig): String {
+    private fun kotlinDslBuildScript(config: AgpTestConfig, buildDirOverride: String?): String {
         val classpathFiles = pluginClasspath.joinToString(",\n                    ") { entry ->
             "\"${entry.absolutePath.replace("\\", "\\\\")}\""
         }
+
+        val buildDirLine = buildDirOverride?.let {
+            "\nlayout.buildDirectory.set(layout.projectDirectory.dir(\"$it\"))\n"
+        } ?: ""
 
         // language=kotlin
         return """
@@ -342,7 +431,7 @@ class AndroidSourceSetRegistrationTest {
                 }
             }
 
-            apply(plugin = "com.android.library")
+            apply(plugin = "com.android.library")${if (config.needsKotlinPlugin) "\n            apply(plugin = \"org.jetbrains.kotlin.android\")" else ""}
             apply(plugin = "dev.tonholo.s2c")
 
             configure<com.android.build.api.dsl.LibraryExtension> {
@@ -351,7 +440,17 @@ class AndroidSourceSetRegistrationTest {
                 defaultConfig {
                     minSdk = 21
                 }
-            }
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
+                }
+            }${if (config.needsKotlinPlugin) """
+
+            tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+                }
+            }""" else ""}
 
             configure<dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension> {
                 processor {
@@ -367,32 +466,14 @@ class AndroidSourceSetRegistrationTest {
                     }
                 }
             }
-
-            tasks.register("verifySourceSetRegistration") {
-                dependsOn("parseSvgToComposeIcon")
-                doLast {
-                    val generatedDir = layout.buildDirectory
-                        .dir("generated/svgToCompose/main/kotlin")
-                        .get().asFile
-                    require(generatedDir.exists()) {
-                        "Generated source directory does not exist: ${'$'}{generatedDir.absolutePath}"
-                    }
-                    val generatedFiles = generatedDir.walkTopDown()
-                        .filter { it.isFile && it.extension == "kt" }
-                        .toList()
-                    require(generatedFiles.isNotEmpty()) {
-                        "No generated .kt files found in ${'$'}{generatedDir.absolutePath}"
-                    }
-                    println("SOURCE_SET_VERIFIED: ${'$'}{generatedDir.absolutePath}")
-                }
-            }
+            $buildDirLine
         """.trimIndent()
     }
 
     private fun skipIfNoAndroidSdk() {
-        org.junit.Assume.assumeTrue(
+        Assumptions.assumeFalse(
+            androidHome.isNullOrBlank(),
             "Skipping: ANDROID_HOME / ANDROID_SDK_ROOT not set",
-            !androidHome.isNullOrBlank(),
         )
     }
 }

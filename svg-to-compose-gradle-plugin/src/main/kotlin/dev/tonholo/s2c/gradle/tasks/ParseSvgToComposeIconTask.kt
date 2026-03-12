@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.gradle.tasks
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.variant.AndroidComponentsExtension
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
@@ -35,6 +35,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.workers.WorkQueue
@@ -417,7 +418,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         configurations = extension.configurations
         maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
         logLevel.set(project.gradle.startParameter.logLevel)
-        sourceDirectory.convention(outputSourceDir)
+        sourceDirectory.set(outputSourceDir)
     }
 
     // Register this task as a dependency of KotlinCompile
@@ -425,35 +426,36 @@ internal fun Project.registerParseSvgToComposeIconTask(
         dependsOn(task)
     }
 
-    if (kmpExtension != null) {
-        val sourceSet = kmpExtension.targets
-            .first { it.platformType == KotlinPlatformType.common }
-            .compilations
-            .first { it.platformType == KotlinPlatformType.common }
-            .defaultSourceSet
-            .kotlin
+    when {
+        kmpExtension != null -> {
+            val sourceSet = kmpExtension.targets
+                .first { it.platformType == KotlinPlatformType.common }
+                .compilations
+                .first { it.platformType == KotlinPlatformType.common }
+                .defaultSourceSet
+                .kotlin
 
-        sourceSet.srcDirs(outputSourceDir)
-    } else {
-        // Defer until the Android plugin is applied, since our plugin may be
-        // listed before the Android plugin in the build script.
-        val androidPluginIds = listOf(
-            "com.android.application",
-            "com.android.library",
-        )
-        androidPluginIds.forEach { pluginId ->
-            pluginManager.withPlugin(pluginId) {
-                // Use findByName + cast instead of findByType to avoid reified generic
-                // mismatch between AGP 8 (6 type params) and AGP 9 (0 type params).
-                // Safe at runtime due to JVM type erasure.
-                val androidExtension = extensions.findByName("android") as? CommonExtension<*, *, *, *, *, *>
-                    ?: return@withPlugin
-                // Pass a resolved File rather than a Provider to avoid AGP 9's
-                // "You cannot add Provider instances to the Android SourceSet API" error.
-                androidExtension.sourceSets
-                    .named("main")
-                    .configure { kotlin.srcDir(outputSourceDir.get().asFile) }
-            }
+            sourceSet.srcDirs(outputSourceDir)
         }
+
+        else -> addToAndroidSourceSet(task)
+    }
+}
+
+/**
+ * Registers the task's generated source directory with each Android variant
+ * via the [AndroidComponentsExtension] variant API. This keeps resolution
+ * fully lazy — [layout.buildDirectory][org.gradle.api.file.ProjectLayout.getBuildDirectory]
+ * overrides applied after plugin evaluation are respected.
+ *
+ * Works with both AGP 8 and AGP 9.
+ */
+private fun Project.addToAndroidSourceSet(task: TaskProvider<ParseSvgToComposeIconTask>) {
+    val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
+    androidComponents.onVariants { variant ->
+        variant.sources.kotlin?.addGeneratedSourceDirectory(
+            task,
+            ParseSvgToComposeIconTask::sourceDirectory,
+        )
     }
 }
