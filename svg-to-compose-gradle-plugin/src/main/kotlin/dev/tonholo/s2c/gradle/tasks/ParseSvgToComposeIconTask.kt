@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.gradle.tasks
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.variant.AndroidComponentsExtension
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
@@ -26,15 +26,16 @@ import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.workers.WorkQueue
@@ -50,11 +51,18 @@ import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
+internal const val COMMON_CONFIGURATION_NAME = "common"
 
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(
-    private val objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
 ) : DefaultTask() {
+    /**
+     * Creates and configures the GradlePluginGraph used by the task.
+     *
+     * The returned graph is initialized with the plugin's S2C graph and the project's build directory.
+     *
+     * @return The configured GradlePluginGraph instance.
+     */
     private fun createGraph(): GradlePluginGraph {
         val s2cGraph = createS2cGraph(
             logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
@@ -94,6 +102,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 
     private val outputDirectories: Map<String, File>
         get() = configurations
+            .filter { it.name != COMMON_CONFIGURATION_NAME }
             .associate { configuration ->
                 val destination = configuration.destinationPackage.get().replace(".", "/")
                 val outputFolder =
@@ -110,7 +119,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                             },
                         ).asFile.toOkioPath()
                     } else {
-                        sourceDirectory.toOkioPath()
+                        sourceDirectory.get().asFile.toOkioPath()
                     }
                 val configurationDestination = outputFolder / destination
 
@@ -118,23 +127,20 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             }
 
     @get:OutputDirectory
-    val sourceDirectory: File
-        get() = objectFactory.directoryProperty().convention(
-            projectLayout.buildDirectory.dir(
-                buildString {
-                    append(GENERATED_FOLDER)
-                    append(
-                        if (isKmp) {
-                            "/commonMain"
-                        } else {
-                            "/main"
-                        },
-                    )
-                    append("/kotlin/")
-                },
-            )
-        ).get().asFile
+    abstract val sourceDirectory: DirectoryProperty
 
+    /**
+     * Executes the task: parses configured SVG/AVG files into Compose icons, runs
+     * worker actions, and updates the task cache.
+     *
+     * This method initializes the processing graph and related resources, registers
+     * the worker bridge, processes all active configurations (excluding the "common"
+     * configuration), aggregates results, removes temporary worker results, saves the
+     * updated cache, and ensures cleanup of the worker bridge and processor.
+     *
+     * @throws ExitProgramException if one or more icons fail to parse; the exception
+     * contains the underlying causes.
+     */
     @TaskAction
     fun run() {
         val graph = createGraph()
@@ -146,10 +152,12 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
-            cacheManager.initialize(configurations.asMap)
+            val activeConfigurations = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
+            val activeConfigMap = activeConfigurations.associateBy { it.name }
+            cacheManager.initialize(activeConfigMap)
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
-            configurations.forEach { configuration ->
+            activeConfigurations.forEach { configuration ->
                 val filesToProcess = findFilesToProcess(configuration, fileManager, cacheManager)
 
                 if (filesToProcess.isEmpty()) {
@@ -363,10 +371,35 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     }
 }
 
+/**
+ * Registers the "parseSvgToComposeIcon" Gradle task and wires generated sources into the project's Kotlin source sets.
+ *
+ * Validates the provided extension and fails the build if configuration errors are found. Creates a task
+ * configured from the extension (including max parallelism, log level and source directory convention)
+ * and makes Kotlin compilation tasks depend on it. If the project is Kotlin Multiplatform, adds the
+ * generated directory to the `commonMain` Kotlin source set; otherwise, waits for the Android plugin and
+ * adds the generated directory to the Android `main` source set.
+ *
+ * @param extension The plugin extension containing configuration for parsing SVGs to Compose icons.
+ */
 internal fun Project.registerParseSvgToComposeIconTask(
     extension: SvgToComposeExtension,
 ) {
     val kmpExtension = extensions.findByType<KotlinMultiplatformExtension>()
+    val outputSourceDir = layout.buildDirectory.dir(
+        buildString {
+            append(GENERATED_FOLDER)
+            append(
+                if (kmpExtension != null) {
+                    "/commonMain"
+                } else {
+                    "/main"
+                },
+            )
+            append("/kotlin/")
+        },
+    )
+
     val task = tasks.register(
         "parseSvgToComposeIcon",
         ParseSvgToComposeIconTask::class.java,
@@ -385,6 +418,7 @@ internal fun Project.registerParseSvgToComposeIconTask(
         configurations = extension.configurations
         maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
         logLevel.set(project.gradle.startParameter.logLevel)
+        sourceDirectory.set(outputSourceDir)
     }
 
     // Register this task as a dependency of KotlinCompile
@@ -392,27 +426,36 @@ internal fun Project.registerParseSvgToComposeIconTask(
         dependsOn(task)
     }
 
-    val outputDirectories = task.map { it.sourceDirectory }
+    when {
+        kmpExtension != null -> {
+            val sourceSet = kmpExtension.targets
+                .first { it.platformType == KotlinPlatformType.common }
+                .compilations
+                .first { it.platformType == KotlinPlatformType.common }
+                .defaultSourceSet
+                .kotlin
 
-    if (kmpExtension != null) {
-        val sourceSet = kmpExtension.targets
-            .first { it.platformType == KotlinPlatformType.common }
-            .compilations
-            .first { it.platformType == KotlinPlatformType.common }
-            .defaultSourceSet
-            .kotlin
-
-        sourceSet.srcDirs(outputDirectories)
-    } else {
-        val androidExtension = project.extensions.findByName("android") as? BaseExtension
-        requireNotNull(androidExtension) {
-            "Android plugin must be applied to use this plugin in Android projects"
+            sourceSet.srcDirs(outputSourceDir)
         }
-        val sourceSet = androidExtension
-            .sourceSets
-            .first { it.name == "main" }
-            .kotlin
 
-        sourceSet.srcDirs(outputDirectories)
+        else -> addToAndroidSourceSet(task)
+    }
+}
+
+/**
+ * Registers the task's generated source directory with each Android variant
+ * via the [AndroidComponentsExtension] variant API. This keeps resolution
+ * fully lazy — [layout.buildDirectory][org.gradle.api.file.ProjectLayout.getBuildDirectory]
+ * overrides applied after plugin evaluation are respected.
+ *
+ * Works with both AGP 8 and AGP 9.
+ */
+private fun Project.addToAndroidSourceSet(task: TaskProvider<ParseSvgToComposeIconTask>) {
+    val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
+    androidComponents.onVariants { variant ->
+        variant.sources.kotlin?.addGeneratedSourceDirectory(
+            task,
+            ParseSvgToComposeIconTask::sourceDirectory,
+        )
     }
 }

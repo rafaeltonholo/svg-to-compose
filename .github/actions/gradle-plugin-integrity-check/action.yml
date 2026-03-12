@@ -3,6 +3,34 @@ description: Runs functional tests to verify the Gradle plugin converts SVG/AVG 
 runs:
   using: composite
   steps:
+    - name: Cache Android SDK
+      id: android-sdk-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/android-sdk
+        key: android-sdk-cmdline-14742923-platforms-35-36
+
+    - name: Set up Android SDK
+      if: steps.android-sdk-cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        CMDLINE_TOOLS_URL: https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip
+      run: |
+        ANDROID_HOME="$HOME/android-sdk"
+        mkdir -p "$ANDROID_HOME/cmdline-tools"
+        curl -fsSL "$CMDLINE_TOOLS_URL" -o /tmp/cmdline-tools.zip
+        unzip -q /tmp/cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools"
+        mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+        rm /tmp/cmdline-tools.zip
+
+        # Accept licenses and install required SDK platforms
+        yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
+        "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "platforms;android-36"
+
+    - name: Export ANDROID_HOME
+      shell: bash
+      run: echo "ANDROID_HOME=$HOME/android-sdk" >> "$GITHUB_ENV"
+
     - name: Run Gradle Plugin functional tests
       shell: bash
       run: ./gradlew :svg-to-compose-gradle-plugin:test

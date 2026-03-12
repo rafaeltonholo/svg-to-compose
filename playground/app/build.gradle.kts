@@ -3,14 +3,13 @@ import dev.tonholo.s2c.annotations.ExperimentalParallelProcessing
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dev.tonholo.s2c)
 }
 
 android {
     namespace = "dev.tonholo.svg_to_compose.playground"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "dev.tonholo.svg_to_compose.playground"
@@ -32,18 +31,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        // That is not a real app, so it won't hurt suppressing
-        // the Kotlin version compatibility check for Compose
-        // compiler.
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true",
-        )
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         compose = true
@@ -53,7 +42,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    composeOptions { }
 }
 
 svgToCompose {

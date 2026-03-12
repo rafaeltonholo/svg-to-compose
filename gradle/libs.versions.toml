@@ -11,6 +11,7 @@ metro = "0.11.2"
 maven-publish = "0.31.0"
 buildconfig = "6.0.9"
 dokka = "1.9.20"
+junit-jupiter = "5.14.0"
 
 [libraries]
 com-github-ajalt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
@@ -29,6 +30,7 @@ com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", ve
 io-gitlab-arturbosch-detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 com-github-gmazzo-buildconfig-plugin = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 com-vanniktech-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
+org-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 
 [plugins]
 app-cash-burst = { id = "app.cash.burst", version.ref = "burst" }
