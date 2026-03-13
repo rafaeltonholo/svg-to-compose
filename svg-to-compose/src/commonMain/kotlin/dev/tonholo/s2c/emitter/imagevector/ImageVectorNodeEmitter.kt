@@ -4,19 +4,15 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
 import dev.tonholo.s2c.extensions.indented
-import dev.tonholo.s2c.logger.Logger
-
 /**
  * Emits Kotlin code for [ImageVectorNode] instances (Path, Group, ChunkFunction).
  *
  * Delegates path command emission to [PathNodeEmitter].
  *
- * @property logger The logger instance for diagnostic output.
  * @property pathNodeEmitter The emitter for individual path commands.
  */
 internal class ImageVectorNodeEmitter(
-    private val logger: Logger,
-    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(logger),
+    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(),
 ) {
     /**
      * Emits the Kotlin code for an [ImageVectorNode].
@@ -155,8 +151,8 @@ internal class ImageVectorNodeEmitter(
     private fun buildGroupParameters(
         group: ImageVectorNode.Group,
         indentSize: Int,
-    ): Set<Pair<String, String>> = with(group.params) {
-        buildSet {
+    ): List<Pair<String, String>> = with(group.params) {
+        buildList {
             clipPath?.let {
                 val clipPathData = clipPath.nodes
                     .joinToString("\n${" ".repeat(indentSize * 2)}") {
