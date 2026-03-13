@@ -28,7 +28,7 @@ class CssParserTest {
             |    background: #f0f;
             |    color: #000;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Dot, startOffset = 0, endOffset = 1),
             Token(kind = CssTokenKind.Ident, startOffset = 1, endOffset = 8),
@@ -148,7 +148,7 @@ class CssParserTest {
             |    background: #f0f;
             |    color: #000;
             |}
-        """.trimMargin()
+            """.trimMargin()
 
         val tokens = listOf(
             Token(kind = CssTokenKind.Hash, startOffset = 0, endOffset = 1),
@@ -273,7 +273,7 @@ class CssParserTest {
             |    background: #0ff;
             |    margin-bottom: 1px;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Dot, startOffset = 0, endOffset = 1),
             Token(kind = CssTokenKind.Ident, startOffset = 1, endOffset = 8),
@@ -488,7 +488,7 @@ class CssParserTest {
             |.my-rule {
             |    font-size: 16;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(CssTokenKind.Dot, startOffset = 0, endOffset = 1),
             Token(CssTokenKind.Ident, startOffset = 1, endOffset = 8),
@@ -579,7 +579,7 @@ class CssParserTest {
             |#my-rule, .my-class {
             |    clip-path: url(#my-clip-path);
             |}
-        """.trimMargin()
+            """.trimMargin()
 
         val tokens = listOf(
             Token(kind = CssTokenKind.Hash, startOffset = 0, endOffset = 1),
@@ -694,7 +694,7 @@ class CssParserTest {
             |    background: #f0f;
             |    color: #000;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),
@@ -813,7 +813,7 @@ class CssParserTest {
             |    background: #f0f;
             |    color: #000;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
             Token(kind = CssTokenKind.Comma, startOffset = 3, endOffset = 4),
@@ -959,7 +959,7 @@ class CssParserTest {
                                 ),
                             ),
                         ),
-                    ),
+                    )
                 ),
             ),
         )
@@ -973,7 +973,7 @@ class CssParserTest {
             |div.element-class#element-id {
             |   display: none;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
             Token(kind = CssTokenKind.Dot, startOffset = 3, endOffset = 4),
@@ -1069,7 +1069,7 @@ class CssParserTest {
                                 ),
                             ),
                         ),
-                    ),
+                    )
                 ),
             ),
         )
@@ -1081,7 +1081,7 @@ class CssParserTest {
     fun `parse rules for css without formatting`() {
         val content = """
             |div{display:none}
-        """.trimMargin()
+            """.trimMargin()
 
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
@@ -1146,7 +1146,7 @@ class CssParserTest {
                                         location = CssLocation(
                                             source = content.substring(12, 16),
                                             start = 12,
-                                            end = 16,
+                                            end = 16
                                         ),
                                         name = "none",
                                     ),
@@ -1164,7 +1164,7 @@ class CssParserTest {
     fun `parse rules for css with tag and id`() {
         val content = """
             |div#id { display:none }
-        """.trimMargin()
+            """.trimMargin()
 
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
@@ -1419,24 +1419,24 @@ class CssParserTest {
             |}
         """.trimMargin()
         val tokens = listOf(
-            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3), // 'div'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4), // ' '
-            Token(kind = CssTokenKind.Ident, startOffset = 4, endOffset = 8), // 'span'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 8, endOffset = 9), // ' '
-            Token(kind = CssTokenKind.Ident, startOffset = 9, endOffset = 14), // 'label'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15), // ' '
-            Token(kind = CssTokenKind.Dot, startOffset = 15, endOffset = 16), // '.'
-            Token(kind = CssTokenKind.Ident, startOffset = 16, endOffset = 24), // 'my-class'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 24, endOffset = 25), // ' '
-            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 25, endOffset = 26), // '{'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 26, endOffset = 31), // '\n    '
-            Token(kind = CssTokenKind.Ident, startOffset = 31, endOffset = 36), // 'color'
-            Token(kind = CssTokenKind.Colon, startOffset = 36, endOffset = 37), // ':'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 37, endOffset = 38), // ' '
-            Token(kind = CssTokenKind.Ident, startOffset = 38, endOffset = 42), // 'blue'
-            Token(kind = CssTokenKind.Semicolon, startOffset = 42, endOffset = 43), // ';'
-            Token(kind = CssTokenKind.WhiteSpace, startOffset = 43, endOffset = 44), // '\n'
-            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 44, endOffset = 45), // '}'
+            Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),               // 'div'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),          // ' '
+            Token(kind = CssTokenKind.Ident, startOffset = 4, endOffset = 8),               // 'span'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 8, endOffset = 9),          // ' '
+            Token(kind = CssTokenKind.Ident, startOffset = 9, endOffset = 14),              // 'label'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15),        // ' '
+            Token(kind = CssTokenKind.Dot, startOffset = 15, endOffset = 16),               // '.'
+            Token(kind = CssTokenKind.Ident, startOffset = 16, endOffset = 24),             // 'my-class'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 24, endOffset = 25),        // ' '
+            Token(kind = CssTokenKind.OpenCurlyBrace, startOffset = 25, endOffset = 26),    // '{'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 26, endOffset = 31),        // '\n    '
+            Token(kind = CssTokenKind.Ident, startOffset = 31, endOffset = 36),             // 'color'
+            Token(kind = CssTokenKind.Colon, startOffset = 36, endOffset = 37),             // ':'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 37, endOffset = 38),        // ' '
+            Token(kind = CssTokenKind.Ident, startOffset = 38, endOffset = 42),             // 'blue'
+            Token(kind = CssTokenKind.Semicolon, startOffset = 42, endOffset = 43),         // ';'
+            Token(kind = CssTokenKind.WhiteSpace, startOffset = 43, endOffset = 44),        // '\n'
+            Token(kind = CssTokenKind.CloseCurlyBrace, startOffset = 44, endOffset = 45),   // '}'
             Token(kind = CssTokenKind.EndOfFile, startOffset = 45, endOffset = 45),
         )
         val expected = StyleSheet(
@@ -1646,7 +1646,7 @@ class CssParserTest {
             |div {
             |    background-image: url($url;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.Ident, startOffset = 0, endOffset = 3),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 3, endOffset = 4),
@@ -1679,7 +1679,7 @@ class CssParserTest {
             |@invalid-rule {
             |    display: none;
             |}
-        """.trimMargin()
+            """.trimMargin()
         val tokens = listOf(
             Token(kind = CssTokenKind.AtKeyword, startOffset = 0, endOffset = 14),
             Token(kind = CssTokenKind.WhiteSpace, startOffset = 14, endOffset = 15),
@@ -1708,7 +1708,11 @@ class CssParserTest {
         assertContains(message, "Invalid at-rule: @invalid-rule")
     }
 
-    private fun assert(content: String, tokens: List<Token<out CssTokenKind>>, expected: StyleSheet) {
+    private fun assert(
+        content: String,
+        tokens: List<Token<out CssTokenKind>>,
+        expected: StyleSheet,
+    ) {
         val astParser = CssParser(consumers = CssConsumers(content))
         val actual = astParser.parse(tokens)
         assertEquals(expected, actual)

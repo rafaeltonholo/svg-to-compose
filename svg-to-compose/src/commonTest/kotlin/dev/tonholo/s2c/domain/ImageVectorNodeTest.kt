@@ -1,7 +1,7 @@
 package dev.tonholo.s2c.domain
 
-import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.SvgRootNode
+import dev.tonholo.s2c.domain.svg.SvgPathNode
 import dev.tonholo.s2c.domain.svg.asNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
 import dev.tonholo.s2c.error.ExitProgramException

@@ -4,12 +4,12 @@ import dev.tonholo.s2c.parser.ast.css.CssCombinator
 import dev.tonholo.s2c.parser.ast.css.syntax.node.AtRule
 import dev.tonholo.s2c.parser.ast.css.syntax.node.AtRulePrelude
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Block
+import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 import dev.tonholo.s2c.parser.ast.css.syntax.node.CssLocation
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Declaration
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Prelude
 import dev.tonholo.s2c.parser.ast.css.syntax.node.QualifiedRule
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Selector
-import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
 import dev.tonholo.s2c.parser.ast.css.syntax.node.Value
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,7 +20,7 @@ class CssTreeTest {
         val location = CssLocation(
             source = "",
             start = 0,
-            end = 0,
+            end = 0
         )
         val rule = QualifiedRule(
             location = location,
@@ -41,9 +41,9 @@ class CssTreeTest {
                                 location = location,
                                 name = "after",
                                 parameters = emptyList(),
-                            ),
+                            )
                         ),
-                    ),
+                    )
                 ),
             ),
             block = Block.SimpleBlock(
@@ -76,7 +76,7 @@ class CssTreeTest {
                                     Value.Identifier(
                                         location = location,
                                         name = "href",
-                                    ),
+                                    )
                                 ),
                             ),
                             Value.String(
@@ -105,7 +105,7 @@ class CssTreeTest {
         val location = CssLocation(
             source = "",
             start = 0,
-            end = 0,
+            end = 0
         )
         val rule = AtRule(
             location = location,
@@ -267,7 +267,7 @@ class CssTreeTest {
         val location = CssLocation(
             source = "",
             start = 0,
-            end = 0,
+            end = 0
         )
         val rule = QualifiedRule(
             location = location,
@@ -337,9 +337,9 @@ class CssTreeTest {
                                 value = "#abc",
                             ),
                         ),
-                    ),
+                    )
                 ),
-            ),
+            )
         )
         val expected = """
             |div .child a, a .child span {

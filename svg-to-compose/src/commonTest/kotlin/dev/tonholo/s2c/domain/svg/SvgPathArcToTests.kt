@@ -142,8 +142,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    x1 = ${x}f,
                 |    y1 = ${y}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -160,8 +159,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    dx1 = ${x}f,
                 |    dy1 = ${y}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -213,8 +211,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    y1 = ${y}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -232,8 +229,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    dy1 = ${y}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -305,7 +301,7 @@ class SvgPathArcToTests : BaseSvgTest() {
     }
 
     @Test
-    fun `arcTo - minified with close instruction omits comment`() {
+    fun `ensure materialize generates arcTo with inlined parameters and no comment with close instruction when minified`() {
         // Arrange
         val nonRelative = ArcParams(
             a = 5f,
@@ -369,7 +365,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                     append(")")
                     appendLine()
                     append("close()")
-                },
+                }
             )
         }
     }

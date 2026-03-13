@@ -11,7 +11,10 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class SvgPathLineToTests : BaseSvgTest() {
-    data class LineParams(val x: Float, val y: Float) {
+    data class LineParams(
+        val x: Float,
+        val y: Float,
+    ) {
         override fun toString(): String = "$x $y".removeTrailingZero()
     }
 
@@ -77,8 +80,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 element = """
                 |// L $this
                 |lineTo(x = ${x}f, y = ${y}f)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -87,8 +89,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 element = """
                 |// l $this
                 |lineToRelative(dx = ${x}f, dy = ${y}f)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -120,8 +121,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 |// L ${this}z
                 |lineTo(x = ${x}f, y = ${y}f)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -131,8 +131,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 |// l ${this}z
                 |lineToRelative(dx = ${x}f, dy = ${y}f)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -160,13 +159,13 @@ class SvgPathLineToTests : BaseSvgTest() {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "lineTo(x = ${x}f, y = ${y}f)",
+                element = "lineTo(x = ${x}f, y = ${y}f)"
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "lineToRelative(dx = ${x}f, dy = ${y}f)",
+                element = "lineToRelative(dx = ${x}f, dy = ${y}f)"
             )
         }
     }
@@ -197,7 +196,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 element = """
                     |lineTo(x = ${x}f, y = ${y}f)
                     |close()
-                """.trimMargin(),
+                """.trimMargin()
             )
         }
         with(relative) {
@@ -206,7 +205,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 element = """
                     |lineToRelative(dx = ${x}f, dy = ${y}f)
                     |close()
-                """.trimMargin(),
+                """.trimMargin()
             )
         }
     }

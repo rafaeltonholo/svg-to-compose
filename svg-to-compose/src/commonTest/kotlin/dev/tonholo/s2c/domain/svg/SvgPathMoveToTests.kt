@@ -12,7 +12,8 @@ import kotlin.test.assertTrue
 
 class SvgPathMoveToTests : BaseSvgTest() {
     private data class MoveToParams(val x: String, val y: String) {
-        override fun toString(): String = "$x $y".removeTrailingZero()
+        override fun toString(): String =
+            "$x $y".removeTrailingZero()
     }
 
     @Test
@@ -76,10 +77,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf(
-                "d" to
-                    "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}",
-            ),
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
         val node = path.asNode(minified = false) as ImageVectorNode.Path
@@ -95,7 +93,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 |// M $this
                 |moveTo(x = ${x}f, y = ${y}f)
                 |
-                """.trimMargin(),
+            """.trimMargin()
             )
         }
         with(relativeMoveToParams) {
@@ -107,7 +105,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 |// m $this
                 |moveToRelative(dx = ${x}f, dy = ${y}f)
                 |
-                """.trimMargin(),
+            """.trimMargin()
             )
         }
     }
@@ -119,10 +117,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf(
-                "d" to
-                    "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z",
-            ),
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
         val node = path.asNode(minified = false) as ImageVectorNode.Path
@@ -139,7 +134,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 |moveTo(x = ${x}f, y = ${y}f)
                 |close()
                 |
-                """.trimMargin(),
+            """.trimMargin()
             )
         }
         with(relativeMoveToParams) {
@@ -152,7 +147,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 |moveToRelative(dx = ${x}f, dy = ${y}f)
                 |close()
                 |
-                """.trimMargin(),
+            """.trimMargin()
             )
         }
     }
@@ -164,10 +159,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf(
-                "d" to
-                    "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}",
-            ),
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y} m${relativeMoveToParams.x} ${relativeMoveToParams.y}"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path
@@ -187,7 +179,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             val y = this.y.toFloat()
             assertContains(
                 array = materialized,
-                element = "moveToRelative(dx = ${x}f, dy = ${y}f)",
+                element = "moveToRelative(dx = ${x}f, dy = ${y}f)"
             )
         }
     }
@@ -199,10 +191,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
         val relativeMoveToParams = MoveToParams(x = "123", y = "654")
         val path = SvgPathNode(
             parent = root,
-            attributes = mutableMapOf(
-                "d" to
-                    "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z",
-            ),
+            attributes = mutableMapOf("d" to "M${nonRelativeMoveToParams.x} ${nonRelativeMoveToParams.y}z m${relativeMoveToParams.x} ${relativeMoveToParams.y}z"),
         )
         // Act
         val node = path.asNode(minified = true) as ImageVectorNode.Path

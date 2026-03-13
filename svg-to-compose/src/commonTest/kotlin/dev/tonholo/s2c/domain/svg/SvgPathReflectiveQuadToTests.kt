@@ -11,7 +11,10 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class SvgPathReflectiveQuadToTests : BaseSvgTest() {
-    data class ReflectiveQuadToParams(val x1: Float, val y1: Float) {
+    data class ReflectiveQuadToParams(
+        val x1: Float,
+        val y1: Float,
+    ) {
         override fun toString(): String = "$x1 $y1".removeTrailingZero()
     }
 
@@ -80,8 +83,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 |    x1 = ${x1}f,
                 |    y1 = ${y1}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -93,8 +95,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 |    dx1 = ${x1}f,
                 |    dy1 = ${y1}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -129,8 +130,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 |    y1 = ${y1}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -143,8 +143,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 |    dy1 = ${y1}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -184,7 +183,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
     }
 
     @Test
-    fun `reflectiveQuadTo - minified with close instruction omits comment`() {
+    fun `ensure materialize generates reflectiveQuadTo with inlined parameters and no comment and close instruction when minified`() {
         // Arrange
         val nonRelative = ReflectiveQuadToParams(
             x1 = 15f,

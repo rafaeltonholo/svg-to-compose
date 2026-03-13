@@ -11,7 +11,12 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class SvgPathReflectiveCurveToTests : BaseSvgTest() {
-    data class ReflectiveCurveToParams(val x1: Float, val y1: Float, val x2: Float, val y2: Float) {
+    data class ReflectiveCurveToParams(
+        val x1: Float,
+        val y1: Float,
+        val x2: Float,
+        val y2: Float,
+    ) {
         override fun toString(): String = "$x1 $y1 $x2 $y2".removeTrailingZero()
     }
 
@@ -86,8 +91,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
                 |    x2 = ${x2}f,
                 |    y2 = ${y2}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -101,8 +105,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
                 |    dx2 = ${x2}f,
                 |    dy2 = ${y2}f,
                 |)
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -143,8 +146,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
                 |    y2 = ${y2}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
         with(relative) {
@@ -159,8 +161,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
                 |    dy2 = ${y2}f,
                 |)
                 |close()
-                |
-                """.trimMargin(),
+                |""".trimMargin()
             )
         }
     }
@@ -218,7 +219,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
     }
 
     @Test
-    fun `reflectiveCurveTo - minified with close instruction omits comment`() {
+    fun `ensure materialize generates reflectiveCurveTo with inlined parameters and no comment and close instruction when minified`() {
         // Arrange
         val nonRelative = ReflectiveCurveToParams(
             x1 = 15f,
