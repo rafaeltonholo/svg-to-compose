@@ -317,6 +317,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             makeInternal.set(iconConfiguration.iconVisibility.get() == IconVisibility.Internal)
             excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
             kmpPreview.set(isKmp)
+            templateFilePath.set(iconConfiguration.templateFile.orNull?.asFile?.absolutePath)
             resultFilePath.set(resultFile.absolutePath)
             this.bridgeToken.set(bridgeToken)
             tempDirPath.set(temporaryDir.resolve("worker-${path.name.hashCode()}").absolutePath)
