@@ -11,15 +11,11 @@ import kotlin.contracts.contract
  *
  * @param TTokenKind The type of token kind.
  */
-abstract class AstParserIterator<TTokenKind : TokenKind>(
-    internal val tokens: List<Token<out TTokenKind>>,
-) {
+open class AstParserIterator<TTokenKind : TokenKind>(internal val tokens: List<Token<out TTokenKind>>) {
     internal var offset = 0
         private set
 
-    fun hasNext(): Boolean {
-        return offset < tokens.size
-    }
+    fun hasNext(): Boolean = offset < tokens.size
 
     /**
      * Returns the next token in the iteration.
@@ -33,8 +29,7 @@ abstract class AstParserIterator<TTokenKind : TokenKind>(
     /**
      * Peeks the next token without consuming it.
      */
-    fun peek(steps: Int = 1): Token<out TTokenKind>? =
-        tokens.getOrNull(offset + steps)
+    fun peek(steps: Int = 1): Token<out TTokenKind>? = tokens.getOrNull(offset + steps)
 
     /**
      * Returns the current token, which is the token that was previously consumed.
@@ -71,16 +66,14 @@ internal fun <TTokenKind : TokenKind> AstParserIterator<TTokenKind>.parserError(
     message: String,
     backtrack: Int = 1,
     forward: Int = 1,
-): Nothing {
-    throw AstParserException(
-        message = message,
-        tokens = tokens,
-        offset = offset,
-        content,
-        backtrack,
-        forward,
-    )
-}
+): Nothing = throw AstParserException(
+    message = message,
+    tokens = tokens,
+    offset = offset,
+    content,
+    backtrack,
+    forward,
+)
 
 /**
  * Asserts a condition during parsing. If the condition is false,
