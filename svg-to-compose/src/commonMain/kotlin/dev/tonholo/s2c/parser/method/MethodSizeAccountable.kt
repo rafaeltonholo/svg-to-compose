@@ -35,6 +35,13 @@ interface MethodSizeAccountable {
         const val METHOD_SIZE_THRESHOLD = 32767
 
         /**
+         * Approximate base bytecode size of the ImageVector builder structure
+         * (property declaration, Builder instantiation, `.build()` call, etc.)
+         * before any path/group nodes are added.
+         */
+        const val ICON_BASE_STRUCTURE_BYTE_SIZE = 73
+
+        /**
          * Represents the approximate byte size accounted for by a floating-point number instruction.
          */
         const val FLOAT_APPROXIMATE_BYTE_SIZE = 4
