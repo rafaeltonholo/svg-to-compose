@@ -16,7 +16,6 @@ import dev.tonholo.s2c.domain.PathNodes.VerticalLineTo
 import dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
-import dev.tonholo.s2c.logger.NoOpLogger
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.BOOLEAN_APPROXIMATE_BYTE_SIZE
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
@@ -66,12 +65,12 @@ sealed class PathNodes(
     @Deprecated(
         message = "Use PathNodeEmitter.emit() instead.",
         replaceWith = ReplaceWith(
-            expression = "PathNodeEmitter(logger).emit(this)",
+            expression = "PathNodeEmitter().emit(this)",
             imports = ["dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter"],
         ),
     )
     @Suppress("DeprecatedCallableAddReplaceWith")
-    open fun materialize(): String = PathNodeEmitter(NoOpLogger).emit(this)
+    open fun materialize(): String = PathNodeEmitter().emit(this)
 
     override fun toString(): String = if (shouldClose) {
         PathCommand.Close.value.toString()

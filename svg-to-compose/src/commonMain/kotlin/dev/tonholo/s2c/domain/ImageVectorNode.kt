@@ -13,7 +13,6 @@ import dev.tonholo.s2c.extensions.EMPTY
 import dev.tonholo.s2c.geom.AffineTransformation
 import dev.tonholo.s2c.geom.applyTransformations
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.logger.NoOpLogger
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
 
@@ -24,7 +23,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     @Deprecated(
         message = "Use ImageVectorNodeEmitter.emit() instead.",
         replaceWith = ReplaceWith(
-            expression = "ImageVectorNodeEmitter(logger).emit(this)",
+            expression = "ImageVectorNodeEmitter().emit(this)",
             imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
         ),
     )
@@ -120,8 +119,14 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 params.approximateByteSize +
                 wrapper.nodes.approximateByteSize
 
-        @Suppress("DeprecatedCallableAddReplaceWith")
-        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
+        @Deprecated(
+            "Use ImageVectorNodeEmitter.emit() instead.",
+            replaceWith = ReplaceWith(
+                "ImageVectorNodeEmitter().emit(this)",
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
+            )
+        )
+        override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
 
     data class Group(
@@ -186,8 +191,14 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 params.approximateByteSize +
                 commands.sumOf { it.approximateByteSize + 1 }
 
-        @Suppress("DeprecatedCallableAddReplaceWith")
-        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
+        @Deprecated(
+            "Use ImageVectorNodeEmitter.emit() instead.",
+            replaceWith = ReplaceWith(
+                "ImageVectorNodeEmitter().emit(this)",
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
+            )
+        )
+        override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
 
     /**
@@ -211,15 +222,21 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         @Deprecated(
             message = "Use ImageVectorNodeEmitter.emitChunkFunctionDefinition() instead.",
             replaceWith = ReplaceWith(
-                expression = "ImageVectorNodeEmitter(logger).emitChunkFunctionDefinition(this)",
+                expression = "ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)",
                 imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
             ),
         )
         fun createChunkFunction(): String =
-            ImageVectorNodeEmitter(NoOpLogger).emitChunkFunctionDefinition(this)
+            ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)
 
-        @Suppress("DeprecatedCallableAddReplaceWith")
-        override fun materialize(): String = ImageVectorNodeEmitter(NoOpLogger).emit(this)
+        @Deprecated(
+            "Use ImageVectorNodeEmitter.emit() instead.",
+            replaceWith = ReplaceWith(
+                "ImageVectorNodeEmitter().emit(this)",
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
+            )
+        )
+        override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
 
     // Support class to Paths. It should not be inherited from ImageVectorNode
@@ -246,15 +263,13 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
             val isContinuation = (currentCommand.isDigit() || currentCommand == '-' || currentCommand == '.') &&
                 lastCommand != Char.EMPTY
             if (isContinuation) {
-                currentCommand = when {
+                currentCommand = when (PathCommand.MoveTo.value) {
                     // For any subsequent coordinate pair(s) after MoveTo (M/m) are interpreted as parameter(s)
                     // for implicit absolute LineTo (L/l) command(s)
-                    lastCommand.lowercaseChar() == PathCommand.MoveTo.value && lastCommand.isLowerCase() ->
+                    lastCommand.lowercaseChar() if lastCommand.isLowerCase() ->
                         PathCommand.LineTo.value
 
-                    lastCommand.lowercaseChar() == PathCommand.MoveTo.value ->
-                        PathCommand.LineTo.uppercaseChar()
-
+                    lastCommand.lowercaseChar() -> PathCommand.LineTo.uppercaseChar()
                     else -> lastCommand
                 }
                 current = currentCommand + current
@@ -340,9 +355,9 @@ private fun createNode(
     throw e
 }
 
-private inline fun resetDotCount(current: Char): Int = if (current == '.') 1 else 0
+private fun resetDotCount(current: Char): Int = if (current == '.') 1 else 0
 
-private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int = if (char == '.') {
+private fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int = if (char == '.') {
     dotCount + 1
 } else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {
     resetDotCount(current = char)
