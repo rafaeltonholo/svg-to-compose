@@ -61,7 +61,7 @@ class SvgStyleNodeTest {
     }
 
     @Test
-    fun `given a style tag with a text node containing a simple css rule - when resolving the css tree - then must return the css tree`() {
+    fun `style tag with simple css rule - resolving css tree returns it`() {
         val children = mutableSetOf<XmlNode>()
         val style = SvgStyleNode(
             parent = XmlRootNode(children = mutableSetOf()),
@@ -134,8 +134,8 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
-                )
+                    ),
+                ),
             ),
         )
 
@@ -145,7 +145,7 @@ class SvgStyleNodeTest {
     }
 
     @Test
-    fun `given a style tag with a text node containing multiple css rules - when resolving the css tree - then must return the css tree`() {
+    fun `style tag with multiple css rules - resolving css tree returns it`() {
         val children = mutableSetOf<XmlNode>()
         val style = SvgStyleNode(
             parent = XmlRootNode(children = mutableSetOf()),
@@ -218,7 +218,7 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
+                    ),
                 ),
                 QualifiedRule(
                     location = CssLocation(
@@ -274,8 +274,8 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
-                )
+                    ),
+                ),
             ),
         )
 
@@ -285,7 +285,7 @@ class SvgStyleNodeTest {
     }
 
     @Test
-    fun `given a style tag with a text node containing an invalid css rule - when resolving the css tree - then must throw an exception`() {
+    fun `style tag with invalid css rule - resolving css tree throws`() {
         val children = mutableSetOf<XmlNode>()
         val style = SvgStyleNode(
             parent = XmlRootNode(children = mutableSetOf()),
@@ -306,7 +306,7 @@ class SvgStyleNodeTest {
     }
 
     @Test
-    fun `given a style tag with a text node containing nested css rules - when resolving the css tree - then must return the css tree`() {
+    fun `style tag with nested css rules - resolving css tree returns it`() {
         val children = mutableSetOf<XmlNode>()
         val style = SvgStyleNode(
             parent = XmlRootNode(children = mutableSetOf()),

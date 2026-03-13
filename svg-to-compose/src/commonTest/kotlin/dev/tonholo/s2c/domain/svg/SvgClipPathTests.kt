@@ -42,19 +42,19 @@ class SvgClipPathTests : BaseSvgTest() {
                 parent = root,
                 attributes = mutableMapOf(
                     "d" to "M10,10 L20,20",
-                )
+                ),
             ),
             SvgPathNode(
                 parent = root,
                 attributes = mutableMapOf(
                     "d" to "M30,30 L40,40",
-                )
+                ),
             ),
             SvgCircleNode(
                 parent = root,
                 attributes = mutableMapOf(
                     "r" to "50",
-                )
+                ),
             ),
         )
         val clipPath = SvgClipPath(root, children, attributes)
@@ -105,7 +105,7 @@ class SvgClipPathTests : BaseSvgTest() {
                     isRelative = true,
                     minified = minified,
                 ),
-            )
+            ),
         )
 
         // Assert

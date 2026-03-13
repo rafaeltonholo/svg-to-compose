@@ -11,9 +11,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class SvgPathHorizontalLineToTests : BaseSvgTest() {
-    data class HorizontalLineParams(
-        val x: Float,
-    ) {
+    data class HorizontalLineParams(val x: Float) {
         override fun toString(): String = "$x".removeTrailingZero()
     }
 
@@ -77,7 +75,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 element = """
                 |// H $this
                 |horizontalLineTo(x = ${x}f)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -86,7 +85,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 element = """
                 |// h $this
                 |horizontalLineToRelative(dx = ${x}f)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -116,7 +116,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 |// H ${this}z
                 |horizontalLineTo(x = ${x}f)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -126,7 +127,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 |// h ${this}z
                 |horizontalLineToRelative(dx = ${x}f)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -186,7 +188,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |horizontalLineTo(x = ${x}f)
-                |close()""".trimMargin()
+                |close()
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -194,7 +197,8 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |horizontalLineToRelative(dx = ${x}f)
-                |close()""".trimMargin()
+                |close()
+                """.trimMargin(),
             )
         }
     }

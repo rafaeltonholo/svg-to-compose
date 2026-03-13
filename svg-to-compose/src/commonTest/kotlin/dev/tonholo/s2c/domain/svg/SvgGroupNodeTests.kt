@@ -30,7 +30,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
                         "d" to "M 30,30 L40,40",
                         "fill" to "#000000",
                     ),
-                )
+                ),
             ),
             attributes = mutableMapOf(),
         )
@@ -126,7 +126,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
         maskChildren += SvgPathNode(
             parent = mask,
             attributes = mutableMapOf(
-                "d" to "M50,50 L40,40z"
+                "d" to "M50,50 L40,40z",
             ),
         )
 
@@ -140,7 +140,7 @@ class SvgGroupNodeTests : BaseSvgTest() {
                     args(40, 40)
                     close = true
                 },
-            )
+            ),
         )
 
         val expectedNodes = listOf(
@@ -201,6 +201,5 @@ class SvgGroupNodeTests : BaseSvgTest() {
             val actualNodeParams = actual.wrapper.nodes.map { it.buildParameters() }
             assertEquals(expected = expectedNodeParams, actual = actualNodeParams)
         }
-
     }
 }
