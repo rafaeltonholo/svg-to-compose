@@ -146,7 +146,7 @@ class AndroidSourceSetRegistrationTest {
      */
     private fun runSourceSetRegistrationTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
         skipIfNoAndroidSdk()
-        val projectDir = scaffoldProject(config, dsl) { buildScript(config, dsl) }
+        val projectDir = scaffoldProject(dsl) { buildScript(config, dsl) }
         try {
             val result = gradle(projectDir, "parseSvgToComposeIcon")
             val task = result.task(":parseSvgToComposeIcon")
@@ -163,7 +163,7 @@ class AndroidSourceSetRegistrationTest {
      */
     private fun runIconGenerationTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
         skipIfNoAndroidSdk()
-        val projectDir = scaffoldProject(config, dsl) { buildScript(config, dsl) }
+        val projectDir = scaffoldProject(dsl) { buildScript(config, dsl) }
         try {
             val result = gradle(projectDir, "parseSvgToComposeIcon")
 
@@ -193,7 +193,7 @@ class AndroidSourceSetRegistrationTest {
     private fun runBuildDirectoryOverrideTest(config: AgpTestConfig, dsl: BuildScriptDsl) {
         skipIfNoAndroidSdk()
         val buildDirOverride = "custom-build"
-        val projectDir = scaffoldProject(config, dsl) {
+        val projectDir = scaffoldProject(dsl) {
             buildScript(config, dsl, buildDirOverride = buildDirOverride)
         }
         try {
@@ -246,7 +246,7 @@ class AndroidSourceSetRegistrationTest {
     // Project scaffolding
     // -------------------------------------------------------------------------
 
-    private fun scaffoldProject(config: AgpTestConfig, dsl: BuildScriptDsl, buildScriptProvider: () -> String): File {
+    private fun scaffoldProject(dsl: BuildScriptDsl, buildScriptProvider: () -> String): File {
         val dir = createTempDirectory("s2c-android-test").toFile()
 
         dir.resolve("local.properties").writeText("sdk.dir=$androidHome\n")
