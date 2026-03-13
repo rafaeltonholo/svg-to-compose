@@ -1,7 +1,7 @@
 package dev.tonholo.s2c.conventions.detekt
 
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.report.ReportMergeTask
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.report.ReportMergeTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getValue
@@ -21,7 +21,11 @@ fun Project.registerDetektMergeReportsTask() {
         }
 
         mergeDetektReport {
-            input.from(tasks.withType<Detekt>().map { it.xmlReportFile })
+            input.from(
+                tasks.withType<Detekt>().map {
+                    it.reports.checkstyle.outputLocation
+                },
+            )
         }
     }
 }
