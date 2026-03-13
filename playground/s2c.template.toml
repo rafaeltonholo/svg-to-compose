@@ -1,0 +1,57 @@
+# SVG-to-Compose template configuration.
+# See docs/TEMPLATES.md for the full schema reference.
+
+# --- Definitions ---
+# Receiver type for the generated icon property (auto-imported).
+[definitions.receiver]
+name = "Icons"
+package = "my.custom.app.designsystem.atom.icon"
+
+# Keyed imports referenced in templates via ${def:<key>}.
+# The simple name (last segment) is emitted; the full path is auto-imported.
+[definitions.imports]
+icon_builder = "my.custom.app.designsystem.atom.icon.icon"
+icon_path = "my.custom.app.designsystem.atom.icon.iconPath"
+theme = "my.custom.app.designsystem.theme.AppTheme"
+
+# Color mappings: replace Color(<value>) with <name> and auto-import <import>.<name>.
+[[definitions.color_mapping]]
+name = "BLACK"
+import = "my.custom.app.designsystem.theme.colors"
+value = "0xFF121212"
+
+# --- Templates ---
+# icon_template: the outer icon property. Placeholders: ${icon:*}, ${template:*}.
+[templates]
+icon_template = """
+${icon:visibility} val ${icon:property_name}: ImageVector by lazy {
+    ${template:icon_builder} {
+        ${icon:body}
+    }
+}
+"""
+
+# preview: custom @Preview function. Set template = "" to suppress preview.
+[templates.preview]
+template = """
+@Preview(name = "${icon:name}", showBackground = true)
+@Composable
+private fun ${icon:name}Preview() {
+    ${def:theme} {
+        Image(
+            imageVector = ${icon:name},
+            contentDescription = null,
+        )
+    }
+}
+"""
+
+# --- Fragments ---
+# Named template snippets referenced via ${template:<name>}.
+# path_builder / group_builder: per-node fragments. The body/commands block
+# is always appended by the emitter; do NOT include ${path:commands} or
+# ${group:body} in these fragments. Null parameters are automatically trimmed.
+[fragments]
+icon_builder = "${def:icon_builder}(name = ${icon:name}, viewportWidth = ${icon:viewport_width}, viewportHeight = ${icon:viewport_height})"
+path_builder = "${def:icon_path}(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, strokeAlpha = ${path:stroke_alpha}, pathFillType = ${path:fill_type})"
+group_builder = "group(rotate = ${group:rotate}, pivotX = ${group:pivot_x}, pivotY = ${group:pivot_y})"

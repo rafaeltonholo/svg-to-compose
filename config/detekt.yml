@@ -152,7 +152,7 @@ complexity:
     allowedFunctionsPerObject: 11
     allowedFunctionsPerEnum: 11
     ignoreDeprecated: false
-    ignorePrivate: false
+    ignorePrivate: true
     ignoreOverridden: true
 
 coroutines:

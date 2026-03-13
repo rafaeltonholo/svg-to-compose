@@ -6,6 +6,7 @@ clikt = "5.0.3"
 compose-rules = "0.5.6"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
+ktoml = "0.7.1"
 okio = "3.16.4"
 detekt = "2.0.0-alpha.2"
 ksoup = "0.2.6"
@@ -23,6 +24,7 @@ com-github-ajalt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markd
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 com-squareup-okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
+com-akuleshov7-ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 org-jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotation" }
 org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

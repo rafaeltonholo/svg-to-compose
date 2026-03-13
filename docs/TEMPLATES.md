@@ -208,10 +208,10 @@ Named template fragments for builder call shapes. The engine applies
 Two optional fragments control chunk function generation for large icons:
 
 - `chunk_function_name` — Controls the function name. Receives
-  `${icon:name}` (camelCase) and `${icon:chunk_index}`.
+  `${icon:name}` (camelCase) and `${chunk:index}`.
   Default: `{name}Chunk{index}`.
 - `chunk_function_definition` — Controls the full function signature and body.
-  Receives `${icon:chunk_name}` (the resolved name) and `${icon:chunk_body}`
+  Receives `${chunk:name}` (the resolved name) and `${chunk:body}`
   (the emitted node code). Default:
   `private fun ImageVector.Builder.{name}() { ... }`.
 
@@ -221,45 +221,54 @@ icon_builder = "${def:icon_builder}(name = ${icon:name}, viewportWidth = ${icon:
 path_builder = "${def:icon_path}(fill = ${path:fill}, fillAlpha = ${path:fill_alpha})"
 group_builder = "group(rotate = ${group:rotate}, pivotX = ${group:pivot_x}, pivotY = ${group:pivot_y})"
 # Optional: customize chunk function names
-chunk_function_name = "${icon:name}Part${icon:chunk_index}"
+chunk_function_name = "${icon:name}Part${chunk:index}"
 # Optional: customize the entire chunk function definition
-chunk_function_definition = "private fun ${def:custom_builder}.${icon:chunk_name}() {\n${icon:chunk_body}\n}"
+chunk_function_definition = "private fun ${def:custom_builder}.${chunk:name}() {\n${chunk:body}\n}"
 ```
 
 ## Placeholder Grammar
 
 **Syntax:** `${namespace:key}`
 
-**Regex:** `\$\{(icon|path|group|template|def):([a-z][a-z0-9_.]*)\}`
+**Regex:** `\$\{(icon|path|group|chunk|template|def):([a-z][a-z0-9_.]*)\}`
 
 ### Namespaces
 
-| Namespace  | Syntax               | Resolves to                      | Scope                           |
-|------------|----------------------|----------------------------------|---------------------------------|
-| `icon`     | `${icon:<field>}`    | Value from icon metadata         | `icon_template`, `icon_builder` |
-| `path`     | `${path:<field>}`    | Value from path node parameters  | `path_builder` fragment only    |
-| `group`    | `${group:<field>}`   | Value from group node parameters | `group_builder` fragment only   |
-| `template` | `${template:<name>}` | Rendered fragment output         | `icon_template`                 |
-| `def`      | `${def:<key>}`       | Simple name of import            | Any template or fragment        |
+| Namespace  | Syntax               | Resolves to                       | Scope                           |
+|------------|----------------------|-----------------------------------|---------------------------------|
+| `icon`     | `${icon:<field>}`    | Value from icon metadata          | `icon_template`, `icon_builder` |
+| `path`     | `${path:<field>}`    | Value from path node parameters   | `path_builder` fragment only    |
+| `group`    | `${group:<field>}`   | Value from group node parameters  | `group_builder` fragment only   |
+| `template` | `${template:<name>}` | Rendered fragment output          | `icon_template`                 |
+| `chunk`    | `${chunk:<field>}`   | Value from chunk function context | `chunk_function_*` fragments    |
+| `def`      | `${def:<key>}`       | Simple name of import             | Any template or fragment        |
 
 ### Icon Variables
 
-| Variable                  | Description                                            |
-|---------------------------|--------------------------------------------------------|
-| `${icon:name}`            | PascalCase icon name                                   |
-| `${icon:property_name}`   | Full property name with receiver prefix                |
-| `${icon:receiver}`        | Receiver from definitions or CLI                       |
-| `${icon:theme}`           | Theme name                                             |
-| `${icon:width}`           | Width in dp                                            |
-| `${icon:height}`          | Height in dp                                           |
-| `${icon:viewport_width}`  | Viewport width (float with `f` suffix)                 |
-| `${icon:viewport_height}` | Viewport height (float with `f` suffix)                |
-| `${icon:body}`            | Engine-generated body (all nodes)                      |
-| `${icon:package}`         | Package name                                           |
-| `${icon:visibility}`      | `"internal"` or `""` based on CLI flag                 |
-| `${icon:chunk_index}`     | Chunk index (`chunk_function_name` only)               |
-| `${icon:chunk_name}`      | Resolved chunk name (`chunk_function_definition` only) |
-| `${icon:chunk_body}`      | Chunk node code (`chunk_function_definition` only)     |
+| Variable                  | Description                             |
+|---------------------------|-----------------------------------------|
+| `${icon:name}`            | PascalCase icon name                    |
+| `${icon:property_name}`   | Full property name with receiver prefix |
+| `${icon:receiver}`        | Receiver from definitions or CLI        |
+| `${icon:theme}`           | Theme name                              |
+| `${icon:width}`           | Width in dp                             |
+| `${icon:height}`          | Height in dp                            |
+| `${icon:viewport_width}`  | Viewport width (float with `f` suffix)  |
+| `${icon:viewport_height}` | Viewport height (float with `f` suffix) |
+| `${icon:body}`            | Engine-generated body (all nodes)       |
+| `${icon:package}`         | Package name                            |
+| `${icon:visibility}`      | `"internal"` or `""` based on CLI flag  |
+
+### Chunk Variables
+
+Available only in `chunk_function_name` and `chunk_function_definition`
+fragments.
+
+| Variable         | Description                                            |
+|------------------|--------------------------------------------------------|
+| `${chunk:index}` | Chunk index (`chunk_function_name` only)               |
+| `${chunk:name}`  | Resolved chunk name (`chunk_function_definition` only) |
+| `${chunk:body}`  | Chunk node code (`chunk_function_definition` only)     |
 
 ### Path Variables
 
@@ -296,7 +305,7 @@ null:
 ```
 path(
     fill = SolidColor(Color.Black),
-    fillAlpha = ${path:fill_alpha},    ← this line is removed
+    fillAlpha = ${path:fill_alpha},    <- this line is removed
     pathFillType = EvenOdd,
 )
 ```
