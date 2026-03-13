@@ -56,6 +56,7 @@ Validation**:
 | [SVG Spec, Paths & Transforms](.ai/skills/svg-spec/SKILL.md)                           | SVG/AVG specification references, path commands, affine transforms, gradients, CSS styling, and W3C links                                                            |
 | [Unit Test Author](.ai/skills/unit-test-author/SKILL.md)                               | Creates and updates Kotlin unit tests following this repository's KMP testing conventions, including Burst parameterized patterns and targeted Gradle execution.     |
 | [Kotlin Gradle Standalone Plugin](.ai/skills/kotlin-gradle-standalone-plugin/SKILL.md) | Develops standalone Gradle plugins in Kotlin with lazy Provider-based configuration, typed DSL/extensions, TestKit coverage, and module-level verification workflow. |
+| [Self-Review](.ai/skills/self-review/SKILL.md)                                        | Performs a thorough self-review of pending changes against project conventions, checking code quality, tests, Detekt, and golden samples before commit/PR.            |
 
 ## Recommended Tools & MCP
 
