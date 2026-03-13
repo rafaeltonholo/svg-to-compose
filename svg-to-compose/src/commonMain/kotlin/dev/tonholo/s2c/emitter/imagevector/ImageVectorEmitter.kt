@@ -29,7 +29,7 @@ class ImageVectorEmitter(
     @Suppress("UnusedPrivateProperty")
     private val formatConfig: FormatConfig = FormatConfig(),
 ) : CodeEmitter {
-    private val nodeEmitter = ImageVectorNodeEmitter(logger)
+    private val nodeEmitter = ImageVectorNodeEmitter()
 
     override fun emit(contents: IconFileContents): String = logger.verboseSection("Generating file") {
         logParameters(contents)
@@ -87,7 +87,7 @@ class ImageVectorEmitter(
            |    height=${contents.height}
            |    viewport_width=${contents.viewportWidth}
            |    viewport_height=${contents.viewportHeight}
-           |    nodes=${contents.nodes.map { nodeEmitter.emit(it) }}
+           |    nodes=[${contents.nodes.size} node(s)]
            |    receiver_type=${contents.receiverType}
            |    imports=${contents.imports}
            |
@@ -161,7 +161,7 @@ class ImageVectorEmitter(
             var i = 1
             val chunks = ceil(byteSize.toFloat() / MethodSizeAccountable.METHOD_SIZE_THRESHOLD)
                 .roundToInt()
-            val chunkSize = contents.nodes.size / chunks
+            val chunkSize = max(1, contents.nodes.size / chunks)
             logger.warn(
                 "Potential large icon detected. Splitting icon's content in $chunks chunks to avoid " +
                     "compilation issues. However, that won't affect the performance of displaying this icon."
