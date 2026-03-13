@@ -9,6 +9,8 @@ import dev.tonholo.s2c.gradle.internal.cache.Cacheable
 import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
 import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
@@ -32,11 +34,12 @@ internal class IconParserConfigurationImpl(
 
     internal val theme: Property<String> = objectFactory.property<String>()
 
-    @Suppress("UNCHECKED_CAST")
     internal val mapIconNameTo: Property<IconMapper> =
-        objectFactory.property(IconMapper::class.java) as Property<IconMapper>
+        objectFactory.property(IconMapper::class.java)
 
     internal val exclude: Property<Regex> = objectFactory.property<Regex>()
+
+    internal val templateFile: RegularFileProperty = objectFactory.fileProperty()
 
     internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
 
@@ -78,6 +81,10 @@ internal class IconParserConfigurationImpl(
         )
     }
 
+    override fun templateFile(path: RegularFile) {
+        templateFile.set(path)
+    }
+
     @DelicateSvg2ComposeApi
     override fun persist() {
         isCodeGenerationPersistent.set(true)
@@ -110,6 +117,8 @@ internal class IconParserConfigurationImpl(
             append(mapIconNameTo.orNull?.let { "fn()" })
             append("|")
             append(isCodeGenerationPersistent.orNull)
+            append("|")
+            append(templateFile.orNull?.asFile?.absolutePath)
         }
         return raw.sha256()
     }
@@ -134,6 +143,9 @@ internal class IconParserConfigurationImpl(
         theme.setIfNotPresent(provider = common.theme, defaultValue = "")
         mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo)
         exclude.setIfNotPresent(provider = common.exclude)
+        if (!templateFile.isPresent && common.templateFile.isPresent) {
+            templateFile.set(common.templateFile)
+        }
     }
 
     override fun toString(): String {
@@ -148,6 +160,7 @@ internal class IconParserConfigurationImpl(
             appendLine("  theme='${theme.orNull}', ")
             appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
             appendLine("  exclude=${exclude.orNull}, ")
+            appendLine("  templateFile=${templateFile.orNull?.asFile?.absolutePath}, ")
             append(")")
         }
     }
