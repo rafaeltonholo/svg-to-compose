@@ -30,8 +30,11 @@ class CodeWriter(
      */
     inline fun indented(block: CodeWriter.() -> Unit): CodeWriter {
         indent()
-        block()
-        dedent()
+        try {
+            block()
+        } finally {
+            dedent()
+        }
         return this
     }
 

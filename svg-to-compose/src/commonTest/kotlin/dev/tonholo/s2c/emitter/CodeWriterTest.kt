@@ -159,4 +159,18 @@ class CodeWriterTest {
         val writer = CodeWriter(FormatConfig(insertFinalNewline = true))
         assertEquals("", writer.toString())
     }
+
+    @Test
+    fun `indented restores indent level when block throws`() {
+        val writer = CodeWriter()
+        writer.writeLine("before")
+        assertFailsWith<RuntimeException> {
+            writer.indented {
+                writeLine("inside")
+                throw RuntimeException("boom")
+            }
+        }
+        writer.writeLine("after")
+        assertEquals("before\n    inside\nafter\n", writer.toString())
+    }
 }
