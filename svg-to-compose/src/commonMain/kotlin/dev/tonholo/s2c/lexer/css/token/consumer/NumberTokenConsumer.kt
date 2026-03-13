@@ -4,16 +4,13 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 
-internal class NumberTokenConsumer(
-    iterator: TokenIterator<CssTokenKind>,
-) : TokenConsumer(iterator) {
+internal class NumberTokenConsumer(iterator: TokenIterator<CssTokenKind>) : TokenConsumer(iterator) {
     override val supportedTokenKinds: Set<CssTokenKind> = setOf(
         CssTokenKind.Number,
     )
 
-    override fun accept(kind: CssTokenKind): Boolean {
-        return super.accept(kind) || kind == CssTokenKind.Dot && iterator.peek(1).isDigit()
-    }
+    override fun accept(kind: CssTokenKind): Boolean =
+        super.accept(kind) || (kind == CssTokenKind.Dot && iterator.peek(1).isDigit())
 
     override fun consume(kind: CssTokenKind): List<Token<out CssTokenKind>> {
         val start = iterator.offset
@@ -24,7 +21,8 @@ internal class NumberTokenConsumer(
                 'e',
                 '+',
                 '-',
-                in '0'..'9' -> {
+                in '0'..'9',
+                -> {
                     iterator.nextOffset()
                 }
 

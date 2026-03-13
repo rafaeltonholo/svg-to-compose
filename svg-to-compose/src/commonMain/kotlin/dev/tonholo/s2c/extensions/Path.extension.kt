@@ -9,7 +9,7 @@ expect val Path.fileSystem: FileSystem
 val Path.isDirectory: Boolean
     get() {
         val metadata = fileSystem.metadataOrNull(this)
-        return metadata != null && metadata.isDirectory ||
+        return (metadata != null && metadata.isDirectory) ||
             name.matches(".*\\.[a-zA-Z0-9]*$".toRegex()).not()
     }
 
@@ -26,8 +26,7 @@ val Path.extension: String
 val Path.isFile: Boolean
     get() = extension.isNotEmpty()
 
-fun Path.encodeToMd5(): String =
-    toString().encodeToByteArray().toByteString().md5().hex()
+fun Path.encodeToMd5(): String = toString().encodeToByteArray().toByteString().md5().hex()
 
 val Path.filename
     get() = segments
