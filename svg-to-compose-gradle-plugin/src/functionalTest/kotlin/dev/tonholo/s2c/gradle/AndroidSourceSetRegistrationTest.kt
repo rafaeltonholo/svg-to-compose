@@ -223,7 +223,7 @@ class AndroidSourceSetRegistrationTest {
             val defaultGeneratedDir = projectDir.resolve("build/generated/svgToCompose")
             assertTrue(
                 !defaultGeneratedDir.exists() ||
-                    defaultGeneratedDir.walkTopDown().filter { it.isFile }.none(),
+                    defaultGeneratedDir.walkTopDown().none { it.isFile },
                 "Generated files found in default build dir — buildDirectory override was not respected",
             )
         } finally {
