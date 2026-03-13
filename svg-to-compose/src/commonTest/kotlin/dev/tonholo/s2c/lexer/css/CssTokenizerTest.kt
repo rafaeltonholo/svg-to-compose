@@ -1001,7 +1001,7 @@ class CssTokenizerTest {
     }
 
     enum class MinifiedCssParams(val content: String, val tokens: List<Token<out CssTokenKind>>) {
-        NO_SPACES(
+        `no spaces`(
             content = ".segment-fill{fill:azure;stroke:#b0c4de;stroke-width:1}" +
                 ".segment-edge{fill:none;stroke:#00bfff;stroke-width:3}",
             tokens = listOf(
@@ -1040,7 +1040,7 @@ class CssTokenizerTest {
                 Token(kind = CssTokenKind.EndOfFile, startOffset = 109, endOffset = 109),
             ),
         ),
-        NO_SPACES_AND_DIMENSIONS_STARTING_WITH_DOT(
+        `no spaces and dimensions starting with dot`(
             content = ".cloud{fill:#fff;stroke:#d3d3d3;stroke-width:2;opacity:.8}" +
                 ".cloud-shadow{fill:rgba(0,0,0,.2);transform:translate(5,5)}",
             tokens = listOf(
