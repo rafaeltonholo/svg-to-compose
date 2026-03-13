@@ -26,6 +26,11 @@ data class FormatConfig(
     val indentStyle: IndentStyle = IndentStyle.SPACE,
     val insertFinalNewline: Boolean = true,
 ) {
+    init {
+        require(indentSize >= 0) { "indentSize must be >= 0, was $indentSize" }
+        require(maxLineLength > 0) { "maxLineLength must be > 0, was $maxLineLength" }
+    }
+
     /**
      * Returns the string representation of a single indent level.
      */
