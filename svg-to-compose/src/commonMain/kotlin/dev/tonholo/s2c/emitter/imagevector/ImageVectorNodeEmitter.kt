@@ -36,6 +36,18 @@ internal class ImageVectorNodeEmitter(
     }
 
     /**
+     * Emits only the path drawing commands (moveTo, lineTo, etc.) for a [path] node,
+     * without the surrounding `path(...)` call or braces.
+     *
+     * @param path The path node whose commands to emit.
+     * @return The emitted path command strings, one per line.
+     */
+    fun emitPathCommands(path: ImageVectorNode.Path): String =
+        path.wrapper.nodes.joinToString("\n") {
+            pathNodeEmitter.emit(it).trimEnd()
+        }
+
+    /**
      * Emits a chunk function definition (the private extension function body).
      *
      * @param chunk The chunk function to emit.
