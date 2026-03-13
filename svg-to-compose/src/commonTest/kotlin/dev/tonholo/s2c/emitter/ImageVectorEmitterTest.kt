@@ -30,7 +30,7 @@ class ImageVectorEmitterTest {
 
     @Test
     fun `simple icon with single path produces identical output to materialize`() {
-        val contents = createSimpleIconContents()
+        val contents = createSimpleIconContents(noPreview = true)
         val materializeOutput = contents.materialize()
         val emitterOutput = emitter.emit(contents)
         assertEquals(materializeOutput, emitterOutput)
@@ -85,7 +85,7 @@ class ImageVectorEmitterTest {
     }
 
     private fun createSimpleIconContents(
-        noPreview: Boolean = true,
+        noPreview: Boolean = false,
         makeInternal: Boolean = false,
         receiverType: String? = null,
         addToMaterial: Boolean = false,
