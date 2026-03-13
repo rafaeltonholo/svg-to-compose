@@ -8,7 +8,6 @@ import dev.tonholo.s2c.emitter.template.TemplateConstants.GroupVar
 import dev.tonholo.s2c.emitter.template.TemplateConstants.Namespace
 import dev.tonholo.s2c.emitter.template.TemplateConstants.PathVar
 import dev.tonholo.s2c.emitter.template.resolver.PlaceholderResolver
-import dev.tonholo.s2c.logger.Logger
 
 /**
  * Per-node template fragment resolution.
@@ -16,12 +15,10 @@ import dev.tonholo.s2c.logger.Logger
  * For nodes where a fragment is defined in the template config, resolves the
  * fragment with the node's variables. Otherwise delegates to [fallbackEmitter].
  *
- * @property logger The logger instance.
  * @property formatConfig The formatting configuration.
  * @property fallbackEmitter The default node emitter used when no fragment is defined.
  */
 internal class TemplateNodeEmitter(
-    private val logger: Logger,
     private val formatConfig: FormatConfig,
     private val fallbackEmitter: ImageVectorNodeEmitter,
 ) {
