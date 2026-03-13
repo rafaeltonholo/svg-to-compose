@@ -30,8 +30,16 @@ class:
       possible, or mapped to Compose `Group` transformations.
     - **Bounds Calculation**: Bounding boxes are calculated for preview
       generation.
-6. **Code Generation**: The IR is passed to `IconWriter`, which uses
-   `ImageVector.Builder` templates to generate the final Kotlin code.
+6. **Template Resolution (Optional)**: If an `s2c.template.toml` file is
+   provided (via `--template` flag, Gradle DSL, or auto-discovered by walking
+   up from the output directory), a `TemplateConfig` is parsed and used to
+   customize the code generation output. See `docs/TEMPLATES.md` for the full
+   schema.
+7. **Code Generation**: The IR is passed to `CodeEmitter` (either the default
+   `ImageVectorEmitter` or `TemplateEmitter` when a template is active), which
+   generates the final Kotlin code. The `TemplateEmitter` resolves
+   `${namespace:key}` placeholders against icon/path/group variables, template
+   fragments, and import definitions.
 
 ## Key Components
 
