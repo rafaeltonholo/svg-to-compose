@@ -11,9 +11,7 @@ import dev.tonholo.s2c.extensions.indented
  *
  * @property pathNodeEmitter The emitter for individual path commands.
  */
-internal class ImageVectorNodeEmitter(
-    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(),
-) {
+internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter()) {
     /**
      * Emits the Kotlin code for an [ImageVectorNode].
      *
@@ -106,12 +104,9 @@ internal class ImageVectorNodeEmitter(
         """.trimMargin()
     }
 
-    private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String =
-        "${chunk.functionName}()"
+    private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String = "${chunk.functionName}()"
 
-    private fun buildPathParameterList(
-        path: ImageVectorNode.Path,
-    ): List<Pair<String, String>> = buildList {
+    private fun buildPathParameterList(path: ImageVectorNode.Path): List<Pair<String, String>> = buildList {
         with(path.params) {
             fill?.let { brush ->
                 brush.toCompose()?.let { add("fill" to it) }
@@ -148,34 +143,32 @@ internal class ImageVectorNodeEmitter(
     }
 
     @Suppress("CyclomaticComplexMethod")
-    private fun buildGroupParameters(
-        group: ImageVectorNode.Group,
-        indentSize: Int,
-    ): List<Pair<String, String>> = with(group.params) {
-        buildList {
-            clipPath?.let {
-                val clipPathData = clipPath.nodes
-                    .joinToString("\n${" ".repeat(indentSize * 2)}") {
-                        pathNodeEmitter.emit(it)
-                            .replace("\n", "\n${" ".repeat(indentSize * 2)}")
-                            .trimEnd()
-                    }
-                val value = """
+    private fun buildGroupParameters(group: ImageVectorNode.Group, indentSize: Int): List<Pair<String, String>> =
+        with(group.params) {
+            buildList {
+                clipPath?.let {
+                    val clipPathData = clipPath.nodes
+                        .joinToString("\n${" ".repeat(indentSize * 2)}") { node ->
+                            pathNodeEmitter.emit(node)
+                                .replace("\n", "\n${" ".repeat(indentSize * 2)}")
+                                .trimEnd()
+                        }
+                    val value = """
                     |PathData {
                     |    ${clipPathData.indented(indentSize = 4)}
                     |${"}".indented(indentSize)}"""
-                    .trimMargin()
-                add(CLIP_PATH_PARAM_NAME to value)
+                        .trimMargin()
+                    add(CLIP_PATH_PARAM_NAME to value)
+                }
+                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
+                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
+                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
+                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
+                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
+                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
+                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
             }
-            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
-            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
-            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
-            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
-            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
-            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
-            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
         }
-    }
 
     private companion object {
         const val CLIP_PATH_PARAM_NAME = "clipPathData"

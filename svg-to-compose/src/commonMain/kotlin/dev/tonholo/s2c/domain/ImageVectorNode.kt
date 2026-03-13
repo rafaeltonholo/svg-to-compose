@@ -25,42 +25,41 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
 
     fun materialize(): String
 
-    fun applyTransformation(): ImageVectorNode {
-        return transformations?.let { transformations ->
-            when (this) {
-                is Group -> copy(
-                    params = params.copy(
-                        clipPath = params.clipPath?.copy(
-                            nodes = params
-                                .clipPath
-                                .nodes
-                                .applyTransformations(transformations = transformations.toTypedArray())
-                                .toList(),
-                        )
-                    ),
-                    commands = commands.map { it.applyTransformation() },
-                )
-
-                is Path -> copy(
-                    wrapper = wrapper.copy(
-                        nodes = wrapper
+    fun applyTransformation(): ImageVectorNode = transformations?.let { transformations ->
+        when (this) {
+            is Group -> copy(
+                params = params.copy(
+                    clipPath = params.clipPath?.copy(
+                        nodes = params
+                            .clipPath
                             .nodes
                             .applyTransformations(transformations = transformations.toTypedArray())
                             .toList(),
-                    )
-                )
+                    ),
+                ),
+                commands = commands.map { it.applyTransformation() },
+            )
 
-                is ChunkFunction -> error("Transformation should be applied before creating helper functions.")
-            }
-        } ?: this
-    }
+            is Path -> copy(
+                wrapper = wrapper.copy(
+                    nodes = wrapper
+                        .nodes
+                        .applyTransformations(transformations = transformations.toTypedArray())
+                        .toList(),
+                ),
+            )
+
+            is ChunkFunction -> error("Transformation should be applied before creating helper functions.")
+        }
+    } ?: this
 
     data class Path(
         val params: Params,
         val wrapper: NodeWrapper,
         val minified: Boolean,
         override val transformations: List<AffineTransformation>? = null,
-    ) : ImageVectorNode, MethodSizeAccountable {
+    ) : ImageVectorNode,
+        MethodSizeAccountable {
         companion object {
             const val PATH_IMPORT = "androidx.compose.ui.graphics.vector.path"
 
@@ -185,7 +184,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         val minified: Boolean,
         val params: Params = Params(),
         override val transformations: List<AffineTransformation>? = null,
-    ) : ImageVectorNode, MethodSizeAccountable {
+    ) : ImageVectorNode,
+        MethodSizeAccountable {
         companion object {
             private const val GROUP_APPROXIMATE_BYTE_SIZE = 90
             private const val CLIP_PATH_APPROXIMATE_BYTE_SIZE = 30
@@ -253,8 +253,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             buildSet {
                 clipPath?.let {
                     val clipPathData = clipPath.nodes
-                        .joinToString("\n${" ".repeat(indentSize * 2)}") {
-                            it.materialize()
+                        .joinToString("\n${" ".repeat(indentSize * 2)}") { node ->
+                            node.materialize()
                                 .replace("\n", "\n${" ".repeat(indentSize * 2)}")
                                 .trimEnd()
                         }
@@ -312,10 +312,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     /**
      * A Chunk function wrapper to separate the icon instructions in smaller pieces.
      */
-    data class ChunkFunction(
-        val functionName: String,
-        val nodes: List<ImageVectorNode>,
-    ) : ImageVectorNode {
+    data class ChunkFunction(val functionName: String, val nodes: List<ImageVectorNode>) : ImageVectorNode {
         override val transformations: List<AffineTransformation>
             get() = error("Transformation should be applied before creating chunk functions.")
         override val imports: Set<String> = emptySet()
@@ -348,17 +345,12 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     }
 
     // Support class to Paths. It should not be inherited from ImageVectorNode
-    data class NodeWrapper(
-        val normalizedPath: String,
-        val nodes: List<PathNodes>,
-    ) {
-        operator fun plus(other: NodeWrapper): NodeWrapper {
-            return NodeWrapper(
-                normalizedPath = "$normalizedPath ${other.normalizedPath}",
-                // Handle auto close if last command isn't closing path.
-                nodes = nodes + other.nodes,
-            )
-        }
+    data class NodeWrapper(val normalizedPath: String, val nodes: List<PathNodes>) {
+        operator fun plus(other: NodeWrapper): NodeWrapper = NodeWrapper(
+            normalizedPath = "$normalizedPath ${other.normalizedPath}",
+            // Handle auto close if last command isn't closing path.
+            nodes = nodes + other.nodes,
+        )
     }
 }
 
@@ -417,11 +409,9 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
  * @return `true` in case the command is lowercased and it is not the very
  *  first move to command, which should be absolute
  */
-private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean {
-    return command.isLowerCase() && (
-        node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
-        )
-}
+private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean = command.isLowerCase() && (
+    node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
+    )
 
 private fun createNode(
     current: String,
@@ -436,7 +426,7 @@ private fun createNode(
 
         else -> throw ExitProgramException(
             errorCode = ErrorCode.NotSupportedFileError,
-            message = "Not support SVG/Android Vector command. Command = $currentCommand"
+            message = "Not support SVG/Android Vector command. Command = $currentCommand",
         )
     }
 } catch (e: NumberFormatException) {
@@ -449,7 +439,7 @@ private fun createNode(
         |currentCommand = $currentCommand,
         |minified = $minified,
         |
-        """.trimMargin()
+        """.trimMargin(),
     )
     throw e
 } catch (e: NoSuchElementException) {
@@ -465,27 +455,22 @@ private fun createNode(
         |currentCommand = $currentCommand,
         |minified = $minified,
         |
-        """.trimMargin()
+        """.trimMargin(),
     )
     throw e
 }
 
-private inline fun resetDotCount(current: Char): Int =
-    if (current == '.') 1 else 0
+private inline fun resetDotCount(current: Char): Int = if (current == '.') 1 else 0
 
-private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int =
-    if (char == '.') {
-        dotCount + 1
-    } else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {
-        resetDotCount(current = char)
-    } else {
-        dotCount
-    }
+private inline fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int = if (char == '.') {
+    dotCount + 1
+} else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {
+    resetDotCount(current = char)
+} else {
+    dotCount
+}
 
-private fun StringBuilder.trimWhitespaceBeforeClose(
-    lastChar: Char,
-    current: Char,
-): StringBuilder = apply {
+private fun StringBuilder.trimWhitespaceBeforeClose(lastChar: Char, current: Char): StringBuilder = apply {
     if (lastChar == ' ' && current == 'z') {
         setLength(length - 1)
     }
@@ -518,7 +503,10 @@ private fun normalizePath(path: String): String {
             command = it
         }
         arcCommandPosition = calculateArcCommandPosition(
-            command, position = arcCommandPosition, current = char, lastChar = lastChar,
+            command,
+            position = arcCommandPosition,
+            current = char,
+            lastChar = lastChar,
         )
         val isSweepFlagWithNoSpace = arcCommandPosition == PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
             lastChar.isDigit() &&
@@ -538,7 +526,7 @@ private fun normalizePath(path: String): String {
                     else -> {
                         char
                     }
-                }
+                },
             )
         lastChar = char
     }
@@ -550,19 +538,16 @@ private fun normalizePath(path: String): String {
     return parsedPath.toString().trimStart()
 }
 
-private fun calculateArcCommandPosition(
-    command: PathCommand,
-    position: Int,
-    current: Char,
-    lastChar: Char,
-): Int {
-    return when {
+private fun calculateArcCommandPosition(command: PathCommand, position: Int, current: Char, lastChar: Char): Int =
+    when {
         command != PathCommand.ArcTo -> -1
+
         lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
+
         position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
             lastChar.isDigit() -> position + 1
 
         lastChar.isWhitespace() && (current.isDigit() || current == '-') -> position + 1
+
         else -> position
     }
-}

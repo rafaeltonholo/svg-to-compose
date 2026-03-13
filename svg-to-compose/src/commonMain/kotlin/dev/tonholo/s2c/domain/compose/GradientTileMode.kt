@@ -5,7 +5,8 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 value class GradientTileMode private constructor(override val value: String) :
-    ComposeType<String>, MethodSizeAccountable {
+    ComposeType<String>,
+    MethodSizeAccountable {
     companion object {
         private const val NAME = "TileMode"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
@@ -17,8 +18,8 @@ value class GradientTileMode private constructor(override val value: String) :
         val Mirror = GradientTileMode("Mirror")
         val Decal = GradientTileMode("Decal")
 
-        operator fun invoke(value: String?): GradientTileMode? = value?.let {
-            val tileMode = GradientTileMode(value.replaceFirstChar { it.uppercaseChar() })
+        operator fun invoke(value: String?): GradientTileMode? = value?.let { raw ->
+            val tileMode = GradientTileMode(raw.replaceFirstChar { char -> char.uppercaseChar() })
             return tileMode.toCompose()?.let { tileMode }
         }
     }
@@ -36,7 +37,6 @@ value class GradientTileMode private constructor(override val value: String) :
         Repeated.value.lowercase(), "repeat" -> "$name.$Repeated"
         Mirror.value.lowercase() -> "$name.$Mirror"
         Decal.value.lowercase() -> "$name.$Decal"
-
         else -> null
     }
 

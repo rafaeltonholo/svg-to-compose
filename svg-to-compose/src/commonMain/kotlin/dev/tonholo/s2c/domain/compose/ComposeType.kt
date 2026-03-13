@@ -60,7 +60,9 @@ fun <T> ComposeType<T>.lowercase(): String = value.toString().lowercase()
  * string value.
  */
 @JvmInline
-value class PathFillType private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
+value class PathFillType private constructor(override val value: String) :
+    ComposeType<String>,
+    MethodSizeAccountable {
     companion object {
         private const val NAME = "PathFillType"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
@@ -83,8 +85,8 @@ value class PathFillType private constructor(override val value: String) : Compo
          * to uppercase.
          * @return A new [PathFillType] object, or `null` if the input string was `null`.
          */
-        operator fun invoke(value: String?): PathFillType? = value?.let {
-            val pathFillType = PathFillType(value.replaceFirstChar { it.uppercaseChar() })
+        operator fun invoke(value: String?): PathFillType? = value?.let { raw ->
+            val pathFillType = PathFillType(raw.replaceFirstChar { char -> char.uppercaseChar() })
             // ensure a valid path fill type
             return pathFillType.toCompose()?.let { pathFillType }
         }
@@ -103,7 +105,6 @@ value class PathFillType private constructor(override val value: String) : Compo
     override fun toCompose(): String? = when (this.value.lowercase()) {
         EvenOdd.value.lowercase() -> "$name.$EvenOdd"
         NonZero.value.lowercase() -> "$name.$NonZero"
-
         else -> null
     }
 }
@@ -125,7 +126,9 @@ value class PathFillType private constructor(override val value: String) : Compo
  * string value.
  */
 @JvmInline
-value class StrokeCap private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
+value class StrokeCap private constructor(override val value: String) :
+    ComposeType<String>,
+    MethodSizeAccountable {
     companion object {
         private const val NAME = "StrokeCap"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
@@ -149,8 +152,8 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
          * to uppercase.
          * @return A new [StrokeCap] object, or `null` if the input string was `null`.
          */
-        operator fun invoke(value: String?): StrokeCap? = value?.let {
-            val strokeCap = StrokeCap(value.replaceFirstChar { it.uppercaseChar() })
+        operator fun invoke(value: String?): StrokeCap? = value?.let { raw ->
+            val strokeCap = StrokeCap(raw.replaceFirstChar { char -> char.uppercaseChar() })
             // Ensure a valid stroke cap
             return strokeCap.toCompose()?.let { strokeCap }
         }
@@ -170,7 +173,6 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
         Butt.value.lowercase() -> "$name.$Butt"
         Round.value.lowercase() -> "$name.$Round"
         Square.value.lowercase() -> "$name.$Square"
-
         else -> null // Unsupported by Compose
     }
 }
@@ -192,7 +194,9 @@ value class StrokeCap private constructor(override val value: String) : ComposeT
  * string value.
  */
 @JvmInline
-value class StrokeJoin private constructor(override val value: String) : ComposeType<String>, MethodSizeAccountable {
+value class StrokeJoin private constructor(override val value: String) :
+    ComposeType<String>,
+    MethodSizeAccountable {
     companion object {
         private const val NAME = "StrokeJoin"
         private val IMPORT = setOf("androidx.compose.ui.graphics.$NAME")
@@ -216,8 +220,8 @@ value class StrokeJoin private constructor(override val value: String) : Compose
          * to uppercase.
          * @return A new [StrokeJoin] object, or `null` if the input string was `null`.
          */
-        operator fun invoke(value: String?): StrokeJoin? = value?.let {
-            val strokeJoin = StrokeJoin(value.replaceFirstChar { it.uppercaseChar() })
+        operator fun invoke(value: String?): StrokeJoin? = value?.let { raw ->
+            val strokeJoin = StrokeJoin(raw.replaceFirstChar { char -> char.uppercaseChar() })
             // Ensure a valid stroke join
             return strokeJoin.toCompose()?.let { strokeJoin }
         }
@@ -238,7 +242,6 @@ value class StrokeJoin private constructor(override val value: String) : Compose
         Miter.value.lowercase() -> "$name.$Miter"
         Round.value.lowercase() -> "$name.$Round"
         Bevel.value.lowercase() -> "$name.$Bevel"
-
         else -> null
     }
 }

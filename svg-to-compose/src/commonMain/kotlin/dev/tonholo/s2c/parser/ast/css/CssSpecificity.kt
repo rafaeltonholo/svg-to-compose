@@ -21,11 +21,7 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
  * @property b The number of class selectors, attribute selectors, and pseudo-classes.
  * @property c The number of type selectors and pseudo-elements.
  */
-data class CssSpecificity(
-    val a: Int = 0,
-    val b: Int = 0,
-    val c: Int = 0,
-) : Comparable<CssSpecificity> {
+data class CssSpecificity(val a: Int = 0, val b: Int = 0, val c: Int = 0) : Comparable<CssSpecificity> {
     operator fun get(index: Int): Int = when (index) {
         0 -> a
         1 -> b
@@ -33,26 +29,20 @@ data class CssSpecificity(
         else -> throw IndexOutOfBoundsException("Index $index is out of bounds.")
     }
 
-    operator fun plus(other: CssSpecificity): CssSpecificity {
-        return CssSpecificity(
-            a = a + other.a,
-            b = b + other.b,
-            c = c + other.c,
-        )
+    operator fun plus(other: CssSpecificity): CssSpecificity = CssSpecificity(
+        a = a + other.a,
+        b = b + other.b,
+        c = c + other.c,
+    )
+
+    override operator fun compareTo(other: CssSpecificity): Int = when {
+        a != other.a -> a.compareTo(other.a)
+        b != other.b -> b.compareTo(other.b)
+        c != other.c -> c.compareTo(other.c)
+        else -> 0
     }
 
-    override operator fun compareTo(other: CssSpecificity): Int {
-        return when {
-            a != other.a -> a.compareTo(other.a)
-            b != other.b -> b.compareTo(other.b)
-            c != other.c -> c.compareTo(other.c)
-            else -> 0
-        }
-    }
-
-    override fun toString(): String {
-        return "($a, $b, $c)"
-    }
+    override fun toString(): String = "($a, $b, $c)"
 }
 
 /**
@@ -67,13 +57,12 @@ data class CssSpecificity(
  * @return A map where the keys are the selector list items and the values
  * are the [CssSpecificity] of each selector in the rule's prelude.
  */
-fun calculateSelectorsSpecificity(prelude: Prelude.Selector): Map<SelectorListItem, CssSpecificity> {
-    return prelude.components.associateWith { selector ->
-        selector.selectors.fold(CssSpecificity()) { selectorSpecificity, selector ->
-            selectorSpecificity + selector.calculateSpecificity()
+fun calculateSelectorsSpecificity(prelude: Prelude.Selector): Map<SelectorListItem, CssSpecificity> =
+    prelude.components.associateWith { selector ->
+        selector.selectors.fold(CssSpecificity()) { selectorSpecificity, simpleSelector ->
+            selectorSpecificity + simpleSelector.calculateSpecificity()
         }
     }
-}
 
 private fun Selector.calculateSpecificity(): CssSpecificity {
     var a = 0
@@ -83,7 +72,8 @@ private fun Selector.calculateSpecificity(): CssSpecificity {
         is Selector.Id -> a = 1
 
         is Selector.Attribute,
-        is Selector.Class -> b = 1
+        is Selector.Class,
+        -> b = 1
 
         is Selector.Type if name != "*" -> c = 1
 
@@ -107,10 +97,12 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
     var c = 0
     when (name) {
         "where" -> Unit
+
         "not",
         "is",
         "has",
-        "matches" -> {
+        "matches",
+        -> {
             parameters
                 .maxOf { it.calculateSpecificity() }
                 .also {
@@ -121,7 +113,8 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
         }
 
         "nth-child",
-        "nth-last-child" -> {
+        "nth-last-child",
+        -> {
             parameters
                 .maxOf { it.calculateSpecificity() }
                 .also {
@@ -134,7 +127,8 @@ private fun Selector.PseudoClass.calculateSpecificity(): CssSpecificity {
         "before",
         "after",
         "first-line",
-        "first-letter" -> {
+        "first-letter",
+        -> {
             c = 1
         }
 

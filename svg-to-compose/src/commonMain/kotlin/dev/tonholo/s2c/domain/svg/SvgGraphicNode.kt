@@ -21,7 +21,8 @@ abstract class SvgGraphicNode<out T>(
     parent: XmlParentNode,
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
-) : SvgChildNode<T>(parent), SvgNode
+) : SvgChildNode<T>(parent),
+    SvgNode
     where T : SvgNode, T : XmlChildNode {
     val fill: SvgColor? by attribute<String?, _>(inherited = true) { it?.let(SvgColor::invoke) }
 
@@ -37,15 +38,15 @@ abstract class SvgGraphicNode<out T>(
     } // <length | percentage>
 
     val strokeLineJoin: StrokeJoin? by attribute<String?, _>(name = "stroke-linejoin", inherited = true) {
-        it?.let { StrokeJoin(it) }
+        it?.let { raw -> StrokeJoin(raw) }
     } // <arcs | bevel |miter | miter-clip | round>
 
     val strokeLineCap: StrokeCap? by attribute<String?, _>(name = "stroke-linecap", inherited = true) {
-        it?.let { StrokeCap(it) }
+        it?.let { raw -> StrokeCap(raw) }
     }
 
     val fillRule: PathFillType? by attribute<String?, _>(name = "fill-rule", inherited = true) {
-        it?.let { PathFillType(it) }
+        it?.let { raw -> PathFillType(raw) }
     } // <nonzero | evenodd>
 
     val strokeOpacity: Float? by attribute<String?, _>(name = "stroke-opacity", inherited = true) {
