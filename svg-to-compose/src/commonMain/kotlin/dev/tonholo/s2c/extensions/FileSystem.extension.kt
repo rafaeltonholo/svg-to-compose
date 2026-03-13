@@ -63,7 +63,7 @@ private suspend fun SequenceScope<Path>.collectRecursively(
         yield(path)
     }
 
-    val children = fileSystem.listOrNull(path) ?: listOf()
+    val children = fileSystem.listOrNull(path).orEmpty()
     if (children.isNotEmpty()) {
         // Figure out if the path is a symlink and detect symlink cycles.
         var symlinkPath = path
