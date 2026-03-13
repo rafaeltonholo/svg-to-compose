@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.parser
 
 import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.parser.config.TemplateConfig
 
 /**
  * Configuration parameters for the Parser class.
@@ -41,6 +42,8 @@ import dev.tonholo.s2c.emitter.FormatConfig
  * delete the temp folder. Useful when running parallel execution.
  * @property formatConfig optional formatting configuration for code emission.
  * When `null`, the processor will attempt to resolve formatting from `.editorconfig`.
+ * @property template optional template configuration for output customization.
+ * When `null`, the processor will attempt auto-discovery of `s2c.template.toml`.
  */
 data class ParserConfig(
     val pkg: String,
@@ -56,4 +59,5 @@ data class ParserConfig(
     val silent: Boolean = false,
     val keepTempFolder: Boolean = false,
     val formatConfig: FormatConfig? = null,
+    val template: TemplateConfig? = null,
 )
