@@ -24,6 +24,7 @@ internal interface IconParsingParameters : WorkParameters {
     val kmpPreview: Property<Boolean>
     val recursive: Property<Boolean>
     val maxDepth: Property<Int>
+    val templateFilePath: Property<String>
     val resultFilePath: Property<String>
     val bridgeToken: Property<String>
 }
