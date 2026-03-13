@@ -34,7 +34,7 @@ class TemplateEmitter(
     private val fallbackEmitter: ImageVectorEmitter,
 ) : CodeEmitter {
     private val nodeEmitter = ImageVectorNodeEmitter(logger, formatConfig)
-    private val templateNodeEmitter = TemplateNodeEmitter(logger, formatConfig, nodeEmitter)
+    private val templateNodeEmitter = TemplateNodeEmitter(formatConfig, nodeEmitter)
     private val chunker = NodeChunker(logger)
 
     override fun emit(contents: IconFileContents): String {
