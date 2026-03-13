@@ -6,6 +6,7 @@ plugins {
     dev.tonholo.s2c.conventions.testing
     alias(libs.plugins.app.cash.burst)
     alias(libs.plugins.dev.zacsweers.metro)
+    alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
 kotlin {
@@ -13,6 +14,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.com.squareup.okio)
             implementation(libs.com.fleeksoft.ksoup)
+            implementation(libs.com.akuleshov7.ktoml.core)
             implementation(libs.org.jetbrains.annotations)
             implementation(kotlin("reflect"))
         }
