@@ -7,6 +7,7 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
+import dev.tonholo.s2c.emitter.template.config.ColorMappingDefinition
 import dev.tonholo.s2c.emitter.template.config.PreviewConfig
 import dev.tonholo.s2c.emitter.template.config.ReceiverDefinition
 import dev.tonholo.s2c.emitter.template.config.TemplateDefinitions
@@ -236,6 +237,37 @@ class TemplateEmitterTest {
     }
 
     @Test
+    fun `color mapping replaces Color expression with named constant`() {
+        val config = TemplateEmitterConfig(
+            definitions = TemplateDefinitions(
+                imports = mapOf(
+                    "icon_path" to "com.example.iconPath",
+                ),
+                colorMapping = listOf(
+                    ColorMappingDefinition(
+                        name = "BLACK",
+                        importPackage = "com.example.colors",
+                        value = "0xFF121212",
+                    ),
+                ),
+            ),
+            templates = TemplateSection(
+                iconTemplate = $$"val ${icon:name}: ImageVector by lazy {$\n    ${icon:body}$\n}",
+            ),
+            fragments = mapOf(
+                "path_builder" to $$"${def:icon_path}(fill = ${path:fill})",
+            ),
+        )
+        val fallback = ImageVectorEmitter(noOpLogger, formatConfig)
+        val emitter = TemplateEmitter(noOpLogger, formatConfig, config, fallback)
+
+        val output = emitter.emit(createSimpleIcon(fillColor = "#121212"))
+        assertContains(output, "SolidColor(BLACK)")
+        assertContains(output, "import com.example.colors.BLACK")
+        assertFalse(output.contains("Color(0xFF121212)"))
+    }
+
+    @Test
     fun `chunk_function_name fragment customizes chunk function names`() {
         // Verify the fragment resolution works by testing PlaceholderResolver directly
         // with the same context TemplateEmitter would create for chunk naming
@@ -277,6 +309,7 @@ class TemplateEmitterTest {
     private fun createSimpleIcon(
         noPreview: Boolean = true,
         makeInternal: Boolean = false,
+        fillColor: String = "Color.Black",
     ): IconFileContents {
         val pathNodes = listOf(
             PathNodes.MoveTo(values = listOf("10", "20"), isRelative = false, minified = false),
@@ -284,7 +317,7 @@ class TemplateEmitterTest {
         )
         val wrapper = ImageVectorNode.NodeWrapper(normalizedPath = "M10 20 L30 40", nodes = pathNodes)
         val path = ImageVectorNode.Path(
-            params = ImageVectorNode.Path.Params(fill = ComposeBrush.SolidColor("Color.Black")),
+            params = ImageVectorNode.Path.Params(fill = ComposeBrush.SolidColor(fillColor)),
             wrapper = wrapper,
             minified = false,
         )
