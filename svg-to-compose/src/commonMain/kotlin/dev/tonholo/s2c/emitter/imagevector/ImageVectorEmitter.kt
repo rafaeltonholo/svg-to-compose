@@ -4,15 +4,12 @@ import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.emitter.CodeEmitter
 import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.emitter.NodeChunker
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.parser.method.MethodSizeAccountable
-import kotlin.math.ceil
 import kotlin.math.max
-import kotlin.math.roundToInt
 
-private const val ICON_BASE_STRUCTURE_BYTE_SIZE = 73
 private const val EXTRA_CONTENT_PLACEHOLDER = "[EXTRA_CONTENT_PLACEHOLDER]"
 
 /**
@@ -29,6 +26,7 @@ class ImageVectorEmitter(
     private val formatConfig: FormatConfig = FormatConfig(),
 ) : CodeEmitter {
     private val nodeEmitter = ImageVectorNodeEmitter(logger, formatConfig)
+    private val chunker = NodeChunker(logger)
 
     /** Single indent level derived from [formatConfig]. */
     private val indent: String get() = formatConfig.indentUnit
@@ -37,7 +35,9 @@ class ImageVectorEmitter(
         logParameters(contents)
 
         val iconPropertyName = buildIconPropertyName(contents)
-        val (nodes, chunkFunctions) = chunkNodesIfNeeded(contents)
+        val (nodes, chunkFunctions) = chunker.chunkIfNeeded(contents) { contents, index ->
+            "${contents.iconName.camelCase()}Chunk$index"
+        }
         val chunkFunctionsContent = buildChunkFunctionsContent(chunkFunctions)
 
         // Path nodes sit inside: val > get() > Builder.apply { ... } — 3 indent levels.
@@ -110,6 +110,21 @@ class ImageVectorEmitter(
         else -> contents.iconName.pascalCase()
     }
 
+    /**
+     * Builds the default `@Preview` function snippet for an icon.
+     *
+     * Returns the preview code (starting with `@Preview`) ready to append,
+     * or an empty string when preview is suppressed.
+     *
+     * @param contents The icon file contents.
+     * @return The preview snippet, or empty string.
+     */
+    fun buildPreviewSnippet(contents: IconFileContents): String {
+        if (contents.noPreview) return ""
+        val iconPropertyName = buildIconPropertyName(contents)
+        return buildPreview(contents, iconPropertyName).trimMargin().trim()
+    }
+
     private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String =
         if (contents.noPreview) {
             ""
@@ -161,38 +176,4 @@ class ImageVectorEmitter(
         }
     }
 
-    private fun chunkNodesIfNeeded(
-        contents: IconFileContents,
-    ): Pair<List<ImageVectorNode>, List<ImageVectorNode.ChunkFunction>?> {
-        val byteSize = ICON_BASE_STRUCTURE_BYTE_SIZE + contents.nodes
-            .sumOf { it.approximateByteSize }
-        val shouldChunkNodes = byteSize > MethodSizeAccountable.METHOD_SIZE_THRESHOLD
-
-        val nodes = if (shouldChunkNodes) {
-            var i = 1
-            val chunks = ceil(byteSize.toFloat() / MethodSizeAccountable.METHOD_SIZE_THRESHOLD)
-                .roundToInt()
-            val chunkSize = contents.nodes.size / chunks
-            logger.warn(
-                "Potential large icon detected. Splitting icon's content in $chunks chunks to avoid " +
-                    "compilation issues. However, that won't affect the performance of displaying this icon."
-            )
-            contents.nodes.chunked(chunkSize) { chunk ->
-                val snapshot = chunk.toList()
-                ImageVectorNode.ChunkFunction(
-                    functionName = "${contents.iconName.camelCase()}Chunk${i++}",
-                    nodes = snapshot,
-                )
-            }
-        } else {
-            contents.nodes
-        }
-        val chunkFunctions = if (shouldChunkNodes) {
-            nodes.filterIsInstance<ImageVectorNode.ChunkFunction>()
-        } else {
-            null
-        }
-
-        return nodes to chunkFunctions
-    }
 }
