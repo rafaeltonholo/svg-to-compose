@@ -14,7 +14,8 @@ enum class IndentStyle {
 /**
  * Configuration for code formatting in emitted output.
  *
- * @property indentSize The number of indent characters per level.
+ * @property indentSize The number of space characters per indent level.
+ *   Only applies when [indentStyle] is [IndentStyle.SPACE]; ignored for [IndentStyle.TAB].
  * @property maxLineLength The maximum line length before wrapping.
  * @property indentStyle The character style used for indentation.
  * @property insertFinalNewline Whether to insert a trailing newline at end of file.
