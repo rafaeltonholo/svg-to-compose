@@ -1,6 +1,8 @@
 package dev.tonholo.s2c.emitter
 
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
+import dev.tonholo.s2c.emitter.template.TemplateEmitter
+import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
 import dev.tonholo.s2c.logger.Logger
 import dev.zacsweers.metro.Inject
 
@@ -16,14 +18,26 @@ class CodeEmitterFactory(
     /**
      * Creates a [CodeEmitter] for the given output format and format configuration.
      *
+     * When a [templateEmitterConfig] is provided, wraps the default emitter with a
+     * [TemplateEmitter] that applies user-defined templates.
+     *
      * @param outputFormat The desired output format.
      * @param formatConfig The formatting configuration to use.
+     * @param templateEmitterConfig Optional template configuration for output customization.
      * @return A [CodeEmitter] instance.
      */
     fun create(
         outputFormat: OutputFormat = OutputFormat.IMAGE_VECTOR,
         formatConfig: FormatConfig = FormatConfig(),
+        templateEmitterConfig: TemplateEmitterConfig? = null,
     ): CodeEmitter = when (outputFormat) {
-        OutputFormat.IMAGE_VECTOR -> ImageVectorEmitter(logger, formatConfig)
+        OutputFormat.IMAGE_VECTOR -> {
+            val imageVectorEmitter = ImageVectorEmitter(logger, formatConfig)
+            if (templateEmitterConfig != null) {
+                TemplateEmitter(logger, formatConfig, templateEmitterConfig, imageVectorEmitter)
+            } else {
+                imageVectorEmitter
+            }
+        }
     }
 }
