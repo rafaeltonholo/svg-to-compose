@@ -12,18 +12,14 @@ class StrokeDashArray(private val value: String) {
     override fun toString(): String = value
 }
 
-private enum class StrokeDashDrawDirection(
-    val command: PathCommand,
-    val edgeCommand: PathCommand,
-) {
+private enum class StrokeDashDrawDirection(val command: PathCommand, val edgeCommand: PathCommand) {
     RIGHT(command = PathCommand.HorizontalLineTo, edgeCommand = PathCommand.VerticalLineTo),
     DOWN(command = PathCommand.VerticalLineTo, edgeCommand = RIGHT.command),
     LEFT(command = PathCommand.HorizontalLineTo, edgeCommand = DOWN.command),
     UP(command = PathCommand.VerticalLineTo, edgeCommand = LEFT.command),
     ;
 
-    fun next(): StrokeDashDrawDirection =
-        entries[(this.ordinal + 1) % entries.size]
+    fun next(): StrokeDashDrawDirection = entries[(this.ordinal + 1) % entries.size]
 }
 
 fun StrokeDashArray.createDashedPathForRect(
@@ -116,24 +112,24 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
                 args(partialDash)
                 isRelative = true
                 minified = isMinified
-            }
+            },
         )
         val rest = dashOrGap - abs(partialDash)
 
         val moveArg = when (direction) {
             StrokeDashDrawDirection.RIGHT -> null
-            StrokeDashDrawDirection.DOWN -> arrayOf(0f, -strokeWidth / 2f)
-            StrokeDashDrawDirection.LEFT -> arrayOf(strokeWidth / 2f, 0f)
-            StrokeDashDrawDirection.UP -> arrayOf(0f, strokeWidth / 2f)
+            StrokeDashDrawDirection.DOWN -> listOf(0f, -strokeWidth / 2f)
+            StrokeDashDrawDirection.LEFT -> listOf(strokeWidth / 2f, 0f)
+            StrokeDashDrawDirection.UP -> listOf(0f, strokeWidth / 2f)
         }
 
         moveArg?.let {
             add(
                 pathNode(command = PathCommand.MoveTo) {
-                    args(it.toList())
+                    args(it)
                     isRelative = true
                     minified = isMinified
-                }
+                },
             )
         }
 
@@ -149,7 +145,7 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
                     args(it)
                     isRelative = true
                     minified = isMinified
-                }
+                },
             )
         }
     } else {
@@ -164,21 +160,18 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
                 args(drawArg)
                 isRelative = true
                 minified = isMinified
-            }
+            },
         )
     }
 }
 
-private fun calculatePartialDashLength(
-    direction: StrokeDashDrawDirection,
-    dashOrGap: Float,
-    diff: Float,
-) = when (direction) {
-    StrokeDashDrawDirection.DOWN -> dashOrGap - diff
-    StrokeDashDrawDirection.LEFT -> dashOrGap - diff
-    StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
-    else -> -(dashOrGap - diff)
-}
+private fun calculatePartialDashLength(direction: StrokeDashDrawDirection, dashOrGap: Float, diff: Float) =
+    when (direction) {
+        StrokeDashDrawDirection.DOWN -> dashOrGap - diff
+        StrokeDashDrawDirection.LEFT -> dashOrGap - diff
+        StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
+        else -> -(dashOrGap - diff)
+    }
 
 private fun MutableList<PathNodes>.addDashWithinEdges(
     direction: StrokeDashDrawDirection,
@@ -211,22 +204,22 @@ private fun MutableList<PathNodes>.addGap(
         val partialGap = dashOrGap - diff
         val rest = dashOrGap - partialGap
         when (direction) {
-            StrokeDashDrawDirection.DOWN -> arrayOf(partialGap, rest)
-            StrokeDashDrawDirection.LEFT -> arrayOf(-diff, partialGap)
-            StrokeDashDrawDirection.UP -> arrayOf(-partialGap, -diff)
-            else -> arrayOf()
+            StrokeDashDrawDirection.DOWN -> listOf(partialGap, rest)
+            StrokeDashDrawDirection.LEFT -> listOf(-diff, partialGap)
+            StrokeDashDrawDirection.UP -> listOf(-partialGap, -diff)
+            else -> emptyList()
         }
     } else {
         when (direction) {
-            StrokeDashDrawDirection.RIGHT -> arrayOf(dashOrGap, 0f)
-            StrokeDashDrawDirection.DOWN -> arrayOf(0f, dashOrGap)
-            StrokeDashDrawDirection.LEFT -> arrayOf(-dashOrGap, 0f)
-            StrokeDashDrawDirection.UP -> arrayOf(0f, -dashOrGap)
+            StrokeDashDrawDirection.RIGHT -> listOf(dashOrGap, 0f)
+            StrokeDashDrawDirection.DOWN -> listOf(0f, dashOrGap)
+            StrokeDashDrawDirection.LEFT -> listOf(-dashOrGap, 0f)
+            StrokeDashDrawDirection.UP -> listOf(0f, -dashOrGap)
         }
     }
     add(
         pathNode(PathCommand.MoveTo) {
-            args(moveArgs.toList())
+            args(moveArgs)
             isRelative = true
             minified = isMinified
         },
