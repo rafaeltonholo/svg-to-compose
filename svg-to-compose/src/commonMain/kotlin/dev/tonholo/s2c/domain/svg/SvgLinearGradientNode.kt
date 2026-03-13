@@ -11,20 +11,19 @@ class SvgLinearGradientNode(
     parent: XmlParentNode,
     children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgLinearGradient<SvgLinearGradientNode>(parent, children, attributes), SvgNode {
+) : SvgLinearGradient<SvgLinearGradientNode>(parent, children, attributes),
+    SvgNode {
     override val constructor = ::SvgLinearGradientNode
 
-    override fun toBrush(
-        target: List<PathNodes>,
-    ): ComposeBrush.Gradient {
+    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient {
         if (href != null) {
             val root = rootParent as SvgRootNode
             val attrX1 = attributes["x1"]
             val attrX2 = attributes["x2"]
             val attrY1 = attributes["y1"]
             val attrY2 = attributes["y2"]
-            val mutatedGradient = root
-                .gradients[href!!.normalizedId()]!!
+            val hrefId = checkNotNull(href).normalizedId()
+            val mutatedGradient = checkNotNull(root.gradients[hrefId])
                 .copy(
                     attributes = attributes.toMutableMap().apply {
                         remove(SvgUseNode.HREF_ATTR_KEY)
@@ -32,7 +31,7 @@ class SvgLinearGradientNode(
                         attrX2?.let { put("x2", it) }
                         attrY1?.let { put("y1", it) }
                         attrY2?.let { put("y2", it) }
-                    }
+                    },
                 ) as SvgLinearGradientNode
 
             return mutatedGradient.toBrush(target)
