@@ -249,7 +249,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
 }
 
 context(logger: Logger)
-fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
+internal fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
     val normalizedPath = normalizePath(this)
     val nodes = logger.verboseSection("Starting path") {
         val commands = normalizedPath.split(" ").filter { it.isNotEmpty() }.toMutableList()
