@@ -53,9 +53,8 @@ internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
 internal const val COMMON_CONFIGURATION_NAME = "common"
 
-internal abstract class ParseSvgToComposeIconTask @Inject constructor(
-    private val projectLayout: ProjectLayout,
-) : DefaultTask() {
+internal abstract class ParseSvgToComposeIconTask @Inject constructor(private val projectLayout: ProjectLayout) :
+    DefaultTask() {
     /**
      * Creates and configures the GradlePluginGraph used by the task.
      *
@@ -250,7 +249,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                         destinationPackage,
                         configuration,
                         resultFile,
-                        bridgeToken
+                        bridgeToken,
                     )
                 }
                 queue.await()
@@ -261,7 +260,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         if (actualResultFiles != expectedResultCount) {
             logger.warn(
                 "Expected $expectedResultCount result files but found $actualResultFiles. " +
-                    "Some workers may have failed. Please see the logs for further investigation."
+                    "Some workers may have failed. Please see the logs for further investigation.",
             )
         }
 
@@ -323,26 +322,22 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         }
     }
 
-    private fun buildOutput(
-        configuration: ProcessorConfiguration,
-        recursive: Boolean,
-        path: Path,
-        parent: Path
-    ): Path = requireNotNull(outputDirectories[configuration.name])
-        .toOkioPath()
-        .let { output ->
-            if (recursive && path.parent != parent) {
-                (output / path.relativeTo(parent)).parent
-            } else {
-                null
-            } ?: output
-        }
+    private fun buildOutput(configuration: ProcessorConfiguration, recursive: Boolean, path: Path, parent: Path): Path =
+        requireNotNull(outputDirectories[configuration.name])
+            .toOkioPath()
+            .let { output ->
+                if (recursive && path.parent != parent) {
+                    (output / path.relativeTo(parent)).parent
+                } else {
+                    null
+                } ?: output
+            }
 
     private fun buildDestinationPackage(
         configuration: ProcessorConfiguration,
         recursive: Boolean,
         path: Path,
-        parent: Path
+        parent: Path,
     ): String = configuration.destinationPackage.get().let { pkg ->
         pkg + if (recursive && path.parent != parent) {
             ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
@@ -382,9 +377,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
  *
  * @param extension The plugin extension containing configuration for parsing SVGs to Compose icons.
  */
-internal fun Project.registerParseSvgToComposeIconTask(
-    extension: SvgToComposeExtension,
-) {
+internal fun Project.registerParseSvgToComposeIconTask(extension: SvgToComposeExtension) {
     val kmpExtension = extensions.findByType<KotlinMultiplatformExtension>()
     val outputSourceDir = layout.buildDirectory.dir(
         buildString {

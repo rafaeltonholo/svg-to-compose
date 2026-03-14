@@ -3,12 +3,12 @@ package dev.tonholo.s2c.gradle
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 class Svg2ComposePluginFunctionalTest {
     private val projectRoot = File(System.getProperty("user.dir")).parentFile
@@ -27,15 +27,12 @@ class Svg2ComposePluginFunctionalTest {
                 }
             }
             rootProject.name = "test-project"
-            """.trimIndent()
+            """.trimIndent(),
         )
         return dir
     }
 
-    private fun buildGradleContent(
-        optimize: Boolean,
-        pkg: String,
-    ) = // language=kotlin
+    private fun buildGradleContent(optimize: Boolean, pkg: String) = // language=kotlin
         """
         plugins {
             kotlin("multiplatform")
@@ -67,17 +64,14 @@ class Svg2ComposePluginFunctionalTest {
         val resourceDir = File(
             requireNotNull(javaClass.classLoader.getResource(type)) {
                 "Test resource directory not found: $type"
-            }.toURI()
+            }.toURI(),
         )
         resourceDir.listFiles().orEmpty().forEach { file ->
             file.copyTo(iconsDir.resolve(file.name))
         }
     }
 
-    private fun runGradle(
-        projectDir: File,
-        vararg args: String,
-    ): BuildResult = GradleRunner.create()
+    private fun runGradle(projectDir: File, vararg args: String): BuildResult = GradleRunner.create()
         .withProjectDir(projectDir)
         .withPluginClasspath()
         .withArguments(*args, "--stacktrace")
@@ -95,12 +89,7 @@ class Svg2ComposePluginFunctionalTest {
      * On the first run, if no expected file exists yet (bootstrap), the generated
      * content is written as the new expected baseline and the check passes.
      */
-    private fun assertAllOutputsMatchExpected(
-        projectDir: File,
-        pkg: String,
-        fileType: String,
-        optimized: Boolean,
-    ) {
+    private fun assertAllOutputsMatchExpected(projectDir: File, pkg: String, fileType: String, optimized: Boolean) {
         val suffix = if (optimized) "optimized" else "nonoptimized"
         val pkgPath = pkg.replace('.', '/')
         // KMP projects output to commonMain/kotlin/<pkg>, non-KMP to main/kotlin/<pkg>

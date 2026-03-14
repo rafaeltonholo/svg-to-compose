@@ -11,16 +11,16 @@ import java.io.Serializable
  * @property value The hexadecimal string representation of the SHA-256 hash
  */
 @JvmInline
-value class Sha256Hash private constructor(private val value: String) : CharSequence by value, Serializable {
+value class Sha256Hash private constructor(private val value: String) :
+    CharSequence by value,
+    Serializable {
     override fun toString(): String = value
 
     companion object {
         private const val serialVersionUID = 1L
-        operator fun invoke(raw: String): Sha256Hash =
-            Sha256Hash(raw.toByteArray())
+        operator fun invoke(raw: String): Sha256Hash = Sha256Hash(raw.toByteArray())
 
-        operator fun invoke(bytes: ByteArray): Sha256Hash =
-            Sha256Hash(bytes.toByteString().sha256().hex())
+        operator fun invoke(bytes: ByteArray): Sha256Hash = Sha256Hash(bytes.toByteString().sha256().hex())
     }
 }
 

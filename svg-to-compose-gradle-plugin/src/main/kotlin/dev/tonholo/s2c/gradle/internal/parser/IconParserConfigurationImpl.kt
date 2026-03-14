@@ -15,10 +15,10 @@ import org.gradle.kotlin.dsl.property
 
 private typealias IconMapper = (String) -> String
 
-internal class IconParserConfigurationImpl(
-    objectFactory: ObjectFactory,
-    override val parentName: String,
-) : IconParserConfiguration, Configuration, Cacheable {
+internal class IconParserConfigurationImpl(objectFactory: ObjectFactory, override val parentName: String) :
+    IconParserConfiguration,
+    Configuration,
+    Cacheable {
     override val name: String = "icons"
     override val iconVisibility: Property<IconVisibility> = objectFactory.property<IconVisibility>()
 
@@ -74,7 +74,7 @@ internal class IconParserConfigurationImpl(
                 Regex(patterns.joinToString("|") { "(?>${it.pattern})" })
             } else {
                 patterns.single()
-            }
+            },
         )
     }
 
@@ -122,7 +122,7 @@ internal class IconParserConfigurationImpl(
                     IconVisibility.Internal
                 } else {
                     IconVisibility.Public
-                }
+                },
             )
         receiverType.setIfNotPresent(provider = common.receiverType)
         addToMaterialIcons.setIfNotPresent(
@@ -136,19 +136,17 @@ internal class IconParserConfigurationImpl(
         exclude.setIfNotPresent(provider = common.exclude)
     }
 
-    override fun toString(): String {
-        return buildString {
-            appendLine("IconParserConfigurationImpl(")
-            appendLine("  name='$name', ")
-            appendLine("  iconVisibility=${iconVisibility.orNull}, ")
-            appendLine("  receiverType='${receiverType.orNull}', ")
-            appendLine("  addToMaterialIcons=${addToMaterialIcons.orNull}, ")
-            appendLine("  minified=${minified.orNull}, ")
-            appendLine("  noPreview=${noPreview.orNull}, ")
-            appendLine("  theme='${theme.orNull}', ")
-            appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
-            appendLine("  exclude=${exclude.orNull}, ")
-            append(")")
-        }
+    override fun toString(): String = buildString {
+        appendLine("IconParserConfigurationImpl(")
+        appendLine("  name='$name', ")
+        appendLine("  iconVisibility=${iconVisibility.orNull}, ")
+        appendLine("  receiverType='${receiverType.orNull}', ")
+        appendLine("  addToMaterialIcons=${addToMaterialIcons.orNull}, ")
+        appendLine("  minified=${minified.orNull}, ")
+        appendLine("  noPreview=${noPreview.orNull}, ")
+        appendLine("  theme='${theme.orNull}', ")
+        appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
+        appendLine("  exclude=${exclude.orNull}, ")
+        append(")")
     }
 }

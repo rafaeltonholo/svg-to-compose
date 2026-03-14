@@ -17,11 +17,10 @@ internal object S2cWorkerBridge {
         registry[token] = factory
     }
 
-    fun get(token: String): Processor.Factory =
-        requireNotNull(registry[token]) {
-            "No Processor.Factory registered for token '$token'. " +
-                "Ensure the task calls S2cWorkerBridge.register() before submitting workers."
-        }
+    fun get(token: String): Processor.Factory = requireNotNull(registry[token]) {
+        "No Processor.Factory registered for token '$token'. " +
+            "Ensure the task calls S2cWorkerBridge.register() before submitting workers."
+    }
 
     fun unregister(token: String) {
         registry.remove(token)

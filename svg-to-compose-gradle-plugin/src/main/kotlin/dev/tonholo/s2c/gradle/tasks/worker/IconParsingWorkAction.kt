@@ -51,7 +51,7 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
             } else {
                 IconParsingWorkActionResult.error(
                     origin = origin.toString(),
-                    message = "No output produced for $origin"
+                    message = "No output produced for $origin",
                 )
             }
         } catch (e: ExitProgramException) {

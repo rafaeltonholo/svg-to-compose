@@ -78,12 +78,10 @@ abstract class SvgToComposeExtension {
         }
     }
 
-    override fun toString(): String {
-        return "SvgToComposeExtension(" +
-            "configurations=[${configurations.joinToString { it.toString() }}], " +
-            "maxParallelExecutions=${maxParallelExecutions.get()}" +
-            ")"
-    }
+    override fun toString(): String = "SvgToComposeExtension(" +
+        "configurations=[${configurations.joinToString { it.toString() }}], " +
+        "maxParallelExecutions=${maxParallelExecutions.get()}" +
+        ")"
 
     private val NamedDomainObjectContainer<ProcessorConfiguration>.commonOrNull: ProcessorConfiguration?
         get() = findByName("common")
