@@ -12,9 +12,12 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
 import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.config.BuildConfig
+import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.emitter.IndentStyle
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.logger.CommonLogger
@@ -146,6 +149,24 @@ class Client : CliktCommand(name = "s2c") {
         help = "A regex used to exclude some icons from the parsing.",
     )
 
+    private val indentSize by option(
+        names = arrayOf("--indent-size"),
+        help = "Number of indent characters per level in generated code. " +
+            "Overrides .editorconfig if specified.",
+    ).int()
+
+    private val indentStyle by option(
+        names = arrayOf("--indent-style"),
+        help = "Indentation style for generated code: 'space' or 'tab'. " +
+            "Overrides .editorconfig if specified.",
+    ).choice("space" to IndentStyle.SPACE, "tab" to IndentStyle.TAB)
+
+    private val noEditorConfig by option(
+        names = arrayOf("--no-editorconfig"),
+        help = "Disable .editorconfig resolution. Uses default formatting unless " +
+            "--indent-size or --indent-style are specified.",
+    ).flag()
+
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
         help = """Replace the icon's name first value of this parameter with the second. 
@@ -187,6 +208,9 @@ class Client : CliktCommand(name = "s2c") {
         logger.verbose("   silent = $silent")
         logger.verbose("   exclude = $exclude")
         logger.verbose("   mapIconNameTo = $mapIconNameTo")
+        logger.verbose("   indentSize = $indentSize")
+        logger.verbose("   indentStyle = $indentStyle")
+        logger.verbose("   noEditorConfig = $noEditorConfig")
 
         AppConfig.verbose = verbose
         AppConfig.debug = verbose || debug
@@ -213,6 +237,7 @@ class Client : CliktCommand(name = "s2c") {
                     silent = silent,
                     kmpPreview = isKmp,
                     exclude = exclude?.let(::Regex),
+                    formatConfig = buildFormatConfig(),
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
@@ -229,5 +254,25 @@ class Client : CliktCommand(name = "s2c") {
             }
             exit(e.errorCode.code)
         }
+    }
+
+    /**
+     * Builds a [FormatConfig] from CLI flags.
+     *
+     * Returns `null` when no CLI formatting overrides are specified and
+     * `.editorconfig` resolution is not disabled — letting the [Processor]
+     * resolve formatting from `.editorconfig` at the output path.
+     */
+    private fun buildFormatConfig(): FormatConfig? {
+        val hasOverrides = indentSize != null || indentStyle != null
+        if (!hasOverrides && !noEditorConfig) return null
+
+        val defaults = FormatConfig()
+        return FormatConfig(
+            indentSize = indentSize ?: defaults.indentSize,
+            indentStyle = indentStyle ?: defaults.indentStyle,
+            maxLineLength = defaults.maxLineLength,
+            insertFinalNewline = defaults.insertFinalNewline,
+        )
     }
 }
