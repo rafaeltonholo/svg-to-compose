@@ -58,11 +58,7 @@ internal object EditorConfigParser {
         var isRoot = false
         var currentSectionApplies = false
         var isGlobalSection = true // before any section header
-
-        var indentSize: Int? = null
-        var indentStyle: IndentStyle? = null
-        var maxLineLength: Int? = null
-        var insertFinalNewline: Boolean? = null
+        val props = mutableMapOf<String, String>()
 
         for (rawLine in content.lineSequence()) {
             val line = rawLine.trim()
@@ -80,42 +76,42 @@ internal object EditorConfigParser {
                 continue
             }
 
-            val eqIndex = line.indexOf('=')
-            if (eqIndex < 0) continue
-            val key = line.substring(0, eqIndex).trim().lowercase()
-            val value = line.substring(eqIndex + 1).trim().lowercase()
+            val (key, value) = parseKeyValue(line) ?: continue
 
             if (isGlobalSection && key == "root" && value == "true") {
                 isRoot = true
-                continue
-            }
-
-            if (!isGlobalSection && !currentSectionApplies) continue
-
-            when (key) {
-                PROP_INDENT_SIZE -> value.toIntOrNull()?.let { indentSize = it }
-                PROP_INDENT_STYLE -> indentStyle = when (value) {
-                    "space" -> IndentStyle.SPACE
-                    "tab" -> IndentStyle.TAB
-                    else -> null
-                }
-
-                PROP_MAX_LINE_LENGTH -> when (value) {
-                    "off" -> maxLineLength = Int.MAX_VALUE
-                    else -> value.toIntOrNull()?.let { maxLineLength = it }
-                }
-
-                PROP_INSERT_FINAL_NEWLINE -> insertFinalNewline = value.toBooleanStrictOrNull()
+            } else if (isGlobalSection || currentSectionApplies) {
+                props[key] = value
             }
         }
 
         return ParsedConfig(
             isRoot = isRoot,
-            indentSize = indentSize,
-            indentStyle = indentStyle,
-            maxLineLength = maxLineLength,
-            insertFinalNewline = insertFinalNewline,
+            indentSize = props[PROP_INDENT_SIZE]?.toIntOrNull(),
+            indentStyle = parseIndentStyle(props[PROP_INDENT_STYLE]),
+            maxLineLength = parseMaxLineLength(props[PROP_MAX_LINE_LENGTH]),
+            insertFinalNewline = props[PROP_INSERT_FINAL_NEWLINE]?.toBooleanStrictOrNull(),
         )
+    }
+
+    private fun parseKeyValue(line: String): Pair<String, String>? {
+        val eqIndex = line.indexOf('=')
+        if (eqIndex < 0) return null
+        val key = line.substring(0, eqIndex).trim().lowercase()
+        val value = line.substring(eqIndex + 1).trim().lowercase()
+        return key to value
+    }
+
+    private fun parseIndentStyle(value: String?): IndentStyle? = when (value) {
+        "space" -> IndentStyle.SPACE
+        "tab" -> IndentStyle.TAB
+        else -> null
+    }
+
+    private fun parseMaxLineLength(value: String?): Int? = when (value) {
+        null -> null
+        "off" -> Int.MAX_VALUE
+        else -> value.toIntOrNull()
     }
 
     /**
@@ -146,7 +142,9 @@ internal object EditorConfigParser {
      */
     private fun matchesKotlinFiles(pattern: String): Boolean = when {
         pattern == "*" -> true
+
         pattern == "*.kt" -> true
+
         pattern.startsWith("*.{") && pattern.endsWith("}") -> {
             val extensions = pattern.substring(3, pattern.length - 1).split(",").map { it.trim() }
             "kt" in extensions
