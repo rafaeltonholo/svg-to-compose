@@ -1,15 +1,18 @@
 package dev.tonholo.s2c.emitter.imagevector
 
 import dev.tonholo.s2c.domain.PathNodes
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.extensions.removeTrailingZero
+
 /**
  * Emits Kotlin path command function calls from [PathNodes] domain objects.
  *
  * Handles all path command types (MoveTo, LineTo, ArcTo, CurveTo, etc.)
  * using a `when` dispatch on the sealed class.
+ *
+ * @property formatConfig The formatting configuration to use.
  */
-internal class PathNodeEmitter {
+internal class PathNodeEmitter(private val formatConfig: FormatConfig = FormatConfig()) {
     /**
      * Emits the Kotlin code for a single [PathNodes] command.
      *
@@ -58,13 +61,13 @@ internal class PathNodeEmitter {
         .replace("\\.0z\\b".toRegex(), "z")
 
     private fun Set<String>.toParameters(minified: Boolean, forceInline: Boolean): String {
-        val indentSize = if (minified || forceInline) 0 else 4
-        val separator = if (minified || forceInline) "" else "\n"
-        val escape = if (minified || forceInline) " " else "|"
-        return joinToString(separator) {
-            "$escape${it.indented(indentSize)},"
-        }.let {
-            if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
-        }
+        val indent = if (minified || forceInline) "" else formatConfig.indentUnit
+        val separator = if (minified || forceInline) " " else "\n"
+        val scape = if (minified || forceInline) " " else "|"
+        return joinToString(separator) { "$it," }
+            .prependIndent("$scape$indent")
+            .let {
+                if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
+            }
     }
 }

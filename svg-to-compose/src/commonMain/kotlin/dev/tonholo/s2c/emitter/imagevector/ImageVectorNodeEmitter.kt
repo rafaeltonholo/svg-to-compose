@@ -3,15 +3,21 @@ package dev.tonholo.s2c.emitter.imagevector
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.emitter.FormatConfig
 /**
  * Emits Kotlin code for [ImageVectorNode] instances (Path, Group, ChunkFunction).
  *
  * Delegates path command emission to [PathNodeEmitter].
  *
+ * @property formatConfig The formatting configuration to use.
  * @property pathNodeEmitter The emitter for individual path commands.
  */
-internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter()) {
+internal class ImageVectorNodeEmitter(
+    private val formatConfig: FormatConfig = FormatConfig(),
+    private val pathNodeEmitter: PathNodeEmitter = PathNodeEmitter(formatConfig),
+) {
+    private val indent: String get() = formatConfig.indentUnit
+
     /**
      * Emits the Kotlin code for an [ImageVectorNode].
      *
@@ -31,24 +37,21 @@ internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitt
      * @return The emitted function definition.
      */
     fun emitChunkFunctionDefinition(chunk: ImageVectorNode.ChunkFunction): String {
-        val indentSize = 4
-        val bodyFunction = chunk.nodes.joinToString("\n${" ".repeat(indentSize)}") {
-            emit(it)
-                .replace("\n", "\n${" ".repeat(indentSize)}")
-        }
+        val bodyFunction = chunk.nodes.joinToString("\n") {
+            emit(it).trimEnd()
+        }.prependIndent(indent)
 
         return """
                 |private fun ImageVector.Builder.${chunk.functionName}() {
-                |    $bodyFunction
+                |$bodyFunction
                 |}
         """.trimMargin()
     }
 
     private fun emitPath(path: ImageVectorNode.Path): String {
-        val indentSize = 4
-        val pathNodes = path.wrapper.nodes.joinToString("\n${" ".repeat(indentSize)}") {
+        val pathNodes = path.wrapper.nodes.joinToString("\n$indent") {
             pathNodeEmitter.emit(it)
-                .replace("\n", "\n${" ".repeat(indentSize)}")
+                .replace("\n", "\n$indent")
                 .trimEnd()
         }
 
@@ -56,7 +59,11 @@ internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitt
 
         val pathParamsString = if (pathParams.isNotEmpty()) {
             """(
-            |${pathParams.joinToString("\n") { (param, value) -> "$param = $value,".indented(4) }}
+            |${
+                pathParams.joinToString("\n") { (param, value) ->
+                    "$param = $value,".prependIndent(formatConfig.indentUnit)
+                }
+            }
             |)"""
         } else {
             ""
@@ -66,29 +73,26 @@ internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitt
 
         return """
             |${comment}path$pathParamsString {
-            |    $pathNodes
+            |$indent$pathNodes
             |}
         """.trimMargin()
     }
 
     private fun emitGroup(group: ImageVectorNode.Group): String {
-        val indentSize = 4
         val groupPaths = group.commands
-            .joinToString("\n${" ".repeat(indentSize)}") {
-                emit(it)
-                    .replace("\n", "\n${" ".repeat(indentSize)}")
-                    .trimEnd()
-            }
+            .joinToString("\n") {
+                emit(it).trimEnd()
+            }.prependIndent(indent)
 
-        val groupParams = buildGroupParameters(group, indentSize)
+        val groupParams = buildGroupParameters(group)
 
         val groupParamsString = if (groupParams.isNotEmpty()) {
             val params = groupParams.joinToString("\n") { (param, value) ->
                 if (param == CLIP_PATH_PARAM_NAME && !group.minified && group.params.clipPath != null) {
-                    "${"// ${group.params.clipPath.normalizedPath}".indented(4)}\n"
+                    "$indent// ${group.params.clipPath.normalizedPath}\n"
                 } else {
                     ""
-                } + "$param = $value,".indented(indentSize)
+                } + "$indent$param = $value,"
             }
             """(
             |$params
@@ -99,7 +103,7 @@ internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitt
 
         return """
             |group$groupParamsString {
-            |    $groupPaths
+            |$groupPaths
             |}
         """.trimMargin()
     }
@@ -143,32 +147,32 @@ internal class ImageVectorNodeEmitter(private val pathNodeEmitter: PathNodeEmitt
     }
 
     @Suppress("CyclomaticComplexMethod")
-    private fun buildGroupParameters(group: ImageVectorNode.Group, indentSize: Int): List<Pair<String, String>> =
-        with(group.params) {
-            buildList {
-                clipPath?.let {
-                    val clipPathData = clipPath.nodes
-                        .joinToString("\n${" ".repeat(indentSize * 2)}") { node ->
-                            pathNodeEmitter.emit(node)
-                                .replace("\n", "\n${" ".repeat(indentSize * 2)}")
-                                .trimEnd()
-                        }
-                    val value = """
+    private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
+        val doubleIndent = indent.repeat(2)
+        buildSet {
+            clipPath?.let {
+                val clipPathData = clipPath.nodes
+                    .joinToString("\n$doubleIndent") { node ->
+                        pathNodeEmitter.emit(node)
+                            .replace("\n", "\n$doubleIndent")
+                            .trimEnd()
+                    }
+                val value = """
                     |PathData {
-                    |    ${clipPathData.indented(indentSize = 4)}
-                    |${"}".indented(indentSize)}"""
-                        .trimMargin()
-                    add(CLIP_PATH_PARAM_NAME to value)
-                }
-                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
-                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
-                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
-                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
-                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
-                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
-                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
+                    |$indent$indent$clipPathData
+                    |$indent}"""
+                    .trimMargin()
+                add(CLIP_PATH_PARAM_NAME to value)
             }
+            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
+            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
+            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
+            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
+            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
+            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
+            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
         }
+    }
 
     private companion object {
         const val CLIP_PATH_PARAM_NAME = "clipPathData"
