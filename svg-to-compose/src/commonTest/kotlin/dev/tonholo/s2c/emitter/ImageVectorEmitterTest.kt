@@ -38,8 +38,16 @@ class ImageVectorEmitterTest {
     @Test
     fun `emits sorted imports`() {
         val output = emitter.emit(createSimpleIcon())
-        assertContains(output, "import androidx.compose.ui.graphics.vector.ImageVector")
-        assertContains(output, "import androidx.compose.ui.unit.dp")
+        val imageVectorImport = "import androidx.compose.ui.graphics.vector.ImageVector"
+        val dpImport = "import androidx.compose.ui.unit.dp"
+        val imageVectorIndex = output.indexOf(imageVectorImport)
+        val dpIndex = output.indexOf(dpImport)
+        assertTrue(imageVectorIndex >= 0, "Expected output to contain '$imageVectorImport'")
+        assertTrue(dpIndex >= 0, "Expected output to contain '$dpImport'")
+        assertTrue(
+            imageVectorIndex < dpIndex,
+            "Expected '$imageVectorImport' to appear before '$dpImport' (imports should be sorted)",
+        )
     }
 
     @Test
