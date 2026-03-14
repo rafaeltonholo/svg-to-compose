@@ -15,9 +15,9 @@ import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
 import dev.tonholo.s2c.AppDefaults
+import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.IndentStyle
-import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.logger.CommonLogger
