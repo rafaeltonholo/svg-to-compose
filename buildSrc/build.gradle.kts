@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     compilerOptions.freeCompilerArgs.addAll(
-        "-Xcontext-receivers",
+        "-Xcontext-parameters",
         "-opt-in=org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi",
     )
 }
