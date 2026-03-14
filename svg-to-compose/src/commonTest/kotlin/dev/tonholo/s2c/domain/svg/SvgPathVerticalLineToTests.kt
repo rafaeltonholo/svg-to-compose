@@ -11,9 +11,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class SvgPathVerticalLineToTests : BaseSvgTest() {
-    data class VerticalLineParams(
-        val y: Float,
-    ) {
+    data class VerticalLineParams(val y: Float) {
         override fun toString(): String = "$y".removeTrailingZero()
     }
 
@@ -77,7 +75,8 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
                 element = """
                 |// V $this
                 |verticalLineTo(y = ${y}f)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -86,7 +85,8 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
                 element = """
                 |// v $this
                 |verticalLineToRelative(dy = ${y}f)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -116,7 +116,8 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
                 |// V ${this}z
                 |verticalLineTo(y = ${y}f)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -126,7 +127,8 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
                 |// v ${this}z
                 |verticalLineToRelative(dy = ${y}f)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }

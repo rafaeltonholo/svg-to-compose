@@ -161,7 +161,7 @@ class ListPathNodesBoundingBoxTests {
         assertEquals(
             expected = "Relative path nodes are not supported. " +
                 "Call List<PathNodes>.toAbsolute() before calling boundingBox().",
-            actual = exception.message
+            actual = exception.message,
         )
     }
 

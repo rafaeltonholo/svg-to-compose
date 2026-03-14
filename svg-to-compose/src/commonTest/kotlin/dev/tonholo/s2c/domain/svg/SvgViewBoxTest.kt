@@ -86,7 +86,7 @@ class SvgViewBoxTest {
             "120" to "120" to floatArrayOf(0f, 0f, 120f, 120f),
             "3000" to "120" to floatArrayOf(0f, 0f, 3000f, 120f),
             "-123" to "987.5" to floatArrayOf(0f, 0f, -123f, 987.5f),
-        )
+        ),
     ) {
         val (dimensions, expected) = params
         val (width, height) = dimensions

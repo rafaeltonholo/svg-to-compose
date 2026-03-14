@@ -126,7 +126,7 @@ class CssSpecificityTest {
                 Selector.Id(location = CssLocation.Undefined, name = "my-id-2"),
                 Selector.Id(location = CssLocation.Undefined, name = "my-id-3"),
             ),
-        )
+        ),
     ) {
         // Arrange (cont.)
         val prelude = Prelude.Selector(
@@ -165,7 +165,7 @@ class CssSpecificityTest {
                 Selector.Class(location = CssLocation.Undefined, name = "my-class-2"),
                 Selector.Class(location = CssLocation.Undefined, name = "my-class-3"),
             ),
-        )
+        ),
     ) {
         // Arrange (cont.)
         val prelude = Prelude.Selector(
@@ -204,7 +204,7 @@ class CssSpecificityTest {
                 Selector.Type(location = CssLocation.Undefined, name = "ul"),
                 Selector.Type(location = CssLocation.Undefined, name = "li"),
             ),
-        )
+        ),
     ) {
         // Arrange (cont.)
         val prelude = Prelude.Selector(
@@ -252,7 +252,7 @@ class CssSpecificityTest {
                     location = CssLocation.Undefined,
                     name = "not",
                     parameters = listOf(
-                        Selector.Type(location = CssLocation.Undefined, name = "FOO")
+                        Selector.Type(location = CssLocation.Undefined, name = "FOO"),
                     ),
                 ),
             ) to "[(1, 0, 1)]",
@@ -267,7 +267,7 @@ class CssSpecificityTest {
                 Selector.Type(
                     location = CssLocation.Undefined,
                     name = "h1",
-                    combinator = CssCombinator.SubsequentSiblingCombinator
+                    combinator = CssCombinator.SubsequentSiblingCombinator,
                 ),
                 Selector.Type(location = CssLocation.Undefined, name = "*"),
                 Selector.Attribute(
@@ -277,7 +277,7 @@ class CssSpecificityTest {
                     value = "up",
                 ),
             ) to "[(0, 1, 1)]",
-        )
+        ),
     ) {
         // Arrange (cont.)
         val (selectors, expected) = rules
