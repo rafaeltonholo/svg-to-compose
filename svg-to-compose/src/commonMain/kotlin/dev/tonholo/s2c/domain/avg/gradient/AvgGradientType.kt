@@ -13,8 +13,11 @@ enum class AvgGradientType {
     companion object {
         operator fun invoke(value: String): AvgGradientType = when (value) {
             Linear.toString() -> Linear
+
             Radial.toString() -> Radial
+
             Sweep.toString() -> Sweep
+
             else -> {
                 warn(
                     "'$value' is an unsupported type of type for ${AvgGradient.TAG_NAME} tag. " +

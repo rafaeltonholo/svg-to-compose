@@ -21,9 +21,7 @@ private val colorFunctions = setOf(
  *
  * @param content The CSS content string being parsed.
  */
-internal class ValueConsumer(
-    content: String,
-) : Consumer<Value>(content) {
+internal class ValueConsumer(content: String) : Consumer<Value>(content) {
     override fun consume(iterator: Iterator): Value {
         val current = iterator.expectTokenNotNull()
         return when (current.kind) {
@@ -33,13 +31,21 @@ internal class ValueConsumer(
             )
 
             CssTokenKind.Ident -> iterator.parseIdentToken()
+
             CssTokenKind.Number -> iterator.parseNumberToken()
+
             CssTokenKind.Dimension -> iterator.parseDimensionToken()
+
             CssTokenKind.Percentage -> iterator.parsePercentageToken()
+
             CssTokenKind.String -> iterator.parseStringToken()
+
             CssTokenKind.Function -> iterator.parseFunction()
+
             CssTokenKind.Url -> iterator.parseUrl()
+
             CssTokenKind.Hash -> iterator.parseColor()
+
             else -> iterator.parserError(
                 content = content,
                 message = "Unexpected token: $current",
@@ -85,7 +91,7 @@ internal class ValueConsumer(
     private fun Iterator.parseDimensionToken(): Value.Dimension {
         val current = expectToken(kind = CssTokenKind.Dimension)
         val value = content.substring(startIndex = current.startOffset, endIndex = current.endOffset)
-        var unit = value.takeLastWhile { char -> char.isLetter() }
+        val unit = value.takeLastWhile { char -> char.isLetter() }
         return Value.Dimension(
             location = CssLocation(
                 source = value,
@@ -190,12 +196,13 @@ internal class ValueConsumer(
             val next = expectNextTokenNotNull()
             when (next.kind) {
                 CssTokenKind.CloseParenthesis -> break
+
                 CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> {
                     parserError(
                         content = content,
                         message = "Incomplete URL. A URL must have a closing parenthesis",
                         backtrack = steps,
-                        forward = 0
+                        forward = 0,
                     )
                 }
 

@@ -30,7 +30,8 @@ class SvgRootNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgElementNode<SvgRootNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgRootNode>(parent, children, attributes, tagName = TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgRootNode
     val width: Float by attribute<SvgLength?, Float> { width ->
         width?.toFloat(baseDimension = viewportWidth)
@@ -238,25 +239,23 @@ class SvgRootNode(
     private fun getDimensionFromViewBox(dimensionIndex: Int): Float? =
         parseViewBox(attributes[ATTR_VIEW_BOX]).getOrNull(dimensionIndex)
 
-    private fun resolveStyleTags(): List<ComputedRule> {
-        return styles
-            .flatMap { style ->
-                val parser = CssParser(consumers = CssConsumers(style.content))
-                style
-                    .resolveTree(parser)
-                    .children
-                    .filterIsInstance<QualifiedRule>()
-                    .flatMap { rule ->
-                        rule.prelude.specificities.map { (selector, specificity) ->
-                            ComputedRule(
-                                selector = selector.location.source,
-                                specificity = specificity,
-                                declarations = rule.block.children,
-                            )
-                        }
+    private fun resolveStyleTags(): List<ComputedRule> = styles
+        .flatMap { style ->
+            val parser = CssParser(consumers = CssConsumers(style.content))
+            style
+                .resolveTree(parser)
+                .children
+                .filterIsInstance<QualifiedRule>()
+                .flatMap { rule ->
+                    rule.prelude.specificities.map { (selector, specificity) ->
+                        ComputedRule(
+                            selector = selector.location.source,
+                            specificity = specificity,
+                            declarations = rule.block.children,
+                        )
                     }
-            }
-    }
+                }
+        }
 
     companion object {
         const val TAG_NAME = "svg"

@@ -2,7 +2,9 @@ package dev.tonholo.s2c.domain.compose
 
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 
-data class ComposeOffset(val x: Float?, val y: Float?) : ComposeType<Pair<Float?, Float?>>, MethodSizeAccountable {
+data class ComposeOffset(val x: Float?, val y: Float?) :
+    ComposeType<Pair<Float?, Float?>>,
+    MethodSizeAccountable {
     companion object {
         private const val NAME = "Offset"
         private const val BYTECODE_SIZE = 6
@@ -21,10 +23,14 @@ data class ComposeOffset(val x: Float?, val y: Float?) : ComposeType<Pair<Float?
     override val approximateByteSize: Int = BYTECODE_SIZE
 
     override fun toCompose(): String = when {
-        this == Infinite -> "$name.Infinite" // should it be Unspecified instead?
+        this == Infinite -> "$name.Infinite"
+
+        // should it be Unspecified instead?
         this == Zero -> "$name.Zero"
+
         // Should it be Offset(x, 0) and Offset(0, y) instead?
-        x != null && y == null || x == null && y != null -> "$name.Unspecified"
+        (x != null && y == null) || (x == null && y != null) -> "$name.Unspecified"
+
         else -> "$name(x = ${x}f, y = ${y}f)"
     }
 }

@@ -12,9 +12,7 @@ import dev.tonholo.s2c.lexer.css.CssTokenKind
  *
  * @param iterator The token iterator to consume tokens from.
  */
-internal abstract class TokenConsumer(
-    protected val iterator: TokenIterator<CssTokenKind>,
-) {
+internal abstract class TokenConsumer(protected val iterator: TokenIterator<CssTokenKind>) {
     /**
      * The set of token kinds that this consumer supports.
      */
@@ -23,9 +21,7 @@ internal abstract class TokenConsumer(
     /**
      * Checks if this consumer accepts the given token kind.
      */
-    open fun accept(kind: CssTokenKind): Boolean {
-        return kind in supportedTokenKinds
-    }
+    open fun accept(kind: CssTokenKind): Boolean = kind in supportedTokenKinds
 
     /**
      * Consumes the given token kind and returns a list of tokens that represent the consumed token.

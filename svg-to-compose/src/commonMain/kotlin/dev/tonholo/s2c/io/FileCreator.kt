@@ -13,11 +13,7 @@ interface FileCreator {
      *     This is equivalent to `O_EXCL` on POSIX and `CREATE_NEW` on Windows.
      */
     @Throws(IOException::class)
-    fun write(
-        file: Path,
-        mustCreate: Boolean = false,
-        writerAction: BufferedSink.() -> Unit,
-    )
+    fun write(file: Path, mustCreate: Boolean = false, writerAction: BufferedSink.() -> Unit)
 
     /**
      * Copies all the bytes from the file at [source] to the file at [target]. This does not copy

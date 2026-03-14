@@ -16,9 +16,9 @@ import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
-abstract class ProcessorConfiguration @Inject constructor(
-    private val objectFactory: ObjectFactory,
-) : SourceConfiguration, Cacheable {
+abstract class ProcessorConfiguration @Inject constructor(private val objectFactory: ObjectFactory) :
+    SourceConfiguration,
+    Cacheable {
     override val parentName: String = "svgToCompose.processor"
     internal val origin: DirectoryProperty = objectFactory.directoryProperty()
     internal val destinationPackage: Property<String> = objectFactory.property()
@@ -117,17 +117,15 @@ abstract class ProcessorConfiguration @Inject constructor(
         }
     }
 
-    override fun toString(): String {
-        return buildString {
-            appendLine("ProcessorConfiguration(")
-            appendLine("  name='$name', ")
-            appendLine("  iconConfiguration=${iconConfiguration.orNull}, ")
-            appendLine("  optimize=${optimize.orNull}, ")
-            appendLine("  maxDepth=${maxDepth.orNull}, ")
-            appendLine("  recursive=${recursive.orNull}, ")
-            appendLine("  destinationPackage=${destinationPackage.orNull}, ")
-            appendLine("  origin=${origin.orNull}, ")
-            append(")")
-        }
+    override fun toString(): String = buildString {
+        appendLine("ProcessorConfiguration(")
+        appendLine("  name='$name', ")
+        appendLine("  iconConfiguration=${iconConfiguration.orNull}, ")
+        appendLine("  optimize=${optimize.orNull}, ")
+        appendLine("  maxDepth=${maxDepth.orNull}, ")
+        appendLine("  recursive=${recursive.orNull}, ")
+        appendLine("  destinationPackage=${destinationPackage.orNull}, ")
+        appendLine("  origin=${origin.orNull}, ")
+        append(")")
     }
 }

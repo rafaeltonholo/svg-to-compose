@@ -4,9 +4,7 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 
-internal class UrlTokenConsumer(
-    iterator: TokenIterator<CssTokenKind>,
-) : TokenConsumer(iterator) {
+internal class UrlTokenConsumer(iterator: TokenIterator<CssTokenKind>) : TokenConsumer(iterator) {
     override val supportedTokenKinds: Set<CssTokenKind> = setOf(
         CssTokenKind.Url,
     )

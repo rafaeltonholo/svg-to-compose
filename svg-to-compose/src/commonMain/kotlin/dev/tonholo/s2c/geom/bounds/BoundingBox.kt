@@ -48,9 +48,8 @@ sealed class BoundingBox private constructor(
         override val maxY: Double,
     ) : BoundingBox(minX, minY, maxX, maxY)
 
-    override fun toString(): String {
-        return "BoundingBox(x=$x, y=$y, width=$width, height=$height, minX=$minX, minY=$minY, maxX=$maxX, maxY=$maxY)"
-    }
+    override fun toString(): String =
+        "BoundingBox(x=$x, y=$y, width=$width, height=$height, minX=$minX, minY=$minY, maxX=$maxX, maxY=$maxY)"
 
     fun copy(
         minX: Double = this.minX,
@@ -81,21 +80,17 @@ sealed class BoundingBox private constructor(
          * @return A [BoundingBox] instance if the coordinates are valid, or
          * [NoBoundingBox] if any of the coordinates are [Double.NaN].
          */
-        operator fun invoke(
-            minX: Double,
-            minY: Double,
-            maxX: Double,
-            maxY: Double,
-        ): BoundingBox = if (minX.isNaN() || minY.isNaN() || maxX.isNaN() || maxY.isNaN()) {
-            NoBoundingBox
-        } else {
-            BoundingBoxImpl(
-                minX = minX,
-                minY = minY,
-                maxX = maxX,
-                maxY = maxY,
-            )
-        }
+        operator fun invoke(minX: Double, minY: Double, maxX: Double, maxY: Double): BoundingBox =
+            if (minX.isNaN() || minY.isNaN() || maxX.isNaN() || maxY.isNaN()) {
+                NoBoundingBox
+            } else {
+                BoundingBoxImpl(
+                    minX = minX,
+                    minY = minY,
+                    maxX = maxX,
+                    maxY = maxY,
+                )
+            }
     }
 }
 
@@ -163,12 +158,8 @@ fun List<PathNodes>.boundingBox(): BoundingBox {
     }
 }
 
-private fun PathNodes.calculateBoundingBox(
-    boundingBox: BoundingBox,
-    currentX: Double,
-    currentY: Double,
-): BoundingBox {
-    return when (this) {
+private fun PathNodes.calculateBoundingBox(boundingBox: BoundingBox, currentX: Double, currentY: Double): BoundingBox =
+    when (this) {
         is PathNodes.ArcTo -> ArcBoundingBoxCalculator(
             boundingBox = boundingBox,
             current = Point2D(x = currentX, y = currentY),
@@ -240,4 +231,3 @@ private fun PathNodes.calculateBoundingBox(
         // Ignore ReflectiveCurveTo and ReflectiveQuadTo since they were removed.
         else -> error("Unexpected node type = $command")
     }
-}

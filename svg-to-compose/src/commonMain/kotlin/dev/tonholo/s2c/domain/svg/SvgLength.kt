@@ -51,6 +51,7 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
         val directParse = value.toFloatOrNull()
         return when {
             directParse != null -> directParse
+
             value.length > 1 && value.endsWith(PERCENT) && baseDimension != null -> {
                 val value = value.removeSuffix(PERCENT)
                 @Suppress("MagicNumber")

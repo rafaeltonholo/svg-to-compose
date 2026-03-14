@@ -91,7 +91,7 @@ class ImageVectorEmitter(
            |    receiver_type=${contents.receiverType}
            |    imports=${contents.imports}
            |
-            """.trimMargin()
+            """.trimMargin(),
         )
     }
 
@@ -100,15 +100,16 @@ class ImageVectorEmitter(
             val receiverType = contents.receiverType.removeSuffix(".")
             "$receiverType.${contents.iconName.pascalCase()}"
         }
+
         contents.addToMaterial -> "Icons.Filled.${contents.iconName.pascalCase()}"
+
         else -> contents.iconName.pascalCase()
     }
 
-    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String =
-        if (contents.noPreview) {
-            ""
-        } else {
-            """
+    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String = if (contents.noPreview) {
+        ""
+    } else {
+        """
             |
             |@Preview
             |@Composable
@@ -129,17 +130,16 @@ class ImageVectorEmitter(
             |    }
             |}
             """
-        }
+    }
 
-    private fun buildChunkFunctionsContent(
-        chunkFunctions: List<ImageVectorNode.ChunkFunction>?,
-    ): String = if (!chunkFunctions.isNullOrEmpty()) {
-        """|
+    private fun buildChunkFunctionsContent(chunkFunctions: List<ImageVectorNode.ChunkFunction>?): String =
+        if (!chunkFunctions.isNullOrEmpty()) {
+            """|
            |${chunkFunctions.joinToString("\n\n") { nodeEmitter.emitChunkFunctionDefinition(it) }}
            """
-    } else {
-        ""
-    }
+        } else {
+            ""
+        }
 
     private fun buildExtraContent(chunkFunctionsContent: String, preview: String): String = buildString {
         if (chunkFunctionsContent.isNotEmpty()) {
@@ -164,7 +164,7 @@ class ImageVectorEmitter(
             val chunkSize = max(1, contents.nodes.size / chunks)
             logger.warn(
                 "Potential large icon detected. Splitting icon's content in $chunks chunks to avoid " +
-                    "compilation issues. However, that won't affect the performance of displaying this icon."
+                    "compilation issues. However, that won't affect the performance of displaying this icon.",
             )
             contents.nodes.chunked(chunkSize) { chunk ->
                 val snapshot = chunk.toList()

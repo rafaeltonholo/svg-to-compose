@@ -13,11 +13,9 @@ import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 import dev.tonholo.s2c.extensions.toLengthFloat
 
-class AvgPathNode(
-    parent: XmlParentNode,
-    children: MutableSet<XmlNode>,
-    attributes: MutableMap<String, String>,
-) : AvgElementNode(parent, children, attributes, TAG_NAME), AvgNode {
+class AvgPathNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
+    AvgElementNode(parent, children, attributes, TAG_NAME),
+    AvgNode {
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
 
     private val fillColor: String? by attribute(namespace = AvgNode.NAMESPACE)
@@ -72,24 +70,20 @@ class AvgPathNode(
         }
     }
 
-    private fun getGradient(propertyName: String): ComposeBrush.Gradient? =
-        children
-            .asSequence()
-            .filterIsInstance<AvgAttrNode>()
-            .filter { it.name == "${AvgNode.NAMESPACE}:$propertyName" }
-            .firstOrNull()
-            ?.children
-            ?.firstInstanceOfOrNull<AvgGradientNode>()
-            ?.toBrush()
+    private fun getGradient(propertyName: String): ComposeBrush.Gradient? = children
+        .asSequence()
+        .filterIsInstance<AvgAttrNode>()
+        .find { it.name == "${AvgNode.NAMESPACE}:$propertyName" }
+        ?.children
+        ?.firstInstanceOfOrNull<AvgGradientNode>()
+        ?.toBrush()
 
     companion object {
         const val TAG_NAME = "path"
     }
 }
 
-fun AvgPathNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path = ImageVectorNode.Path(
+fun AvgPathNode.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
         fill = fillBrush,
         fillAlpha = fillAlpha,

@@ -31,11 +31,7 @@ internal class PathNodeEmitter {
         return emitPathCommand(node, fnName, forceInline)
     }
 
-    private fun emitPathCommand(
-        node: PathNodes,
-        fnName: String,
-        forceInline: Boolean,
-    ): String {
+    private fun emitPathCommand(node: PathNodes, fnName: String, forceInline: Boolean): String {
         val params = node.buildParameters()
         val paramsString = params.toParameters(node.minified, forceInline)
         val relativeSuffix = if (node.isRelative) "Relative" else ""
@@ -58,9 +54,8 @@ internal class PathNodeEmitter {
         return if (node.minified) result.trim() else result
     }
 
-    private fun String.removeTrailingZeroConsiderCloseCommand(): String =
-        removeTrailingZero()
-            .replace("\\.0z\\b".toRegex(), "z")
+    private fun String.removeTrailingZeroConsiderCloseCommand(): String = removeTrailingZero()
+        .replace("\\.0z\\b".toRegex(), "z")
 
     private fun Set<String>.toParameters(minified: Boolean, forceInline: Boolean): String {
         val indentSize = if (minified || forceInline) 0 else 4

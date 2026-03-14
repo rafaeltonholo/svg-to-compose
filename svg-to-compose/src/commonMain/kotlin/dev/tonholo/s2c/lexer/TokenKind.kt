@@ -12,7 +12,5 @@ interface TokenKind {
     /**
      * Checks if a character is part of this token kind's representation.
      */
-    operator fun contains(other: Char): Boolean {
-        return other in representation
-    }
+    operator fun contains(other: Char): Boolean = other in representation
 }

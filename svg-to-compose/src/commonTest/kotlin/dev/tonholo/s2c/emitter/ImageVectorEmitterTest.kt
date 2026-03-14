@@ -3,8 +3,8 @@ package dev.tonholo.s2c.emitter
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
-import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.domain.compose.ComposeBrush
+import dev.tonholo.s2c.domain.defaultImports
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
 import dev.tonholo.s2c.logger.Logger
 import kotlin.test.Test

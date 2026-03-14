@@ -1,14 +1,8 @@
 package dev.tonholo.s2c.command
 
-data class CommandOutput(
-    val stdout: String?,
-    val stderr: String? = null,
-)
+data class CommandOutput(val stdout: String?, val stderr: String? = null)
 
-data class CommandResult(
-    val exitCode: Int,
-    val output: CommandOutput,
-)
+data class CommandResult(val exitCode: Int, val output: CommandOutput)
 
 data class Command(
     val program: String,
@@ -28,18 +22,14 @@ data class Command(
 annotation class CommandDsl
 
 @CommandDsl
-class CommandBuilder(
-    private var program: String,
-) {
-    private var args: MutableList<String>? = null
+class CommandBuilder(private var program: String) {
+    private val args: MutableList<String> = mutableListOf()
     var showStdout: Boolean = true
     var showStderr: Boolean = true
     var trim: Boolean = false
 
     fun args(vararg args: String) {
-        if (this.args == null) this.args = mutableListOf()
-
-        this.args!!.addAll(args)
+        this.args.addAll(args)
     }
 
     fun execute(): CommandResult = executeCommand(
@@ -49,13 +39,11 @@ class CommandBuilder(
             showStdout = showStdout,
             showStderr = showStderr,
             trim = trim,
-        )
+        ),
     )
 }
 
 fun command(program: String, builder: CommandBuilder.() -> Unit): CommandResult =
     CommandBuilder(program = program).apply(builder).execute()
 
-internal expect fun executeCommand(
-    command: Command,
-): CommandResult
+internal expect fun executeCommand(command: Command): CommandResult

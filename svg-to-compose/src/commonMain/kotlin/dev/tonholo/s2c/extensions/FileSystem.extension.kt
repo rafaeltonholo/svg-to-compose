@@ -24,7 +24,7 @@ import okio.Path
 internal fun FileSystem.listRecursively(
     dir: Path,
     followSymlinks: Boolean = false,
-    maxDepth: Int? = null
+    maxDepth: Int? = null,
 ): Sequence<Path> = if (maxDepth == null) {
     listRecursively(dir, followSymlinks)
 } else {
@@ -63,7 +63,7 @@ private suspend fun SequenceScope<Path>.collectRecursively(
         yield(path)
     }
 
-    val children = fileSystem.listOrNull(path) ?: listOf()
+    val children = fileSystem.listOrNull(path).orEmpty()
     if (children.isNotEmpty()) {
         // Figure out if the path is a symlink and detect symlink cycles.
         var symlinkPath = path
@@ -105,5 +105,6 @@ private suspend fun SequenceScope<Path>.collectRecursively(
 @Throws(IOException::class)
 private fun FileSystem.symlinkTarget(path: Path): Path? {
     val target = metadata(path).symlinkTarget ?: return null
-    return path.parent!!.div(target)
+    val parent = checkNotNull(path.parent) { "Cannot resolve symlink for root path: $path" }
+    return parent.div(target)
 }

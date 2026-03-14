@@ -8,15 +8,8 @@ import dev.zacsweers.metro.Inject
 import okio.Path
 
 @Inject
-class IconWriter(
-    private val logger: Logger,
-    private val fileManager: FileManager,
-) {
-    fun write(
-        iconName: String,
-        fileContents: String,
-        output: Path,
-    ): Path {
+class IconWriter(private val logger: Logger, private val fileManager: FileManager) {
+    fun write(iconName: String, fileContents: String, output: Path): Path {
         printEmpty()
         logger.output("📝 Writing icon file on $output")
         return logger.debugSection("Writing document") {

@@ -25,7 +25,7 @@ internal class AstParserException internal constructor(
     private val offset: Int,
     private val content: String,
     private val backtrack: Int,
-    private val forward: Int
+    private val forward: Int,
 ) : IllegalStateException(message) {
     private val _message = message
 

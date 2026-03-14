@@ -50,8 +50,7 @@ class SvgParser : XmlParser() {
         root = root as? SvgRootNode,
     )
 
-    override fun XmlNode.isRootNode(): Boolean =
-        this is SvgRootNode
+    override fun XmlNode.isRootNode(): Boolean = this is SvgRootNode
 
     override fun getPreProcessedElement(node: Node, parent: XmlParentNode): XmlNode? = elementsPendingParent
         .find { it.id == node.attributes()["id"] }
@@ -263,7 +262,7 @@ class SvgParser : XmlParser() {
             throw ParserException(
                 errorCode = ErrorCode.ParseSvgError,
                 message = "Failed to find a replacement for <use> element. The ID of the element is null.",
-                cause = e
+                cause = e,
             )
         }
 

@@ -9,9 +9,7 @@ import dev.tonholo.s2c.lexer.css.CssTokenKind.entries
  *
  * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">CSS Syntax Token Definition</a>
  */
-enum class CssTokenKind(
-    override val representation: Set<Char> = emptySet(),
-) : TokenKind {
+enum class CssTokenKind(override val representation: Set<Char> = emptySet()) : TokenKind {
     EndOfFile,
     WhiteSpace(representation = setOf(' ', '\n', '\t')),
     AtKeyword(representation = setOf('@')),
@@ -95,8 +93,6 @@ enum class CssTokenKind(
          * @return The [CssTokenKind] associated with the given [char], or `null` if no
          * match is found.
          */
-        fun fromChar(char: Char): CssTokenKind? {
-            return entries.firstOrNull { char in it }
-        }
+        fun fromChar(char: Char): CssTokenKind? = entries.firstOrNull { char in it }
     }
 }

@@ -15,20 +15,14 @@ import java.io.Serializable
  *  This could be used for storing formatting preferences, linting rules,
  *  etc.
  */
-data class CacheData(
-    val files: List<IconCacheData>,
-    val extensionConfiguration: Map<String, Sha256Hash>,
-) : Serializable {
+data class CacheData(val files: List<IconCacheData>, val extensionConfiguration: Map<String, Sha256Hash>) :
+    Serializable {
     companion object {
         private const val serialVersionUID = 1L
     }
 }
 
-data class IconCacheData(
-    val origin: String,
-    val hash: Sha256Hash,
-    val output: String? = null,
-) : Serializable {
+data class IconCacheData(val origin: String, val hash: Sha256Hash, val output: String? = null) : Serializable {
     companion object {
         private const val serialVersionUID = 1L
     }

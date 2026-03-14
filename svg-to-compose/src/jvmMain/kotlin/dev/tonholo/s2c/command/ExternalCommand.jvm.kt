@@ -32,6 +32,6 @@ actual fun executeCommand(command: Command): CommandResult {
         output = CommandOutput(
             stdout = if (command.trim) output.trim() else output,
             stderr = if (command.trim) errorOutput.trim() else errorOutput,
-        )
+        ),
     )
 }

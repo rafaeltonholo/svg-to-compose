@@ -47,8 +47,7 @@ sealed interface SvgNode : XmlNode {
          */
         fun String.normalizedId(): String = normalizeId(this)
 
-        private fun normalizeId(id: String): String =
-            id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
+        private fun normalizeId(id: String): String = id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
     }
 
     fun resolveAttributesFromStyle(computedRules: List<ComputedRule>) {
@@ -95,6 +94,7 @@ sealed interface SvgNode : XmlNode {
             for (declaration in rule.declarations) {
                 when {
                     attributes.containsKey(declaration.property) || containsKey(declaration.property) -> Unit
+
                     else -> put(
                         declaration.property,
                         declaration.values.joinToString(" ") { value -> resolveAttributeValue(value) },
@@ -104,11 +104,9 @@ sealed interface SvgNode : XmlNode {
         }
     }
 
-    private fun resolveAttributeValue(value: Value): String {
-        return when (value) {
-            is Value.Url -> "url(${value.value})"
-            else -> value.location.source
-        }
+    private fun resolveAttributeValue(value: Value): String = when (value) {
+        is Value.Url -> "url(${value.value})"
+        else -> value.location.source
     }
 }
 
@@ -143,14 +141,9 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
     return stacked?.let(::SvgTransform)
 }
 
-data class ComputedRule(
-    val selector: String,
-    val specificity: CssSpecificity,
-    val declarations: List<Declaration>,
-) : Comparable<ComputedRule> {
-    override fun compareTo(other: ComputedRule): Int {
-        return specificity.compareTo(other.specificity)
-    }
+data class ComputedRule(val selector: String, val specificity: CssSpecificity, val declarations: List<Declaration>) :
+    Comparable<ComputedRule> {
+    override fun compareTo(other: ComputedRule): Int = specificity.compareTo(other.specificity)
 }
 
 /**
@@ -168,16 +161,24 @@ fun SvgNode.asNodes(
     resolveAttributesFromStyle(computedRules)
     return when (this) {
         is SvgRootNode -> asNodes(computedRules, minified = minified)
+
         is SvgGraphicNode<*> if maskId != null ->
             asMaskGroup().flatNode(masks, computedRules, minified)
 
         is SvgGroupNode -> flatNode(masks, computedRules, minified)
+
         is SvgCircleNode -> listOf(asNode(minified = minified))
+
         is SvgPathNode -> listOf(asNode(minified = minified))
+
         is SvgRectNode -> listOf(asNode(minified = minified))
+
         is SvgPolygonNode -> listOf(asNode(minified = minified))
+
         is SvgPolylineNode -> listOf(asNode(minified = minified))
+
         is SvgEllipseNode -> listOf(asNode(minified = minified))
+
         else -> null
     }
 }

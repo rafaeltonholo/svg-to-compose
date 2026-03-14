@@ -20,7 +20,7 @@ data class Point2D(val x: Double, val y: Double) {
         x,
         y,
         other.x,
-        other.y
+        other.y,
     )
 
     /**
@@ -31,8 +31,7 @@ data class Point2D(val x: Double, val y: Double) {
      * @return A new [Point2D] instance with the sum of the
      *  coordinates of the two input points.
      */
-    operator fun plus(other: Point2D): Point2D =
-        Point2D(x + other.x, y + other.y)
+    operator fun plus(other: Point2D): Point2D = Point2D(x + other.x, y + other.y)
 
     /**
      * Multiplies the coordinates of this point by the given factor.
@@ -40,8 +39,7 @@ data class Point2D(val x: Double, val y: Double) {
      * @param factor the factor to multiply the coordinates by
      * @return a new point with the multiplied coordinates
      */
-    operator fun times(factor: Double): Point2D =
-        Point2D(x = x * factor, y = y * factor)
+    operator fun times(factor: Double): Point2D = Point2D(x = x * factor, y = y * factor)
 
     /**
      * Multiplies the coordinates of this point by the given factor.
@@ -49,8 +47,7 @@ data class Point2D(val x: Double, val y: Double) {
      * @param factor the factor to multiply the coordinates by
      * @return a new point with the multiplied coordinates
      */
-    operator fun times(factor: Int): Point2D =
-        Point2D(x = x * factor, y = y * factor)
+    operator fun times(factor: Int): Point2D = Point2D(x = x * factor, y = y * factor)
 
     /**
      * Returns the angle formed by the vector from the origin to this
@@ -76,8 +73,7 @@ data class Point2D(val x: Double, val y: Double) {
      * @param point the other point
      * @return the dot product of this point with the given point
      */
-    private infix fun dot(point: Point2D): Double =
-        x * point.x + y * point.y
+    private infix fun dot(point: Point2D): Double = x * point.x + y * point.y
 
     /**
      * Calculates the norm (Euclidean distance) of the complex number.
@@ -93,8 +89,7 @@ data class Point2D(val x: Double, val y: Double) {
  * @param other the [Point2D] whose coordinates will be appended to this array
  * @return a new [DoubleArray] containing all elements of this array followed by the x and y coordinates of the point
  */
-infix fun DoubleArray.combineWith(other: Point2D): DoubleArray =
-    this + doubleArrayOf(other.x, other.y)
+infix fun DoubleArray.combineWith(other: Point2D): DoubleArray = this + doubleArrayOf(other.x, other.y)
 
 /**
  * Transforms this point by applying the given affine transformation matrix.

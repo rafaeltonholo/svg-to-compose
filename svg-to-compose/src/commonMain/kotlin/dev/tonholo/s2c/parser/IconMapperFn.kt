@@ -9,5 +9,4 @@ typealias IconMapperFn = (String) -> String
  * @return This [IconMapperFn] if it's not null, otherwise returns a default
  * mapper function that simply returns the input icon name.
  */
-fun IconMapperFn?.orDefault(): IconMapperFn =
-    this ?: { iconName -> iconName }
+fun IconMapperFn?.orDefault(): IconMapperFn = this ?: { iconName -> iconName }

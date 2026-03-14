@@ -134,8 +134,8 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
-                )
+                    ),
+                ),
             ),
         )
 
@@ -218,7 +218,7 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
+                    ),
                 ),
                 QualifiedRule(
                     location = CssLocation(
@@ -274,8 +274,8 @@ class SvgStyleNodeTest {
                                 ),
                             ),
                         ),
-                    )
-                )
+                    ),
+                ),
             ),
         )
 

@@ -142,7 +142,8 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    x1 = ${x}f,
                 |    y1 = ${y}f,
                 |)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -159,7 +160,8 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    dx1 = ${x}f,
                 |    dy1 = ${y}f,
                 |)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -211,7 +213,8 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    y1 = ${y}f,
                 |)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -229,7 +232,8 @@ class SvgPathArcToTests : BaseSvgTest() {
                 |    dy1 = ${y}f,
                 |)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -365,7 +369,7 @@ class SvgPathArcToTests : BaseSvgTest() {
                     append(")")
                     appendLine()
                     append("close()")
-                }
+                },
             )
         }
     }

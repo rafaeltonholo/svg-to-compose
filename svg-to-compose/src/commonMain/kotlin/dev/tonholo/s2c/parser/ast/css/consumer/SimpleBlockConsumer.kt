@@ -23,10 +23,8 @@ private val blockOpeningTokens = mapOf(
  * object.
  * @param T The type of the children of the block.
  */
-internal abstract class SimpleBlockConsumer<T : CssNode>(
-    content: String,
-    private val consumer: Consumer<T>,
-) : Consumer<Block.SimpleBlock<T>>(content) {
+internal open class SimpleBlockConsumer<T : CssNode>(content: String, private val consumer: Consumer<T>) :
+    Consumer<Block.SimpleBlock<T>>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Block.SimpleBlock<T> {
         val prev = iterator.peek(steps = -1)
         iterator.parserCheckNotNull(value = prev, content = content) {
@@ -55,10 +53,11 @@ internal abstract class SimpleBlockConsumer<T : CssNode>(
                         source = content.substring(prev.startOffset, current.endOffset.coerceAtMost(content.length)),
                         start = prev.startOffset,
                         end = current.endOffset,
-                    )
+                    ),
                 )
 
                 CssTokenKind.EndOfFile -> iterator.parserError(content, "Incomplete simple block")
+
                 else -> {
                     children += consumer.consume(iterator)
                 }
@@ -71,10 +70,8 @@ internal abstract class SimpleBlockConsumer<T : CssNode>(
 /**
  * Consumes a simple block of rules.
  */
-internal class SimpleRuleBlockConsumer(
-    content: String,
-    qualifiedRuleConsumer: Consumer<Rule>,
-) : SimpleBlockConsumer<Rule>(content, qualifiedRuleConsumer)
+internal class SimpleRuleBlockConsumer(content: String, qualifiedRuleConsumer: Consumer<Rule>) :
+    SimpleBlockConsumer<Rule>(content, qualifiedRuleConsumer)
 
 /**
  * Consumes a simple block of declarations.
@@ -82,10 +79,8 @@ internal class SimpleRuleBlockConsumer(
  *
  * E.g.: `selector { declaration1; declaration2; }`
  */
-internal class SimpleDeclarationBlockConsumer(
-    content: String,
-    declarationConsumer: Consumer<Declaration>,
-) : SimpleBlockConsumer<Declaration>(
-    content = content,
-    consumer = declarationConsumer,
-)
+internal class SimpleDeclarationBlockConsumer(content: String, declarationConsumer: Consumer<Declaration>) :
+    SimpleBlockConsumer<Declaration>(
+        content = content,
+        consumer = declarationConsumer,
+    )

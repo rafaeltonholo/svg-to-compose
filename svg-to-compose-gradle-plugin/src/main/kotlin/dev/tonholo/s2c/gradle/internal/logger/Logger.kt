@@ -5,9 +5,7 @@ import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger as GradleLogger
 
 private lateinit var logLevel: LogLevel
-internal fun Logger(
-    logger: GradleLogger,
-): Logger = object : Logger {
+internal fun Logger(logger: GradleLogger): Logger = object : Logger {
 
     init {
         if (::logLevel.isInitialized.not()) {

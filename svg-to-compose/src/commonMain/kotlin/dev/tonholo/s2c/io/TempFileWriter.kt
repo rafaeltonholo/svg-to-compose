@@ -6,16 +6,10 @@ import dev.tonholo.s2c.logger.Logger
 import okio.Path
 import okio.Path.Companion.toPath
 
-class TempFileWriter(
-    private val logger: Logger,
-    private val fileManager: FileManager,
-    baseDirectory: Path? = null,
-) {
+class TempFileWriter(private val logger: Logger, private val fileManager: FileManager, baseDirectory: Path? = null) {
     private val tempFolder: Path = (baseDirectory ?: S2C_TEMP_FOLDER.toPath())
 
-    fun create(
-        file: Path,
-    ): Path = logger.debugSection("Creating temporary file") {
+    fun create(file: Path): Path = logger.debugSection("Creating temporary file") {
         val tempDir = tempFolder / file.encodeToMd5()
         fileManager.createDirectories(dir = tempDir, mustCreate = false)
 

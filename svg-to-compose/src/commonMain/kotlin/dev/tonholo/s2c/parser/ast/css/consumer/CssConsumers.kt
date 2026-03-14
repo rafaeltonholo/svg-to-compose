@@ -117,6 +117,8 @@ internal class CssConsumersBuilder {
  * @return An instance of [CssConsumers].
  */
 @CssConsumersDslMarker
-internal fun CssConsumers(content: String, builder: CssConsumersBuilder.() -> Unit = {}): CssConsumers {
-    return CssConsumersBuilder().apply(builder).build(content)
-}
+internal fun CssConsumers(
+    content: String,
+    builder: CssConsumersBuilder.() -> Unit = {
+    },
+): CssConsumers = CssConsumersBuilder().apply(builder).build(content)

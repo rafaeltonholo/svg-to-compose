@@ -1,9 +1,7 @@
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.context
-import com.github.ajalt.clikt.core.installMordantMarkdown
 import com.github.ajalt.clikt.core.main
-import com.github.ajalt.clikt.output.MordantHelpFormatter
 import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
@@ -135,7 +133,7 @@ class Client : CliktCommand(name = "s2c") {
     private val recursiveDepth by option(
         names = arrayOf("--recursive-depth", "--depth"),
         help = "The depth level for recursive file search within directory. " +
-            "The default value is ${AppDefaults.MAX_RECURSIVE_DEPTH}."
+            "The default value is ${AppDefaults.MAX_RECURSIVE_DEPTH}.",
     ).int().default(AppDefaults.MAX_RECURSIVE_DEPTH)
 
     private val silent by option(

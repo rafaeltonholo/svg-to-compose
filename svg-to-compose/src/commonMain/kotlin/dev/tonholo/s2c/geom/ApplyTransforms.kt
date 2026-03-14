@@ -17,9 +17,7 @@ import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
 
-sealed class AffineTransformation(
-    vararg matrix: DoubleArray,
-) {
+sealed class AffineTransformation(vararg matrix: DoubleArray) {
     val matrix: Array<out DoubleArray>
 
     init {
@@ -34,12 +32,10 @@ sealed class AffineTransformation(
             row: Int,
             column: Int,
             original: Array<out DoubleArray>,
-            other: Array<out DoubleArray>,
-        ): Double {
-            return (original[row][0] * other[0][column]) +
-                (original[row][1] * other[1][column]) +
-                (original[row][2] * other[2][column])
-        }
+            multiplier: Array<out DoubleArray>,
+        ): Double = (original[row][0] * multiplier[0][column]) +
+            (original[row][1] * multiplier[1][column]) +
+            (original[row][2] * multiplier[2][column])
         return Matrix(
             doubleArrayOf(
                 calculateMatrixElement(row = 0, column = 0, matrix, other.matrix),
@@ -63,9 +59,7 @@ sealed class AffineTransformation(
         private inline val Double.rad: Double get() = this * PI / 180.0
     }
 
-    class Matrix(
-        vararg matrix: DoubleArray,
-    ) : AffineTransformation(matrix = matrix) {
+    class Matrix(vararg matrix: DoubleArray) : AffineTransformation(matrix = matrix) {
         operator fun get(index: Int): DoubleArray = matrix[index]
     }
 
@@ -75,58 +69,55 @@ sealed class AffineTransformation(
         doubleArrayOf(0.0, 0.0, 1.0),
     )
 
-    data class Translate(val tx: Double, val ty: Double) : AffineTransformation(
-        doubleArrayOf(1.0, 0.0, tx),
-        doubleArrayOf(0.0, 1.0, ty),
-        doubleArrayOf(0.0, 0.0, 1.0),
-    )
+    data class Translate(val tx: Double, val ty: Double) :
+        AffineTransformation(
+            doubleArrayOf(1.0, 0.0, tx),
+            doubleArrayOf(0.0, 1.0, ty),
+            doubleArrayOf(0.0, 0.0, 1.0),
+        )
 
-    data class Rotate(
-        val angle: Double,
-        val centerX: Double = 0.0,
-        val centerY: Double = 0.0,
-    ) : AffineTransformation(
-        matrix = run {
-            val cos = cos(angle.rad)
-            val sin = sin(angle.rad)
-            arrayOf(
-                doubleArrayOf(cos, -sin, (1 - cos) * centerX + sin * centerY),
-                doubleArrayOf(sin, cos, (1 - cos) * centerY - sin * centerX),
-                doubleArrayOf(0.0, 0.0, 1.0),
-            )
-        },
-    )
+    data class Rotate(val angle: Double, val centerX: Double = 0.0, val centerY: Double = 0.0) :
+        AffineTransformation(
+            matrix = run {
+                val cos = cos(angle.rad)
+                val sin = sin(angle.rad)
+                arrayOf(
+                    doubleArrayOf(cos, -sin, (1 - cos) * centerX + sin * centerY),
+                    doubleArrayOf(sin, cos, (1 - cos) * centerY - sin * centerX),
+                    doubleArrayOf(0.0, 0.0, 1.0),
+                )
+            },
+        )
 
-    data class Scale(val sx: Double, val sy: Double = sx) : AffineTransformation(
-        doubleArrayOf(sx, 0.0, 0.0),
-        doubleArrayOf(0.0, sy, 0.0),
-        doubleArrayOf(0.0, 0.0, 1.0),
-    )
+    data class Scale(val sx: Double, val sy: Double = sx) :
+        AffineTransformation(
+            doubleArrayOf(sx, 0.0, 0.0),
+            doubleArrayOf(0.0, sy, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0),
+        )
 
-    data class SkewX(val angle: Double) : AffineTransformation(
-        doubleArrayOf(1.0, tan(angle.rad), 0.0),
-        doubleArrayOf(0.0, 1.0, 0.0),
-        doubleArrayOf(0.0, 0.0, 1.0),
-    )
+    data class SkewX(val angle: Double) :
+        AffineTransformation(
+            doubleArrayOf(1.0, tan(angle.rad), 0.0),
+            doubleArrayOf(0.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0),
+        )
 
-    data class SkewY(val angle: Double) : AffineTransformation(
-        doubleArrayOf(1.0, 0.0, 0.0),
-        doubleArrayOf(tan(angle.rad), 1.0, 0.0),
-        doubleArrayOf(0.0, 0.0, 1.0),
-    )
+    data class SkewY(val angle: Double) :
+        AffineTransformation(
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(tan(angle.rad), 1.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0),
+        )
 }
 
-fun List<PathNodes>.applyTransformations(
-    vararg transformations: AffineTransformation,
-): Sequence<PathNodes> {
+fun List<PathNodes>.applyTransformations(vararg transformations: AffineTransformation): Sequence<PathNodes> {
     if (transformations.isEmpty()) return asSequence()
     val combinedMatrix = transformations.reduce { acc, current -> (acc * current) }
     return applyTransformation(combinedMatrix)
 }
 
-fun List<PathNodes>.applyTransformation(
-    transformation: AffineTransformation,
-): Sequence<PathNodes> = sequence {
+fun List<PathNodes>.applyTransformation(transformation: AffineTransformation): Sequence<PathNodes> = sequence {
     val start = doubleArrayOf(0.0, 0.0)
     val cursor = doubleArrayOf(0.0, 0.0)
 
@@ -150,18 +141,15 @@ fun List<PathNodes>.applyTransformation(
     }
 }
 
-private fun PathNodes.transform(
-    cursor: DoubleArray,
-    start: DoubleArray,
-    transformation: AffineTransformation,
-) = when (this) {
-    is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.HorizontalLineTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.VerticalLineTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.LineTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.CurveTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.ReflectiveCurveTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.QuadTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.ReflectiveQuadTo -> applyTransformation(cursor, start, transformation)
-    is PathNodes.ArcTo -> applyTransformation(cursor, start, transformation)
-}
+private fun PathNodes.transform(cursor: DoubleArray, start: DoubleArray, transformation: AffineTransformation) =
+    when (this) {
+        is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.HorizontalLineTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.VerticalLineTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.LineTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.CurveTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.ReflectiveCurveTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.QuadTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.ReflectiveQuadTo -> applyTransformation(cursor, start, transformation)
+        is PathNodes.ArcTo -> applyTransformation(cursor, start, transformation)
+    }

@@ -10,10 +10,9 @@ import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.logger.warn
 
-class SvgRectNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNode<SvgRectNode>(parent, attributes, TAG_NAME), SvgNode {
+class SvgRectNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
+    SvgGraphicNode<SvgRectNode>(parent, attributes, TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgRectNode
     val width: Int by attribute<SvgLength, Int> { width ->
         val root = rootParent as SvgRootNode
@@ -43,9 +42,7 @@ class SvgRectNode(
     }
 }
 
-fun SvgRectNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path {
+fun SvgRectNode.asNode(minified: Boolean): ImageVectorNode.Path {
     val wrapper = createPath(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -95,7 +92,7 @@ private fun SvgRectNode.createDashedRect(
 ): List<PathNodes> {
     warn(
         "Parsing a `stroke-dasharray` attribute is experimental and " +
-            "might differ a little from the original."
+            "might differ a little from the original.",
     )
     return strokeDashArray.createDashedPathForRect(
         x = x,
@@ -107,11 +104,7 @@ private fun SvgRectNode.createDashedRect(
     )
 }
 
-private fun SvgRectNode.createRegularRect(
-    x: Float,
-    y: Float,
-    isMinified: Boolean,
-) = listOf(
+private fun SvgRectNode.createRegularRect(x: Float, y: Float, isMinified: Boolean) = listOf(
     pathNode(command = PathCommand.MoveTo) {
         args(x, y)
         minified = isMinified

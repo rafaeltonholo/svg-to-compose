@@ -7,10 +7,8 @@ import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
-class SvgEllipseNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNode<SvgEllipseNode>(parent, attributes, TAG_NAME) {
+class SvgEllipseNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
+    SvgGraphicNode<SvgEllipseNode>(parent, attributes, TAG_NAME) {
     override val constructor: SvgChildNodeConstructorFn<SvgEllipseNode> = ::SvgEllipseNode
     val cx: Float by attribute<SvgLength, Float>(defaultValue = 0.0f) { cx ->
         val root = rootParent as SvgRootNode
@@ -38,9 +36,7 @@ class SvgEllipseNode(
     }
 }
 
-fun SvgEllipseNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path {
+fun SvgEllipseNode.asNode(minified: Boolean): ImageVectorNode.Path {
     val nodes = createSimpleEllipseNodes(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -73,9 +69,7 @@ private fun SvgEllipseNode.buildNormalizedPath(): String = buildString {
     append("/>")
 }
 
-private fun SvgEllipseNode.createSimpleEllipseNodes(
-    minified: Boolean,
-): List<PathNodes> = listOf(
+private fun SvgEllipseNode.createSimpleEllipseNodes(minified: Boolean): List<PathNodes> = listOf(
     pathNode(command = PathCommand.MoveTo) {
         args(cx, cy - ry)
         this.minified = minified

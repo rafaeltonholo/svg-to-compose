@@ -41,7 +41,9 @@ value class ComposeColor(override val value: String) : ComposeType<String> {
                     }
 
                     it.isEmpty() || it.lowercase().contains("url") ->
-                        "FF000000 /* not supported this \"$it\" */" // not supported yet.
+                        "FF000000 /* not supported this \"$it\" */"
+
+                    // not supported yet.
                     else -> it
                 }
             }

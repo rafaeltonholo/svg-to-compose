@@ -29,9 +29,7 @@ data object XmlPendingParentElement : XmlParentNode {
 
 private const val MAX_DEPTH = 5
 
-abstract class XmlChildNode(
-    parent: XmlParentNode,
-) : XmlNode {
+abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
     var parent: XmlParentNode = parent
         private set
 
@@ -69,19 +67,17 @@ abstract class XmlChildNode(
         append("}")
     }
 
-    private fun buildParentName(): String {
-        return if (AppConfig.debug) {
-            var parentTag = parent.tagName
-            var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
-            var deep = 0
-            while (currentParent != null && currentParent !is XmlRootNode && deep++ < MAX_DEPTH) {
-                parentTag = "${currentParent.tagName}.$parentTag"
-                currentParent = (currentParent as? XmlChildNode)?.parent
-            }
-            parentTag
-        } else {
-            parent.tagName
+    private fun buildParentName(): String = if (AppConfig.debug) {
+        var parentTag = parent.tagName
+        var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
+        var deep = 0
+        while (currentParent != null && currentParent !is XmlRootNode && deep++ < MAX_DEPTH) {
+            parentTag = "${currentParent.tagName}.$parentTag"
+            currentParent = (currentParent as? XmlChildNode)?.parent
         }
+        parentTag
+    } else {
+        parent.tagName
     }
 
     fun attachParentIfNeeded(parent: XmlParentNode) {
@@ -99,10 +95,7 @@ abstract class XmlChildNode(
     }
 }
 
-class XmlTextNode(
-    parent: XmlParentNode,
-    val content: String,
-) : XmlChildNode(parent) {
+class XmlTextNode(parent: XmlParentNode, val content: String) : XmlChildNode(parent) {
     override val tagName: String = parent.tagName
     override val attributes: MutableMap<String, String> = parent.attributes.toMutableMap()
     override fun toString(): String = toJsString {
@@ -110,17 +103,13 @@ class XmlTextNode(
     }
 }
 
-data class XmlRootNode(
-    override val tagName: String = "#root",
-    override val children: MutableSet<XmlNode>,
-) : XmlParentNode {
+data class XmlRootNode(override val tagName: String = "#root", override val children: MutableSet<XmlNode>) :
+    XmlParentNode {
     override val id: String? = null
     override val className: String? = null
     override val style: String? = null
     override val attributes: MutableMap<String, String> = mutableMapOf()
-    override fun toString(): String {
-        return "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
-    }
+    override fun toString(): String = "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
 }
 
 open class XmlElementNode(
@@ -128,21 +117,19 @@ open class XmlElementNode(
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
-) : XmlChildNode(parent), XmlParentNode {
+) : XmlChildNode(parent),
+    XmlParentNode {
     override fun toString(): String = toJsString()
 
-    override fun toJsString(extra: (StringBuilder.() -> Unit)?): String =
-        super.toJsString {
-            append("\"children\": ${children.toJsString()}")
-            if (extra != null) {
-                append(", ")
-                extra()
-            }
+    override fun toJsString(extra: (StringBuilder.() -> Unit)?): String = super.toJsString {
+        append("\"children\": ${children.toJsString()}")
+        if (extra != null) {
+            append(", ")
+            extra()
         }
+    }
 }
 
-fun Map<String, String>.toJsString() =
-    "[${map { "{\"${it.key}\":\"${it.value}\"}" }.joinToString(",")}]"
+fun Map<String, String>.toJsString() = "[${map { "{\"${it.key}\":\"${it.value}\"}" }.joinToString(",")}]"
 
-fun Set<*>.toJsString() =
-    "[${joinToString(",")}]"
+fun Set<*>.toJsString() = "[${joinToString(",")}]"

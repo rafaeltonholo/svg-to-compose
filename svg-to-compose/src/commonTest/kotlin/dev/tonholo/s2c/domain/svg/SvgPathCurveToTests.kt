@@ -99,7 +99,8 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 |    x3 = ${x3}f,
                 |    y3 = ${y3}f,
                 |)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -115,7 +116,8 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 |    dx3 = ${x3}f,
                 |    dy3 = ${y3}f,
                 |)
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -162,7 +164,8 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 |    y3 = ${y3}f,
                 |)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
         with(relative) {
@@ -179,7 +182,8 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 |    dy3 = ${y3}f,
                 |)
                 |close()
-                |""".trimMargin()
+                |
+                """.trimMargin(),
             )
         }
     }
@@ -224,7 +228,7 @@ class SvgPathCurveToTests : BaseSvgTest() {
                     append(" x3 = ${x3}f,")
                     append(" y3 = ${y3}f")
                     append(")")
-                }
+                },
             )
         }
         with(relative) {
@@ -239,7 +243,7 @@ class SvgPathCurveToTests : BaseSvgTest() {
                     append(" dx3 = ${x3}f,")
                     append(" dy3 = ${y3}f")
                     append(")")
-                }
+                },
             )
         }
     }
@@ -286,7 +290,7 @@ class SvgPathCurveToTests : BaseSvgTest() {
                     append(")")
                     appendLine()
                     append("close()")
-                }
+                },
             )
         }
         with(relative) {
@@ -303,7 +307,7 @@ class SvgPathCurveToTests : BaseSvgTest() {
                     append(")")
                     appendLine()
                     append("close()")
-                }
+                },
             )
         }
     }

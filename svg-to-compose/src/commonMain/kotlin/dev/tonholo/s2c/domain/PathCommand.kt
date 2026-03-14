@@ -32,21 +32,18 @@ enum class PathCommand(
     }
 }
 
-inline fun String.removeSuffix(pathCommand: PathCommand): String =
-    removeSuffix(pathCommand.value.toString())
+inline fun String.removeSuffix(pathCommand: PathCommand): String = removeSuffix(pathCommand.value.toString())
 
-inline fun Char.toPathCommand(): PathCommand? {
-    return when (this) {
-        PathCommand.ArcTo.value -> PathCommand.ArcTo
-        PathCommand.CurveTo.value -> PathCommand.CurveTo
-        PathCommand.HorizontalLineTo.value -> PathCommand.HorizontalLineTo
-        PathCommand.LineTo.value -> PathCommand.LineTo
-        PathCommand.MoveTo.value -> PathCommand.MoveTo
-        PathCommand.QuadTo.value -> PathCommand.QuadTo
-        PathCommand.ReflectiveCurveTo.value -> PathCommand.ReflectiveCurveTo
-        PathCommand.ReflectiveQuadTo.value -> PathCommand.ReflectiveQuadTo
-        PathCommand.VerticalLineTo.value -> PathCommand.VerticalLineTo
-        PathCommand.Close.value -> PathCommand.Close
-        else -> null
-    }
+inline fun Char.toPathCommand(): PathCommand? = when (this) {
+    PathCommand.ArcTo.value -> PathCommand.ArcTo
+    PathCommand.CurveTo.value -> PathCommand.CurveTo
+    PathCommand.HorizontalLineTo.value -> PathCommand.HorizontalLineTo
+    PathCommand.LineTo.value -> PathCommand.LineTo
+    PathCommand.MoveTo.value -> PathCommand.MoveTo
+    PathCommand.QuadTo.value -> PathCommand.QuadTo
+    PathCommand.ReflectiveCurveTo.value -> PathCommand.ReflectiveCurveTo
+    PathCommand.ReflectiveQuadTo.value -> PathCommand.ReflectiveQuadTo
+    PathCommand.VerticalLineTo.value -> PathCommand.VerticalLineTo
+    PathCommand.Close.value -> PathCommand.Close
+    else -> null
 }

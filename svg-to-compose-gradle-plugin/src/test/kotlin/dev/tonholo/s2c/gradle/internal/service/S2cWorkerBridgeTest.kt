@@ -14,8 +14,7 @@ class S2cWorkerBridgeTest {
 
     /** Minimal stub that records its identity for assertion. */
     private class StubProcessorFactory(val id: String) : Processor.Factory {
-        override fun create(tempDirectory: Path?): Processor =
-            error("Not expected to be called in this test")
+        override fun create(tempDirectory: Path?): Processor = error("Not expected to be called in this test")
     }
 
     @Test

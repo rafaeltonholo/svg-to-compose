@@ -1,10 +1,7 @@
 package dev.tonholo.s2c.error
 
-open class ExitProgramException(
-    val errorCode: ErrorCode,
-    message: String,
-    private vararg val causes: Throwable?,
-) : Exception(message, causes.singleOrNull()) {
+open class ExitProgramException(val errorCode: ErrorCode, message: String, private vararg val causes: Throwable?) :
+    Exception(message, causes.singleOrNull()) {
     init {
         causes
             .filterNotNull()

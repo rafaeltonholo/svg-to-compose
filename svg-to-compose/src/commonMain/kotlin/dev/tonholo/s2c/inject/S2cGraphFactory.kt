@@ -17,10 +17,8 @@ import okio.FileSystem
  * @return A fully configured [SvgToComposeGraph] instance with all dependencies resolved
  *  and ready for use.
  */
-fun createS2cGraph(
-    logger: Logger,
-    fileSystem: FileSystem,
-): SvgToComposeGraph = createGraphFactory<SvgToComposeGraph.Factory>().create(
-    logger = logger,
-    fileSystem = fileSystem,
-)
+fun createS2cGraph(logger: Logger, fileSystem: FileSystem): SvgToComposeGraph =
+    createGraphFactory<SvgToComposeGraph.Factory>().create(
+        logger = logger,
+        fileSystem = fileSystem,
+    )

@@ -5,9 +5,7 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 
-internal class HashTokenConsumer(
-    iterator: TokenIterator<CssTokenKind>,
-) : TokenConsumer(iterator) {
+internal class HashTokenConsumer(iterator: TokenIterator<CssTokenKind>) : TokenConsumer(iterator) {
     override val supportedTokenKinds: Set<CssTokenKind> = setOf(
         CssTokenKind.Hash,
     )
@@ -41,7 +39,8 @@ internal class HashTokenConsumer(
             val char = iterator.get()
             when (char.lowercaseChar()) {
                 in '0'..'9',
-                in 'a'..'f' -> {
+                in 'a'..'f',
+                -> {
                     iterator.nextOffset()
                 }
 
@@ -52,7 +51,5 @@ internal class HashTokenConsumer(
         return Token(CssTokenKind.HexDigit, start, iterator.offset)
     }
 
-    private fun Char.isHexDigit(): Boolean {
-        return this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
-    }
+    private fun Char.isHexDigit(): Boolean = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
 }

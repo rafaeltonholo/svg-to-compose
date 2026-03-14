@@ -64,8 +64,7 @@ abstract class XmlParser {
      * @param fileType The file type to check.
      * @return True if the parser accepts the file type, false otherwise.
      */
-    fun accept(fileType: FileType): Boolean =
-        this.fileType == fileType
+    fun accept(fileType: FileType): Boolean = this.fileType == fileType
 
     /**
      * Parse a XML string content to an [XmlRootNode]
@@ -73,27 +72,26 @@ abstract class XmlParser {
      * @param content The XML content's file
      * @return The XML as an object
      */
-    fun parse(content: String): XmlRootNode =
-        verboseSection("Parsing $fileType file") {
-            val strippedXml = content
-                .replace("\\r?\\n".toRegex(), "")
-                .replace("\\s{2,}".toRegex(), " ")
-                .replace("> <", "><")
+    fun parse(content: String): XmlRootNode = verboseSection("Parsing $fileType file") {
+        val strippedXml = content
+            .replace("\\r?\\n".toRegex(), "")
+            .replace("\\s{2,}".toRegex(), " ")
+            .replace("> <", "><")
 
-            val (node, duration) = measureTimedValue {
-                val xmlParser = Parser.xmlParser()
-                val doc = xmlParser.parseInput(input = strippedXml, baseUri = "")
-                val node = doc.getElementsByTag(tagName = fileType.tag)
-                if (node.size != 1) {
-                    error("Not a proper ${fileType.extension.uppercase()} file.")
-                }
-
-                val rootNode = node.single()
-                traverseXmlTree(rootNode)
+        val (node, duration) = measureTimedValue {
+            val xmlParser = Parser.xmlParser()
+            val doc = xmlParser.parseInput(input = strippedXml, baseUri = "")
+            val node = doc.getElementsByTag(tagName = fileType.tag)
+            if (node.size != 1) {
+                error("Not a proper ${fileType.extension.uppercase()} file.")
             }
-            verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
-            node
+
+            val rootNode = node.single()
+            traverseXmlTree(rootNode)
         }
+        verbose("Parsed ${fileType.extension.uppercase()} within ${duration.inWholeMilliseconds}ms")
+        node
+    }
 
     /**
      * Creates a default [XmlElementNode] instance with the given parameters.
@@ -104,26 +102,20 @@ abstract class XmlParser {
      * @param parent The parent node of the XML element.
      * @return A new [XmlElementNode] instance.
      */
-    protected fun createDefaultElement(
-        nodeName: String,
-        attributes: Attributes,
-        parent: XmlParentNode,
-    ) = XmlElementNode(
-        parent = parent,
-        children = mutableSetOf(),
-        attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-        tagName = nodeName,
-    )
+    protected fun createDefaultElement(nodeName: String, attributes: Attributes, parent: XmlParentNode) =
+        XmlElementNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+            tagName = nodeName,
+        )
 
     /**
      * Creates an [XmlNode] instance with the given parameters.
      * @param node The XML node to be converted.
      * @param parent The parent node of the XML node.
      */
-    protected abstract fun createElement(
-        node: Element,
-        parent: XmlParentNode,
-    ): XmlNode
+    protected abstract fun createElement(node: Element, parent: XmlParentNode): XmlNode
 
     /**
      * Checks if the given XML node is the root node of the XML document.
@@ -177,7 +169,7 @@ abstract class XmlParser {
         rootNode.traverse { node, depth ->
             if (currentDepth > depth) {
                 repeat(currentDepth - depth) {
-                    stack.removeLast().also { verbose("removed ${it.tagName} from stack") }
+                    stack.removeLast().also { removed -> verbose("removed ${removed.tagName} from stack") }
                 }
                 stack.lastOrNull()?.let { current = it }
             }
@@ -212,10 +204,7 @@ abstract class XmlParser {
      * @param parent The parent node of the processed node.
      * @return The processed XmlNode object, or null if the node is ignored or not supported.
      */
-    private fun processElement(
-        node: Node,
-        parent: XmlParentNode,
-    ): XmlNode? {
+    private fun processElement(node: Node, parent: XmlParentNode): XmlNode? {
         val preProcessedElement = getPreProcessedElement(node, parent)
 
         val element = preProcessedElement ?: when (node) {
