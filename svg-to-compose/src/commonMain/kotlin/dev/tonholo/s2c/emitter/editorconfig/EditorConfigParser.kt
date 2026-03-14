@@ -78,10 +78,9 @@ internal object EditorConfigParser {
 
             val (key, value) = parseKeyValue(line) ?: continue
 
-            if (isGlobalSection && key == "root" && value == "true") {
-                isRoot = true
-            } else if (isGlobalSection || currentSectionApplies) {
-                props[key] = value
+            when {
+                isGlobalSection -> isRoot = isRoot || (key == "root" && value == "true")
+                currentSectionApplies -> props[key] = value
             }
         }
 
