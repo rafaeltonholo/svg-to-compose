@@ -13,7 +13,7 @@ import kotlin.system.exitProcess
  * This is only for debugging purposes.
  * Should never be used in production.
  */
-@Suppress("UnusedPrivateMember")
+@Suppress("UnusedPrivateFunction")
 private fun main() {
     AppConfig.debug = true
     AppConfig.stackTrace = true
@@ -69,7 +69,7 @@ private fun SampleAppPackage.svg(): SampleAppPackage = this + ".svg"
 private fun SampleAppPackage.avg(): SampleAppPackage = this + ".avg"
 
 
-@Suppress("UNUSED_PARAMETER", "unused")
+@Suppress("UNUSED_PARAMETER", "unused", "MaxLineLength")
 private sealed class SampleFile(
     val sampleAppPackage: SampleAppPackage,
     input: String,
