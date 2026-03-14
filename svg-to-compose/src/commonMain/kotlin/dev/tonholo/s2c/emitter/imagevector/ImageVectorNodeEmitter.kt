@@ -159,7 +159,7 @@ internal class ImageVectorNodeEmitter(
                     }
                 val value = """
                     |PathData {
-                    |$indent${clipPathData.prependIndent(indent)}
+                    |$indent$indent$clipPathData
                     |$indent}"""
                     .trimMargin()
                 add(CLIP_PATH_PARAM_NAME to value)
