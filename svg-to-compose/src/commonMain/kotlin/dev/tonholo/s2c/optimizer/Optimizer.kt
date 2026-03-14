@@ -91,10 +91,7 @@ sealed class Optimizer(private val logger: Logger) {
      * @throws OptimizationException when the optimization
      * fails to run.
      */
-    protected fun runOptimization(
-        errorCode: ErrorCode,
-        vararg args: String,
-    ): Unit = with(logger) {
+    protected fun runOptimization(errorCode: ErrorCode, vararg args: String): Unit = with(logger) {
         logger.verbose(
             """
                 |Args:

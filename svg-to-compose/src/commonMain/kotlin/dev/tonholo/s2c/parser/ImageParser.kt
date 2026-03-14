@@ -32,10 +32,7 @@ import okio.Path
  * @see [ImageParser.SvgImageParser]
  * @see [ImageParser.AndroidVectorParser]
  */
-sealed class ImageParser(
-    protected val fileManager: FileManager,
-    protected val logger: Logger,
-) {
+sealed class ImageParser(protected val fileManager: FileManager, protected val logger: Logger) {
     /**
      * Parse a SVG/AVG icon and creates a [IconFileContents] object containing
      * all the required information to generate the Jetpack Compose Icon.
@@ -122,10 +119,7 @@ sealed class ImageParser(
      * @param fileManager The Main tool that helps to manage files and allows
      *  reading data from the file system.
      */
-    class SvgImageParser(
-        fileManager: FileManager,
-        logger: Logger,
-    ) : ImageParser(fileManager, logger) {
+    class SvgImageParser(fileManager: FileManager, logger: Logger) : ImageParser(fileManager, logger) {
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -147,11 +141,7 @@ sealed class ImageParser(
          * @return [IconFileContents] object instance which contains details about the
          * icon parsed from the file.
          */
-        override fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): IconFileContents = with(logger) {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
@@ -194,10 +184,7 @@ sealed class ImageParser(
      * @param fileManager The Main tool that helps to manage files and allows
      * reading data from the file system.
      */
-    class AndroidVectorParser(
-        fileManager: FileManager,
-        logger: Logger,
-    ) : ImageParser(fileManager, logger) {
+    class AndroidVectorParser(fileManager: FileManager, logger: Logger) : ImageParser(fileManager, logger) {
         /**
          * Parses an AVG file into an [IconFileContents] object.
          *
@@ -217,11 +204,7 @@ sealed class ImageParser(
          * @return an [IconFileContents] object instance that holds data about the parsed
          * icon.
          */
-        override fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): IconFileContents = with(logger) {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Avg)
@@ -311,10 +294,7 @@ sealed class ImageParser(
             message = "Use parseToModel() with a CodeEmitter instead.",
             replaceWith = ReplaceWith("parseToModel(file, iconName, config)"),
         )
-        fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): String = parseToModel(file, iconName, config).materialize()
+        fun parse(file: Path, iconName: String, config: ParserConfig): String =
+            parseToModel(file, iconName, config).materialize()
     }
 }

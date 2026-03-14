@@ -26,9 +26,7 @@ class AvgGroupNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attribu
 }
 
 context(logger: Logger)
-fun AvgGroupNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Group = ImageVectorNode.Group(
+fun AvgGroupNode.asNode(minified: Boolean): ImageVectorNode.Group = ImageVectorNode.Group(
     params = ImageVectorNode.Group.Params(
         clipPath = clipPath?.pathData?.asNodeWrapper(minified),
         rotate = rotation,

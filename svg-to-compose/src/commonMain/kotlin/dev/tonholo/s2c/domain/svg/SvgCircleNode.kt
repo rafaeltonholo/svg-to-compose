@@ -38,9 +38,7 @@ class SvgCircleNode(parent: XmlParentNode, attributes: MutableMap<String, String
 }
 
 context(logger: Logger)
-fun SvgCircleNode.asNode(
-    minified: Boolean,
-): ImageVectorNode = when {
+fun SvgCircleNode.asNode(minified: Boolean): ImageVectorNode = when {
     strokeDashArray != null -> {
         logger.warn(
             "Parsing a `stroke-dasharray` attribute is experimental and " +

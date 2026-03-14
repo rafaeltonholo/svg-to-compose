@@ -28,9 +28,7 @@ import kotlin.time.measureTimedValue
  * @property elementsPendingParent A set of elements that have not yet been assigned
  * a parent.
  */
-abstract class XmlParser(
-    protected val logger: Logger = NoOpLogger,
-) {
+abstract class XmlParser(protected val logger: Logger = NoOpLogger) {
     companion object {
         private val parsers = setOf<(Logger) -> XmlParser>(
             { logger -> AvgParser(logger) },

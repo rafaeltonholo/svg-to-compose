@@ -24,28 +24,25 @@ data class Command(
 annotation class CommandDsl
 
 @CommandDsl
-class CommandBuilder(
-    private val logger: Logger,
-    private var program: String,
-) {
-    private var args: MutableList<String>? = null
+class CommandBuilder(private val logger: Logger, private var program: String) {
+    private val args: MutableList<String> = mutableListOf()
     var showStdout: Boolean = true
     var showStderr: Boolean = true
     var trim: Boolean = false
 
     fun args(vararg args: String) {
-        this.args.addAll(args)
+        this.args.addAll(args.toList())
     }
 
     fun execute(): CommandResult = with(logger) {
         executeCommand(
             command = Command(
                 program = program,
-                args = args,
+                args = args.ifEmpty { null },
                 showStdout = showStdout,
                 showStderr = showStderr,
                 trim = trim,
-            )
+            ),
         )
     }
 }

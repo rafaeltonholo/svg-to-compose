@@ -33,16 +33,12 @@ class AvgRootNode(
 }
 
 context(logger: Logger)
-fun AvgRootNode.asNodes(
-    minified: Boolean,
-): List<ImageVectorNode> = children.mapNotNull { node ->
+fun AvgRootNode.asNodes(minified: Boolean): List<ImageVectorNode> = children.mapNotNull { node ->
     (node as? AvgNode)?.asNode(minified)
 }
 
 context(logger: Logger)
-fun AvgNode.asNode(
-    minified: Boolean,
-): ImageVectorNode? = when (this) {
+fun AvgNode.asNode(minified: Boolean): ImageVectorNode? = when (this) {
     is AvgGroupNode -> asNode(minified)
     is AvgPathNode -> asNode(minified)
     else -> null

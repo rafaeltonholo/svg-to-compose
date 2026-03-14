@@ -123,8 +123,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             "Use ImageVectorNodeEmitter.emit() instead.",
             replaceWith = ReplaceWith(
                 "ImageVectorNodeEmitter().emit(this)",
-                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
-            )
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter",
+            ),
         )
         override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
@@ -195,8 +195,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             "Use ImageVectorNodeEmitter.emit() instead.",
             replaceWith = ReplaceWith(
                 "ImageVectorNodeEmitter().emit(this)",
-                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
-            )
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter",
+            ),
         )
         override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
@@ -226,15 +226,14 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
             ),
         )
-        fun createChunkFunction(): String =
-            ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)
+        fun createChunkFunction(): String = ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)
 
         @Deprecated(
             "Use ImageVectorNodeEmitter.emit() instead.",
             replaceWith = ReplaceWith(
                 "ImageVectorNodeEmitter().emit(this)",
-                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"
-            )
+                "dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter",
+            ),
         )
         override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
@@ -270,6 +269,7 @@ fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrapper {
                         PathCommand.LineTo.value
 
                     lastCommand.lowercaseChar() -> PathCommand.LineTo.uppercaseChar()
+
                     else -> lastCommand
                 }
                 current = currentCommand + current

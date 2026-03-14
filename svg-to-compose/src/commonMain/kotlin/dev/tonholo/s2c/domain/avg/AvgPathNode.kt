@@ -85,9 +85,7 @@ class AvgPathNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attribut
 }
 
 context(logger: Logger)
-fun AvgPathNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path = ImageVectorNode.Path(
+fun AvgPathNode.asNode(minified: Boolean): ImageVectorNode.Path = ImageVectorNode.Path(
     params = ImageVectorNode.Path.Params(
         fill = fillBrush,
         fillAlpha = fillAlpha,

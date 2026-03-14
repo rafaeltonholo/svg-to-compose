@@ -43,9 +43,7 @@ class SvgRectNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
 }
 
 context(logger: Logger)
-fun SvgRectNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path {
+fun SvgRectNode.asNode(minified: Boolean): ImageVectorNode.Path {
     val wrapper = createPath(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
