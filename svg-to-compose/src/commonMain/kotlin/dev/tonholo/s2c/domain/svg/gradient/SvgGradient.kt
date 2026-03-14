@@ -27,7 +27,8 @@ sealed class SvgGradient<out T>(
     val gradientTransform: SvgTransform? by attribute<String?, SvgTransform?> {
         it?.let(::SvgTransform)
     }
-    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
+
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     val spreadMethod: SvgGradientSpreadMethod by attribute<String, _>(
         defaultValue = SvgGradientSpreadMethod.Pad,
     ) { spreadMethod ->

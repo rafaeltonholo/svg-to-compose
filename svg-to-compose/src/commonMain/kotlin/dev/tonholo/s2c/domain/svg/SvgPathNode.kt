@@ -45,13 +45,11 @@ class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
         error("use strokeBrush property instead")
     }
 
-    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in lazy properties.
-    private fun getGradient(fillColor: String): ComposeBrush.Gradient? {
-        return getGradient(
-            fillColor = fillColor,
-            nodes = with(NoOpLogger) { d.asNodeWrapper(minified = false) }.nodes,
-        )
-    }
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in lazy properties.
+    private fun getGradient(fillColor: String): ComposeBrush.Gradient? = getGradient(
+        fillColor = fillColor,
+        nodes = with(NoOpLogger) { d.asNodeWrapper(minified = false) }.nodes,
+    )
 
     companion object {
         const val TAG_NAME = "path"
@@ -59,10 +57,7 @@ class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
 }
 
 context(logger: Logger)
-fun SvgPathNode.asNode(
-    computedRules: List<ComputedRule> = emptyList(),
-    minified: Boolean = false,
-): ImageVectorNode {
+fun SvgPathNode.asNode(computedRules: List<ComputedRule> = emptyList(), minified: Boolean = false): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush,

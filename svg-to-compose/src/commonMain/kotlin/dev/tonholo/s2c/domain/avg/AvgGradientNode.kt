@@ -27,7 +27,8 @@ class AvgGradientNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attr
     override val startY: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val endX: Float? by attribute(namespace = AvgNode.NAMESPACE)
     override val endY: Float? by attribute(namespace = AvgNode.NAMESPACE)
-    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
+
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val tileMode: AvgGradientTileMode? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
         tileMode?.let { with(NoOpLogger) { AvgGradientTileMode(it) } }
     }
@@ -38,7 +39,8 @@ class AvgGradientNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attr
         it?.let(::AvgColor)
     }
     override val endColor: AvgColor? by attribute(namespace = AvgNode.NAMESPACE)
-    // TODO: figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
+
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val type: AvgGradientType? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
         tileMode?.let { with(NoOpLogger) { AvgGradientType(it) } }
     }
