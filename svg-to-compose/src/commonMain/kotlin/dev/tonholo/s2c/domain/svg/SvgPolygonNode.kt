@@ -31,10 +31,8 @@ abstract class SvgGraphicNodeWithListOfPoints<T>(
     }
 }
 
-class SvgPolygonNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNodeWithListOfPoints<SvgPolygonNode>(parent, attributes, TAG_NAME) {
+class SvgPolygonNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
+    SvgGraphicNodeWithListOfPoints<SvgPolygonNode>(parent, attributes, TAG_NAME) {
     override val constructor: SvgChildNodeConstructorFn<SvgPolygonNode> = ::SvgPolygonNode
 
     companion object {
@@ -42,9 +40,7 @@ class SvgPolygonNode(
     }
 }
 
-fun SvgPolygonNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path {
+fun SvgPolygonNode.asNode(minified: Boolean): ImageVectorNode.Path {
     val nodes = createSimplePolygonNodes(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -74,9 +70,7 @@ private fun SvgPolygonNode.buildNormalizedPath(): String = buildString {
     append("/>")
 }
 
-private fun SvgPolygonNode.createSimplePolygonNodes(
-    minified: Boolean,
-): List<PathNodes> = buildList {
+private fun SvgPolygonNode.createSimplePolygonNodes(minified: Boolean): List<PathNodes> = buildList {
     val points = points.toMutableList()
     val first = points.removeFirst()
     add(

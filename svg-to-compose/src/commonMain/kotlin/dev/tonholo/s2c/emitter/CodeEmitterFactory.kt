@@ -10,9 +10,7 @@ import dev.zacsweers.metro.Inject
  * @property logger The logger instance for diagnostic output.
  */
 @Inject
-class CodeEmitterFactory(
-    private val logger: Logger,
-) {
+class CodeEmitterFactory(private val logger: Logger) {
     /**
      * Creates a [CodeEmitter] for the given output format and format configuration.
      *

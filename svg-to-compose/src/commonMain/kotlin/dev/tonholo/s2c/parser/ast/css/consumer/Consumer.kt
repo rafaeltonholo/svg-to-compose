@@ -20,9 +20,7 @@ internal typealias Iterator = AstParserIterator<CssTokenKind>
  *
  * @param T The type of [CssNode] produced by this consumer.
  */
-internal abstract class Consumer<out T : CssNode>(
-    protected val content: String,
-) {
+internal abstract class Consumer<out T : CssNode>(protected val content: String) {
     /**
      * Consumes tokens from the iterator and produces a [CssNode] of type [T].
      */
@@ -63,9 +61,7 @@ internal abstract class Consumer<out T : CssNode>(
     /**
      * Expects the current token to be one of the given types.
      */
-    protected fun Iterator.expectToken(
-        kinds: Set<CssTokenKind>
-    ): Token<out CssTokenKind> {
+    protected fun Iterator.expectToken(kinds: Set<CssTokenKind>): Token<out CssTokenKind> {
         val current = current()
         parserCheckNotNull(value = current, content = content) {
             "Expected one of $kinds but got null"

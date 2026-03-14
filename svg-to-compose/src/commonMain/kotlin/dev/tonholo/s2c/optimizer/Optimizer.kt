@@ -17,9 +17,7 @@ import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 
-sealed class Optimizer(
-    private val logger: Logger,
-) {
+sealed class Optimizer(private val logger: Logger) {
     /**
      * Represents the external command that will be used
      * for optimization.
@@ -64,14 +62,13 @@ sealed class Optimizer(
      * @return A [Boolean], `true` if the required command is available
      * and `false` if it's not.
      */
-    fun verifyDependency() =
-        command(program = command) {
-            args(versionFlag)
-            showStdout = false
-            showStderr = false
-        }.also { (code, _) ->
-            logger.verbose("exit code = $code")
-        }.exitCode == 0
+    fun verifyDependency() = command(program = command) {
+        args(versionFlag)
+        showStdout = false
+        showStderr = false
+    }.also { (code, _) ->
+        logger.verbose("exit code = $code")
+    }.exitCode == 0
 
     /**
      * Runs the optimization process on the given [file],
@@ -92,16 +89,13 @@ sealed class Optimizer(
      * @throws OptimizationException when the optimization
      * fails to run.
      */
-    protected fun runOptimization(
-        errorCode: ErrorCode,
-        vararg args: String,
-    ) {
+    protected fun runOptimization(errorCode: ErrorCode, vararg args: String) {
         logger.verbose(
             """
                 |Args:
                 |   errorCode=$errorCode,
                 |   args=${args.joinToString(" ")}
-            """.trimMargin()
+            """.trimMargin(),
         )
         logger.output("⏳ Running $command")
         try {
@@ -128,10 +122,7 @@ sealed class Optimizer(
      *
      * @see <a href="https://svgo.dev/">SVGO documentation</a>
      */
-    class SvgoOptimizer(
-        private val logger: Logger,
-        private val fileManager: FileManager,
-    ) : Optimizer(logger) {
+    class SvgoOptimizer(private val logger: Logger, private val fileManager: FileManager) : Optimizer(logger) {
         override val command: String = "svgo"
         override val allowedExtension: String = FileType.Svg.extension
 
@@ -161,7 +152,7 @@ sealed class Optimizer(
 
             val tempDir = file.parent ?: throw OptimizationException(
                 ErrorCode.SvgoOptimizationError,
-                "Unable to determine parent directory for file: $file"
+                "Unable to determine parent directory for file: $file",
             )
             val optimizedFile = tempDir / "${file.filename}.optimized.svg"
 
@@ -183,9 +174,7 @@ sealed class Optimizer(
      *
      * @see <a href="https://github.com/alexjlockwood/avocado">Avocado documentation</a>
      */
-    class AvocadoOptimizer(
-        logger: Logger,
-    ) : Optimizer(logger) {
+    class AvocadoOptimizer(logger: Logger) : Optimizer(logger) {
         override val command: String = "avocado"
         override val allowedExtension: String = FileType.Avg.extension
 
@@ -199,10 +188,7 @@ sealed class Optimizer(
     }
 
     @Inject
-    class Factory(
-        private val logger: Logger,
-        fileManager: FileManager,
-    ) {
+    class Factory(private val logger: Logger, fileManager: FileManager) {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */

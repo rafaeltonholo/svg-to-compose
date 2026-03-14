@@ -15,7 +15,8 @@ class AvgRootNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : AvgElementNode(parent, children, attributes, tagName = TAG_NAME), AvgNode {
+) : AvgElementNode(parent, children, attributes, tagName = TAG_NAME),
+    AvgNode {
     val width: Float by attribute<String, _>(namespace = AvgNode.NAMESPACE) {
         it.removeSuffix("dp").toFloat()
     }
@@ -30,15 +31,11 @@ class AvgRootNode(
     }
 }
 
-inline fun AvgRootNode.asNodes(
-    minified: Boolean,
-): List<ImageVectorNode> = children.mapNotNull { node ->
+inline fun AvgRootNode.asNodes(minified: Boolean): List<ImageVectorNode> = children.mapNotNull { node ->
     (node as? AvgNode)?.asNode(minified)
 }
 
-inline fun AvgNode.asNode(
-    minified: Boolean,
-): ImageVectorNode? = when (this) {
+inline fun AvgNode.asNode(minified: Boolean): ImageVectorNode? = when (this) {
     is AvgGroupNode -> asNode(minified)
     is AvgPathNode -> asNode(minified)
     else -> null

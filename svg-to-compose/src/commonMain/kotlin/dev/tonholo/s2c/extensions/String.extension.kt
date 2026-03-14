@@ -53,10 +53,8 @@ fun String.prependIndent(indentSize: Int) = prependIndent(" ".repeat(indentSize)
  * @return The percentage calculation based on the max of [width] and [height],
  * in case of [String] with `%`, or a direct conversion to [Float]
  */
-fun String.toLengthFloat(
-    width: Float,
-    height: Float,
-): Float = toLengthFloatOrNull(width, height) ?: throw NumberFormatException("Can't parse '$this' to Float")
+fun String.toLengthFloat(width: Float, height: Float): Float =
+    toLengthFloatOrNull(width, height) ?: throw NumberFormatException("Can't parse '$this' to Float")
 
 /**
  * Converts a string representation of a length to a float value.
@@ -78,10 +76,7 @@ fun String.toLengthFloat(
  * @param height The height to use for percentage calculations.
  * @return The float value represented by the input string, or null if the string cannot be parsed.
  */
-fun String.toLengthFloatOrNull(
-    width: Float,
-    height: Float,
-): Float? = if (this.contains("%")) {
+fun String.toLengthFloatOrNull(width: Float, height: Float): Float? = if (this.contains("%")) {
     max(width, height) * this.removeSuffix("%").toFloat() / PERCENT
 } else {
     this.toFloatOrNull()

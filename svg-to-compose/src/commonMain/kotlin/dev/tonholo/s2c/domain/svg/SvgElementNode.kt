@@ -17,7 +17,8 @@ abstract class SvgElementNode<out T>(
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
     override val tagName: String,
-) : XmlElementNode(parent, children, attributes, tagName), SvgNode
+) : XmlElementNode(parent, children, attributes, tagName),
+    SvgNode
     where T : SvgNode, T : XmlParentNode {
     protected abstract val constructor: SvgElementNodeConstructorFn<T>
     override val transform: SvgTransform? by lazy {
@@ -42,7 +43,7 @@ abstract class SvgElementNode<out T>(
                         is SvgElementNode<*> -> it.copy(parent = this)
                         else -> it
                     }
-                }
+                },
             )
         }
     }

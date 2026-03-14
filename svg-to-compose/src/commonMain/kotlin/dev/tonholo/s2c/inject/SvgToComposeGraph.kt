@@ -28,16 +28,10 @@ interface SvgToComposeGraph {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideFileManager(
-        fileSystem: FileSystem,
-        logger: Logger,
-    ): FileManager = FileManager(fileSystem, logger)
+    fun provideFileManager(fileSystem: FileSystem, logger: Logger): FileManager = FileManager(fileSystem, logger)
 
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(
-            @Provides logger: Logger,
-            @Provides fileSystem: FileSystem,
-        ): SvgToComposeGraph
+        fun create(@Provides logger: Logger, @Provides fileSystem: FileSystem): SvgToComposeGraph
     }
 }

@@ -12,10 +12,9 @@ import kotlin.math.roundToInt
  *
  * see: [SVG Gradient Stops](https://www.w3.org/TR/SVG11/single-page.html#pservers-GradientStops)
  */
-class SvgGradientStopNode(
-    parent: XmlParentNode,
-    override val attributes: MutableMap<String, String>,
-) : SvgChildNode<SvgGradientStopNode>(parent), SvgNode {
+class SvgGradientStopNode(parent: XmlParentNode, override val attributes: MutableMap<String, String>) :
+    SvgChildNode<SvgGradientStopNode>(parent),
+    SvgNode {
     override val constructor = ::SvgGradientStopNode
 
     /**

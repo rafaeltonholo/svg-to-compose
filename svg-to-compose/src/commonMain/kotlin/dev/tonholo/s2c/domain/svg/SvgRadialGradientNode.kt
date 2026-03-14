@@ -11,12 +11,11 @@ class SvgRadialGradientNode(
     parent: XmlParentNode,
     children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgRadialGradient<SvgRadialGradientNode>(parent, children, attributes), SvgNode {
+) : SvgRadialGradient<SvgRadialGradientNode>(parent, children, attributes),
+    SvgNode {
     override val constructor = ::SvgRadialGradientNode
 
-    override fun toBrush(
-        target: List<PathNodes>,
-    ): ComposeBrush.Gradient.Radial {
+    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
         val (colors, stops) = colorStops
 
         val cx = calculateGradientXCoordinate(cx, target)

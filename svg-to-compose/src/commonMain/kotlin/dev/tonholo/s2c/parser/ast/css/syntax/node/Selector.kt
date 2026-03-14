@@ -15,8 +15,7 @@ sealed interface Selector : CssNode {
     val name: String
     val combinator: CssCombinator?
 
-    override fun toString(indent: Int): String =
-        name + combinator?.representation.orEmpty()
+    override fun toString(indent: Int): String = name + combinator?.representation.orEmpty()
 
     /**
      * Represents a type selector (e.g., `div`, `p`).
@@ -40,9 +39,7 @@ sealed interface Selector : CssNode {
         override val name: String,
         override val combinator: CssCombinator? = null,
     ) : Selector {
-        override fun toString(indent: Int): String {
-            return ".${super.toString(indent)}"
-        }
+        override fun toString(indent: Int): String = ".${super.toString(indent)}"
     }
 
     /**
@@ -58,9 +55,7 @@ sealed interface Selector : CssNode {
         override val name: String,
         override val combinator: CssCombinator? = null,
     ) : Selector {
-        override fun toString(indent: Int): String {
-            return "#${super.toString(indent)}"
-        }
+        override fun toString(indent: Int): String = "#${super.toString(indent)}"
     }
 
     /**
@@ -78,16 +73,14 @@ sealed interface Selector : CssNode {
         val parameters: List<Selector>,
         override val combinator: CssCombinator? = null,
     ) : Selector {
-        override fun toString(indent: Int): String {
-            return buildString {
-                append(":$name")
-                if (parameters.isNotEmpty()) {
-                    append("(")
-                    append(parameters.joinToString(", ") { it.toString(indent = 0) })
-                    append(")")
-                }
-                append(combinator?.representation.orEmpty())
+        override fun toString(indent: Int): String = buildString {
+            append(":$name")
+            if (parameters.isNotEmpty()) {
+                append("(")
+                append(parameters.joinToString(", ") { it.toString(indent = 0) })
+                append(")")
             }
+            append(combinator?.representation.orEmpty())
         }
     }
 
@@ -106,16 +99,14 @@ sealed interface Selector : CssNode {
         val parameters: List<Selector>,
         override val combinator: CssCombinator? = null,
     ) : Selector {
-        override fun toString(indent: Int): String {
-            return buildString {
-                append("::$name")
-                if (parameters.isNotEmpty()) {
-                    append("(")
-                    append(parameters.joinToString(", ") { it.toString(indent = 0) })
-                    append(")")
-                }
-                append(combinator?.representation.orEmpty())
+        override fun toString(indent: Int): String = buildString {
+            append("::$name")
+            if (parameters.isNotEmpty()) {
+                append("(")
+                append(parameters.joinToString(", ") { it.toString(indent = 0) })
+                append(")")
             }
+            append(combinator?.representation.orEmpty())
         }
     }
 
@@ -136,16 +127,14 @@ sealed interface Selector : CssNode {
         val value: String? = null,
         override val combinator: CssCombinator? = null,
     ) : Selector {
-        override fun toString(indent: Int): String {
-            return buildString {
-                append("[$name")
-                if (value != null && matcher != null) {
-                    append(matcher)
-                    append("\"$value\"")
-                }
-                append("]")
-                append(combinator?.representation.orEmpty())
+        override fun toString(indent: Int): String = buildString {
+            append("[$name")
+            if (value != null && matcher != null) {
+                append(matcher)
+                append("\"$value\"")
             }
+            append("]")
+            append(combinator?.representation.orEmpty())
         }
     }
 }
@@ -155,27 +144,22 @@ sealed interface Selector : CssNode {
  *
  * @property selectors The list of selectors.
  */
-data class SelectorListItem(
-    override val location: CssLocation,
-    val selectors: List<Selector>,
-) : CssComponentValueNode {
-    override fun toString(indent: Int): String =
-        selectors.joinToString("") { it.toString(indent = 0) }
+data class SelectorListItem(override val location: CssLocation, val selectors: List<Selector>) :
+    CssComponentValueNode {
+    override fun toString(indent: Int): String = selectors.joinToString("") { it.toString(indent = 0) }
 
-    override fun toString(): String {
-        return buildString {
-            appendLine("SelectorListItem(")
-            appendLine(
-                "location = $location,".prependIndent(indentSize = 2),
-            )
-            appendLine(
-                "selectors = [".prependIndent(indentSize = 2),
-            )
-            selectors.forEach {
-                appendLine(it.toString().prependIndent(indentSize = 4))
-            }
-            appendLine("],".prependIndent(indentSize = 2))
-            append(")")
+    override fun toString(): String = buildString {
+        appendLine("SelectorListItem(")
+        appendLine(
+            "location = $location,".prependIndent(indentSize = 2),
+        )
+        appendLine(
+            "selectors = [".prependIndent(indentSize = 2),
+        )
+        selectors.forEach {
+            appendLine(it.toString().prependIndent(indentSize = 4))
         }
+        appendLine("],".prependIndent(indentSize = 2))
+        append(")")
     }
 }

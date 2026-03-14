@@ -25,10 +25,7 @@ internal sealed class PathTransformation<T : PathNodes> {
         return Point2D(newX, newY)
     }
 
-    fun PathNodes.new(
-        args: List<Any>,
-        command: PathCommand? = null,
-    ): PathNodes = pathNode(command ?: this.command) {
+    fun PathNodes.new(args: List<Any>, command: PathCommand? = null): PathNodes = pathNode(command ?: this.command) {
         args(args)
         isRelative = this@new.isRelative
         minified = this@new.minified

@@ -9,9 +9,7 @@ package dev.tonholo.s2c.emitter
  *
  * @property formatConfig The formatting configuration to use.
  */
-class CodeWriter(
-    private val formatConfig: FormatConfig = FormatConfig(),
-) {
+class CodeWriter(private val formatConfig: FormatConfig = FormatConfig()) {
     private val buffer = StringBuilder()
     private var currentIndentLevel: Int = 0
 

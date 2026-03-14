@@ -57,7 +57,7 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
                 node.isPositiveArc,
                 x,
                 y,
-            )
+            ),
         )
     }
 
@@ -148,47 +148,39 @@ internal data object ArcTransformation : PathTransformation<PathNodes.ArcTo>() {
         }
     }
 
-    private fun parseEllipticalArcToEllipseMatrix(
-        a: Double,
-        cos: Double,
-        b: Double,
-        sin: Double,
-    ) = AffineTransformation.Matrix(
-        doubleArrayOf(a * cos, -b * sin, 0.0),
-        doubleArrayOf(a * sin, b * cos, 0.0),
-        doubleArrayOf(0.0, 0.0, 1.0),
-    )
+    private fun parseEllipticalArcToEllipseMatrix(a: Double, cos: Double, b: Double, sin: Double) =
+        AffineTransformation.Matrix(
+            doubleArrayOf(a * cos, -b * sin, 0.0),
+            doubleArrayOf(a * sin, b * cos, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0),
+        )
 
-    private fun PathNodes.ArcTo.applyOutOfRangeRadiiCorrection(
-        x: Double,
-        cos: Double,
-        y: Double,
-        sin: Double,
-    ) = if (a > 0 && b > 0) {
-        val a = a
-        val b = b
-        // If a and b bigger than 0, it ensures that the ellipse arc is
-        // valid and not degenerated.
+    private fun PathNodes.ArcTo.applyOutOfRangeRadiiCorrection(x: Double, cos: Double, y: Double, sin: Double) =
+        if (a > 0 && b > 0) {
+            val a = a
+            val b = b
+            // If a and b bigger than 0, it ensures that the ellipse arc is
+            // valid and not degenerated.
 
-        // Determine if the endpoint of the arc is outside the bounds of the ellipse.
-        // By using the distance formula: x'^2 / a^2 + y'^2 / b^2 = 1
-        // where x' and y' are coordinates of the rotated point
-        // x' = ((x * cos(θ) + y * sin(θ)) / 2 * a)
-        // y' = ((y * cos(θ) - x * sin(θ)) / 2 * b)
-        var scalingFactor = (x * cos + y * sin).pow(2) / (4 * a * a) +
-            (y * cos - x * sin).pow(2) / (4 * b * b)
+            // Determine if the endpoint of the arc is outside the bounds of the ellipse.
+            // By using the distance formula: x'^2 / a^2 + y'^2 / b^2 = 1
+            // where x' and y' are coordinates of the rotated point
+            // x' = ((x * cos(θ) + y * sin(θ)) / 2 * a)
+            // y' = ((y * cos(θ) - x * sin(θ)) / 2 * b)
+            var scalingFactor = (x * cos + y * sin).pow(2) / (4 * a * a) +
+                (y * cos - x * sin).pow(2) / (4 * b * b)
 
-        if (scalingFactor > 1) {
-            // The endpoint is outside the ellipse.
-            // Adjust it to ensure that the ellipse encompasses the endpoint of the arc.
-            scalingFactor = sqrt(scalingFactor)
+            if (scalingFactor > 1) {
+                // The endpoint is outside the ellipse.
+                // Adjust it to ensure that the ellipse encompasses the endpoint of the arc.
+                scalingFactor = sqrt(scalingFactor)
 
-            // Scales both a and b by this scaling factor.
-            a * scalingFactor to b * scalingFactor
+                // Scales both a and b by this scaling factor.
+                a * scalingFactor to b * scalingFactor
+            } else {
+                a to b
+            }
         } else {
             a to b
         }
-    } else {
-        a to b
-    }
 }

@@ -29,35 +29,33 @@ fun List<PathNodes>.toAbsolute(): List<PathNodes> {
     }
 }
 
-private fun PathNodes.LineTo.toAbsolute(current: DoubleArray): PathNodes.LineTo =
-    if (isRelative.not()) {
-        current[0] = x
-        current[1] = y
-        this
-    } else {
-        current[0] += x
-        current[1] += y
-        copy(
-            x = current[0],
-            y = current[1],
-            isRelative = false,
-        )
-    }
+private fun PathNodes.LineTo.toAbsolute(current: DoubleArray): PathNodes.LineTo = if (isRelative.not()) {
+    current[0] = x
+    current[1] = y
+    this
+} else {
+    current[0] += x
+    current[1] += y
+    copy(
+        x = current[0],
+        y = current[1],
+        isRelative = false,
+    )
+}
 
-private fun PathNodes.MoveTo.toAbsolute(current: DoubleArray): PathNodes.MoveTo =
-    if (isRelative.not()) {
-        current[0] = x
-        current[1] = y
-        this
-    } else {
-        current[0] += x
-        current[1] += y
-        copy(
-            x = current[0],
-            y = current[1],
-            isRelative = false,
-        )
-    }
+private fun PathNodes.MoveTo.toAbsolute(current: DoubleArray): PathNodes.MoveTo = if (isRelative.not()) {
+    current[0] = x
+    current[1] = y
+    this
+} else {
+    current[0] += x
+    current[1] += y
+    copy(
+        x = current[0],
+        y = current[1],
+        isRelative = false,
+    )
+}
 
 private fun PathNodes.HorizontalLineTo.toAbsolute(current: DoubleArray): PathNodes.HorizontalLineTo =
     if (isRelative.not()) {
@@ -83,70 +81,67 @@ private fun PathNodes.VerticalLineTo.toAbsolute(current: DoubleArray): PathNodes
         )
     }
 
-fun PathNodes.CurveTo.toAbsolute(current: DoubleArray): PathNodes.CurveTo =
-    if (isRelative.not()) {
-        current[0] = x3
-        current[1] = y3
-        this
-    } else {
-        val currentX = current[0]
-        val currentY = current[1]
-        copy(
-            x1 = currentX + x1,
-            y1 = currentY + y1,
-            x2 = currentX + x2,
-            y2 = currentY + y2,
-            x3 = (currentX + x3).also {
-                current[0] = it
-            },
-            y3 = (currentY + y3).also {
-                current[1] = it
-            },
-            isRelative = false,
-        )
-    }
+fun PathNodes.CurveTo.toAbsolute(current: DoubleArray): PathNodes.CurveTo = if (isRelative.not()) {
+    current[0] = x3
+    current[1] = y3
+    this
+} else {
+    val currentX = current[0]
+    val currentY = current[1]
+    copy(
+        x1 = currentX + x1,
+        y1 = currentY + y1,
+        x2 = currentX + x2,
+        y2 = currentY + y2,
+        x3 = (currentX + x3).also {
+            current[0] = it
+        },
+        y3 = (currentY + y3).also {
+            current[1] = it
+        },
+        isRelative = false,
+    )
+}
 
-fun PathNodes.ReflectiveCurveTo.toAbsolute(current: DoubleArray): PathNodes.ReflectiveCurveTo =
-    if (isRelative.not()) {
-        current[0] = x2
-        current[1] = y2
-        this
-    } else {
-        val currentX = current[0]
-        val currentY = current[1]
-        copy(
-            x1 = currentX + x1,
-            y1 = currentY + y1,
-            x2 = (currentX + x2).also {
-                current[0] = it
-            },
-            y2 = (currentY + y2).also {
-                current[1] = it
-            },
-            isRelative = false,
-        )
-    }
+fun PathNodes.ReflectiveCurveTo.toAbsolute(current: DoubleArray): PathNodes.ReflectiveCurveTo = if (isRelative.not()) {
+    current[0] = x2
+    current[1] = y2
+    this
+} else {
+    val currentX = current[0]
+    val currentY = current[1]
+    copy(
+        x1 = currentX + x1,
+        y1 = currentY + y1,
+        x2 = (currentX + x2).also {
+            current[0] = it
+        },
+        y2 = (currentY + y2).also {
+            current[1] = it
+        },
+        isRelative = false,
+    )
+}
 
-private fun PathNodes.QuadTo.toAbsolute(current: DoubleArray): PathNodes.QuadTo =
-    if (isRelative.not()) {
-        current[0] = x2
-        current[1] = y2
-        this
-    } else {
-        val currentX = current[0]
-        val currentY = current[1]
-        copy(
-            x1 = currentX + x1,
-            y1 = currentY + y1,
-            x2 = (currentX + x2).also {
-                current[0] = it
-            },
-            y2 = (currentY + y2).also {
-                current[1] = it
-            },
-            isRelative = false,
-        )
-    }
+private fun PathNodes.QuadTo.toAbsolute(current: DoubleArray): PathNodes.QuadTo = if (isRelative.not()) {
+    current[0] = x2
+    current[1] = y2
+    this
+} else {
+    val currentX = current[0]
+    val currentY = current[1]
+    copy(
+        x1 = currentX + x1,
+        y1 = currentY + y1,
+        x2 = (currentX + x2).also {
+            current[0] = it
+        },
+        y2 = (currentY + y2).also {
+            current[1] = it
+        },
+        isRelative = false,
+    )
+}
 
 private fun PathNodes.ReflectiveQuadTo.toAbsolute(current: DoubleArray): PathNodes.ReflectiveQuadTo =
     if (isRelative.not()) {
@@ -163,17 +158,16 @@ private fun PathNodes.ReflectiveQuadTo.toAbsolute(current: DoubleArray): PathNod
         )
     }
 
-fun PathNodes.ArcTo.toAbsolute(current: DoubleArray): PathNodes.ArcTo =
-    if (isRelative.not()) {
-        current[0] = x
-        current[1] = y
-        this
-    } else {
-        current[0] += x
-        current[1] += y
-        copy(
-            x = current[0],
-            y = current[1],
-            isRelative = false,
-        )
-    }
+fun PathNodes.ArcTo.toAbsolute(current: DoubleArray): PathNodes.ArcTo = if (isRelative.not()) {
+    current[0] = x
+    current[1] = y
+    this
+} else {
+    current[0] += x
+    current[1] += y
+    copy(
+        x = current[0],
+        y = current[1],
+        isRelative = false,
+    )
+}

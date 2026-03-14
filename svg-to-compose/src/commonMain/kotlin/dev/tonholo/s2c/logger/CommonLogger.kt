@@ -14,21 +14,19 @@ internal class CommonLogger : Logger {
         }
     }
 
-    override fun <T> debugSection(title: String, block: () -> T): T =
-        if (!AppConfig.silent && AppConfig.debug) {
-            startSection(title)
-            block().also { endSection() }
-        } else {
-            block()
-        }
+    override fun <T> debugSection(title: String, block: () -> T): T = if (!AppConfig.silent && AppConfig.debug) {
+        startSection(title)
+        block().also { endSection() }
+    } else {
+        block()
+    }
 
-    override fun <T> verboseSection(title: String, block: () -> T): T =
-        if (!AppConfig.silent && AppConfig.verbose) {
-            startSection(title)
-            block().also { endSection() }
-        } else {
-            block()
-        }
+    override fun <T> verboseSection(title: String, block: () -> T): T = if (!AppConfig.silent && AppConfig.verbose) {
+        startSection(title)
+        block().also { endSection() }
+    } else {
+        block()
+    }
 
     private fun startSection(message: String) {
         println()

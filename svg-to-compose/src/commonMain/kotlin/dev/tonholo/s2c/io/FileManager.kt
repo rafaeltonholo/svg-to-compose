@@ -8,7 +8,11 @@ import okio.FileSystem
 import okio.IOException
 import okio.Path
 
-interface FileManager : FileFinder, FileReader, FileCreator, FileDeleter {
+interface FileManager :
+    FileFinder,
+    FileReader,
+    FileCreator,
+    FileDeleter {
     /**
      * @return `true` if the path refers to a directory that contains 0 or more child paths.
      */
@@ -45,10 +49,7 @@ interface FileManager : FileFinder, FileReader, FileCreator, FileDeleter {
     fun exists(path: Path): Boolean
 }
 
-fun FileManager(
-    fileSystem: FileSystem,
-    logger: Logger,
-): FileManager = object : FileManager {
+fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : FileManager {
     override fun isDirectory(path: Path): Boolean {
         val metadata = fileSystem.metadata(path)
         return metadata.isDirectory
@@ -62,19 +63,13 @@ fun FileManager(
         fileSystem.createDirectories(dir, mustCreate)
     }
 
-    override fun exists(path: Path): Boolean =
-        fileSystem.exists(path)
+    override fun exists(path: Path): Boolean = fileSystem.exists(path)
 
     override fun write(file: Path, mustCreate: Boolean, writerAction: BufferedSink.() -> Unit) {
         fileSystem.write(file, mustCreate, writerAction)
     }
 
-    override fun findFilesToProcess(
-        from: Path,
-        recursive: Boolean,
-        maxDepth: Int?,
-        exclude: Regex?,
-    ): List<Path> {
+    override fun findFilesToProcess(from: Path, recursive: Boolean, maxDepth: Int?, exclude: Regex?): List<Path> {
         val depth = if (recursive) {
             logger.debug("Recursive directory search is enabled. Verifying all directories until depth $maxDepth")
             maxDepth

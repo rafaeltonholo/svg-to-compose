@@ -46,10 +46,7 @@ sealed class SvgGradient<out T>(
                 .unzip()
         }
 
-    internal fun calculateGradientXCoordinate(
-        length: SvgLength,
-        target: List<PathNodes> = emptyList(),
-    ): Float {
+    internal fun calculateGradientXCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Float {
         val root = rootParent as SvgRootNode
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
@@ -62,10 +59,7 @@ sealed class SvgGradient<out T>(
         }
     }
 
-    internal fun calculateGradientYCoordinate(
-        length: SvgLength,
-        target: List<PathNodes> = emptyList(),
-    ): Float {
+    internal fun calculateGradientYCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Float {
         val root = rootParent as SvgRootNode
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
@@ -78,10 +72,7 @@ sealed class SvgGradient<out T>(
         }
     }
 
-    internal fun calculateGradientXYCoordinate(
-        length: SvgLength,
-        target: List<PathNodes> = emptyList(),
-    ): Float {
+    internal fun calculateGradientXYCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Float {
         val root = rootParent as SvgRootNode
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
@@ -94,7 +85,5 @@ sealed class SvgGradient<out T>(
         }
     }
 
-    abstract fun toBrush(
-        target: List<PathNodes>,
-    ): ComposeBrush.Gradient
+    abstract fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient
 }

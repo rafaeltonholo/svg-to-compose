@@ -7,7 +7,8 @@ class SvgSymbolNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     override val attributes: MutableMap<String, String>,
-) : SvgElementNode<SvgSymbolNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgSymbolNode>(parent, children, attributes, tagName = TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgSymbolNode
     companion object {
         const val TAG_NAME = "symbol"

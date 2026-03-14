@@ -63,6 +63,7 @@ internal class QualifiedRuleConsumer(
             }
             when (next.kind) {
                 CssTokenKind.EndOfFile -> iterator.parserError(content, "Incomplete qualified rule.")
+
                 CssTokenKind.OpenCurlyBrace -> {
                     val block = blockConsumer.consume(iterator)
                     return rule.copy(

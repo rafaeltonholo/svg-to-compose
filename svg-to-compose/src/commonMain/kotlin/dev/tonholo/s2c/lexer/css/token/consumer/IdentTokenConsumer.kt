@@ -4,9 +4,7 @@ import dev.tonholo.s2c.lexer.Token
 import dev.tonholo.s2c.lexer.TokenIterator
 import dev.tonholo.s2c.lexer.css.CssTokenKind
 
-internal class IdentTokenConsumer(
-    iterator: TokenIterator<CssTokenKind>,
-) : TokenConsumer(iterator) {
+internal class IdentTokenConsumer(iterator: TokenIterator<CssTokenKind>) : TokenConsumer(iterator) {
     override val supportedTokenKinds: Set<CssTokenKind> = setOf(
         CssTokenKind.Ident,
     )
@@ -21,7 +19,8 @@ internal class IdentTokenConsumer(
                 in 'a'..'z',
                 in 'A'..'Z',
                 '-',
-                '_' -> {
+                '_',
+                -> {
                     iterator.nextOffset()
                 }
 
@@ -32,7 +31,7 @@ internal class IdentTokenConsumer(
         }
 
         return listOf(
-            Token(CssTokenKind.Ident, start, iterator.offset)
+            Token(CssTokenKind.Ident, start, iterator.offset),
         )
     }
 }

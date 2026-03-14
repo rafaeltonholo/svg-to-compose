@@ -19,8 +19,7 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     private val defaultValue: TTransform? = null,
     private val transform: (TAttribute) -> TTransform = { it as TTransform },
 ) {
-    private fun key(property: KProperty<*>): String =
-        namespace?.let { "$it:" }.orEmpty() + (name ?: property.name)
+    private fun key(property: KProperty<*>): String = namespace?.let { "$it:" }.orEmpty() + (name ?: property.name)
 
     operator fun getValue(element: XmlChildNode, property: KProperty<*>): TTransform {
         val key = key(property)
@@ -42,10 +41,15 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
         return transform(
             when (kClass) {
                 SvgLength::class -> value?.toSvgLengthOrNull()
+
                 Int::class -> value?.toIntOrNull()
+
                 String::class -> value
+
                 Float::class -> value?.toFloatOrNull()
+
                 Double::class -> value?.toDoubleOrNull()
+
                 else -> if (isNullable) {
                     null
                 } else {
@@ -98,15 +102,14 @@ inline fun <reified TAttribute : Any?> attribute(
     namespace: String? = null,
     defaultValue: TAttribute? = null,
     inherited: Boolean = false,
-): AttributeDelegate<TAttribute, TAttribute> =
-    AttributeDelegate(
-        kClass = TAttribute::class,
-        isNullable = null is TAttribute,
-        name = name,
-        namespace = namespace,
-        defaultValue = defaultValue,
-        inherited = inherited,
-    )
+): AttributeDelegate<TAttribute, TAttribute> = AttributeDelegate(
+    kClass = TAttribute::class,
+    isNullable = null is TAttribute,
+    name = name,
+    namespace = namespace,
+    defaultValue = defaultValue,
+    inherited = inherited,
+)
 
 /**
  * Creates an attribute delegate for an XML element property.
@@ -129,14 +132,12 @@ inline fun <reified TAttribute : Any?, reified TTransform : Any?> attribute(
     defaultValue: TTransform? = null,
     inherited: Boolean = false,
     noinline transform: (TAttribute) -> TTransform,
-): AttributeDelegate<TAttribute, TTransform> {
-    return AttributeDelegate(
-        kClass = TAttribute::class,
-        isNullable = null is TAttribute,
-        name = name,
-        namespace = namespace,
-        defaultValue = defaultValue,
-        transform = transform,
-        inherited = inherited,
-    )
-}
+): AttributeDelegate<TAttribute, TTransform> = AttributeDelegate(
+    kClass = TAttribute::class,
+    isNullable = null is TAttribute,
+    name = name,
+    namespace = namespace,
+    defaultValue = defaultValue,
+    transform = transform,
+    inherited = inherited,
+)

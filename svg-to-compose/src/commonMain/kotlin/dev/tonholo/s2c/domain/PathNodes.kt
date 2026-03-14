@@ -79,9 +79,8 @@ sealed class PathNodes(
         ""
     }
 
-    fun String.removeTrailingZeroConsiderCloseCommand(): String =
-        this.removeTrailingZero()
-            .replace("\\.0z\\b".toRegex(), PathCommand.Close.value.toString())
+    fun String.removeTrailingZeroConsiderCloseCommand(): String = this.removeTrailingZero()
+        .replace("\\.0z\\b".toRegex(), PathCommand.Close.value.toString())
 
     /**
      * Materializes the commands on the Compose path functions.`
@@ -94,10 +93,7 @@ sealed class PathNodes(
      * should be inlined or not. By default, it's set to `false.
      * @return The function representation of the SVG/AVG command.
      */
-    protected fun materialize(
-        fnName: String,
-        forceInline: Boolean = false,
-    ): String = """
+    protected fun materialize(fnName: String, forceInline: Boolean = false): String = """
         |${if (minified) "" else "// ${toString().removeTrailingZeroConsiderCloseCommand()}"}
         |$fnName${if (isRelative) "Relative" else ""}(${buildParameters().toParameters(forceInline)})
         |${closeCommand()}
@@ -146,16 +142,13 @@ sealed class PathNodes(
      * @property minified A boolean value indicating whether the output of
      * [materialize] should be minified.
      */
-    class MoveTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.MoveTo,
-        minified = minified,
-    ),
+    class MoveTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.MoveTo,
+            minified = minified,
+        ),
         CoordinatePoint {
         override val x = values.first().lowercase().removePrefix(command.toString()).toDouble()
         override val y = values[1]
@@ -171,12 +164,10 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "moveTo",
-                forceInline = true,
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "moveTo",
+            forceInline = true,
+        )
 
         override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
@@ -236,16 +227,13 @@ sealed class PathNodes(
      * @property minified A boolean value indicating whether the output of [materialize]
      * should be minified.
      */
-    class ArcTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.ArcTo,
-        minified = minified,
-    ),
+    class ArcTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.ArcTo,
+            minified = minified,
+        ),
         CoordinatePoint {
         /**
          * rx
@@ -306,11 +294,9 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "arcTo",
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "arcTo",
+        )
 
         override fun toString(): String {
             val arc = "$realCommand ${this.a.toFloat()} ${this.b.toFloat()} ${theta.toFloat()}"
@@ -394,16 +380,13 @@ sealed class PathNodes(
      * should be minified.
      * @property y The new y-coordinate to which the line extends.
      */
-    class VerticalLineTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.VerticalLineTo,
-        minified = minified,
-    ),
+    class VerticalLineTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.VerticalLineTo,
+            minified = minified,
+        ),
         CoordinateY {
         override val y = values
             .first()
@@ -417,16 +400,12 @@ sealed class PathNodes(
             return setOf("${relativePrefix}y = ${y.toFloat()}f")
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "verticalLineTo",
-                forceInline = true,
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "verticalLineTo",
+            forceInline = true,
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${y.toFloat()}" + super.toString()
-        }
+        override fun toString(): String = "$realCommand ${y.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the current [VerticalLineTo] command with the given parameters.
@@ -477,16 +456,13 @@ sealed class PathNodes(
      * should be minified or not.
      * @property x The new x-coordinate to which the line extends.
      */
-    class HorizontalLineTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.HorizontalLineTo,
-        minified = minified,
-    ),
+    class HorizontalLineTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.HorizontalLineTo,
+            minified = minified,
+        ),
         CoordinateX {
         override val x = values
             .first()
@@ -500,16 +476,12 @@ sealed class PathNodes(
             return setOf("${relativePrefix}x = ${x.toFloat()}f")
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "horizontalLineTo",
-                forceInline = true,
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "horizontalLineTo",
+            forceInline = true,
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${x.toFloat()}" + super.toString()
-        }
+        override fun toString(): String = "$realCommand ${x.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of this [HorizontalLineTo] command.
@@ -566,16 +538,13 @@ sealed class PathNodes(
      * @property x The new x-coordinate to which the line extends.
      * @property y The new y-coordinate to which the line extends.
      */
-    class LineTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.LineTo,
-        minified = minified,
-    ),
+    class LineTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.LineTo,
+            minified = minified,
+        ),
         CoordinatePoint {
         override val x = values
             .first()
@@ -595,16 +564,12 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "lineTo",
-                forceInline = true,
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "lineTo",
+            forceInline = true,
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
-        }
+        override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [LineTo] command with the specified changes.
@@ -661,16 +626,13 @@ sealed class PathNodes(
      * @property minified A boolean value indicating whether the output of [materialize]
      * should be minified or not.
      */
-    class CurveTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.CurveTo,
-        minified = minified,
-    ),
+    class CurveTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.CurveTo,
+            minified = minified,
+        ),
         ControlPoint1,
         ControlPoint2,
         ControlPoint3 {
@@ -696,11 +658,9 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "curveTo",
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "curveTo",
+        )
 
         override fun toString(): String {
             val controls = "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}"
@@ -778,16 +738,13 @@ sealed class PathNodes(
      * @property x2 The x-coordinate for the second control point.
      * @property y2 The y-coordinate for the second control point.
      */
-    class ReflectiveCurveTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.ReflectiveCurveTo,
-        minified = minified,
-    ),
+    class ReflectiveCurveTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.ReflectiveCurveTo,
+            minified = minified,
+        ),
         ControlPoint1,
         ControlPoint2 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
@@ -808,15 +765,12 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "reflectiveCurveTo",
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "reflectiveCurveTo",
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
-        }
+        override fun toString(): String =
+            "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [ReflectiveCurveTo] command with the specified values.
@@ -880,16 +834,13 @@ sealed class PathNodes(
      * @property x2 The x-coordinate for the second control point.
      * @property y2 The y-coordinate for the second control point.
      */
-    class QuadTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.QuadTo,
-        minified = minified,
-    ),
+    class QuadTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.QuadTo,
+            minified = minified,
+        ),
         ControlPoint1,
         ControlPoint2 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
@@ -910,15 +861,12 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "quadTo",
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "quadTo",
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
-        }
+        override fun toString(): String =
+            "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [QuadTo] command with the given parameters.
@@ -985,16 +933,13 @@ sealed class PathNodes(
      * @property x1 represents the x-coordinate for the ending point of the curve
      * @property y1 signifies the y-coordinate for the ending point of the curve
      */
-    class ReflectiveQuadTo(
-        values: List<String>,
-        isRelative: Boolean,
-        minified: Boolean,
-    ) : PathNodes(
-        values = values,
-        isRelative = isRelative,
-        command = PathCommand.ReflectiveQuadTo,
-        minified = minified,
-    ),
+    class ReflectiveQuadTo(values: List<String>, isRelative: Boolean, minified: Boolean) :
+        PathNodes(
+            values = values,
+            isRelative = isRelative,
+            command = PathCommand.ReflectiveQuadTo,
+            minified = minified,
+        ),
         ControlPoint1 {
         override val x1 = values.first().lowercase().removePrefix(command.toString()).toDouble()
         override val y1 = values[1]
@@ -1010,15 +955,11 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String {
-            return materialize(
-                fnName = "reflectiveQuadTo",
-            )
-        }
+        override fun materialize(): String = materialize(
+            fnName = "reflectiveQuadTo",
+        )
 
-        override fun toString(): String {
-            return "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
-        }
+        override fun toString(): String = "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [ReflectiveQuadTo] command with the
@@ -1084,7 +1025,9 @@ internal interface CoordinateY {
 /**
  * Interface representing a point in a 2D space with both X and Y coordinates.
  */
-internal interface CoordinatePoint : CoordinateX, CoordinateY
+internal interface CoordinatePoint :
+    CoordinateX,
+    CoordinateY
 
 /**
  * Interface representing the X-coordinate of the first control point.
@@ -1121,7 +1064,9 @@ internal interface ControlPointY1 {
  * a control point determines the direction and length of the curve. The
  * first control point helps define the initial slope of the curve.
  */
-internal interface ControlPoint1 : ControlPointX1, ControlPointY1
+internal interface ControlPoint1 :
+    ControlPointX1,
+    ControlPointY1
 
 /**
  * Interface representing the X-coordinate of the second control point.
@@ -1158,7 +1103,9 @@ internal interface ControlPointY2 {
  * a control point determines the direction and length of the curve. The
  * second control point helps define the curvature towards the end point.
  */
-internal interface ControlPoint2 : ControlPointX2, ControlPointY2
+internal interface ControlPoint2 :
+    ControlPointX2,
+    ControlPointY2
 
 /**
  * Interface representing the X-coordinate of the third control point.
@@ -1198,4 +1145,6 @@ internal interface ControlPointY3 {
  * curve. This is less common in basic Bézier curves but can be applicable
  * in more intricate path definitions.
  */
-internal interface ControlPoint3 : ControlPointX3, ControlPointY3
+internal interface ControlPoint3 :
+    ControlPointX3,
+    ControlPointY3

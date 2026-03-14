@@ -63,7 +63,7 @@ internal class ArcBoundingBoxCalculator(
             doubleArrayOf(cosPhi, sinPhi, 0.0),
             doubleArrayOf(-sinPhi, cosPhi, 0.0),
             doubleArrayOf(0.0, 0.0, 0.0),
-        )
+        ),
     )
 
     private lateinit var primedCenter: Point2D
@@ -105,7 +105,7 @@ internal class ArcBoundingBoxCalculator(
                 listOf(
                     Point2D(current.x, current.y),
                     Point2D(x, y),
-                )
+                ),
             )
             .fold(
                 initial = boundingBox,
@@ -119,9 +119,7 @@ internal class ArcBoundingBoxCalculator(
             }
     }
 
-    private fun correctOutOfRangeRadii(
-        primedCoordinates: Point2D,
-    ) {
+    private fun correctOutOfRangeRadii(primedCoordinates: Point2D) {
         // eq. 6.1
         rx = abs(rx)
         ry = abs(ry)
@@ -152,7 +150,7 @@ internal class ArcBoundingBoxCalculator(
             Point2D(x = 0.0, y = 0.0)
         } else {
             val sqrt = sqrt(
-                dividend / (divisor1 + divisor2)
+                dividend / (divisor1 + divisor2),
             )
 
             if (sqrt.isNaN()) {
@@ -160,7 +158,7 @@ internal class ArcBoundingBoxCalculator(
             } else {
                 Point2D(
                     rx * primedCoordinates.y / ry,
-                    -ry * primedCoordinates.x / rx
+                    -ry * primedCoordinates.x / rx,
                 ) * sqrt
             }
         } * multiplier
@@ -171,7 +169,7 @@ internal class ArcBoundingBoxCalculator(
                 doubleArrayOf(cosPhi, sinPhi, 0.0),
                 doubleArrayOf(-sinPhi, cosPhi, 0.0),
                 doubleArrayOf(0.0, 0.0, 0.0),
-            )
+            ),
         ) + Point2D(
             x = (current.x + x) / 2,
             y = (current.y + y) / 2,
@@ -244,7 +242,7 @@ internal class ArcBoundingBoxCalculator(
         val cosTheta = cos(tInAngle)
         return Point2D(
             x = cosPhi * rx * cosTheta - sinPhi * ry * sinTheta + center.x,
-            y = sinPhi * ry * cosTheta + cosPhi * rx * sinTheta + center.y
+            y = sinPhi * ry * cosTheta + cosPhi * rx * sinTheta + center.y,
         )
     }
 }

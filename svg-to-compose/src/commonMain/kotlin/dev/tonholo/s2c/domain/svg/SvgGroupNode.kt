@@ -10,7 +10,8 @@ class SvgGroupNode(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgElementNode<SvgGroupNode>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgGroupNode>(parent, children, attributes, tagName = TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgGroupNode
     val maskId: String? by attribute("mask")
     val filterId: String? by attribute("filter")
@@ -91,7 +92,9 @@ private fun SvgGroupNode.createGroupClipPath(
     val clipPathAttribute = attributes["clip-path"]
     return when {
         paths != null -> paths
+
         clipPath != null -> clipPath?.asNodeWrapper(computedRules, minified = true)
+
         clipPathAttribute?.startsWith("url") == true -> {
             val clipPathId = clipPathAttribute.normalizedId()
             return (rootParent as? SvgRootNode)

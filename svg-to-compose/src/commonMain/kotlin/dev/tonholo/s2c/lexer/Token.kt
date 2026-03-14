@@ -13,18 +13,12 @@ import dev.tonholo.s2c.extensions.prependIndent
  * @property startOffset The inclusive start offset of the token in the original text.
  * @property endOffset The exclusive end offset of the token in the original text.
  */
-data class Token<T : TokenKind>(
-    val kind: T,
-    val startOffset: Int,
-    val endOffset: Int,
-) {
-    override fun toString(): String {
-        return buildString {
-            appendLine("Token(")
-            appendLine("kind = $kind,".prependIndent(indentSize = 2))
-            appendLine("startOffset = $startOffset,".prependIndent(indentSize = 2))
-            appendLine("endOffset = $endOffset,".prependIndent(indentSize = 2))
-            appendLine(")")
-        }
+data class Token<T : TokenKind>(val kind: T, val startOffset: Int, val endOffset: Int) {
+    override fun toString(): String = buildString {
+        appendLine("Token(")
+        appendLine("kind = $kind,".prependIndent(indentSize = 2))
+        appendLine("startOffset = $startOffset,".prependIndent(indentSize = 2))
+        appendLine("endOffset = $endOffset,".prependIndent(indentSize = 2))
+        appendLine(")")
     }
 }

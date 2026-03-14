@@ -6,10 +6,8 @@ import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.builder.pathNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
-class SvgPolylineNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNodeWithListOfPoints<SvgPolylineNode>(parent, attributes, TAG_NAME) {
+class SvgPolylineNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
+    SvgGraphicNodeWithListOfPoints<SvgPolylineNode>(parent, attributes, TAG_NAME) {
     override val constructor: SvgChildNodeConstructorFn<SvgPolylineNode> = ::SvgPolylineNode
 
     companion object {
@@ -17,9 +15,7 @@ class SvgPolylineNode(
     }
 }
 
-fun SvgPolylineNode.asNode(
-    minified: Boolean,
-): ImageVectorNode.Path {
+fun SvgPolylineNode.asNode(minified: Boolean): ImageVectorNode.Path {
     val nodes = createSimplePolylineNodes(minified)
     return ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
@@ -49,9 +45,7 @@ private fun SvgPolylineNode.buildNormalizedPath(): String = buildString {
     append("/>")
 }
 
-private fun SvgPolylineNode.createSimplePolylineNodes(
-    minified: Boolean,
-): List<PathNodes> = buildList {
+private fun SvgPolylineNode.createSimplePolylineNodes(minified: Boolean): List<PathNodes> = buildList {
     val points = points.toMutableList()
     val first = points.removeFirst()
     add(

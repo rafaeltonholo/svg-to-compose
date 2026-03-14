@@ -18,9 +18,7 @@ import dev.tonholo.s2c.parser.ast.iterator.parserError
  *
  * @param content The CSS content being parsed.
  */
-internal class SimpleSelectorConsumer(
-    content: String,
-) : Consumer<Selector>(content) {
+internal class SimpleSelectorConsumer(content: String) : Consumer<Selector>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Selector {
         val current = iterator.expectToken(selectorTokens)
         return when (current.kind) {
@@ -95,19 +93,15 @@ internal class SimpleSelectorConsumer(
         }
     }
 
-    private fun lookupForCombinator(iterator: AstParserIterator<CssTokenKind>): CssCombinator? {
-        return CssCombinator.from(iterator.peek(steps = 0)?.kind)
-    }
+    private fun lookupForCombinator(iterator: AstParserIterator<CssTokenKind>): CssCombinator? =
+        CssCombinator.from(iterator.peek(steps = 0)?.kind)
 
     private fun calculateLocation(
         startToken: Token<out CssTokenKind>,
         endToken: Token<out CssTokenKind>,
     ): CssLocation = calculateLocation(startToken.startOffset, endToken.endOffset)
 
-    private fun calculateLocation(
-        startOffset: Int,
-        endOffset: Int,
-    ): CssLocation = CssLocation(
+    private fun calculateLocation(startOffset: Int, endOffset: Int): CssLocation = CssLocation(
         source = content.substring(startOffset, endOffset),
         start = startOffset,
         end = endOffset,

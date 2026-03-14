@@ -26,11 +26,7 @@ sealed interface CssStatementNode : CssNode
 /**
  * Represents a location in a CSS source file.
  */
-data class CssLocation(
-    val source: String,
-    val start: Int,
-    val end: Int,
-) {
+data class CssLocation(val source: String, val start: Int, val end: Int) {
     override fun toString(): String = buildString {
         appendLine("CssLocation(")
         appendLine("source = \"\"\"$source\"\"\",".prependIndent(indentSize = 2))

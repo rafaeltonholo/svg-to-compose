@@ -8,10 +8,9 @@ import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 
-class SvgPathNode(
-    parent: XmlParentNode,
-    attributes: MutableMap<String, String>,
-) : SvgGraphicNode<SvgPathNode>(parent, attributes, TAG_NAME), SvgNode {
+class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
+    SvgGraphicNode<SvgPathNode>(parent, attributes, TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgPathNode
     val d: String by attribute()
     val clipPath: String? by attribute(name = "clip-path")
@@ -44,22 +43,17 @@ class SvgPathNode(
         error("use strokeBrush property instead")
     }
 
-    private fun getGradient(fillColor: String): ComposeBrush.Gradient? {
-        return getGradient(
-            fillColor = fillColor,
-            nodes = d.asNodeWrapper(minified = false).nodes,
-        )
-    }
+    private fun getGradient(fillColor: String): ComposeBrush.Gradient? = getGradient(
+        fillColor = fillColor,
+        nodes = d.asNodeWrapper(minified = false).nodes,
+    )
 
     companion object {
         const val TAG_NAME = "path"
     }
 }
 
-fun SvgPathNode.asNode(
-    computedRules: List<ComputedRule> = emptyList(),
-    minified: Boolean = false,
-): ImageVectorNode {
+fun SvgPathNode.asNode(computedRules: List<ComputedRule> = emptyList(), minified: Boolean = false): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush,

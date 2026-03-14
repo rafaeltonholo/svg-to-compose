@@ -84,8 +84,7 @@ internal fun debug(message: Any) = logger.debug(message)
         expression = "logger.debugSection(title, block)",
     ),
 )
-internal fun <T> debugSection(title: String, block: () -> T): T =
-    logger.debugSection(title, block)
+internal fun <T> debugSection(title: String, block: () -> T): T = logger.debugSection(title, block)
 
 @Deprecated(
     "Use logger instead.",
@@ -93,8 +92,7 @@ internal fun <T> debugSection(title: String, block: () -> T): T =
         expression = "logger.verboseSection(title, block)",
     ),
 )
-internal fun <T> verboseSection(title: String, block: () -> T) =
-    logger.verboseSection(title, block)
+internal fun <T> verboseSection(title: String, block: () -> T) = logger.verboseSection(title, block)
 
 @Deprecated(
     "Use logger instead.",

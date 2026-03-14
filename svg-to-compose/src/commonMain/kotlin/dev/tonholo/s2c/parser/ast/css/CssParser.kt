@@ -17,9 +17,7 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.StyleSheet
  *
  * @property consumers The consumers used to parse the CSS syntax.
  */
-internal class CssParser(
-    private val consumers: CssConsumers,
-) : AstParser<CssTokenKind, StyleSheet> {
+internal class CssParser(private val consumers: CssConsumers) : AstParser<CssTokenKind, StyleSheet> {
     override fun parse(tokens: List<Token<out CssTokenKind>>): StyleSheet {
         val iterator = CssIterator(tokens)
         val root = consumers.styleSheetConsumer.consume(iterator = iterator)

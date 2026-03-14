@@ -38,7 +38,7 @@ val kmpPreviewImports = buildSet {
 }
 
 val materialReceiverTypeImport = setOf(
-    "androidx.compose.material.icons.Icons"
+    "androidx.compose.material.icons.Icons",
 )
 
 /**
@@ -93,7 +93,7 @@ data class IconFileContents(
            |    receiver_type=$receiverType
            |    imports=$imports
            |
-            """.trimMargin()
+            """.trimMargin(),
         )
 
         val iconPropertyName = buildIconPropertyName(receiverType)
@@ -163,6 +163,7 @@ data class IconFileContents(
         }
 
         addToMaterial -> "Icons.Filled.${iconName.pascalCase()}"
+
         else -> iconName.pascalCase()
     }
 
@@ -234,7 +235,7 @@ data class IconFileContents(
             val chunkSize = nodes.size / chunks
             warn(
                 "Potential large icon detected. Splitting icon's content in $chunks chunks to avoid " +
-                    "compilation issues. However, that won't affect the performance of displaying this icon."
+                    "compilation issues. However, that won't affect the performance of displaying this icon.",
             )
             nodes.chunked(chunkSize) { chunk ->
                 val snapshot = chunk.toList()

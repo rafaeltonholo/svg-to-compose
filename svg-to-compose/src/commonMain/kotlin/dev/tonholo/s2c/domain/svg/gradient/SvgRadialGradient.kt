@@ -27,7 +27,7 @@ abstract class SvgRadialGradient<out T>(
      */
     internal val radius: SvgLength by attribute<SvgLength?, SvgLength>(
         name = "r",
-        transform = { length -> length ?: SvgLength("50%") }
+        transform = { length -> length ?: SvgLength("50%") },
     )
 
     /**

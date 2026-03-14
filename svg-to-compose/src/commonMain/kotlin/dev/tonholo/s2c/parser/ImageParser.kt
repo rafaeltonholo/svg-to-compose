@@ -31,9 +31,7 @@ import okio.Path
  * @see [ImageParser.SvgImageParser]
  * @see [ImageParser.AndroidVectorParser]
  */
-sealed class ImageParser(
-    protected val fileManager: FileManager,
-) {
+sealed class ImageParser(protected val fileManager: FileManager) {
     /**
      * Parse a SVG/AVG icon and creates a [IconFileContents] object containing
      * all the required information to generate the Jetpack Compose Icon.
@@ -47,11 +45,7 @@ sealed class ImageParser(
      * @return An [IconFileContents] object instance which contains information
      * about the icon parsed from the file.
      */
-    abstract fun parse(
-        file: Path,
-        iconName: String,
-        config: ParserConfig,
-    ): IconFileContents
+    abstract fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents
 
     /**
      * This function generates the Icon's imports for the provided list of
@@ -84,10 +78,7 @@ sealed class ImageParser(
      * @see createGroupImports
      * @see createChunkFunctionsImports
      */
-    protected fun createImports(
-        nodes: List<ImageVectorNode>,
-        config: ParserConfig,
-    ): Set<String> = buildSet {
+    protected fun createImports(nodes: List<ImageVectorNode>, config: ParserConfig): Set<String> = buildSet {
         addAll(defaultImports)
         if (config.noPreview.not()) {
             addAll(if (config.kmpPreview) kmpPreviewImports else androidPreviewImports)
@@ -127,9 +118,7 @@ sealed class ImageParser(
      * @param fileManager The Main tool that helps to manage files and allows
      *  reading data from the file system.
      */
-    class SvgImageParser(
-        fileManager: FileManager,
-    ) : ImageParser(fileManager) {
+    class SvgImageParser(fileManager: FileManager) : ImageParser(fileManager) {
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -151,11 +140,7 @@ sealed class ImageParser(
          * @return [IconFileContents] object instance which contains details about the
          * icon parsed from the file.
          */
-        override fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): IconFileContents {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
@@ -198,9 +183,7 @@ sealed class ImageParser(
      * @param fileManager The Main tool that helps to manage files and allows
      * reading data from the file system.
      */
-    class AndroidVectorParser(
-        fileManager: FileManager,
-    ) : ImageParser(fileManager) {
+    class AndroidVectorParser(fileManager: FileManager) : ImageParser(fileManager) {
         /**
          * Parses an AVG file into an [IconFileContents] object.
          *
@@ -220,11 +203,7 @@ sealed class ImageParser(
          * @return an [IconFileContents] object instance that holds data about the parsed
          * icon.
          */
-        override fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): IconFileContents {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Avg)
@@ -283,11 +262,7 @@ sealed class ImageParser(
          * @returns A string after parsing the mentioned file using the appropriate
          * parser based on the file extension.
          */
-        fun parse(
-            file: Path,
-            iconName: String,
-            config: ParserConfig,
-        ): String {
+        fun parse(file: Path, iconName: String, config: ParserConfig): String {
             val extension = file.extension
             return parsers[extension]?.invoke()?.parse(
                 file = file,
@@ -295,7 +270,7 @@ sealed class ImageParser(
                 config = config,
             )?.materialize() ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
-                message = "invalid file extension ($extension)."
+                message = "invalid file extension ($extension).",
             )
         }
     }

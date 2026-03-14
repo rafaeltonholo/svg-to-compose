@@ -39,12 +39,10 @@ private val transformsMap = mapOf(
 
 @JvmInline
 value class SvgTransform(val value: String) {
-    fun toTransformations(): List<AffineTransformation> {
-        return transforms()
-            .mapNotNull { (name, values) ->
-                transformsMap[name]?.invoke(values)
-            }
-    }
+    fun toTransformations(): List<AffineTransformation> = transforms()
+        .mapNotNull { (name, values) ->
+            transformsMap[name]?.invoke(values)
+        }
 
     private fun transforms(): List<Pair<String, List<Double>>> = value
         .split(REGEX_TRANSFORM_SPLIT.toRegex())

@@ -8,13 +8,8 @@ import dev.tonholo.s2c.extensions.prependIndent
  * @property location The location of the stylesheet in the source code.
  * @property children The list of CSS statements within the stylesheet.
  */
-data class StyleSheet(
-    override val location: CssLocation,
-    val children: List<CssStatementNode>,
-) : CssNode {
-    override fun toString(indent: Int): String {
-        return children.joinToString("\n") { it.toString(indent) }
-    }
+data class StyleSheet(override val location: CssLocation, val children: List<CssStatementNode>) : CssNode {
+    override fun toString(indent: Int): String = children.joinToString("\n") { it.toString(indent) }
 
     override fun toString(): String = buildString {
         appendLine("StyleSheet(")

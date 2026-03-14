@@ -14,9 +14,13 @@ enum class AvgGradientTileMode {
     companion object {
         operator fun invoke(value: String): AvgGradientTileMode = when (value.lowercase()) {
             Clamp.toString().lowercase() -> Clamp
+
             Mirror.toString().lowercase() -> Mirror
+
             Repeat.toString().lowercase() -> Repeat
+
             Disabled.toString().lowercase() -> Disabled
+
             else -> {
                 warn(
                     "'$value' is an unsupported type of tileMode for ${AvgGradient.TAG_NAME} tag. " +

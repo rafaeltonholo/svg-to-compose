@@ -8,7 +8,8 @@ class SvgClipPath(
     parent: XmlParentNode,
     override val children: MutableSet<XmlNode>,
     attributes: MutableMap<String, String>,
-) : SvgElementNode<SvgClipPath>(parent, children, attributes, tagName = TAG_NAME), SvgNode {
+) : SvgElementNode<SvgClipPath>(parent, children, attributes, tagName = TAG_NAME),
+    SvgNode {
     override val constructor = ::SvgClipPath
 
     companion object {

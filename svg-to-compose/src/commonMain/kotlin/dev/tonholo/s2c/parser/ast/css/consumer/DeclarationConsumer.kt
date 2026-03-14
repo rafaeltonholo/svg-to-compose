@@ -17,10 +17,8 @@ import dev.tonholo.s2c.parser.ast.iterator.AstParserIterator
  * @param content The complete CSS content being parsed.
  * @param valueConsumer The [Consumer] responsible for parsing value tokens into [Value] objects.
  */
-internal class DeclarationConsumer(
-    content: String,
-    private val valueConsumer: Consumer<Value>,
-) : Consumer<Declaration>(content) {
+internal class DeclarationConsumer(content: String, private val valueConsumer: Consumer<Value>) :
+    Consumer<Declaration>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Declaration {
         val current = iterator.expectToken(kind = CssTokenKind.Ident)
         val property = content.substring(startIndex = current.startOffset, endIndex = current.endOffset)
@@ -31,6 +29,7 @@ internal class DeclarationConsumer(
             val next = iterator.expectNextTokenNotNull()
             when (next.kind) {
                 CssTokenKind.Colon, CssTokenKind.WhiteSpace -> Unit
+
                 CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> {
                     last = next
                     break

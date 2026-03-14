@@ -10,7 +10,7 @@ value class SvgColor private constructor(val value: String) {
     companion object {
         val Default = SvgColor("#FF000000")
         operator fun invoke(value: String): SvgColor = SvgColor(
-            namedColors[value] ?: value
+            namedColors[value] ?: value,
         )
     }
 }

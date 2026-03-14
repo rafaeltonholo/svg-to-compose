@@ -4,7 +4,9 @@ import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import kotlin.jvm.JvmInline
 
-sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
+sealed interface ComposeBrush :
+    ComposeType<String>,
+    MethodSizeAccountable {
     @JvmInline
     value class SolidColor(override val value: String) : ComposeBrush {
         companion object {
@@ -197,11 +199,7 @@ sealed interface ComposeBrush : ComposeType<String>, MethodSizeAccountable {
     }
 }
 
-private fun StringBuilder.appendColors(
-    stops: List<Float>?,
-    colors: List<ComposeColor>,
-    indent: Int,
-) {
+private fun StringBuilder.appendColors(stops: List<Float>?, colors: List<ComposeColor>, indent: Int) {
     if (stops.isNullOrEmpty()) {
         appendLine("colors = listOf(".indented(indent))
         colors

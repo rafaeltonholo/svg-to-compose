@@ -23,10 +23,8 @@ private val validAtRules = setOf("media", "keyframes", "import", "charset", "sup
  * @param content The CSS content being parsed.
  * @param blockConsumer The consumer used to parse the block of the at-rule, if present.
  */
-internal class AtRuleConsumer(
-    content: String,
-    private val blockConsumer: SimpleBlockConsumer<Rule>,
-) : Consumer<AtRule>(content) {
+internal class AtRuleConsumer(content: String, private val blockConsumer: SimpleBlockConsumer<Rule>) :
+    Consumer<AtRule>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): AtRule {
         val current = iterator.current()
         iterator.parserCheckNotNull(value = current, content = content) {
@@ -56,6 +54,7 @@ internal class AtRuleConsumer(
                 CssTokenKind.Semicolon, CssTokenKind.CloseCurlyBrace -> break
 
                 CssTokenKind.EndOfFile -> iterator.parserError(content, "Incomplete @rule.")
+
                 CssTokenKind.OpenCurlyBrace -> {
                     val block = blockConsumer.consume(iterator)
                     atRule = atRule.copy(
@@ -84,7 +83,7 @@ internal class AtRuleConsumer(
                             end = preludeContentEndOffset,
                         ),
                         value = content.substring(preludeStartOffset, preludeContentEndOffset),
-                    )
+                    ),
                 ),
             ),
         )

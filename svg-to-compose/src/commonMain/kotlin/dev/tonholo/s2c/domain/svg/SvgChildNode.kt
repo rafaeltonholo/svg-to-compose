@@ -9,26 +9,25 @@ typealias SvgChildNodeConstructorFn<T> = (
     attributes: MutableMap<String, String>,
 ) -> T
 
-abstract class SvgChildNode<out T>(parent: XmlParentNode) : XmlChildNode(parent), SvgNode
+abstract class SvgChildNode<out T>(parent: XmlParentNode) :
+    XmlChildNode(parent),
+    SvgNode
     where T : SvgNode, T : XmlChildNode {
     protected abstract val constructor: SvgChildNodeConstructorFn<T>
     override val transform: SvgTransform? by lazy {
         stackedTransform(parent)
     }
 
-    override fun toJsString(extra: (StringBuilder.() -> Unit)?): String {
-        return super.toJsString {
-            append("\"stackedTransform\": \"$transform\"")
-            if (extra != null) {
-                append(", ")
-                extra()
-            }
+    override fun toJsString(extra: (StringBuilder.() -> Unit)?): String = super.toJsString {
+        append("\"stackedTransform\": \"$transform\"")
+        if (extra != null) {
+            append(", ")
+            extra()
         }
     }
 
-    open fun copy(parent: XmlParentNode? = null, attributes: Map<String, String>? = null): T =
-        constructor(
-            parent ?: this.parent,
-            (attributes ?: this.attributes).toMutableMap(),
-        )
+    open fun copy(parent: XmlParentNode? = null, attributes: Map<String, String>? = null): T = constructor(
+        parent ?: this.parent,
+        (attributes ?: this.attributes).toMutableMap(),
+    )
 }
