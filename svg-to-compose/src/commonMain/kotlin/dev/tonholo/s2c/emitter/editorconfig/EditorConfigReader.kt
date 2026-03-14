@@ -19,9 +19,7 @@ private const val EDITOR_CONFIG_FILENAME = ".editorconfig"
  * @property fileManager The file manager used to check file existence and read content.
  */
 @Inject
-class EditorConfigReader(
-    private val fileManager: FileManager,
-) {
+class EditorConfigReader(private val fileManager: FileManager) {
     /**
      * Resolves a [FormatConfig] by walking up from [outputPath] and merging
      * all `.editorconfig` files found along the way.

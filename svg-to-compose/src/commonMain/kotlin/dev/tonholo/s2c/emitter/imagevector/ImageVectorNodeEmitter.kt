@@ -148,16 +148,14 @@ internal class ImageVectorNodeEmitter(
     }
 
     @Suppress("CyclomaticComplexMethod")
-    private fun buildGroupParameters(
-        group: ImageVectorNode.Group,
-    ): Set<Pair<String, String>> = with(group.params) {
+    private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
         val indentSize = formatConfig.indentSize
         buildSet {
             clipPath?.let {
                 val doubleIndent = " ".repeat(indentSize * 2)
                 val clipPathData = clipPath.nodes
-                    .joinToString("\n$doubleIndent") {
-                        pathNodeEmitter.emit(it)
+                    .joinToString("\n$doubleIndent") { node ->
+                        pathNodeEmitter.emit(node)
                             .replace("\n", "\n$doubleIndent")
                             .trimEnd()
                     }
@@ -165,18 +163,18 @@ internal class ImageVectorNodeEmitter(
                     |PathData {
                     |${indent}${clipPathData.indented(indentSize = indentSize)}
                     |${"}".indented(indentSize)}"""
-                        .trimMargin()
-                    add(CLIP_PATH_PARAM_NAME to value)
-                }
-                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
-                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
-                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
-                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
-                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
-                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
-                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
+                    .trimMargin()
+                add(CLIP_PATH_PARAM_NAME to value)
             }
+            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
+            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
+            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
+            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
+            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
+            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
+            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
         }
+    }
 
     private companion object {
         const val CLIP_PATH_PARAM_NAME = "clipPathData"

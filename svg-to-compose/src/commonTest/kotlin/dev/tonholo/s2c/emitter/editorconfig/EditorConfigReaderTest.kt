@@ -103,33 +103,31 @@ class EditorConfigReaderTest {
         assertEquals(IndentStyle.TAB, result.indentStyle)
     }
 
-    private fun fakeFileManager(
-        files: Map<String, String>,
-        directories: Set<String> = emptySet(),
-    ): FileManager = object : FileManager {
-        override fun isDirectory(path: Path): Boolean = path.toString() in directories
+    private fun fakeFileManager(files: Map<String, String>, directories: Set<String> = emptySet()): FileManager =
+        object : FileManager {
+            override fun isDirectory(path: Path): Boolean = path.toString() in directories
 
-        override fun createDirectory(dir: Path) = Unit
-        override fun createDirectories(dir: Path, mustCreate: Boolean) = Unit
+            override fun createDirectory(dir: Path) = Unit
+            override fun createDirectories(dir: Path, mustCreate: Boolean) = Unit
 
-        override fun exists(path: Path): Boolean = path.toString() in files
+            override fun exists(path: Path): Boolean = path.toString() in files
 
-        override fun readContent(file: Path): String =
-            files[file.toString()] ?: throw IOException("File not found: $file")
+            override fun readContent(file: Path): String =
+                files[file.toString()] ?: throw IOException("File not found: $file")
 
-        override fun readBytes(file: Path): ByteArray = readContent(file).encodeToByteArray()
+            override fun readBytes(file: Path): ByteArray = readContent(file).encodeToByteArray()
 
-        override fun write(file: Path, mustCreate: Boolean, writerAction: BufferedSink.() -> Unit) = Unit
+            override fun write(file: Path, mustCreate: Boolean, writerAction: BufferedSink.() -> Unit) = Unit
 
-        override fun findFilesToProcess(
-            from: Path,
-            recursive: Boolean,
-            maxDepth: Int?,
-            exclude: Regex?,
-        ): List<Path> = emptyList()
+            override fun findFilesToProcess(
+                from: Path,
+                recursive: Boolean,
+                maxDepth: Int?,
+                exclude: Regex?,
+            ): List<Path> = emptyList()
 
-        override fun copy(source: Path, target: Path) = Unit
-        override fun deleteRecursively(fileOrDirectory: Path, mustExist: Boolean) = Unit
-        override fun delete(fileOrDirectory: Path, mustExist: Boolean) = Unit
-    }
+            override fun copy(source: Path, target: Path) = Unit
+            override fun deleteRecursively(fileOrDirectory: Path, mustExist: Boolean) = Unit
+            override fun delete(fileOrDirectory: Path, mustExist: Boolean) = Unit
+        }
 }

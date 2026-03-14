@@ -24,10 +24,8 @@ private const val EXTRA_CONTENT_PLACEHOLDER = "[EXTRA_CONTENT_PLACEHOLDER]"
  * @property logger The logger instance for diagnostic output.
  * @property formatConfig The formatting configuration to use.
  */
-class ImageVectorEmitter(
-    private val logger: Logger,
-    private val formatConfig: FormatConfig = FormatConfig(),
-) : CodeEmitter {
+class ImageVectorEmitter(private val logger: Logger, private val formatConfig: FormatConfig = FormatConfig()) :
+    CodeEmitter {
     private val nodeEmitter = ImageVectorNodeEmitter(formatConfig)
 
     /** Single indent level derived from [formatConfig]. */
@@ -50,7 +48,7 @@ class ImageVectorEmitter(
         val extraContent = buildExtraContent(chunkFunctionsContent, preview)
         val visibilityModifier = if (contents.makeInternal) "internal " else ""
 
-        val level1 = indent          // 1 level
+        val level1 = indent // 1 level
         val level2 = indent.repeat(2) // 2 levels
         val level3 = indent.repeat(3) // 3 levels
 
@@ -70,10 +68,10 @@ class ImageVectorEmitter(
             |${level3}defaultHeight = ${contents.height}.dp,
             |${level3}viewportWidth = ${contents.viewportWidth}f,
             |${level3}viewportHeight = ${contents.viewportHeight}f,
-            |${level2}).apply {
+            |$level2).apply {
             |$pathNodes
-            |${level2}}.build().also { _${contents.iconName.camelCase()} = it }
-            |${level1}}
+            |$level2}.build().also { _${contents.iconName.camelCase()} = it }
+            |$level1}
             |$EXTRA_CONTENT_PLACEHOLDER
             |@Suppress("ObjectPropertyName")
             |private var _${contents.iconName.camelCase()}: ImageVector? = null
@@ -111,16 +109,15 @@ class ImageVectorEmitter(
         else -> contents.iconName.pascalCase()
     }
 
-    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String =
-        if (contents.noPreview) {
-            ""
-        } else {
-            val level1 = indent
-            val level2 = indent.repeat(2)
-            val level3 = indent.repeat(3)
-            val level4 = indent.repeat(4)
-            val level5 = indent.repeat(5)
-            """
+    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String = if (contents.noPreview) {
+        ""
+    } else {
+        val level1 = indent
+        val level2 = indent.repeat(2)
+        val level3 = indent.repeat(3)
+        val level4 = indent.repeat(4)
+        val level5 = indent.repeat(5)
+        """
             |
             |@Preview
             |@Composable
@@ -129,16 +126,16 @@ class ImageVectorEmitter(
             |${level2}Column(
             |${level3}verticalArrangement = Arrangement.spacedBy(8.dp),
             |${level3}horizontalAlignment = Alignment.CenterHorizontally,
-            |${level2}) {
+            |$level2) {
             |${level3}Image(
             |${level4}imageVector = $iconPropertyName,
             |${level4}contentDescription = null,
             |${level4}modifier = Modifier
-            |${level5}.width((${max(contents.width, contents.viewportWidth)}).dp)
-            |${level5}.height((${max(contents.height, contents.viewportHeight)}).dp),
-            |${level3})
-            |${level2}}
-            |${level1}}
+            |$level5.width((${max(contents.width, contents.viewportWidth)}).dp)
+            |$level5.height((${max(contents.height, contents.viewportHeight)}).dp),
+            |$level3)
+            |$level2}
+            |$level1}
             |}
             """
     }

@@ -12,9 +12,7 @@ import dev.tonholo.s2c.extensions.removeTrailingZero
  *
  * @property formatConfig The formatting configuration to use.
  */
-internal class PathNodeEmitter(
-    private val formatConfig: FormatConfig = FormatConfig(),
-) {
+internal class PathNodeEmitter(private val formatConfig: FormatConfig = FormatConfig()) {
     /**
      * Emits the Kotlin code for a single [PathNodes] command.
      *
@@ -67,7 +65,7 @@ internal class PathNodeEmitter(
         val separator = if (minified || forceInline) " " else "\n"
         val scape = if (minified || forceInline) " " else "|"
         return joinToString(separator) { "$it," }
-            .prependIndent("$scape${indent}")
+            .prependIndent("$scape$indent")
             .let {
                 if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
             }

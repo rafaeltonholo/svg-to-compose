@@ -37,7 +37,7 @@ class EditorConfigFunctionalTest {
                 }
             }
             rootProject.name = "test-project"
-            """.trimIndent()
+            """.trimIndent(),
         )
         return dir
     }
@@ -75,7 +75,7 @@ class EditorConfigFunctionalTest {
         val resourceDir = File(
             requireNotNull(javaClass.classLoader.getResource("svg")) {
                 "Test resource directory not found: svg"
-            }.toURI()
+            }.toURI(),
         )
         val icon = resourceDir.listFiles().orEmpty()
             .filter { it.isFile && it.extension == "svg" }
@@ -87,13 +87,12 @@ class EditorConfigFunctionalTest {
         projectDir.resolve(".editorconfig").writeText(content)
     }
 
-    private fun runGradle(projectDir: File): BuildResult =
-        GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withPluginClasspath()
-            .withArguments("parseSvgToComposeIcon", "--stacktrace")
-            .forwardOutput()
-            .build()
+    private fun runGradle(projectDir: File): BuildResult = GradleRunner.create()
+        .withProjectDir(projectDir)
+        .withPluginClasspath()
+        .withArguments("parseSvgToComposeIcon", "--stacktrace")
+        .forwardOutput()
+        .build()
 
     private fun readGeneratedFiles(projectDir: File, pkg: String): List<String> {
         val pkgPath = pkg.replace('.', '/')
