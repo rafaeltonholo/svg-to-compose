@@ -38,4 +38,28 @@ data class FormatConfig(
             IndentStyle.SPACE -> " ".repeat(indentSize)
             IndentStyle.TAB -> "\t"
         }
+
+    /**
+     * Partial formatting overrides with nullable fields.
+     *
+     * Non-null values take precedence when merged onto a resolved [FormatConfig]
+     * via [applyTo].
+     */
+    data class Overrides(
+        val indentSize: Int? = null,
+        val indentStyle: IndentStyle? = null,
+        val maxLineLength: Int? = null,
+        val insertFinalNewline: Boolean? = null,
+    ) {
+        /**
+         * Applies these overrides onto a base [FormatConfig], returning
+         * a new config where non-null override values replace the base values.
+         */
+        fun applyTo(base: FormatConfig): FormatConfig = FormatConfig(
+            indentSize = indentSize ?: base.indentSize,
+            maxLineLength = maxLineLength ?: base.maxLineLength,
+            indentStyle = indentStyle ?: base.indentStyle,
+            insertFinalNewline = insertFinalNewline ?: base.insertFinalNewline,
+        )
+    }
 }

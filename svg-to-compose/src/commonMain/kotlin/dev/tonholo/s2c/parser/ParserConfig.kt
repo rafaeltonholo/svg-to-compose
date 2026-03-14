@@ -41,6 +41,9 @@ import dev.tonholo.s2c.emitter.FormatConfig
  * delete the temp folder. Useful when running parallel execution.
  * @property formatConfig optional formatting configuration for code emission.
  * When `null`, the processor will attempt to resolve formatting from `.editorconfig`.
+ * @property formatOverrides optional partial overrides applied on top of the resolved
+ * [FormatConfig]. Use this to let CLI flags override individual fields while still
+ * inheriting unspecified values from `.editorconfig`.
  */
 data class ParserConfig(
     val pkg: String,
@@ -56,4 +59,5 @@ data class ParserConfig(
     val silent: Boolean = false,
     val keepTempFolder: Boolean = false,
     val formatConfig: FormatConfig? = null,
+    val formatOverrides: FormatConfig.Overrides? = null,
 )

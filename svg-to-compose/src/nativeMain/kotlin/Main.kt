@@ -238,6 +238,7 @@ class Client : CliktCommand(name = "s2c") {
                     kmpPreview = isKmp,
                     exclude = exclude?.let(::Regex),
                     formatConfig = buildFormatConfig(),
+                    formatOverrides = buildFormatOverrides(),
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
@@ -257,22 +258,33 @@ class Client : CliktCommand(name = "s2c") {
     }
 
     /**
-     * Builds a [FormatConfig] from CLI flags.
-     *
-     * Returns `null` when no CLI formatting overrides are specified and
-     * `.editorconfig` resolution is not disabled — letting the [Processor]
-     * resolve formatting from `.editorconfig` at the output path.
+     * Builds a full [FormatConfig] when `.editorconfig` resolution is
+     * disabled via `--no-editorconfig`. Returns `null` otherwise so
+     * the [Processor] resolves formatting from `.editorconfig`.
      */
     private fun buildFormatConfig(): FormatConfig? {
-        val hasOverrides = indentSize != null || indentStyle != null
-        if (!hasOverrides && !noEditorConfig) return null
-
+        if (!noEditorConfig) return null
         val defaults = FormatConfig()
         return FormatConfig(
             indentSize = indentSize ?: defaults.indentSize,
             indentStyle = indentStyle ?: defaults.indentStyle,
             maxLineLength = defaults.maxLineLength,
             insertFinalNewline = defaults.insertFinalNewline,
+        )
+    }
+
+    /**
+     * Builds partial [FormatConfig.Overrides] from CLI flags.
+     *
+     * Returns `null` when no CLI formatting flags are specified.
+     * Non-null overrides are merged on top of the resolved config
+     * (from `.editorconfig` or defaults) by the [Processor].
+     */
+    private fun buildFormatOverrides(): FormatConfig.Overrides? {
+        if (indentSize == null && indentStyle == null) return null
+        return FormatConfig.Overrides(
+            indentSize = indentSize,
+            indentStyle = indentStyle,
         )
     }
 }
