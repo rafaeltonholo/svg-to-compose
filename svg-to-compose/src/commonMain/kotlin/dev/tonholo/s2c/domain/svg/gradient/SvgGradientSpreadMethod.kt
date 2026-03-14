@@ -1,7 +1,7 @@
 package dev.tonholo.s2c.domain.svg.gradient
 
 import dev.tonholo.s2c.domain.compose.GradientTileMode
-import dev.tonholo.s2c.logger.warn
+import dev.tonholo.s2c.logger.Logger
 
 enum class SvgGradientSpreadMethod {
     Pad,
@@ -18,6 +18,7 @@ enum class SvgGradientSpreadMethod {
     }
 
     companion object {
+        context(logger: Logger)
         operator fun invoke(value: String): SvgGradientSpreadMethod = when (value.lowercase()) {
             Pad.toString() -> Pad
 
@@ -26,7 +27,7 @@ enum class SvgGradientSpreadMethod {
             Repeat.toString() -> Repeat
 
             else -> {
-                warn(
+                logger.warn(
                     "'$value' is an unsupported type of spreadMethod. Using default to '$Pad'",
                 )
                 Pad

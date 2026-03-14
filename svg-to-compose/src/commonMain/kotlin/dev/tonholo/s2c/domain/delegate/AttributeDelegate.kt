@@ -5,7 +5,6 @@ import dev.tonholo.s2c.domain.svg.toSvgLengthOrNull
 import dev.tonholo.s2c.domain.xml.XmlChildNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
-import dev.tonholo.s2c.logger.debug
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -69,9 +68,6 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     }
 
     private fun findInheritedValue(element: XmlChildNode, key: String): String? {
-        debug(
-            "The current element '${element.tagName}' doesn't have the attribute '$key'. Looking for inherited value.",
-        )
         var parent: XmlParentNode? = element.parent
         var attr: String?
         do {

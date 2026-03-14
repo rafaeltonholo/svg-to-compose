@@ -23,7 +23,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "s2,-2 4,5"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -41,7 +41,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "S2,-2 4,5"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val nodes = node.wrapper.nodes
         // Assert
         assertEquals(expected = 1, actual = nodes.size)
@@ -71,7 +71,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "S$nonRelative s$relative"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -127,7 +127,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "S${nonRelative}z s${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = false) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -185,7 +185,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "S$nonRelative s$relative"),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert
@@ -237,7 +237,7 @@ class SvgPathReflectiveCurveToTests : BaseSvgTest() {
             attributes = mutableMapOf("d" to "S${nonRelative}z s${relative}z"),
         )
         // Act
-        val node = path.asNode(minified = true) as ImageVectorNode.Path
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
         val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
 
         // Assert

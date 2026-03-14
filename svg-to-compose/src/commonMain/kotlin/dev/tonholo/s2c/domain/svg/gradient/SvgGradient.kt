@@ -13,6 +13,7 @@ import dev.tonholo.s2c.domain.svg.transform.SvgTransform
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.geom.bounds.boundingBox
+import dev.tonholo.s2c.logger.NoOpLogger
 import kotlin.math.max
 
 sealed class SvgGradient<out T>(
@@ -26,10 +27,12 @@ sealed class SvgGradient<out T>(
     val gradientTransform: SvgTransform? by attribute<String?, SvgTransform?> {
         it?.let(::SvgTransform)
     }
+
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     val spreadMethod: SvgGradientSpreadMethod by attribute<String, _>(
         defaultValue = SvgGradientSpreadMethod.Pad,
     ) { spreadMethod ->
-        spreadMethod.let(SvgGradientSpreadMethod::invoke)
+        with(NoOpLogger) { SvgGradientSpreadMethod(spreadMethod) }
     }
     val href: String? by attribute(name = "xlink:href")
 

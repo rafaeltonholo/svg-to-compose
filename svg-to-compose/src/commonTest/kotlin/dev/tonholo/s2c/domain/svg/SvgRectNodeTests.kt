@@ -56,7 +56,7 @@ class SvgRectNodeTests : BaseSvgTest() {
         val attributes = mutableMapOf("x" to "10", "y" to "20", "width" to "30", "height" to "40")
         val rect = SvgRectNode(root, attributes)
 
-        val path = rect.asNode(minified = false)
+        val path = with(logger) { rect.asNode(minified = false) }
         assertIs<ImageVectorNode.Path>(path)
 
         val nodes = path.wrapper.nodes
@@ -98,7 +98,7 @@ class SvgRectNodeTests : BaseSvgTest() {
         )
         val rect = SvgRectNode(root, attributes)
 
-        val path = rect.asNode(minified = false)
+        val path = with(logger) { rect.asNode(minified = false) }
         assertIs<ImageVectorNode.Path>(path)
 
         val nodes = path.wrapper.nodes
@@ -202,7 +202,7 @@ class SvgRectNodeTests : BaseSvgTest() {
 
             val rect = SvgRectNode(root, attributes)
 
-            val rectNode = rect.asNode(minified = false)
+            val rectNode = with(logger) { rect.asNode(minified = false) }
             assertIs<ImageVectorNode.Path>(rectNode)
 
             assertEquals(expected = "#FF0000".toBrush(), actual = rectNode.params.stroke)

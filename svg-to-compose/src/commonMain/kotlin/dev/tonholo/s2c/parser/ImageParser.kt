@@ -15,6 +15,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.logger.Logger
 import dev.zacsweers.metro.Inject
 import okio.Path
 
@@ -31,7 +32,7 @@ import okio.Path
  * @see [ImageParser.SvgImageParser]
  * @see [ImageParser.AndroidVectorParser]
  */
-sealed class ImageParser(protected val fileManager: FileManager) {
+sealed class ImageParser(protected val fileManager: FileManager, protected val logger: Logger) {
     /**
      * Parse a SVG/AVG icon and creates a [IconFileContents] object containing
      * all the required information to generate the Jetpack Compose Icon.
@@ -118,7 +119,7 @@ sealed class ImageParser(protected val fileManager: FileManager) {
      * @param fileManager The Main tool that helps to manage files and allows
      *  reading data from the file system.
      */
-    class SvgImageParser(fileManager: FileManager) : ImageParser(fileManager) {
+    class SvgImageParser(fileManager: FileManager, logger: Logger) : ImageParser(fileManager, logger) {
         /**
          * Parses an SVG file into an [IconFileContents] object.
          *
@@ -140,7 +141,7 @@ sealed class ImageParser(protected val fileManager: FileManager) {
          * @return [IconFileContents] object instance which contains details about the
          * icon parsed from the file.
          */
-        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Svg)
@@ -154,7 +155,7 @@ sealed class ImageParser(protected val fileManager: FileManager) {
                     it.applyTransformation()
                 }
 
-            return IconFileContents(
+            IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
@@ -183,7 +184,7 @@ sealed class ImageParser(protected val fileManager: FileManager) {
      * @param fileManager The Main tool that helps to manage files and allows
      * reading data from the file system.
      */
-    class AndroidVectorParser(fileManager: FileManager) : ImageParser(fileManager) {
+    class AndroidVectorParser(fileManager: FileManager, logger: Logger) : ImageParser(fileManager, logger) {
         /**
          * Parses an AVG file into an [IconFileContents] object.
          *
@@ -203,14 +204,14 @@ sealed class ImageParser(protected val fileManager: FileManager) {
          * @return an [IconFileContents] object instance that holds data about the parsed
          * icon.
          */
-        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents {
+        override fun parse(file: Path, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
             val content = fileManager.readContent(file)
 
             val root = XmlParser.parse(content = content, fileType = FileType.Avg)
             val avg = root.children.single { it is AvgRootNode } as AvgRootNode
             val nodes = avg.asNodes(minified = config.minified)
 
-            return IconFileContents(
+            IconFileContents(
                 pkg = config.pkg,
                 iconName = iconName,
                 theme = config.theme,
@@ -241,15 +242,17 @@ sealed class ImageParser(protected val fileManager: FileManager) {
      * @param fileManager a [FileManager] instance that allows reading from the file system.
      */
     @Inject
-    class Factory(fileManager: FileManager) {
+    class Factory(fileManager: FileManager, private val logger: Logger) {
         private val parsers: Map<String, () -> ImageParser> = mapOf(
-            FileType.Svg.extension to { SvgImageParser(fileManager) },
-            FileType.Avg.extension to { AndroidVectorParser(fileManager) },
+            FileType.Svg.extension to { SvgImageParser(fileManager, logger) },
+            FileType.Avg.extension to { AndroidVectorParser(fileManager, logger) },
         )
 
         /**
-         * A part of the sealed [ImageParser] companion object, [parse] is a function
-         * that parses a [file] to a [String], with the help of a specified [ParserConfig].
+         * Parses a file into an [IconFileContents] domain model.
+         *
+         * This is the preferred method for parsing files. Use with a
+         * [dev.tonholo.s2c.emitter.CodeEmitter] to generate the output code.
          *
          * Supported extensions: `.xml`, `.svg`
          *
@@ -259,19 +262,39 @@ sealed class ImageParser(protected val fileManager: FileManager) {
          * @param config An instance of the [ParserConfig] class, which contains
          * configurations required for parsing the file.
          * @throws ExitProgramException if an unsupported file extension is provided.
-         * @returns A string after parsing the mentioned file using the appropriate
-         * parser based on the file extension.
+         * @return An [IconFileContents] domain model.
          */
-        fun parse(file: Path, iconName: String, config: ParserConfig): String {
+        fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents {
             val extension = file.extension
             return parsers[extension]?.invoke()?.parse(
                 file = file,
                 iconName = iconName,
                 config = config,
-            )?.materialize() ?: throw ExitProgramException(
+            ) ?: throw ExitProgramException(
                 errorCode = ErrorCode.NotSupportedFileError,
                 message = "invalid file extension ($extension).",
             )
         }
+
+        /**
+         * Parses a [file] to a [String], with the help of a specified [ParserConfig].
+         *
+         * Supported extensions: `.xml`, `.svg`
+         *
+         * @param file A [Path] object that points towards the file that needs to be parsed.
+         * @param iconName An identifier for the icon that gets generated after parsing
+         * the file.
+         * @param config An instance of the [ParserConfig] class, which contains
+         * configurations required for parsing the file.
+         * @throws ExitProgramException if an unsupported file extension is provided.
+         * @return A string after parsing the mentioned file using the appropriate
+         * parser based on the file extension.
+         */
+        @Deprecated(
+            message = "Use parseToModel() with a CodeEmitter instead.",
+            replaceWith = ReplaceWith("parseToModel(file, iconName, config)"),
+        )
+        fun parse(file: Path, iconName: String, config: ParserConfig): String =
+            parseToModel(file, iconName, config).materialize()
     }
 }

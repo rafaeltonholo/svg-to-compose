@@ -7,6 +7,8 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.toBrush
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.logger.NoOpLogger
 
 class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>) :
     SvgGraphicNode<SvgPathNode>(parent, attributes, TAG_NAME),
@@ -43,9 +45,10 @@ class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
         error("use strokeBrush property instead")
     }
 
+    // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in lazy properties.
     private fun getGradient(fillColor: String): ComposeBrush.Gradient? = getGradient(
         fillColor = fillColor,
-        nodes = d.asNodeWrapper(minified = false).nodes,
+        nodes = with(NoOpLogger) { d.asNodeWrapper(minified = false) }.nodes,
     )
 
     companion object {
@@ -53,6 +56,7 @@ class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
     }
 }
 
+context(logger: Logger)
 fun SvgPathNode.asNode(computedRules: List<ComputedRule> = emptyList(), minified: Boolean = false): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(

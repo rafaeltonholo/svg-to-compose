@@ -4,6 +4,7 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.delegate.attribute
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.logger.Logger
 
 sealed interface AvgNode : XmlNode {
     companion object {
@@ -31,11 +32,13 @@ class AvgRootNode(
     }
 }
 
-inline fun AvgRootNode.asNodes(minified: Boolean): List<ImageVectorNode> = children.mapNotNull { node ->
+context(logger: Logger)
+fun AvgRootNode.asNodes(minified: Boolean): List<ImageVectorNode> = children.mapNotNull { node ->
     (node as? AvgNode)?.asNode(minified)
 }
 
-inline fun AvgNode.asNode(minified: Boolean): ImageVectorNode? = when (this) {
+context(logger: Logger)
+fun AvgNode.asNode(minified: Boolean): ImageVectorNode? = when (this) {
     is AvgGroupNode -> asNode(minified)
     is AvgPathNode -> asNode(minified)
     else -> null

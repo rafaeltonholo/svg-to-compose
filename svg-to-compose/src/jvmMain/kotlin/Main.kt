@@ -1,7 +1,6 @@
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.logger.CommonLogger
-import dev.tonholo.s2c.logger.output
 import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.parser.ParserConfig
 import okio.FileSystem
@@ -38,9 +37,10 @@ private fun main() {
         minified = false,
         kmpPreview = false,
     )
+    val logger = CommonLogger()
     try {
         val graph = createS2cGraph(
-            logger = CommonLogger(),
+            logger = logger,
             fileSystem = FileSystem.SYSTEM,
         )
         graph.processorFactory.create(tempDirectory = null).run(
@@ -51,7 +51,7 @@ private fun main() {
         )
     } catch (e: ExitProgramException) {
         printEmpty()
-        output(e.message.orEmpty())
+        logger.output(e.message.orEmpty())
         exitProcess(e.errorCode.code)
     }
 }

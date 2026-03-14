@@ -2,6 +2,7 @@ package dev.tonholo.s2c
 
 import AppConfig
 import dev.tonholo.s2c.domain.FileType
+import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
@@ -33,6 +34,7 @@ class Processor(
     @Assisted @param:TempDirectory private val tempDirectory: Path?,
     private val optimizers: Optimizer.Factory,
     private val parser: ImageParser.Factory,
+    private val codeEmitterFactory: CodeEmitterFactory,
 ) {
     private val tempFileWriter = TempFileWriter(logger, fileManager, tempDirectory)
 
@@ -382,13 +384,16 @@ class Processor(
         val pkg = "${config.pkg}$relativePackage"
 
         logger.info("👓 Parsing the ${finalFile.extension} file")
-        val fileContents = parser.parse(
+        val iconModel = parser.parseToModel(
             file = finalFile,
             iconName = iconName,
             config = config.copy(
                 pkg = pkg,
             ),
         )
+
+        val emitter = codeEmitterFactory.create()
+        val fileContents = emitter.emit(iconModel)
 
         logger.verbose("File contents = $fileContents")
 

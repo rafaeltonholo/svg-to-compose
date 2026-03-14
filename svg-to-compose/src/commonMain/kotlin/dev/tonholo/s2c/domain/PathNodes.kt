@@ -13,7 +13,7 @@ import dev.tonholo.s2c.domain.PathNodes.QuadTo
 import dev.tonholo.s2c.domain.PathNodes.ReflectiveCurveTo
 import dev.tonholo.s2c.domain.PathNodes.ReflectiveQuadTo
 import dev.tonholo.s2c.domain.PathNodes.VerticalLineTo
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
@@ -62,16 +62,15 @@ sealed class PathNodes(
      */
     internal abstract fun buildParameters(): Set<String>
 
-    abstract fun materialize(): String
-
-    private fun closeCommand(): String = if (shouldClose) {
-        """
-        |close()
-        |
-        """.trimMargin()
-    } else {
-        ""
-    }
+    @Deprecated(
+        message = "Use PathNodeEmitter.emit() instead.",
+        replaceWith = ReplaceWith(
+            expression = "PathNodeEmitter().emit(this)",
+            imports = ["dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter"],
+        ),
+    )
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    open fun materialize(): String = PathNodeEmitter().emit(this)
 
     override fun toString(): String = if (shouldClose) {
         PathCommand.Close.value.toString()
@@ -81,45 +80,6 @@ sealed class PathNodes(
 
     fun String.removeTrailingZeroConsiderCloseCommand(): String = this.removeTrailingZero()
         .replace("\\.0z\\b".toRegex(), PathCommand.Close.value.toString())
-
-    /**
-     * Materializes the commands on the Compose path functions.`
-     * By default, it prints in pretty mode, adding a comment explaining
-     * the path command where the parameters were taken and in case of more
-     * than two parameters, separate them on new line.
-     *
-     * @param fnName The function name to be used in the SVG/AVG command.
-     * @param forceInline A flag indicating whether the command parameters
-     * should be inlined or not. By default, it's set to `false.
-     * @return The function representation of the SVG/AVG command.
-     */
-    protected fun materialize(fnName: String, forceInline: Boolean = false): String = """
-        |${if (minified) "" else "// ${toString().removeTrailingZeroConsiderCloseCommand()}"}
-        |$fnName${if (isRelative) "Relative" else ""}(${buildParameters().toParameters(forceInline)})
-        |${closeCommand()}
-    """.trimMargin().let {
-        if (minified) it.trim() else it
-    }
-
-    /**
-     * A helper function that helps in indenting parameters, adding
-     * separators, and wrapping without initial and end separators
-     * if required as per minified or forceInline flags.
-     *
-     * @param forceInline A boolean flag indicating whether the parameters
-     * should be in a single line ignoring minification.
-     * @return The formatted parameter string.
-     */
-    private fun Set<String>.toParameters(forceInline: Boolean = false): String {
-        val indentSize = if (minified || forceInline) 0 else 4
-        val separator = if (minified || forceInline) "" else "\n"
-        val scape = if (minified || forceInline) " " else "|"
-        return joinToString(separator) {
-            "$scape${it.indented(indentSize)},"
-        }.let {
-            if (minified || forceInline) it.substring(1, it.length - 1) else "\n$it\n"
-        }
-    }
 
     /**
      * The [MoveTo] represents the SVG/AVG command to move the pen to a new location.
@@ -163,11 +123,6 @@ sealed class PathNodes(
                 "${relativePrefix}y = ${y.toFloat()}f",
             )
         }
-
-        override fun materialize(): String = materialize(
-            fnName = "moveTo",
-            forceInline = true,
-        )
 
         override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
@@ -294,10 +249,6 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String = materialize(
-            fnName = "arcTo",
-        )
-
         override fun toString(): String {
             val arc = "$realCommand ${this.a.toFloat()} ${this.b.toFloat()} ${theta.toFloat()}"
             val flags = "${isMoreThanHalf.toInt()} ${isPositiveArc.toInt()} ${x.toFloat()} ${y.toFloat()}"
@@ -400,11 +351,6 @@ sealed class PathNodes(
             return setOf("${relativePrefix}y = ${y.toFloat()}f")
         }
 
-        override fun materialize(): String = materialize(
-            fnName = "verticalLineTo",
-            forceInline = true,
-        )
-
         override fun toString(): String = "$realCommand ${y.toFloat()}" + super.toString()
 
         /**
@@ -475,11 +421,6 @@ sealed class PathNodes(
             val relativePrefix = if (isRelative) "d" else ""
             return setOf("${relativePrefix}x = ${x.toFloat()}f")
         }
-
-        override fun materialize(): String = materialize(
-            fnName = "horizontalLineTo",
-            forceInline = true,
-        )
 
         override fun toString(): String = "$realCommand ${x.toFloat()}" + super.toString()
 
@@ -563,11 +504,6 @@ sealed class PathNodes(
                 "${relativePrefix}y = ${y.toFloat()}f",
             )
         }
-
-        override fun materialize(): String = materialize(
-            fnName = "lineTo",
-            forceInline = true,
-        )
 
         override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
@@ -657,10 +593,6 @@ sealed class PathNodes(
                 "${relativePrefix}y3 = ${y3.toFloat()}f",
             )
         }
-
-        override fun materialize(): String = materialize(
-            fnName = "curveTo",
-        )
 
         override fun toString(): String {
             val controls = "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}"
@@ -765,10 +697,6 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String = materialize(
-            fnName = "reflectiveCurveTo",
-        )
-
         override fun toString(): String =
             "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
 
@@ -861,10 +789,6 @@ sealed class PathNodes(
             )
         }
 
-        override fun materialize(): String = materialize(
-            fnName = "quadTo",
-        )
-
         override fun toString(): String =
             "$realCommand ${x1.toFloat()} ${y1.toFloat()} ${x2.toFloat()} ${y2.toFloat()}" + super.toString()
 
@@ -954,10 +878,6 @@ sealed class PathNodes(
                 "${relativePrefix}y1 = ${y1.toFloat()}f",
             )
         }
-
-        override fun materialize(): String = materialize(
-            fnName = "reflectiveQuadTo",
-        )
 
         override fun toString(): String = "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
 
