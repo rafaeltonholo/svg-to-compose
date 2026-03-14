@@ -20,7 +20,7 @@ class SvgPathNodeTests : BaseSvgTest() {
     fun `ensure SvgPathNode correctly sets attributes`() {
         val attributes = mutableMapOf(
             "d" to "M10 10 L20 20",
-            "clip-path" to "url(#clip)"
+            "clip-path" to "url(#clip)",
         )
         val svgPathNode = SvgPathNode(root, attributes)
 
@@ -57,7 +57,7 @@ class SvgPathNodeTests : BaseSvgTest() {
     @Test
     fun `ensure SvgPathNode handle empty attributes`() {
         val attributes = mutableMapOf(
-            "d" to "M 0,0 L1,2z"
+            "d" to "M 0,0 L1,2z",
         )
         val svgPathNode = SvgPathNode(root, attributes)
 
@@ -116,5 +116,4 @@ class SvgPathNodeTests : BaseSvgTest() {
 
         assertEquals(expected = 50f, actual = svgPathNode.strokeWidth) // 50% of viewport width
     }
-
 }

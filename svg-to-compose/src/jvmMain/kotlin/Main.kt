@@ -61,20 +61,14 @@ private value class SampleAppPackage(val value: String) {
     override fun toString(): String = value
     fun toDirectory(): String = value.replace(".", "/")
 
-    operator fun plus(value: String): SampleAppPackage =
-        SampleAppPackage(this.value + value)
+    operator fun plus(value: String): SampleAppPackage = SampleAppPackage(this.value + value)
 }
 
 private fun SampleAppPackage.svg(): SampleAppPackage = this + ".svg"
 private fun SampleAppPackage.avg(): SampleAppPackage = this + ".avg"
 
-
 @Suppress("UNUSED_PARAMETER", "unused", "MaxLineLength")
-private sealed class SampleFile(
-    val sampleAppPackage: SampleAppPackage,
-    input: String,
-    output: String,
-) {
+private sealed class SampleFile(val sampleAppPackage: SampleAppPackage, input: String, output: String) {
     companion object {
         const val ROOT_PLAYGROUND_ANDROID_APP_PATH = "playground/app/src/main/kotlin"
     }
@@ -87,380 +81,298 @@ private sealed class SampleFile(
     operator fun component2(): String = input
     operator fun component3(): String = output
 
-    class Directory(
-        sampleAppPackage: SampleAppPackage,
-        ignored: String,
-    ) : SampleFile(
-        sampleAppPackage = sampleAppPackage,
-        input = "samples/",
-        output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.toDirectory()}"
-    )
+    class Directory(sampleAppPackage: SampleAppPackage, ignored: String) :
+        SampleFile(
+            sampleAppPackage = sampleAppPackage,
+            input = "samples/",
+            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.toDirectory()}",
+        )
 
     sealed interface Svg {
         companion object {
             private const val BASE_PATH = "samples/svg/"
         }
 
-        class All(
-            sampleAppPackage: SampleAppPackage,
-            ignored: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = BASE_PATH,
-            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
-        )
+        class All(sampleAppPackage: SampleAppPackage, ignored: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = BASE_PATH,
+                output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+            )
 
-        class File(
-            sampleAppPackage: SampleAppPackage,
-            path: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/$path",
-            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
-        )
+        class File(sampleAppPackage: SampleAppPackage, path: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/$path",
+                output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.svg().toDirectory()}",
+            )
 
-        class GithubIssue(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/github_issue_$suffix.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/GithubIssue.$suffix.kt",
-        )
+        class GithubIssue(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/github_issue_$suffix.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/GithubIssue.$suffix.kt",
+            )
 
-        class Brasil(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/brasil.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Brasil.$suffix.kt",
-        )
+        class Brasil(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/brasil.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Brasil.$suffix.kt",
+            )
 
-        class ShieldSolid(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/shield-halved-solid.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
-        )
+        class ShieldSolid(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/shield-halved-solid.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ShieldSolid.$suffix.kt",
+            )
 
-        class Smiley(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/smiley.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Smiley.$suffix.kt",
-        )
+        class Smiley(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/smiley.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Smiley.$suffix.kt",
+            )
 
-        class Illustration(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/illustration.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Illustration.$suffix.kt",
-        )
+        class Illustration(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/illustration.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Illustration.$suffix.kt",
+            )
 
-        class Rects(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/rects/rects.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
-        )
+        class Rects(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/rects/rects.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Rects.$suffix.kt",
+            )
 
-        class DashArrayRect(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/rects/dash-array-rect.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayRect.$suffix.kt",
-        )
+        class DashArrayRect(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/rects/dash-array-rect.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayRect.$suffix.kt",
+            )
 
-        class ComplexRects(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/rects/complex-rects.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ComplexRects.$suffix.kt",
-        )
+        class ComplexRects(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/rects/complex-rects.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/ComplexRects.$suffix.kt",
+            )
 
-        class RoundedRect(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/rects/rounded-rect.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RoundedRect.$suffix.kt",
-        )
+        class RoundedRect(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/rects/rounded-rect.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RoundedRect.$suffix.kt",
+            )
 
-        class SimpleCircle(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/circle/simple-circle.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/SimpleCircle.$suffix.kt",
-        )
+        class SimpleCircle(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/circle/simple-circle.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/SimpleCircle.$suffix.kt",
+            )
 
-        class DashArrayCircle(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/circle/dasharray-circle.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
-        )
+        class DashArrayCircle(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/circle/dasharray-circle.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/DashArrayCircle.$suffix.kt",
+            )
 
-        class Android(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/android.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Android.$suffix.kt",
-        )
+        class Android(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/android.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/Android.$suffix.kt",
+            )
 
-        class AndroidDevelopers(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/android-developers.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
-        )
+        class AndroidDevelopers(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/android-developers.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/AndroidDevelopers.$suffix.kt",
+            )
 
-        class RectTransform(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.svg(),
-            input = "$BASE_PATH/transform/rect-transform.svg",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
-        )
+        class RectTransform(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.svg(),
+                input = "$BASE_PATH/transform/rect-transform.svg",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/RectTransform.$suffix.kt",
+            )
 
         sealed interface Gradient {
-            class AbstractEnvelope(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/abstract-envelope.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/AbstractEnvelope.$suffix.kt",
-            )
+            class AbstractEnvelope(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/abstract-envelope.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/AbstractEnvelope.$suffix.kt",
+                )
 
-            class BermudaCircle(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/bermuda-circle.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaCircle.$suffix.kt",
-            )
+            class BermudaCircle(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/bermuda-circle.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaCircle.$suffix.kt",
+                )
 
-            class BermudaDiamond(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/bermuda-diamond.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaDiamond.$suffix.kt",
-            )
+            class BermudaDiamond(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/bermuda-diamond.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaDiamond.$suffix.kt",
+                )
 
-            class BermudaSquare(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/bermuda-square.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaSquare.$suffix.kt",
-            )
+            class BermudaSquare(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/bermuda-square.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaSquare.$suffix.kt",
+                )
 
-            class BermudaTraingle(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/bermuda-traingle.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaTraingle.$suffix.kt",
-            )
+            class BermudaTraingle(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/bermuda-traingle.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BermudaTraingle.$suffix.kt",
+                )
 
-            class BullseyeGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/bullseye-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BullseyeGradient.$suffix.kt",
-            )
+            class BullseyeGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/bullseye-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/BullseyeGradient.$suffix.kt",
+                )
 
-            class CorneredStairs(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/cornered-stairs.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/CorneredStairs.$suffix.kt",
-            )
+            class CorneredStairs(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/cornered-stairs.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/CorneredStairs.$suffix.kt",
+                )
 
-            class DiamondSunset(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/diamond-sunset.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DiamondSunset.$suffix.kt",
-            )
+            class DiamondSunset(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/diamond-sunset.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DiamondSunset.$suffix.kt",
+                )
 
-            class DragonScales(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/dragon-scales.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DragonScales.$suffix.kt",
-            )
+            class DragonScales(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/dragon-scales.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/DragonScales.$suffix.kt",
+                )
 
-            class GeometricIntersection(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/geometric-intersection.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/GeometricIntersection.$suffix.kt",
-            )
+            class GeometricIntersection(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/geometric-intersection.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/GeometricIntersection.$suffix.kt",
+                )
 
-            class LinearGradient01(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/linear-gradient01.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LinearGradient01.$suffix.kt",
-            )
+            class LinearGradient01(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/linear-gradient01.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LinearGradient01.$suffix.kt",
+                )
 
-            class LiquidCheese(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/liquid-cheese.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LiquidCheese.$suffix.kt",
-            )
+            class LiquidCheese(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/liquid-cheese.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/LiquidCheese.$suffix.kt",
+                )
 
-            class ParabolicEllipse(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/parabolic-ellipse.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicEllipse.$suffix.kt",
-            )
+            class ParabolicEllipse(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/parabolic-ellipse.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicEllipse.$suffix.kt",
+                )
 
-            class ParabolicPentagon(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/parabolic-pentagon.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicPentagon.$suffix.kt",
-            )
+            class ParabolicPentagon(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/parabolic-pentagon.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicPentagon.$suffix.kt",
+                )
 
-            class ParabolicRectangle(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/parabolic-rectangle.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicRectangle.$suffix.kt",
-            )
+            class ParabolicRectangle(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/parabolic-rectangle.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicRectangle.$suffix.kt",
+                )
 
-            class ParabolicTriangle(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/parabolic-triangle.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicTriangle.$suffix.kt",
-            )
+            class ParabolicTriangle(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/parabolic-triangle.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/ParabolicTriangle.$suffix.kt",
+                )
 
-            class QuantumGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/quantum-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg()}/gradientQuantumGradient.$suffix.kt",
-            )
+            class QuantumGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/quantum-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg()}/gradientQuantumGradient.$suffix.kt",
+                )
 
-            class RadiantGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/radiant-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RadiantGradient.$suffix.kt",
-            )
+            class RadiantGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/radiant-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RadiantGradient.$suffix.kt",
+                )
 
-            class RosePetals(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/rose-petals.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RosePetals.$suffix.kt",
-            )
+            class RosePetals(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/rose-petals.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/RosePetals.$suffix.kt",
+                )
 
-            class SlantedGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/slanted-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SlantedGradient.$suffix.kt",
-            )
+            class SlantedGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/slanted-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SlantedGradient.$suffix.kt",
+                )
 
-            class SpectrumGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/spectrum-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SpectrumGradient.$suffix.kt",
-            )
+            class SpectrumGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/spectrum-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SpectrumGradient.$suffix.kt",
+                )
 
-            class StrokeGradient(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/stroke-gradient.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/StrokeGradient.$suffix.kt",
-            )
+            class StrokeGradient(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/stroke-gradient.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/StrokeGradient.$suffix.kt",
+                )
 
-            class SubtlePrism(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/subtle-prism.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SubtlePrism.$suffix.kt",
-            )
+            class SubtlePrism(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/subtle-prism.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/SubtlePrism.$suffix.kt",
+                )
 
-            class WinterySunburst(
-                sampleAppPackage: SampleAppPackage,
-                suffix: String,
-            ) : SampleFile(
-                sampleAppPackage = sampleAppPackage.svg(),
-                input = "$BASE_PATH/gradient/wintery-sunburst.svg",
-                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/WinterySunburst.$suffix.kt",
-            )
+            class WinterySunburst(sampleAppPackage: SampleAppPackage, suffix: String) :
+                SampleFile(
+                    sampleAppPackage = sampleAppPackage.svg(),
+                    input = "$BASE_PATH/gradient/wintery-sunburst.svg",
+                    output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.svg().toDirectory()}/gradient/WinterySunburst.$suffix.kt",
+                )
         }
     }
 
@@ -469,31 +381,25 @@ private sealed class SampleFile(
             private const val BASE_PATH = "samples/avg/"
         }
 
-        class All(
-            sampleAppPackage: SampleAppPackage,
-            ignored: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.avg(),
-            input = BASE_PATH,
-            output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.avg().toDirectory()}",
-        )
+        class All(sampleAppPackage: SampleAppPackage, ignored: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.avg(),
+                input = BASE_PATH,
+                output = "${ROOT_PLAYGROUND_ANDROID_APP_PATH}/${sampleAppPackage.avg().toDirectory()}",
+            )
 
-        class ShieldSolid(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.avg(),
-            input = "$BASE_PATH/shield-halved-solid.xml",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/ShieldSolid.$suffix.kt",
-        )
+        class ShieldSolid(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.avg(),
+                input = "$BASE_PATH/shield-halved-solid.xml",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/ShieldSolid.$suffix.kt",
+            )
 
-        class Illustration(
-            sampleAppPackage: SampleAppPackage,
-            suffix: String,
-        ) : SampleFile(
-            sampleAppPackage = sampleAppPackage.avg(),
-            input = "$BASE_PATH/illustration.xml",
-            output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/Illustration.$suffix.kt",
-        )
+        class Illustration(sampleAppPackage: SampleAppPackage, suffix: String) :
+            SampleFile(
+                sampleAppPackage = sampleAppPackage.avg(),
+                input = "$BASE_PATH/illustration.xml",
+                output = "$ROOT_PLAYGROUND_ANDROID_APP_PATH/${sampleAppPackage.avg().toDirectory()}/Illustration.$suffix.kt",
+            )
     }
 }

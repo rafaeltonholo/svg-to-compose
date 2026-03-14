@@ -753,3 +753,9 @@ style:
     active: true
     excludeImports:
       - 'java.util.*'
+
+ktlint:
+  MaximumLineLength:
+    excludes: ['**/test/**', '**/commonTest/**', '**/jvmTest/**', '**/functionalTest/**']
+  EnumEntryNameCase:
+    excludes: ['**/test/**', '**/commonTest/**', '**/jvmTest/**', '**/functionalTest/**']
