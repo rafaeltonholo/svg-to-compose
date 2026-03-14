@@ -28,6 +28,19 @@ class EditorConfigParserTest {
     }
 
     @Test
+    fun `parse ignores preamble properties other than root`() {
+        val content = """
+            root = true
+            indent_size = 2
+            indent_style = tab
+        """.trimIndent()
+        val result = EditorConfigParser.parse(content)
+        assertTrue(result.isRoot)
+        assertNull(result.indentSize)
+        assertNull(result.indentStyle)
+    }
+
+    @Test
     fun `parse global section applies to kotlin files`() {
         val content = """
             [*]
