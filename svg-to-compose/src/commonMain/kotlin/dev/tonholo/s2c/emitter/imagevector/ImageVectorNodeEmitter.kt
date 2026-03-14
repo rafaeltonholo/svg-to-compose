@@ -4,7 +4,6 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
 import dev.tonholo.s2c.emitter.FormatConfig
-import dev.tonholo.s2c.extensions.indented
 /**
  * Emits Kotlin code for [ImageVectorNode] instances (Path, Group, ChunkFunction).
  *
@@ -90,10 +89,10 @@ internal class ImageVectorNodeEmitter(
         val groupParamsString = if (groupParams.isNotEmpty()) {
             val params = groupParams.joinToString("\n") { (param, value) ->
                 if (param == CLIP_PATH_PARAM_NAME && !group.minified && group.params.clipPath != null) {
-                    "${"// ${group.params.clipPath.normalizedPath}".indented(formatConfig.indentSize)}\n"
+                    "$indent// ${group.params.clipPath.normalizedPath}\n"
                 } else {
                     ""
-                } + "$param = $value,".indented(formatConfig.indentSize)
+                } + "$indent$param = $value,"
             }
             """(
             |$params
@@ -149,10 +148,9 @@ internal class ImageVectorNodeEmitter(
 
     @Suppress("CyclomaticComplexMethod")
     private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
-        val indentSize = formatConfig.indentSize
+        val doubleIndent = indent.repeat(2)
         buildSet {
             clipPath?.let {
-                val doubleIndent = " ".repeat(indentSize * 2)
                 val clipPathData = clipPath.nodes
                     .joinToString("\n$doubleIndent") { node ->
                         pathNodeEmitter.emit(node)
@@ -161,8 +159,8 @@ internal class ImageVectorNodeEmitter(
                     }
                 val value = """
                     |PathData {
-                    |${indent}${clipPathData.indented(indentSize = indentSize)}
-                    |${"}".indented(indentSize)}"""
+                    |$indent${clipPathData.prependIndent(indent)}
+                    |$indent}"""
                     .trimMargin()
                 add(CLIP_PATH_PARAM_NAME to value)
             }
