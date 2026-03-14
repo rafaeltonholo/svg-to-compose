@@ -394,17 +394,18 @@ class Processor(
             ),
         )
 
-        val formatConfig = config.formatConfig ?: editorConfigReader.resolve(output)
-        val emitter = codeEmitterFactory.create(formatConfig = formatConfig)
-        val fileContents = emitter.emit(iconModel)
-
-        logger.verbose("File contents = $fileContents")
-
         val iconOutput = if (recursive.not() || file == basePath) {
             output
         } else {
             output / relativePackage.removePrefix(".").replace(".", "/")
         }
+
+        val resolved = config.formatConfig ?: editorConfigReader.resolve(iconOutput)
+        val formatConfig = config.formatOverrides?.applyTo(resolved) ?: resolved
+        val emitter = codeEmitterFactory.create(formatConfig = formatConfig)
+        val fileContents = emitter.emit(iconModel)
+
+        logger.verbose("File contents = $fileContents")
         val outputFile = iconWriter.write(
             iconName = iconName,
             fileContents = fileContents,
