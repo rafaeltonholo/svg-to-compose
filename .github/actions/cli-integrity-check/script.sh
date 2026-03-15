@@ -28,6 +28,7 @@ if [ "$rebuild" == "--rebuild" ]; then
 else
   rebuild=""
 fi
+rebuild_applied="false"
 
 # Package must match exactly what the Gradle plugin functional tests use so
 # both tools validate against the same expected .kt files.
@@ -66,18 +67,27 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
   tmp_dir="$(mktemp -d)"
   tmp_output="${tmp_dir}/${icon_name}.kt"
 
+  rebuild_arg=""
+  if [ "$rebuild_applied" == "false" ]; then
+    rebuild_arg="$rebuild"
+  fi
+
   if ! command "$root_directory/s2c" \
         -o "$tmp_output" \
         -p "$package" \
         --theme "" \
         --no-preview \
         -opt="$optimize" \
-        ${rebuild:+"$rebuild"} \
+        ${rebuild_arg:+"$rebuild_arg"} \
         "$input"; then
     echo "Failed to execute CLI integrity check for $stem."
     rm -rf "$tmp_dir"
     errors+=("$stem.$ext")
     continue
+  fi
+
+  if [ -n "$rebuild" ]; then
+    rebuild_applied="true"
   fi
 
   if [ ! -f "$expected_file" ]; then
