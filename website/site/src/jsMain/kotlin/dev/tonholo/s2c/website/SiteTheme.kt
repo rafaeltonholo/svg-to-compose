@@ -32,6 +32,10 @@ data class SitePalette(
     val onPrimary: Color,
     val primaryContainer: Color,
     val error: Color,
+    val warning: Color,
+    val onWarning: Color,
+    val warningContainer: Color,
+    val onWarningContainer: Color,
 )
 
 object SitePalettes {
@@ -48,6 +52,10 @@ object SitePalettes {
         onPrimary = Colors.White,
         primaryContainer = Color.rgb(value = 0x6D28D9),
         error = Color.rgb(value = 0xDC2626),
+        warning = Color.rgb(value = 0xD97706),
+        onWarning = Colors.White,
+        warningContainer = Color.rgb(value = 0xFEF3C7),
+        onWarningContainer = Color.rgb(value = 0x92400E),
     )
     val dark = SitePalette(
         background = Color.rgb(value = 0x0C0A09),
@@ -62,6 +70,10 @@ object SitePalettes {
         onPrimary = Colors.White,
         primaryContainer = Color.rgb(value = 0xA78BFA),
         error = Color.rgb(value = 0xF87171),
+        warning = Color.rgb(value = 0xFBBF24),
+        onWarning = Color.rgb(value = 0x451A03),
+        warningContainer = Color.rgb(value = 0x78350F),
+        onWarningContainer = Color.rgb(value = 0xFDE68A),
     )
 }
 

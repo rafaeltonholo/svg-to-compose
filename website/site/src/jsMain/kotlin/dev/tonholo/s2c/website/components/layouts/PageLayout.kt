@@ -9,18 +9,29 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.gridRow
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateRows
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
+import com.varabyte.kobweb.compose.ui.modifiers.position
+import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.data.getValue
 import com.varabyte.kobweb.core.layout.Layout
+import com.varabyte.kobweb.silk.components.icons.fa.FaTriangleExclamation
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
+import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.components.atoms.Banner
 import dev.tonholo.s2c.website.components.organisms.NavHeader
 import dev.tonholo.s2c.website.components.organisms.footer.Footer
 import kotlinx.browser.document
+import org.jetbrains.compose.web.css.Position
+import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.dom.Main
+
+private val NAV_HEADER_HEIGHT = 4.cssRem
+private const val BANNER_Z_INDEX = 999
 
 val RootStyle = CssStyle {
     base {
@@ -48,6 +59,18 @@ fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
         contentAlignment = Alignment.Center,
     ) {
         NavHeader()
+        val palette = SiteTheme.palette
+        Banner(
+            text = "This site is a work in progress - feedback welcome!",
+            contentColor = palette.onWarningContainer,
+            containerColor = palette.warningContainer,
+            borderColor = palette.warning,
+            modifier = Modifier
+                .position(Position.Fixed)
+                .top(NAV_HEADER_HEIGHT)
+                .zIndex(BANNER_Z_INDEX),
+            leadingIcon = { FaTriangleExclamation() },
+        )
         Main(attrs = Modifier.fillMaxWidth().toAttrs()) {
             content()
         }
