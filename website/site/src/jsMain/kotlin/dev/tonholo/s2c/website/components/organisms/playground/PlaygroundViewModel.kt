@@ -13,10 +13,13 @@ import dev.tonholo.s2c.website.state.playground.ConversionInputFactory
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundReducer
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
+import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
 import dev.tonholo.s2c.website.state.playground.fileKey
 import dev.tonholo.s2c.website.worker.ConversionInput
 import dev.tonholo.s2c.website.worker.ConversionOutput
+import kotlinx.browser.window
+import kotlinx.coroutines.await
 
 /**
  * Thin coordinator between UI events and state. Delegates state
@@ -44,6 +47,20 @@ internal class PlaygroundViewModel : ViewModel() {
 
     fun dispatch(action: PlaygroundAction) {
         state = PlaygroundReducer.reduce(state, action)
+    }
+
+    suspend fun selectSample(index: Int) {
+        dispatch(PlaygroundAction.SelectSample(index))
+        val sample = samples[index]
+        val response = window.fetch(sample.path).await()
+        val svgCode = response.text().await()
+        dispatch(
+            PlaygroundAction.SampleLoaded(
+                svgCode = svgCode,
+                samplePath = sample.path,
+                iconName = sample.name,
+            ),
+        )
     }
 
     fun onWorkerOutput(output: ConversionOutput) {

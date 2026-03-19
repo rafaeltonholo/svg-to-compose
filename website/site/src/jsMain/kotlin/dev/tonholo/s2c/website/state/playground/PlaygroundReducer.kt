@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.website.state.playground
 
-import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.worker.ConversionOutput
 import kotlin.js.Date
 
@@ -15,7 +14,7 @@ internal object PlaygroundReducer {
     fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
         is PlaygroundAction.SelectSample -> state.copy(
             selectedSample = action.index,
-            inputCode = samples[action.index].svgCode,
+            inputCode = "",
             inputMode = "paste",
             previewExpanded = true,
             inputFileName = "input.svg",
@@ -26,6 +25,13 @@ internal object PlaygroundReducer {
             selectedFiles = emptySet(),
             expandedFolders = emptySet(),
             uploadedFiles = emptyList(),
+        )
+
+        is PlaygroundAction.SampleLoaded -> state.copy(
+            inputCode = action.svgCode,
+            inputFileName = action.samplePath,
+            outputFileName = "${action.iconName}.kt",
+            previewExpanded = true,
         )
 
         is PlaygroundAction.ChangeInputMode -> if (action.mode == "upload") {

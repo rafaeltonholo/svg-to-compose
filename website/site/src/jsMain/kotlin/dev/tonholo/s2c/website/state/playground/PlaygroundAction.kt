@@ -9,6 +9,7 @@ import dev.tonholo.s2c.website.worker.ConversionOutput
 internal sealed interface PlaygroundAction {
     // Editor actions
     data class SelectSample(val index: Int) : PlaygroundAction
+    data class SampleLoaded(val svgCode: String, val samplePath: String, val iconName: String) : PlaygroundAction
     data class ChangeInputMode(val mode: String) : PlaygroundAction
     data class UpdateInputCode(val code: String) : PlaygroundAction
     data class LoadContent(val content: String) : PlaygroundAction
