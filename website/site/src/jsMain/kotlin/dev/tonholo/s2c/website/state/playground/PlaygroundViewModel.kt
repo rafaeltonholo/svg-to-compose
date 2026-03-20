@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.organisms.playground
+package dev.tonholo.s2c.website.state.playground
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -7,15 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.state.playground.ConversionInputFactory
-import dev.tonholo.s2c.website.state.playground.PlaygroundAction
-import dev.tonholo.s2c.website.state.playground.PlaygroundReducer
-import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
-import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
-import dev.tonholo.s2c.website.state.playground.fileKey
 import dev.tonholo.s2c.website.worker.ConversionInput
 import dev.tonholo.s2c.website.worker.ConversionOutput
 import kotlinx.browser.window

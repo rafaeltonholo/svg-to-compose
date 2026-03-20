@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.toAttrs
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.dom.Input
 import org.w3c.dom.HTMLInputElement
@@ -28,15 +29,14 @@ fun FilePickerInput(
     multiple: Boolean = true,
 ) {
     Input(
-        type = org.jetbrains.compose.web.attributes.InputType.File,
+        type = InputType.File,
         attrs = modifier
             .display(DisplayStyle.None)
             .toAttrs {
                 attr("accept", accept)
                 if (multiple) attr("multiple", "")
                 if (directory) attr("webkitdirectory", "")
-                ref { element ->
-                    val input = element as HTMLInputElement
+                ref { input ->
                     inputRef(input)
                     input.onchange = {
                         val files = input.files

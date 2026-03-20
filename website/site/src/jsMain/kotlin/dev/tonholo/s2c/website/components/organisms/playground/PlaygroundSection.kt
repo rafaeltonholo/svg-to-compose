@@ -9,39 +9,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import com.varabyte.kobweb.compose.css.Cursor
-import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.Overflow
-import com.varabyte.kobweb.compose.css.TextAlign
-import com.varabyte.kobweb.compose.css.Transition
-import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
-import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.flex
 import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
-import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.minWidth
-import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
-import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.position
-import com.varabyte.kobweb.compose.ui.modifiers.textAlign
-import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -53,34 +37,21 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.worker.rememberWorker
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
-import dev.tonholo.s2c.website.components.atoms.FileDropOverlay
 import dev.tonholo.s2c.website.components.atoms.FilePickerInput
-import dev.tonholo.s2c.website.components.atoms.MobileTabBar
+import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
-import dev.tonholo.s2c.website.components.molecules.OptionsContent
-import dev.tonholo.s2c.website.components.molecules.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
-import dev.tonholo.s2c.website.components.molecules.playground.ComparisonStrip
-import dev.tonholo.s2c.website.components.molecules.playground.InputPanel
-import dev.tonholo.s2c.website.components.molecules.playground.OutputPanel
-import dev.tonholo.s2c.website.components.molecules.playground.PlaygroundToolbar
-import dev.tonholo.s2c.website.components.molecules.playground.UploadPanel
+import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
+import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
-import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
-import dev.tonholo.s2c.website.state.playground.detectExtension
+import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
 import dev.tonholo.s2c.website.toSitePalette
 import dev.tonholo.s2c.website.util.handleDrop
-import dev.tonholo.s2c.website.util.readFileAsText
 import dev.tonholo.s2c.website.worker.IconConvertWorker
-import dev.tonholo.s2c.website.zip.ZipLimitCheck
-import dev.tonholo.s2c.website.zip.checkZipFileCountLimit
-import dev.tonholo.s2c.website.zip.checkZipSizeLimit
 import dev.tonholo.s2c.website.zip.downloadAsZip
-import dev.tonholo.s2c.website.zip.extractFilesFromParsedZip
-import dev.tonholo.s2c.website.zip.parseZipEntries
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -89,7 +60,6 @@ import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
-import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.dom.Div
@@ -113,34 +83,6 @@ val EditorPanelStyle = CssStyle.base {
         .overflow(Overflow.Hidden)
 }
 
-val ConvertButtonStyle = CssStyle {
-    base {
-        val palette = colorMode.toSitePalette()
-        Modifier
-            .backgroundColor(palette.primary)
-            .color(palette.onPrimary)
-            .borderRadius(0.5.cssRem)
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
-            .fontWeight(FontWeight.SemiBold)
-            .fontSize(0.8.cssRem)
-            .cursor(Cursor.Pointer)
-            .border(0.px, LineStyle.None, Colors.Transparent)
-            .transition(
-                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
-                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
-            )
-    }
-    cssRule(":hover") {
-        Modifier.backgroundColor(colorMode.toSitePalette().primaryContainer)
-    }
-    cssRule(":focus-visible") {
-        val palette = colorMode.toSitePalette()
-        Modifier
-            .outline(2.px, LineStyle.Solid, palette.onPrimary)
-            .backgroundColor(palette.primaryContainer)
-    }
-}
-
 val DesktopPanelsStyle = CssStyle {
     base {
         Modifier
@@ -157,43 +99,6 @@ val DesktopPanelsStyle = CssStyle {
             .overflow(Overflow.Auto)
             .minWidth(0.px)
             .minHeight(0.px)
-    }
-}
-
-val MobileTabBarStyle = CssStyle.base {
-    Modifier
-        .display(DisplayStyle.Flex)
-        .gap(0.25.cssRem)
-        .padding(0.5.cssRem)
-        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
-}
-
-val MobileTabStyle = CssStyle {
-    base {
-        val palette = colorMode.toSitePalette()
-        Modifier
-            .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
-            .cursor(Cursor.Pointer)
-            .fontWeight(FontWeight.Medium)
-            .fontSize(0.8.cssRem)
-            .border(0.px, LineStyle.None, Colors.Transparent)
-            .borderBottom(width = 2.px, style = LineStyle.Solid, color = Colors.Transparent)
-            .borderRadius(0.px)
-            .transition(
-                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
-                Transition.of("border-bottom-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
-            )
-            .flex(1)
-            .textAlign(TextAlign.Center)
-            .backgroundColor(Colors.Transparent)
-            .color(palette.onSurfaceVariant)
-    }
-    cssRule(".active") {
-        val palette = colorMode.toSitePalette()
-        Modifier
-            .color(palette.primary)
-            .fontWeight(FontWeight.SemiBold)
-            .borderBottom(width = 2.px, style = LineStyle.Solid, color = palette.primary)
     }
 }
 
@@ -265,98 +170,6 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
             onSelectFiles = onSelectFiles,
         )
     }
-}
-
-@Composable
-private fun rememberFileSelectedHandler(
-    scope: CoroutineScope,
-    vm: PlaygroundViewModel,
-): (List<File>, Map<String, String>) -> Unit = remember(scope, vm) {
-    { files: List<File>, paths: Map<String, String> ->
-        val zipFile = files.firstOrNull { file ->
-            file.name.endsWith(".zip", ignoreCase = true)
-        }
-        if (zipFile != null) {
-            scope.launch {
-                when (val result = processZipUpload(zipFile)) {
-                    is ZipUploadResult.Success ->
-                        vm.loadFiles(result.files)
-
-                    is ZipUploadResult.Error ->
-                        vm.dispatch(PlaygroundAction.ZipUploadError(result.message))
-                }
-            }
-        } else {
-            val validFiles = files.filter { file ->
-                file.name.endsWith(".svg", ignoreCase = true) ||
-                    file.name.endsWith(".xml", ignoreCase = true)
-            }
-            when {
-                validFiles.size == 1 -> scope.launch {
-                    val file = validFiles.first()
-                    val content = readFileAsText(file)
-                    vm.dispatch(
-                        PlaygroundAction.SingleFileLoaded(file.name, content),
-                    )
-                }
-
-                validFiles.size > 1 -> scope.launch {
-                    val uploadedInfos = validFiles.map { file ->
-                        val content = readFileAsText(file)
-                        UploadedFileInfo(
-                            name = file.name,
-                            content = content,
-                            detectedExtension = detectExtension(content)
-                                ?: "svg",
-                            relativePath = paths[file.name] ?: "",
-                        )
-                    }
-                    vm.loadFiles(uploadedInfos)
-                }
-            }
-        }
-    }
-}
-
-private sealed interface ZipUploadResult {
-    data class Success(val files: List<UploadedFileInfo>) : ZipUploadResult
-    data class Error(val message: String) : ZipUploadResult
-}
-
-private suspend fun processZipUpload(file: File): ZipUploadResult {
-    val sizeCheck = checkZipSizeLimit(file)
-    if (sizeCheck is ZipLimitCheck.SizeWarning) {
-        val sizeMb = sizeCheck.sizeBytes / (1024 * 1024)
-        console.warn(
-            "Zip file is ${sizeMb.toInt()} MB, " +
-                "which exceeds the 50 MB soft limit.",
-        )
-    }
-
-    val parsedZip = try {
-        parseZipEntries(file)
-    } catch (e: IllegalStateException) {
-        console.error(e.message)
-        return ZipUploadResult.Error(
-            e.message ?: "Failed to read the zip file.",
-        )
-    }
-
-    val countCheck = checkZipFileCountLimit(parsedZip)
-    if (countCheck is ZipLimitCheck.FileCountWarning) {
-        console.warn(
-            "Zip contains ${countCheck.count} matching files, " +
-                "which exceeds the 200 file soft limit.",
-        )
-    }
-
-    val result = extractFilesFromParsedZip(parsedZip)
-    if (result.files.isEmpty() && result.errors.isEmpty()) {
-        return ZipUploadResult.Error(
-            "No SVG or Android Vector Drawable files found in the zip.",
-        )
-    }
-    return ZipUploadResult.Success(result.files)
 }
 
 @Composable

@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Cursor
@@ -43,7 +43,8 @@ import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.components.organisms.playground.ConvertButtonStyle
+import dev.tonholo.s2c.website.components.molecules.playground.ConvertButtonStyle
+import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -173,9 +174,9 @@ fun PlaygroundToolbar(
     isConverting: Boolean,
     sampleNames: List<String>,
     selectedSample: Int,
-    onSampleSelect: (Int) -> Unit,
-    onInputModeChange: (String) -> Unit,
-    onConvert: () -> Unit,
+    onSampleSelect: (Int) -> Unit = {},
+    onInputModeChange: (String) -> Unit = {},
+    onConvert: () -> Unit = {},
 ) {
     Div(attrs = ToolbarStyle.toModifier().toAttrs()) {
         SampleButtons(sampleNames, selectedSample, onSampleSelect)

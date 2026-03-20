@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.atoms
+package dev.tonholo.s2c.website.components.molecules.playground
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Cursor
@@ -51,22 +51,6 @@ private const val ZOOM_OCTUPLE = 8f
 private const val PERCENT_MULTIPLIER = 100
 
 private val ZOOM_LEVELS = floatArrayOf(ZOOM_QUARTER, ZOOM_HALF, 1f, 2f, ZOOM_QUADRUPLE, ZOOM_OCTUPLE)
-
-/** Finds the previous zoom level, handling arbitrary values not in ZOOM_LEVELS. */
-private fun previousZoom(current: Float): Float? {
-    // Find the largest level strictly less than current (with small epsilon for float comparison)
-    val prev = ZOOM_LEVELS.lastOrNull { it < current - 0.001f }
-    if (prev != null) return prev
-    // If current is at or below minimum, no zoom out possible
-    return null
-}
-
-/** Finds the next zoom level, handling arbitrary values not in ZOOM_LEVELS. */
-private fun nextZoom(current: Float): Float? {
-    val next = ZOOM_LEVELS.firstOrNull { it > current + 0.001f }
-    if (next != null) return next
-    return null
-}
 
 /**
  * Zoom control bar with [-], [+], and [1:1] buttons.
@@ -142,4 +126,20 @@ fun ZoomControls(
             }
         }
     }
+}
+
+/** Finds the previous zoom level, handling arbitrary values not in ZOOM_LEVELS. */
+private fun previousZoom(current: Float): Float? {
+    // Find the largest level strictly less than current (with small epsilon for float comparison)
+    val prev = ZOOM_LEVELS.lastOrNull { it < current - 0.001f }
+    if (prev != null) return prev
+    // If current is at or below minimum, no zoom out possible
+    return null
+}
+
+/** Finds the next zoom level, handling arbitrary values not in ZOOM_LEVELS. */
+private fun nextZoom(current: Float): Float? {
+    val next = ZOOM_LEVELS.firstOrNull { it > current + 0.001f }
+    if (next != null) return next
+    return null
 }

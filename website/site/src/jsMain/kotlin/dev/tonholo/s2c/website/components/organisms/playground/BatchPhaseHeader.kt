@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +53,7 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.SitePalette
+import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.toSitePalette
 import kotlinx.coroutines.delay
@@ -141,13 +142,13 @@ internal fun BatchPhaseHeader(
     totalFiles: Int,
     selectedCount: Int,
     allSelected: Boolean,
-    onToggleSelectAll: () -> Unit,
-    onStartConversion: () -> Unit,
-    onCancel: () -> Unit,
-    onDownload: () -> Unit,
-    onRestart: () -> Unit,
-    onClear: () -> Unit,
     modifier: Modifier = Modifier,
+    onToggleSelectAll: () -> Unit = {},
+    onStartConversion: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    onDownload: () -> Unit = {},
+    onRestart: () -> Unit = {},
+    onClear: () -> Unit = {},
 ) {
     Column(
         modifier = BatchPhaseHeaderStyle.toModifier().then(modifier).gap(0.5.cssRem),
@@ -331,13 +332,20 @@ private fun ResultsPhaseContent(
     val successCount = phase.completed.count { it.isSuccess }
     val failureCount = phase.completed.size - successCount
 
+    val duration = formatDuration(phase.durationMs)
+    val summaryText = if (phase.cancelled) {
+        "Cancelled — ${phase.completed.size} of $totalFiles completed in $duration"
+    } else {
+        "Conversion complete — $successCount succeeded, $failureCount failed in $duration"
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth().gap(0.5.cssRem),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         SpanText(
-            buildResultSummary(phase, totalFiles, successCount, failureCount),
+            summaryText,
             modifier = Modifier
                 .flex(1)
                 .fontSize(0.8.cssRem)
@@ -351,20 +359,6 @@ private fun ResultsPhaseContent(
             onRestart = onRestart,
             onClear = onClear,
         )
-    }
-}
-
-private fun buildResultSummary(
-    phase: BatchPhase.Results,
-    totalFiles: Int,
-    successCount: Int,
-    failureCount: Int,
-): String {
-    val duration = formatDuration(phase.durationMs)
-    return if (phase.cancelled) {
-        "Cancelled — ${phase.completed.size} of $totalFiles completed in $duration"
-    } else {
-        "Conversion complete — $successCount succeeded, $failureCount failed in $duration"
     }
 }
 

@@ -22,8 +22,8 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
-import dev.tonholo.s2c.website.components.molecules.SectionContainer
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -72,6 +72,7 @@ fun InstallSection(modifier: Modifier = Modifier) {
                 )
                 CodeBlock(
                     language = "bash",
+                    // language=sh
                     code = """
                         |curl -o s2c https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
                         |chmod +x s2c
@@ -93,9 +94,11 @@ fun InstallSection(modifier: Modifier = Modifier) {
                 )
                 CodeBlock(
                     language = "kotlin",
+                    // language=kotlin
                     code = """plugins {
-    id("dev.tonholo.s2c") version "2.1.2"
-}""",
+                            |    id("dev.tonholo.s2c") version "2.1.2"
+                            |}
+                    """.trimMargin(),
                 )
             }
         }

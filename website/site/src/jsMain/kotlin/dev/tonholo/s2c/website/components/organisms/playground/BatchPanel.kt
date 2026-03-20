@@ -24,7 +24,6 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.components.molecules.playground.BatchPhaseHeader
 import dev.tonholo.s2c.website.components.molecules.playground.FileGroupHeader
 import dev.tonholo.s2c.website.components.molecules.playground.FileRow
 import dev.tonholo.s2c.website.state.playground.BatchConversionResult
@@ -32,7 +31,10 @@ import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.FileGroup
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
+import dev.tonholo.s2c.website.state.playground.batch.BatchFileListState
 import dev.tonholo.s2c.website.state.playground.fileKey
+import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
+import dev.tonholo.s2c.website.state.playground.folder.FolderGroupState
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -64,24 +66,24 @@ val BatchPanelFileListStyle = CssStyle.base {
  * Root-level files (those whose [FileGroup.folderPath] is empty) are rendered
  * directly as [FileRow]s without a folder header. Files inside named folders are
  * rendered under a collapsible [FileGroupHeader], with their rows visible only
- * when the folder is expanded via [state.expandedFolders].
+ * when the folder is expanded via [PlaygroundState.expandedFolders].
  */
 @Composable
 internal fun BatchPanel(
     state: PlaygroundState,
     completedCountByFolder: Map<String, Int>,
-    onToggleSelectAll: () -> Unit,
-    onToggleFileSelection: (String) -> Unit,
-    onToggleFolderSelection: (String) -> Unit,
-    onSetFoldersSelection: (folderPaths: List<String>, selected: Boolean) -> Unit,
-    onToggleFolderExpand: (String) -> Unit,
-    onStartConversion: () -> Unit,
-    onCancel: () -> Unit,
-    onDownload: () -> Unit,
-    onRestart: () -> Unit,
-    onClear: () -> Unit,
-    onInspect: (BatchConversionResult) -> Unit,
     modifier: Modifier = Modifier,
+    onToggleSelectAll: () -> Unit = {},
+    onToggleFileSelection: (String) -> Unit = {},
+    onToggleFolderSelection: (String) -> Unit = {},
+    onSetFoldersSelection: (folderPaths: List<String>, selected: Boolean) -> Unit = { _, _ -> },
+    onToggleFolderExpand: (String) -> Unit = {},
+    onStartConversion: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    onDownload: () -> Unit = {},
+    onRestart: () -> Unit = {},
+    onClear: () -> Unit = {},
+    onInspect: (BatchConversionResult) -> Unit = {},
 ) {
     val phase = state.batchPhase ?: return
 
@@ -116,44 +118,74 @@ internal fun BatchPanel(
             onClear = onClear,
         )
 
-        Column(modifier = BatchPanelFileListStyle.toModifier()) {
-            for (group in state.fileGroups) {
-                if (group.folderPath.isEmpty()) {
-                    RootFileRows(
+        BatchFileList(
+            state = BatchFileListState(
+                playgroundState = state,
+                phase = phase,
+                completedResults = completedResults,
+                completedCountByFolder = completedCountByFolder,
+                folderPaths = folderPaths,
+                lastClickedFolderIndex = lastClickedFolderIndex,
+            ),
+            onLastClickedFolderIndexChange = { lastClickedFolderIndex = it },
+            onToggleFileSelection = onToggleFileSelection,
+            onToggleFolderExpand = onToggleFolderExpand,
+            onToggleFolderSelection = onToggleFolderSelection,
+            onSetFoldersSelection = onSetFoldersSelection,
+            onInspect = onInspect,
+        )
+    }
+}
+
+@Composable
+private fun BatchFileList(
+    state: BatchFileListState,
+    onLastClickedFolderIndexChange: (Int) -> Unit = {},
+    onToggleFileSelection: (String) -> Unit = {},
+    onToggleFolderExpand: (String) -> Unit = {},
+    onToggleFolderSelection: (String) -> Unit = {},
+    onSetFoldersSelection: (List<String>, Boolean) -> Unit = { _, _ -> },
+    onInspect: (BatchConversionResult) -> Unit = {},
+) {
+    Column(modifier = BatchPanelFileListStyle.toModifier()) {
+        for (group in state.playgroundState.fileGroups) {
+            if (group.folderPath.isEmpty()) {
+                RootFileRows(
+                    group = group,
+                    phase = state.phase,
+                    selectedFiles = state.playgroundState.selectedFiles,
+                    completedResults = state.completedResults,
+                    onToggleFileSelection = onToggleFileSelection,
+                    onInspect = onInspect,
+                )
+            } else {
+                val folderIndex = state.folderPaths.indexOf(group.folderPath)
+                FolderGroup(
+                    state = FolderGroupState(
                         group = group,
-                        phase = phase,
-                        selectedFiles = state.selectedFiles,
-                        completedResults = completedResults,
-                        onToggleFileSelection = onToggleFileSelection,
-                        onInspect = onInspect,
-                    )
-                } else {
-                    val folderIndex = folderPaths.indexOf(group.folderPath)
-                    FolderGroup(
-                        group = group,
-                        phase = phase,
-                        selectedFiles = state.selectedFiles,
-                        expandedFolders = state.expandedFolders,
-                        completedResults = completedResults,
-                        completedCountByFolder = completedCountByFolder,
-                        onToggleFolderExpand = onToggleFolderExpand,
-                        onToggleFolderSelection = { shiftKey ->
-                            handleFolderSelectionClick(
-                                shiftKey = shiftKey,
-                                folderIndex = folderIndex,
-                                lastClickedIndex = lastClickedFolderIndex,
-                                folderPaths = folderPaths,
-                                selectedFiles = state.selectedFiles,
-                                uploadedFiles = state.uploadedFiles,
-                                onToggle = onToggleFolderSelection,
-                                onSetRange = onSetFoldersSelection,
-                            )
-                            lastClickedFolderIndex = folderIndex
-                        },
-                        onToggleFileSelection = onToggleFileSelection,
-                        onInspect = onInspect,
-                    )
-                }
+                        phase = state.phase,
+                        selectedFiles = state.playgroundState.selectedFiles,
+                        expandedFolders = state.playgroundState.expandedFolders,
+                        completedResults = state.completedResults,
+                        completedCountByFolder = state.completedCountByFolder,
+                    ),
+                    onToggleFolderExpand = onToggleFolderExpand,
+                    onToggleFolderSelection = { shiftKey ->
+                        handleFolderSelectionClick(
+                            shiftKey = shiftKey,
+                            folderIndex = folderIndex,
+                            lastClickedIndex = state.lastClickedFolderIndex,
+                            folderPaths = state.folderPaths,
+                            selectedFiles = state.playgroundState.selectedFiles,
+                            uploadedFiles = state.playgroundState.uploadedFiles,
+                            onToggle = onToggleFolderSelection,
+                            onSetRange = onSetFoldersSelection,
+                        )
+                        onLastClickedFolderIndexChange(folderIndex)
+                    },
+                    onToggleFileSelection = onToggleFileSelection,
+                    onInspect = onInspect,
+                )
             }
         }
     }
@@ -165,8 +197,8 @@ private fun RootFileRows(
     phase: BatchPhase,
     selectedFiles: Set<String>,
     completedResults: List<BatchConversionResult>,
-    onToggleFileSelection: (String) -> Unit,
-    onInspect: (BatchConversionResult) -> Unit,
+    onToggleFileSelection: (String) -> Unit = {},
+    onInspect: (BatchConversionResult) -> Unit = {},
 ) {
     for (file in group.files) {
         val result = completedResults.find { it.fileName == file.name && it.relativePath == file.relativePath }
@@ -184,24 +216,19 @@ private fun RootFileRows(
 
 @Composable
 private fun FolderGroup(
-    group: FileGroup,
-    phase: BatchPhase,
-    selectedFiles: Set<String>,
-    expandedFolders: Set<String>,
-    completedResults: List<BatchConversionResult>,
-    completedCountByFolder: Map<String, Int>,
-    onToggleFolderExpand: (String) -> Unit,
-    onToggleFolderSelection: (shiftKey: Boolean) -> Unit,
-    onToggleFileSelection: (String) -> Unit,
-    onInspect: (BatchConversionResult) -> Unit,
+    state: FolderGroupState,
+    onToggleFolderExpand: (String) -> Unit = {},
+    onToggleFolderSelection: (shiftKey: Boolean) -> Unit = {},
+    onToggleFileSelection: (String) -> Unit = {},
+    onInspect: (BatchConversionResult) -> Unit = {},
 ) {
-    val isExpanded = group.folderPath in expandedFolders
-    val groupSelectedCount = group.files.count { file -> file.fileKey() in selectedFiles }
-    val groupCompletedCount = when (phase) {
-        is BatchPhase.Converting -> completedCountByFolder[group.folderPath] ?: 0
+    val isExpanded = state.group.folderPath in state.expandedFolders
+    val groupSelectedCount = state.group.files.count { file -> file.fileKey() in state.selectedFiles }
+    val groupCompletedCount = when (state.phase) {
+        is BatchPhase.Converting -> state.completedCountByFolder[state.group.folderPath] ?: 0
 
-        is BatchPhase.Results -> completedResults.count { result ->
-            group.files.any { file -> file.name == result.fileName && file.relativePath == result.relativePath }
+        is BatchPhase.Results -> state.completedResults.count { result ->
+            state.group.files.any { file -> file.name == result.fileName && file.relativePath == result.relativePath }
         }
 
         else -> 0
@@ -209,22 +236,22 @@ private fun FolderGroup(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         FileGroupHeader(
-            group = group,
-            phase = phase,
-            isExpanded = isExpanded,
-            selectedCount = groupSelectedCount,
-            selectedFiles = selectedFiles,
-            completedCount = groupCompletedCount,
-            onToggleExpand = { onToggleFolderExpand(group.folderPath) },
+            state = FileGroupHeaderState(
+                groupState = state,
+                isExpanded = isExpanded,
+                selectedCount = groupSelectedCount,
+                completedCount = groupCompletedCount,
+            ),
+            onToggleExpand = { onToggleFolderExpand(state.group.folderPath) },
             onToggleSelection = onToggleFolderSelection,
         )
 
         if (isExpanded) {
             ExpandedFolderFiles(
-                group = group,
-                phase = phase,
-                selectedFiles = selectedFiles,
-                completedResults = completedResults,
+                group = state.group,
+                phase = state.phase,
+                selectedFiles = state.selectedFiles,
+                completedResults = state.completedResults,
                 onToggleFileSelection = onToggleFileSelection,
                 onInspect = onInspect,
             )
@@ -238,8 +265,8 @@ private fun ExpandedFolderFiles(
     phase: BatchPhase,
     selectedFiles: Set<String>,
     completedResults: List<BatchConversionResult>,
-    onToggleFileSelection: (String) -> Unit,
-    onInspect: (BatchConversionResult) -> Unit,
+    onToggleFileSelection: (String) -> Unit = {},
+    onInspect: (BatchConversionResult) -> Unit = {},
 ) {
     var showAll by remember { mutableStateOf(false) }
     val filesToShow = if (showAll || group.files.size <= MAX_VISIBLE_FILES) {
@@ -296,9 +323,9 @@ private fun handleFolderSelectionClick(
     lastClickedIndex: Int,
     folderPaths: List<String>,
     selectedFiles: Set<String>,
-    uploadedFiles: List<UploadedFileInfo>,
-    onToggle: (String) -> Unit,
-    onSetRange: (paths: List<String>, selected: Boolean) -> Unit,
+    uploadedFiles: List<UploadedFileInfo> = emptyList(),
+    onToggle: (String) -> Unit = {},
+    onSetRange: (paths: List<String>, selected: Boolean) -> Unit = { _, _ -> },
 ) {
     if (!shiftKey) {
         onToggle(folderPaths[folderIndex])

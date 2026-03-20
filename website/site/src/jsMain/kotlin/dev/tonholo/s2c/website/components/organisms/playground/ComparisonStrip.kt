@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -32,11 +32,13 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.SitePalette
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.CheckerboardPreview
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
-import dev.tonholo.s2c.website.components.atoms.ZoomControls
+import dev.tonholo.s2c.website.components.molecules.playground.ZoomControls
+import dev.tonholo.s2c.website.state.playground.preview.SourcePreviewContent
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -95,76 +97,26 @@ fun ComparisonStrip(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Center,
         ) {
-            // Source preview
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.gap(0.5.cssRem),
-            ) {
-                CheckerboardPreview(sizePx = previewSizePx) {
-                    SourcePreviewContent(
-                        svgCode = svgCode,
-                        extension = extension,
-                        zoomLevel = zoomLevel,
-                        panX = panX,
-                        panY = panY,
-                        onPan = { dx, dy ->
-                            panX += dx
-                            panY += dy
-                        },
-                        containerSizePx = previewSizePx,
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.gap(0.5.cssRem),
-                ) {
-                    SpanText(
-                        "Source",
-                        modifier = Modifier
-                            .fontSize(0.7.cssRem)
-                            .color(palette.onSurfaceVariant),
-                    )
-                    Badge(
-                        text = extension.uppercase(),
-                        color = palette.onSurfaceVariant,
-                        variant = SquaredBadge,
-                    )
-                }
-            }
-
-            // Converted preview
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.gap(0.5.cssRem),
-            ) {
-                CheckerboardPreview(sizePx = previewSizePx) {
-                    ComparisonIframe(
-                        iconFileContentsJson = iconFileContentsJson,
-                        zoomLevel = zoomLevel,
-                        panX = panX,
-                        panY = panY,
-                        sizePx = previewSizePx,
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.gap(0.5.cssRem),
-                ) {
-                    SpanText(
-                        "Converted",
-                        modifier = Modifier
-                            .fontSize(0.7.cssRem)
-                            .color(palette.onSurfaceVariant),
-                    )
-                    if (iconFileContentsJson != null) {
-                        Badge(
-                            text = "ImageVector",
-                            color = SiteTheme.palette.primary,
-                            variant = SquaredBadge,
-                        )
-                    }
-                }
-            }
+            SourcePreviewColumn(
+                svgCode = svgCode,
+                extension = extension,
+                zoomLevel = zoomLevel,
+                panX = panX,
+                panY = panY,
+                onPan = { dx, dy ->
+                    panX += dx
+                    panY += dy
+                },
+                previewSizePx = previewSizePx,
+                palette = palette,
+            )
+            ConvertedPreviewColumn(
+                iconFileContentsJson = iconFileContentsJson,
+                zoomLevel = zoomLevel,
+                panX = panX,
+                panY = panY,
+                previewSizePx = previewSizePx,
+            )
         }
 
         ZoomControls(
@@ -173,6 +125,97 @@ fun ComparisonStrip(
             nativeScale = nativeScale,
             modifier = Modifier.padding(top = 0.75.cssRem),
         )
+    }
+}
+
+@Composable
+@Suppress("LongParameterList")
+private fun SourcePreviewColumn(
+    svgCode: String,
+    extension: String,
+    zoomLevel: Float,
+    panX: Float,
+    panY: Float,
+    onPan: (dx: Float, dy: Float) -> Unit,
+    previewSizePx: Int,
+    palette: SitePalette,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.gap(0.5.cssRem),
+    ) {
+        CheckerboardPreview(sizePx = previewSizePx) {
+            SourcePreviewContent(
+                state = SourcePreviewContent(
+                    svgCode = svgCode,
+                    extension = extension,
+                    zoomLevel = zoomLevel,
+                    panX = panX,
+                    panY = panY,
+                    containerSizePx = previewSizePx,
+                ),
+                onPan = onPan,
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.gap(0.5.cssRem),
+        ) {
+            SpanText(
+                "Source",
+                modifier = Modifier
+                    .fontSize(0.7.cssRem)
+                    .color(palette.onSurfaceVariant),
+            )
+            Badge(
+                text = extension.uppercase(),
+                color = palette.onSurfaceVariant,
+                variant = SquaredBadge,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ConvertedPreviewColumn(
+    iconFileContentsJson: String?,
+    zoomLevel: Float,
+    panX: Float,
+    panY: Float,
+    previewSizePx: Int,
+) {
+    val palette = ColorMode.current.toSitePalette()
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.gap(0.5.cssRem),
+    ) {
+        CheckerboardPreview(sizePx = previewSizePx) {
+            ComparisonIframe(
+                iconFileContentsJson = iconFileContentsJson,
+                zoomLevel = zoomLevel,
+                panX = panX,
+                panY = panY,
+                sizePx = previewSizePx,
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.gap(0.5.cssRem),
+        ) {
+            SpanText(
+                "Converted",
+                modifier = Modifier
+                    .fontSize(0.7.cssRem)
+                    .color(palette.onSurfaceVariant),
+            )
+            if (iconFileContentsJson != null) {
+                Badge(
+                    text = "ImageVector",
+                    color = SiteTheme.palette.primary,
+                    variant = SquaredBadge,
+                )
+            }
+        }
     }
 }
 
@@ -193,18 +236,10 @@ private fun computeNativeScale(svgCode: String, containerSizePx: Int): Float? {
 }
 
 @Composable
-private fun SourcePreviewContent(
-    svgCode: String,
-    extension: String,
-    zoomLevel: Float,
-    panX: Float,
-    panY: Float,
-    onPan: (dx: Float, dy: Float) -> Unit,
-    containerSizePx: Int,
-) {
-    if (extension == "avg") {
+private fun SourcePreviewContent(state: SourcePreviewContent, onPan: (dx: Float, dy: Float) -> Unit) {
+    if (state.extension == "avg") {
         Column(
-            modifier = Modifier.size(containerSizePx.px),
+            modifier = Modifier.size(state.containerSizePx.px),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -222,12 +257,12 @@ private fun SourcePreviewContent(
         }
     } else {
         FittedSvgPreview(
-            svgCode = svgCode,
-            zoomLevel = zoomLevel,
-            panX = panX,
-            panY = panY,
+            svgCode = state.svgCode,
+            zoomLevel = state.zoomLevel,
+            panX = state.panX,
+            panY = state.panY,
             onPan = onPan,
-            containerSizePx = containerSizePx,
+            containerSizePx = state.containerSizePx,
         )
     }
 }
@@ -242,8 +277,8 @@ private fun FittedSvgPreview(
     zoomLevel: Float,
     panX: Float,
     panY: Float,
-    onPan: (dx: Float, dy: Float) -> Unit,
     containerSizePx: Int,
+    onPan: (dx: Float, dy: Float) -> Unit = { _, _ -> },
 ) {
     var isDragging by remember { mutableStateOf(false) }
 

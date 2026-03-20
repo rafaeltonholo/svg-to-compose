@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules
+package dev.tonholo.s2c.website.components.layouts
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.foundation.layout.Column

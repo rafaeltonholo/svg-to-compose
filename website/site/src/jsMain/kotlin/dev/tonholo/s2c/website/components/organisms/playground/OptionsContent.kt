@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Overflow

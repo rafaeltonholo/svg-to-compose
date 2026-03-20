@@ -19,7 +19,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
-import dev.tonholo.s2c.website.components.molecules.SectionContainer
+import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.TabPanel
 import dev.tonholo.s2c.website.components.organisms.howtouse.CliUsageContent
 import dev.tonholo.s2c.website.components.organisms.howtouse.GradleUsageContent

@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -229,9 +229,7 @@ fun InputPanel(
                     // Strip Shiki's inline background-color on <pre> so our
                     // CSS rule (transparent) takes effect. Inline styles have
                     // higher specificity than class-based rules.
-                    scopeElement.querySelector("pre")?.let { pre ->
-                        pre.asDynamic().style.backgroundColor = ""
-                    }
+                    scopeElement.querySelector("pre")?.let { pre -> pre.asDynamic().style.backgroundColor = "" }
                     onDispose { }
                 }
             }

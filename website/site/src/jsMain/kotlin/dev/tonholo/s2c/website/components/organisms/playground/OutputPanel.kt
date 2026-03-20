@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.JustifyContent
 import com.varabyte.kobweb.compose.css.Overflow
@@ -17,7 +16,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
-import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.color
@@ -50,15 +48,15 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SpinKeyframes
+import dev.tonholo.s2c.website.SitePalette
 import dev.tonholo.s2c.website.components.molecules.PanelHeaderStyle
+import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
 import dev.tonholo.s2c.website.shiki.ShikiCodeBlock
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.AnimationTimingFunction
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.cssRem
@@ -75,18 +73,6 @@ val OutputPanelStyle = CssStyle.base {
         .flex(1)
         .minHeight(0.px)
         .overflow(Overflow.Auto)
-}
-
-/** Styles the spinner icon with a continuous rotation animation. */
-val SpinnerIconStyle = CssStyle.base {
-    Modifier
-        .animation(
-            SpinKeyframes.toAnimation(
-                duration = 1000.ms,
-                timingFunction = AnimationTimingFunction.Linear,
-                iterationCount = AnimationIterationCount.Infinite,
-            ),
-        )
 }
 
 /** Styles the monospace code block inside the output panel. */
@@ -216,7 +202,7 @@ private fun OutputPanelContent(
 }
 
 @Composable
-private fun OutputConvertingState(progress: String, palette: dev.tonholo.s2c.website.SitePalette) {
+private fun OutputConvertingState(progress: String, palette: SitePalette) {
     Column(
         modifier = Modifier.fillMaxSize().padding(2.cssRem),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -240,7 +226,7 @@ private fun OutputConvertingState(progress: String, palette: dev.tonholo.s2c.web
 }
 
 @Composable
-private fun OutputErrorState(error: String, palette: dev.tonholo.s2c.website.SitePalette) {
+private fun OutputErrorState(error: String, palette: SitePalette) {
     Column(
         modifier = Modifier.fillMaxSize().padding(2.cssRem),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -259,7 +245,7 @@ private fun OutputErrorState(error: String, palette: dev.tonholo.s2c.website.Sit
 }
 
 @Composable
-private fun OutputEmptyState(palette: dev.tonholo.s2c.website.SitePalette) {
+private fun OutputEmptyState(palette: SitePalette) {
     Column(
         modifier = Modifier.fillMaxSize().padding(2.cssRem),
         horizontalAlignment = Alignment.CenterHorizontally,

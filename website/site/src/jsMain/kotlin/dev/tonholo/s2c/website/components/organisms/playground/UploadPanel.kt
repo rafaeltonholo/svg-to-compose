@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.molecules.playground
+package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Cursor
@@ -53,7 +53,12 @@ val UploadPanelStyle = CssStyle.base {
         .padding(2.cssRem)
 }
 
-val UploadDropZoneStyle = CssStyle.base {
+val UploadDropZoneStyle = CssStyle.base(
+    extraModifier = Modifier
+        .tabIndex(0)
+        .role("button")
+        .ariaLabel("Drop files here or click to upload"),
+) {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
@@ -83,110 +88,117 @@ val UploadButtonStyle = CssStyle.base {
  */
 @Composable
 fun UploadPanel(onFilePickerClick: () -> Unit, onFolderPickerClick: () -> Unit, modifier: Modifier = Modifier) {
-    val palette = ColorMode.current.toSitePalette()
-
     Column(
         modifier = UploadPanelStyle.toModifier().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Column(
-            modifier = UploadDropZoneStyle.toModifier()
-                .onClick { onFilePickerClick() }
-                .tabIndex(0)
-                .role("button")
-                .ariaLabel("Drop files here or click to upload")
-                .attrsModifier {
-                    onKeyDown { event ->
-                        when (event.key) {
-                            " ", "Enter" -> {
-                                event.preventDefault()
-                                onFilePickerClick()
-                            }
-                        }
-                    }
-                },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            FaUpload(
-                size = IconSize.X2,
-                modifier = Modifier
-                    .color(palette.onSurfaceVariant)
-                    .margin(bottom = 1.cssRem),
-            )
-            SpanText(
-                "Drop SVG/AVG files, a folder, or a zip file here",
-                modifier = Modifier
-                    .fontSize(0.9.cssRem)
-                    .fontWeight(FontWeight.SemiBold)
-                    .color(palette.onSurface),
-            )
-            SpanText(
-                "or use the buttons below",
-                modifier = Modifier
-                    .fontSize(0.75.cssRem)
-                    .color(palette.onSurfaceVariant)
-                    .margin(top = 0.25.cssRem),
-            )
+        UploadDropZone(
+            onFilePickerClick = onFilePickerClick,
+            onFolderPickerClick = onFolderPickerClick,
+        )
+    }
+}
 
-            Row(
-                modifier = Modifier
-                    .margin(top = 1.cssRem)
-                    .gap(0.75.cssRem),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Button(
-                    attrs = UploadButtonStyle.toModifier()
-                        .onClick { event ->
-                            event.stopPropagation()
+@Composable
+private fun UploadDropZone(onFilePickerClick: () -> Unit, onFolderPickerClick: () -> Unit) {
+    val palette = ColorMode.current.toSitePalette()
+    Column(
+        modifier = UploadDropZoneStyle.toModifier()
+            .onClick { onFilePickerClick() }
+            .attrsModifier {
+                onKeyDown { event ->
+                    when (event.key) {
+                        " ", "Enter" -> {
+                            event.preventDefault()
                             onFilePickerClick()
                         }
-                        .toAttrs(),
-                ) {
-                    Row(
-                        modifier = Modifier.gap(0.4.cssRem),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        FaFile()
-                        SpanText("Choose File")
                     }
                 }
-                Button(
-                    attrs = UploadButtonStyle.toModifier()
-                        .onClick { event ->
-                            event.stopPropagation()
-                            onFolderPickerClick()
-                        }
-                        .toAttrs(),
-                ) {
-                    Row(
-                        modifier = Modifier.gap(0.4.cssRem),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        FaFolderOpen()
-                        SpanText("Choose Folder")
-                    }
-                }
-            }
-
-            Row(
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        FaUpload(
+            size = IconSize.X2,
+            modifier = Modifier
+                .color(palette.onSurfaceVariant)
+                .margin(bottom = 1.cssRem),
+        )
+        SpanText(
+            "Drop SVG/AVG files, a folder, or a zip file here",
+            modifier = Modifier
+                .fontSize(0.9.cssRem)
+                .fontWeight(FontWeight.SemiBold)
+                .color(palette.onSurface),
+        )
+        SpanText(
+            "or use the buttons below",
+            modifier = Modifier
+                .fontSize(0.75.cssRem)
+                .color(palette.onSurfaceVariant)
+                .margin(top = 0.25.cssRem),
+        )
+        UploadActionButtons(onFilePickerClick, onFolderPickerClick)
+        Row(
+            modifier = Modifier
+                .margin(top = 1.25.cssRem)
+                .gap(0.35.cssRem),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FaShieldHalved(
                 modifier = Modifier
-                    .margin(top = 1.25.cssRem)
-                    .gap(0.35.cssRem),
+                    .fontSize(0.75.cssRem)
+                    .color(palette.onSurfaceVariant),
+            )
+            SpanText(
+                "All processing happens locally in your browser. Works offline too.",
+                modifier = Modifier
+                    .fontSize(0.75.cssRem)
+                    .color(palette.onSurfaceVariant),
+            )
+        }
+    }
+}
+
+@Composable
+private fun UploadActionButtons(onFilePickerClick: () -> Unit, onFolderPickerClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .margin(top = 1.cssRem)
+            .gap(0.75.cssRem),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Button(
+            attrs = UploadButtonStyle.toModifier()
+                .onClick { event ->
+                    event.stopPropagation()
+                    onFilePickerClick()
+                }
+                .toAttrs(),
+        ) {
+            Row(
+                modifier = Modifier.gap(0.4.cssRem),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FaShieldHalved(
-                    modifier = Modifier
-                        .fontSize(0.75.cssRem)
-                        .color(palette.onSurfaceVariant),
-                )
-                SpanText(
-                    "All processing happens locally in your browser. Works offline too.",
-                    modifier = Modifier
-                        .fontSize(0.75.cssRem)
-                        .color(palette.onSurfaceVariant),
-                )
+                FaFile()
+                SpanText("Choose File")
+            }
+        }
+        Button(
+            attrs = UploadButtonStyle.toModifier()
+                .onClick { event ->
+                    event.stopPropagation()
+                    onFolderPickerClick()
+                }
+                .toAttrs(),
+        ) {
+            Row(
+                modifier = Modifier.gap(0.4.cssRem),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                FaFolderOpen()
+                SpanText("Choose Folder")
             }
         }
     }

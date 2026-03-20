@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.components.atoms
+package dev.tonholo.s2c.website.components.molecules.playground
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
@@ -39,7 +39,6 @@ import org.jetbrains.compose.web.dom.Div
 private const val FILE_DROP_Z_INDEX = 10
 
 val FileDropOverlayStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
     Modifier
         .position(Position.Absolute)
         .top(0.px)

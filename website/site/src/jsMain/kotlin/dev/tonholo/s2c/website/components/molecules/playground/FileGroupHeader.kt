@@ -50,6 +50,7 @@ import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.FileGroup
 import dev.tonholo.s2c.website.state.playground.fileKey
+import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
@@ -113,12 +114,7 @@ val FileGroupProgressBarFillStyle = CssStyle.base {
  */
 @Composable
 internal fun FileGroupHeader(
-    group: FileGroup,
-    phase: BatchPhase,
-    isExpanded: Boolean,
-    selectedCount: Int,
-    selectedFiles: Set<String>,
-    completedCount: Int,
+    state: FileGroupHeaderState,
     onToggleExpand: () -> Unit,
     onToggleSelection: (shiftKey: Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -132,27 +128,28 @@ internal fun FileGroupHeader(
             .onClick { onToggleExpand() }
             .tabIndex(0)
             .role("button")
-            .ariaLabel("Toggle folder ${group.folderPath}"),
+            .ariaLabel("Toggle folder ${state.groupState.group.folderPath}"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Expand/collapse chevron
-        if (isExpanded) {
+        if (state.isExpanded) {
             FaChevronDown(modifier = iconModifier)
         } else {
             FaChevronRight(modifier = iconModifier)
         }
 
         // Checkbox (only shown in Select phase)
-        if (phase is BatchPhase.Select) {
+        val fileGroup = state.groupState.group
+        if (state.groupState.phase is BatchPhase.Select) {
             FileGroupCheckbox(
-                selectedCount = selectedCount,
-                totalCount = group.files.size,
+                selectedCount = state.selectedCount,
+                totalCount = fileGroup.files.size,
                 onToggleSelection = onToggleSelection,
             )
         }
 
         // Folder icon
-        if (isExpanded) {
+        if (state.isExpanded) {
             FaFolderOpen(modifier = Modifier.fontSize(0.8.cssRem).color(palette.onSurfaceVariant))
         } else {
             FaFolder(modifier = Modifier.fontSize(0.8.cssRem).color(palette.onSurfaceVariant))
@@ -160,7 +157,7 @@ internal fun FileGroupHeader(
 
         // Folder name
         SpanText(
-            group.folderPath.ifEmpty { "(root)" },
+            fileGroup.folderPath.ifEmpty { "(root)" },
             modifier = Modifier
                 .fontWeight(FontWeight.Medium)
                 .fontSize(0.8.cssRem)
@@ -168,33 +165,38 @@ internal fun FileGroupHeader(
         )
 
         // Phase-specific trailing content
-        when (phase) {
-            is BatchPhase.Select -> {
-                SpanText(
-                    "(${group.files.size} ${if (group.files.size == 1) "file" else "files"})",
-                    modifier = Modifier
-                        .fontSize(0.75.cssRem)
-                        .color(palette.onSurfaceVariant),
-                )
-            }
+        TrailingContent(state, fileGroup, palette)
+    }
+}
 
-            is BatchPhase.Converting -> {
-                FileGroupConvertingTrailing(
-                    completedCount = completedCount,
-                    totalCount = group.files.size,
-                )
-            }
+@Composable
+private fun TrailingContent(state: FileGroupHeaderState, fileGroup: FileGroup, palette: SitePalette) {
+    when (state.groupState.phase) {
+        is BatchPhase.Select -> {
+            SpanText(
+                "(${fileGroup.files.size} ${if (fileGroup.files.size == 1) "file" else "files"})",
+                modifier = Modifier
+                    .fontSize(0.75.cssRem)
+                    .color(palette.onSurfaceVariant),
+            )
+        }
 
-            is BatchPhase.Results -> {
-                val selectedInGroup = group.files.count { file ->
-                    file.fileKey() in selectedFiles
-                }
-                FileGroupResultsTrailing(
-                    completedCount = completedCount,
-                    selectedCount = selectedInGroup,
-                    palette = palette,
-                )
+        is BatchPhase.Converting -> {
+            FileGroupConvertingTrailing(
+                completedCount = state.completedCount,
+                totalCount = fileGroup.files.size,
+            )
+        }
+
+        is BatchPhase.Results -> {
+            val selectedInGroup = fileGroup.files.count { file ->
+                file.fileKey() in state.groupState.selectedFiles
             }
+            FileGroupResultsTrailing(
+                completedCount = state.completedCount,
+                selectedCount = selectedInGroup,
+                palette = palette,
+            )
         }
     }
 }
