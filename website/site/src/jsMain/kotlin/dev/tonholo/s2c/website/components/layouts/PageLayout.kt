@@ -15,8 +15,8 @@ import com.varabyte.kobweb.core.data.getValue
 import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.components.sections.Footer
-import dev.tonholo.s2c.website.components.sections.NavHeader
+import dev.tonholo.s2c.website.components.organisms.footer.Footer
+import dev.tonholo.s2c.website.components.organisms.NavHeader
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.vh

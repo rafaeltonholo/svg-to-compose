@@ -14,11 +14,13 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.textTransform
+import com.varabyte.kobweb.compose.ui.modifiers.translateY
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
@@ -28,6 +30,7 @@ import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.init.registerStyleBase
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.addVariantBase
+import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.theme.modifyStyleBase
 import org.jetbrains.compose.web.css.CSSMediaQuery
@@ -38,11 +41,38 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
 
+// Animation keyframes
+val FadeInUpKeyframes = Keyframes {
+    from { Modifier.opacity(0).translateY(20.px) }
+    to { Modifier.opacity(1).translateY(0.px) }
+}
+
+val FadeInKeyframes = Keyframes {
+    from { Modifier.opacity(0) }
+    to { Modifier.opacity(1) }
+}
+
+val PulseKeyframes = Keyframes {
+    from { Modifier.opacity(1) }
+    50.percent { Modifier.opacity(0.5) }
+    to { Modifier.opacity(1) }
+}
+
 @InitSilk
 fun initSiteStyles(ctx: InitSilkContext) {
     ctx.stylesheet.registerStyle("html") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
             Modifier.scrollBehavior(com.varabyte.kobweb.compose.css.ScrollBehavior.Smooth)
+        }
+    }
+
+    ctx.stylesheet.registerStyle("*") {
+        cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("reduce"))) {
+            Modifier.styleModifier {
+                property("animation-duration", "0.01ms !important")
+                property("animation-iteration-count", "1 !important")
+                property("transition-duration", "0.01ms !important")
+            }
         }
     }
 

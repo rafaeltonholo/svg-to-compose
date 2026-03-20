@@ -1,0 +1,214 @@
+package dev.tonholo.s2c.website.components.molecules.playground
+
+import androidx.compose.runtime.Composable
+import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.foundation.layout.RowScope
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.lightened
+import com.varabyte.kobweb.compose.ui.modifiers.BorderSideScope
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
+import com.varabyte.kobweb.compose.ui.modifiers.borderLeft
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.borderRight
+import com.varabyte.kobweb.compose.ui.modifiers.borderTop
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
+import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.height
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.icons.fa.FaClipboard
+import com.varabyte.kobweb.silk.components.icons.fa.FaPlay
+import com.varabyte.kobweb.silk.components.icons.fa.FaUpload
+import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.components.organisms.ConvertButtonStyle
+import dev.tonholo.s2c.website.toSitePalette
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Div
+
+val ToolbarStyle = CssStyle.base {
+    Modifier
+        .display(DisplayStyle.Flex)
+        .alignItems(AlignItems.Center)
+        .styleModifier { property("flex-wrap", "wrap") }
+        .gap(0.75.cssRem)
+        .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+        .backgroundColor(colorMode.toSitePalette().surfaceHeader)
+}
+val ToolbarButtonRowStyle = CssStyle {
+    val borderRadius = 0.375.cssRem
+    fun BorderSideScope.applyBorder() {
+        width(1.px)
+        style(LineStyle.Solid)
+        color(colorMode.toSitePalette().brand.purple.darkened(byPercent = .75f))
+    }
+    cssRule("> :first-child") {
+        Modifier
+            .borderRadius {
+                topLeft(borderRadius)
+                bottomLeft(borderRadius)
+            }
+            .borderLeft { applyBorder() }
+            .borderRight { style(LineStyle.None) }
+            .borderTop { applyBorder() }
+            .borderBottom { applyBorder() }
+    }
+    cssRule("> :last-child") {
+        Modifier
+            .borderRadius {
+                topRight(borderRadius)
+                bottomRight(borderRadius)
+            }
+            .borderLeft { style(LineStyle.None) }
+            .borderRight { applyBorder() }
+            .borderTop { applyBorder() }
+            .borderBottom { applyBorder() }
+    }
+}
+
+sealed interface ToolbarButtonKind : ComponentKind
+
+val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
+    base {
+        val sitePalette = colorMode.toSitePalette()
+        Modifier
+            .backgroundColor(sitePalette.nearBackground)
+            .padding(topBottom = 0.375.cssRem, leftRight = 0.75.cssRem)
+            .fontSize(0.75.cssRem)
+            .cursor(Cursor.Pointer)
+            .color(sitePalette.nearBackground.inverted())
+            .fontWeight(FontWeight.Medium)
+            .styleModifier { property("transition", "all 0.2s ease") }
+    }
+    cssRule(".active") {
+        val sitePalette = colorMode.toSitePalette()
+        Modifier
+            .backgroundColor(sitePalette.brand.purple.darkened(byPercent = .65f))
+            .color(sitePalette.brand.purple.lightened(byPercent = .5f))
+    }
+}
+
+val TealToolButtonStyle = ToolbarButtonStyle.addVariant {
+    cssRule(".active") {
+        val sitePalette = colorMode.toSitePalette()
+        Modifier
+            .backgroundColor(sitePalette.brand.teal.darkened(byPercent = .65f))
+            .color(sitePalette.brand.teal.lightened(byPercent = .5f))
+    }
+}
+
+@Composable
+fun PlaygroundToolbar(inputMode: String, extension: String, onInputModeChange: (String) -> Unit) {
+    Div(attrs = ToolbarStyle.toModifier().toAttrs()) {
+        // Input mode buttons
+        ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
+            ToolbarButton(
+                active = inputMode == "paste",
+                onClick = { onInputModeChange("paste") },
+            ) {
+                FaClipboard()
+                SpanText("Paste Code")
+            }
+
+            ToolbarButton(
+                active = inputMode == "upload",
+                onClick = { onInputModeChange("upload") },
+            ) {
+                FaUpload()
+                SpanText("Upload File")
+            }
+        }
+
+        // Separator
+        Div(
+            attrs = Modifier
+                .width(1.px)
+                .height(1.cssRem)
+                .backgroundColor(ColorMode.current.toSitePalette().border)
+                .toAttrs(),
+        )
+
+        // Format buttons
+        ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
+            ToolbarButton(
+                active = extension == "svg",
+                onClick = { },
+                variant = TealToolButtonStyle,
+            ) {
+                SpanText("SVG")
+            }
+            ToolbarButton(
+                active = extension == "avg",
+                onClick = { },
+                variant = TealToolButtonStyle,
+            ) {
+                SpanText("AVG (Android XML)")
+            }
+        }
+
+        // Convert button
+        Button(
+            attrs = ConvertButtonStyle.toModifier()
+                .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.4.cssRem)
+                .toAttrs(),
+        ) {
+            FaPlay()
+            SpanText("Convert")
+        }
+    }
+}
+
+@Composable
+fun ToolbarButtonRow(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Row(modifier = ToolbarButtonRowStyle.toModifier().then(modifier), content = content)
+}
+
+@Composable
+fun ToolbarButton(
+    active: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<ToolbarButtonKind>? = null,
+    content: @Composable () -> Unit,
+) {
+
+    Button(
+        attrs = ToolbarButtonStyle
+            .toModifier(variant)
+            .then(modifier)
+            .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.35.cssRem)
+            .onClick { onClick() }
+            .toAttrs {
+                if (active) {
+                    classes("active")
+                }
+            },
+    ) {
+        content()
+    }
+}

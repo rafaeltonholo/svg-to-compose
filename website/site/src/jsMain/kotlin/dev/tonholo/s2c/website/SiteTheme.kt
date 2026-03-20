@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.website
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.silk.init.InitSilk
@@ -8,7 +10,16 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 
-class SitePalette(
+object SiteTheme {
+    val palette: SitePalette
+        @Composable
+        @ReadOnlyComposable
+        get() = ColorMode.current.toSitePalette()
+}
+
+
+data class SitePalette(
+    val background: Color,
     val nearBackground: Color,
     val surface: Color,
     val surfaceAlt: Color,
@@ -19,14 +30,21 @@ class SitePalette(
     val mutedStrong: Color,
     val brand: Brand,
     val windowChrome: WindowChrome,
+    val link: Color,
 ) {
-    class Brand(
+    data class Brand(
         val purple: Color,
         val purpleDeep: Color,
         val teal: Color,
+        val orange: Color,
+        val green: Color,
+        val violet: Color,
+        val blue: Color,
+        val yellow: Color,
+        val red: Color,
     )
 
-    class WindowChrome(
+    data class WindowChrome(
         val red: Color = Color.rgb(value = 0xFF5F57),
         val yellow: Color = Color.rgb(value = 0xFEBC2E),
         val green: Color = Color.rgb(value = 0x28C840),
@@ -56,11 +74,12 @@ object FeatureColors {
 
 object SitePalettes {
     val light = SitePalette(
+        background = Color.rgb(value = 0xFFFFFF),
         nearBackground = Color.rgb(value = 0xF4F6FA),
         surface = Color.rgb(value = 0xFFFFFF),
         surfaceAlt = Color.rgb(value = 0xF3F3F5),
         surfaceHeader = Color.rgb(value = 0xECECF0),
-        border = Color.rgba(0, 0, 0, 0.1f),
+        border = Color.rgba(r = 0, g = 0, b = 0, a = 0.1f),
         borderStrong = Color.rgb(value = 0xD0D0D8),
         muted = Color.rgb(value = 0x717182),
         mutedStrong = Color.rgb(value = 0x546E7A),
@@ -68,15 +87,23 @@ object SitePalettes {
             purple = Color.rgb(value = 0x7F52FF),
             purpleDeep = Color.rgb(value = 0x5A30DD),
             teal = Color.rgb(value = 0x00D4AA),
+            orange = Color.rgb(value = 0xF78C6C),
+            green = Color.rgb(value = 0xA5D6A7),
+            violet = Color.rgb(value = 0xCF9AFF),
+            blue = Color.rgb(value = 0x82AAFF),
+            yellow = Color.rgb(value = 0xFFCB6B),
+            red = Color.rgb(value = 0xF07178),
         ),
         windowChrome = SitePalette.WindowChrome(),
+        link = Color.rgb(value = 0x8A8AA0),
     )
     val dark = SitePalette(
+        background = Color.rgb(value = 0x0A0A12),
         nearBackground = Color.rgb(value = 0x0B0B16),
         surface = Color.rgb(value = 0x0B0B18),
         surfaceAlt = Color.rgb(value = 0x0D0D1A),
         surfaceHeader = Color.rgb(value = 0x12122A),
-        border = Color.rgba(127, 82, 255, 0.15f),
+        border = Color.rgba(r = 127, g = 82, b = 255, a = 0.15f),
         borderStrong = Color.rgb(value = 0x2A2A4A),
         muted = Color.rgb(value = 0x8A8AA0),
         mutedStrong = Color.rgb(value = 0x546E7A),
@@ -84,8 +111,15 @@ object SitePalettes {
             purple = Color.rgb(value = 0x7F52FF),
             purpleDeep = Color.rgb(value = 0x5A30DD),
             teal = Color.rgb(value = 0x00D4AA),
+            orange = Color.rgb(value = 0xF78C6C),
+            green = Color.rgb(value = 0xA5D6A7),
+            violet = Color.rgb(value = 0xCF9AFF),
+            blue = Color.rgb(value = 0x82AAFF),
+            yellow = Color.rgb(value = 0xFFCB6B),
+            red = Color.rgb(value = 0xF07178),
         ),
         windowChrome = SitePalette.WindowChrome(),
+        link = Color.rgb(value = 0x8A8AA0),
     )
 }
 
@@ -96,10 +130,11 @@ fun ColorMode.toSitePalette(): SitePalette {
     }
 }
 
+
 @InitSilk
 fun initTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes.light.background = Color.rgb(value = 0xFFFFFF)
+    ctx.theme.palettes.light.background = SitePalettes.light.background
     ctx.theme.palettes.light.color = Colors.Black
-    ctx.theme.palettes.dark.background = Color.rgb(value = 0x0A0A12)
+    ctx.theme.palettes.dark.background = SitePalettes.dark.background
     ctx.theme.palettes.dark.color = Color.rgb(value = 0xE2E2F0)
 }

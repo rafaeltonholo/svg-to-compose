@@ -17,6 +17,7 @@ detekt {
 
 dependencies {
     detektPlugins(libs.detekt.rules.ktlint.wrapper)
+    detektPlugins(libs.io.nlopez.compose.rules.detekt)
 }
 
 tasks.withType<Detekt>().configureEach {

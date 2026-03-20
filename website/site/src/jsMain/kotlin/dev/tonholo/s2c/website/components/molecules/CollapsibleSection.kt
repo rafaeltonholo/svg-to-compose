@@ -1,0 +1,122 @@
+package dev.tonholo.s2c.website.components.molecules
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.foundation.layout.Spacer
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.border
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
+import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.overflow
+import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.icons.fa.FaChevronDown
+import com.varabyte.kobweb.silk.components.icons.fa.IconSize
+import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.toSitePalette
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Div
+
+private val containerBorderColor = Color.rgba(127, 82, 255, 0.2f)
+
+val CollapsibleContainerStyle = CssStyle.base {
+    Modifier
+        .fillMaxWidth()
+        .border(1.px, LineStyle.Solid, containerBorderColor)
+        .borderRadius(0.5.cssRem)
+        .overflow(Overflow.Hidden)
+}
+
+val CollapsibleHeaderStyle = CssStyle.base {
+    Modifier
+        .fillMaxWidth()
+        .padding(1.cssRem)
+        .cursor(Cursor.Pointer)
+        .backgroundColor(colorMode.toSitePalette().surfaceHeader)
+        .display(DisplayStyle.Flex)
+        .alignItems(AlignItems.Center)
+        .fontSize(0.875.cssRem)
+        .gap(0.5.cssRem)
+}
+
+@Composable
+fun CollapsibleSection(
+    title: String,
+    initiallyExpanded: Boolean = false,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
+
+    Div(attrs = CollapsibleContainerStyle.toModifier().toAttrs()) {
+        Row(
+            modifier = CollapsibleHeaderStyle.toModifier()
+                .onClick { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            leadingIcon?.invoke()
+            SpanText(
+                title,
+                modifier = Modifier
+                    .fontWeight(FontWeight.SemiBold),
+            )
+            Spacer()
+            FaChevronDown(
+                size = IconSize.SM,
+                modifier = Modifier
+                    .color(ColorMode.current.toSitePalette().muted)
+                    .styleModifier {
+                        property("transition", "transform 0.3s ease")
+                        if (expanded) {
+                            property("transform", "rotate(180deg)")
+                        }
+                    },
+            )
+        }
+        Div(
+            attrs = Modifier
+                .fillMaxWidth()
+                .overflow(Overflow.Hidden)
+                .styleModifier {
+                    if (expanded) {
+                        property("max-height", "200rem")
+                        property("opacity", "1")
+                    } else {
+                        property("max-height", "0")
+                        property("opacity", "0")
+                    }
+                    property("transition", "max-height 0.3s ease, opacity 0.3s ease")
+                }
+                .toAttrs(),
+        ) {
+            content()
+        }
+    }
+}

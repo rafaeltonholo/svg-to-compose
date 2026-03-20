@@ -3,6 +3,7 @@ agp = "8.13.2"
 burst = "2.11.0"
 kotlin = "2.3.0"
 clikt = "5.0.3"
+compose-rules = "0.5.6"
 okio = "3.16.4"
 detekt = "2.0.0-alpha.2"
 ksoup = "0.2.6"
@@ -31,6 +32,10 @@ com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", ve
 com-github-gmazzo-buildconfig-plugin = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 com-vanniktech-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
 org-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+
+# region [Website]
+io-nlopez-compose-rules-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "compose-rules" }
+# endregion [Website]
 
 [plugins]
 app-cash-burst = { id = "app.cash.burst", version.ref = "burst" }
