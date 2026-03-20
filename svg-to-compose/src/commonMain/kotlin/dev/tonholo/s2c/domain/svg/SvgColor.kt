@@ -175,4 +175,7 @@ private val namedColors = mapOf(
     "whitesmoke" to "#FFF5F5F5",
     "yellow" to "#FFFFFF00",
     "yellowgreen" to "#FF9ACD32",
+    // On Canvas or VectorPainter, which are `@Composable` functions,
+    // this should be LocalContentColor.current.
+    "currentColor" to "#FF000000",
 )
