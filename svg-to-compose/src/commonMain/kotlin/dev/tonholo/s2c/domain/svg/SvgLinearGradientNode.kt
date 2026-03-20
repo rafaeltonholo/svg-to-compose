@@ -6,6 +6,8 @@ import dev.tonholo.s2c.domain.compose.ComposeOffset
 import dev.tonholo.s2c.domain.svg.gradient.SvgLinearGradient
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
+import dev.tonholo.s2c.geom.Point2D
+import dev.tonholo.s2c.geom.transform
 
 class SvgLinearGradientNode(
     parent: XmlParentNode,
@@ -15,45 +17,68 @@ class SvgLinearGradientNode(
     SvgNode {
     override val constructor = ::SvgLinearGradientNode
 
-    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient {
-        if (href != null) {
-            val root = rootParent as SvgRootNode
-            val attrX1 = attributes["x1"]
-            val attrX2 = attributes["x2"]
-            val attrY1 = attributes["y1"]
-            val attrY2 = attributes["y2"]
-            val hrefId = checkNotNull(href).normalizedId()
-            val mutatedGradient = checkNotNull(root.gradients[hrefId])
-                .copy(
-                    attributes = attributes.toMutableMap().apply {
-                        remove(SvgUseNode.HREF_ATTR_KEY)
-                        attrX1?.let { put("x1", it) }
-                        attrX2?.let { put("x2", it) }
-                        attrY1?.let { put("y1", it) }
-                        attrY2?.let { put("y2", it) }
-                    },
-                ) as SvgLinearGradientNode
+    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient = if (href != null) {
+        resolveReferencedGradient().toBrush(target)
+    } else {
+        createLinearGradientBrush(target)
+    }
 
-            return mutatedGradient.toBrush(target)
+    private fun resolveReferencedGradient(): SvgLinearGradientNode {
+        val root = rootParent as SvgRootNode
+        val hrefId = checkNotNull(href).normalizedId()
+        val referenced = checkNotNull(root.gradients[hrefId])
+        check(referenced is SvgLinearGradientNode) {
+            "linearGradient href='#$hrefId' references a ${referenced::class.simpleName} instead of a linearGradient"
         }
+        val mergedAttributes = buildMergedAttributes(referenced)
+
+        return referenced.copy(attributes = mergedAttributes)
+    }
+
+    private fun buildMergedAttributes(
+        referencedGradient: SvgLinearGradientNode,
+    ): MutableMap<String, String> = referencedGradient.attributes.toMutableMap().apply {
+        remove(SvgUseNode.HREF_ATTR_KEY)
+        // Overlay this node's attributes onto referenced, so local values override inherited ones
+        for ((key, value) in this@SvgLinearGradientNode.attributes) {
+            if (key != SvgUseNode.HREF_ATTR_KEY) {
+                put(key, value)
+            }
+        }
+    }
+
+    private fun createLinearGradientBrush(target: List<PathNodes>): ComposeBrush.Gradient.Linear {
         val (colors, stops) = colorStops
-
-        val startOffset = ComposeOffset(
-            x = calculateGradientXCoordinate(x1, target),
-            y = calculateGradientXYCoordinate(y1, target),
-        )
-
-        val endOffset = ComposeOffset(
-            x = calculateGradientXCoordinate(x2, target),
-            y = calculateGradientYCoordinate(y2, target),
-        )
+        val (start, end) = calculateGradientOffsets(target)
 
         return ComposeBrush.Gradient.Linear(
-            start = startOffset,
-            end = endOffset,
+            start = ComposeOffset(start.x.toFloat(), start.y.toFloat()),
+            end = ComposeOffset(end.x.toFloat(), end.y.toFloat()),
             tileMode = spreadMethod.toCompose(),
             colors = colors.map { it.toComposeColor() },
             stops = stops,
         )
+    }
+
+    private fun calculateGradientOffsets(target: List<PathNodes>): Pair<Point2D, Point2D> {
+        val startOffset = Point2D(
+            x = calculateGradientXCoordinate(x1, target),
+            y = calculateGradientYCoordinate(y1, target),
+        )
+        val endOffset = Point2D(
+            x = calculateGradientXCoordinate(x2, target),
+            y = calculateGradientYCoordinate(y2, target),
+        )
+
+        return applyGradientTransform(startOffset, endOffset)
+    }
+
+    private fun applyGradientTransform(start: Point2D, end: Point2D): Pair<Point2D, Point2D> {
+        val matrix = computeGradientTransformMatrix()
+        return if (matrix != null) {
+            start.transform(matrix) to end.transform(matrix)
+        } else {
+            start to end
+        }
     }
 }

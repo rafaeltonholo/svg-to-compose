@@ -44,22 +44,111 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
     fun toInt(baseDimension: Int): Int = toInt(baseDimension.toFloat())
     fun toIntOrNull(baseDimension: Int?): Int? = toIntOrNull(baseDimension?.toFloat())
 
+    /**
+     * Converts this [SvgLength] to a [Double] value.
+     *
+     * This method attempts to parse the [SvgLength] value and convert it to a [Double].
+     * It handles various SVG length units and converts them appropriately based on the
+     * provided base dimension.
+     * If the value cannot be converted to a valid number, a NumberFormatException is
+     * thrown.
+     *
+     * @param baseDimension The base dimension value used for relative unit calculations
+     *  (e.g., percentage values)
+     * @return The [Double] representation of this [SvgLength] object
+     * @throws NumberFormatException if the value cannot be converted to a valid [Double]
+     */
+    fun toDouble(baseDimension: Double): Double = toDoubleOrNull(baseDimension)
+        ?: throw NumberFormatException("$value is not a Number")
+
+    /**
+     * Converts this [SvgLength] to a [Double] value, or returns null if the conversion fails.
+     *
+     * This method attempts to parse the [SvgLength] value and convert it to a [Double].
+     * It handles various SVG length units and converts them appropriately based on the
+     * provided base dimension. If the value cannot be converted to a valid number, null
+     * is returned instead of throwing an exception.
+     *
+     * @param baseDimension The base dimension value used for relative unit calculations
+     *  (e.g., percentage values). If null, percentage-based conversions will return null.
+     * @return The [Double] representation of this [SvgLength] object, or null if the
+     *  conversion fails or is not possible
+     */
+    fun toDoubleOrNull(baseDimension: Double?): Double? = toFloatingPointOrNull(
+        baseDimension = baseDimension,
+        toTNumberOrNull = String::toDoubleOrNull,
+        calculatePercentage = { dimension, percentValue -> (percentValue / 100.0 * dimension) },
+    )
+
+    /**
+     * Converts this [SvgLength] to a [Float] value.
+     *
+     * This method attempts to parse the [SvgLength] value and convert it to a [Float].
+     * It handles various SVG length units and converts them appropriately based on the
+     * provided base dimension.
+     * If the value cannot be converted to a valid number, a NumberFormatException is thrown.
+     *
+     * @param baseDimension The base dimension value used for relative unit calculations
+     *  (e.g., percentage values)
+     * @return The [Float] representation of this [SvgLength] object
+     * @throws NumberFormatException if the value cannot be converted to a valid [Float]
+     */
     fun toFloat(baseDimension: Float): Float = toFloatOrNull(baseDimension)
         ?: throw NumberFormatException("$value is not a Number")
 
-    fun toFloatOrNull(baseDimension: Float?): Float? {
-        val directParse = value.toFloatOrNull()
+    /**
+     * Converts this [SvgLength] to a [Float] value, or returns null if the conversion fails.
+     *
+     * This method attempts to parse the [SvgLength] value and convert it to a [Float].
+     * It handles various SVG length units and converts them appropriately based on the
+     * provided base dimension. If the value cannot be converted to a valid number, null
+     * is returned instead of throwing an exception.
+     *
+     * @param baseDimension The base dimension value used for relative unit calculations
+     *  (e.g., percentage values). If null, percentage-based conversions will return null.
+     * @return The [Float] representation of this [SvgLength] object, or null if the
+     *  conversion fails or is not possible
+     */
+    fun toFloatOrNull(baseDimension: Float?): Float? = toFloatingPointOrNull(
+        baseDimension = baseDimension,
+        toTNumberOrNull = String::toFloatOrNull,
+        calculatePercentage = { dimension, percentValue -> (percentValue / 100f * dimension) },
+    )
+
+    /**
+     * Converts this SvgLength to a floating-point number type, or returns null if the conversion fails.
+     * 
+     * This generic method handles the conversion of SVG length values to floating-point number types
+     * ([Float] or [Double]). It supports direct numeric values, percentage-based values, and values with
+     * SVG length unit suffixes. The conversion process attempts multiple parsing strategies in order
+     * of precedence: direct numeric parsing, percentage calculation (if a base dimension is provided),
+     * and unit suffix removal.
+     *
+     * @param baseDimension The base dimension value used for percentage calculations. If null,
+     *  percentage-based conversions will return null.
+     * @param toTNumberOrNull A function that attempts to convert a String to TNumber, returning null
+     *  if the conversion fails
+     * @param calculatePercentage A function that calculates the percentage value based on the base
+     *  dimension and the parsed percentage value
+     * @return The TNumber representation of this SvgLength object, or null if the conversion fails
+     *  or is not possible
+     */
+    private fun <TNumber : Number> toFloatingPointOrNull(
+        baseDimension: TNumber?,
+        toTNumberOrNull: String.() -> TNumber?,
+        calculatePercentage: (baseDimension: TNumber, percentValue: TNumber) -> TNumber,
+    ): TNumber? {
+        val directParse = value.toTNumberOrNull()
         return when {
             directParse != null -> directParse
 
             value.length > 1 && value.endsWith(PERCENT) && baseDimension != null -> {
                 val value = value.removeSuffix(PERCENT)
-                @Suppress("MagicNumber")
-                (value.toFloat() / 100f * baseDimension)
+                value.toTNumberOrNull()?.let { calculatePercentage(baseDimension, it) }
             }
 
             value.length > 2 && value.substring(value.length - 2) in possibleUnits ->
-                value.substring(0, value.length - 2).toFloat()
+                value.substring(0, value.length - 2).toTNumberOrNull()
 
             else -> null
         }

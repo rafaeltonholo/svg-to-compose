@@ -243,8 +243,8 @@ val Android: ImageVector
                         0.307f to Color(0xFF4FAF53),
                         1.0f to Color(0xFF118016),
                         1.0f to Color(0x004FAF53),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 47.092957f, y = 55.79932f),
+                        radius = 46.25078f,
                     ),
                 ) {
                     // M 86.42 23.58
@@ -525,8 +525,8 @@ val Android: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFFFFFFFF),
                         0.948f to Color(0x00FFFFFF),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 22.7829f, y = 27.03815f),
+                        radius = 2.4601667f,
                     ),
                     fillAlpha = 0.9f,
                     strokeAlpha = 0.15f,
@@ -574,8 +574,8 @@ val Android: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFFFFFFFF),
                         0.948f to Color(0x00FFFFFF),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 71.951515f, y = 27.260931f),
+                        radius = 2.4601667f,
                     ),
                     fillAlpha = 0.9f,
                     strokeAlpha = 0.15f,
@@ -792,8 +792,8 @@ val Android: ImageVector
                 fill = Brush.radialGradient(
                     0.0f to Color(0xFF93E19F),
                     1.0f to Color(0x0093E19F),
-                    center = Offset.Zero,
-                    radius = 1.0f,
+                    center = Offset(x = 31.969488f, y = 54.580315f),
+                    radius = 1.4572636f,
                 ),
                 fillAlpha = 0.7f,
             ) {
@@ -835,8 +835,8 @@ val Android: ImageVector
                 fill = Brush.radialGradient(
                     0.0f to Color(0xFF93E19F),
                     1.0f to Color(0x0093E19F),
-                    center = Offset.Zero,
-                    radius = 1.0f,
+                    center = Offset(x = 64.02f, y = 53.387f),
+                    radius = 1.456427f,
                 ),
                 fillAlpha = 0.7f,
             ) {
