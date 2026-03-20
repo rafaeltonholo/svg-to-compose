@@ -542,8 +542,8 @@ val AndroidDevelopers: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFFFFFFFF),
                         0.948f to Color(0x00FFFFFF),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 4.183f, y = 0.688f),
+                        radius = 0.7784294f,
                     ),
                     fillAlpha = 0.9f,
                     strokeAlpha = 0.15f,
@@ -593,8 +593,8 @@ val AndroidDevelopers: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFFFFFFFF),
                         0.948f to Color(0x00FFFFFF),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 21.568f, y = 0.487f),
+                        radius = 0.8232718f,
                     ),
                     fillAlpha = 0.9f,
                     strokeAlpha = 0.15f,
@@ -964,8 +964,8 @@ val AndroidDevelopers: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFF93E19F),
                         1.0f to Color(0x0093E19F),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 8.017492f, y = 9.233649f),
+                        radius = 0.51956874f,
                     ),
                     fillAlpha = 0.7f,
                 ) {
@@ -1014,8 +1014,8 @@ val AndroidDevelopers: ImageVector
                     fill = Brush.radialGradient(
                         0.0f to Color(0xFF93E19F),
                         1.0f to Color(0x0093E19F),
-                        center = Offset.Zero,
-                        radius = 1.0f,
+                        center = Offset(x = 19.084423f, y = 9.097099f),
+                        radius = 0.5192711f,
                     ),
                     fillAlpha = 0.7f,
                 ) {
