@@ -7,10 +7,10 @@ import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
-import dev.tonholo.s2c.website.components.organisms.FeaturesSection
-import dev.tonholo.s2c.website.components.organisms.GetStartedSection
+import dev.tonholo.s2c.website.components.organisms.CapabilitiesSection
 import dev.tonholo.s2c.website.components.organisms.HeroSection
 import dev.tonholo.s2c.website.components.organisms.HowToUseSection
+import dev.tonholo.s2c.website.components.organisms.InstallSection
 import dev.tonholo.s2c.website.components.organisms.playground.PlaygroundSection
 
 @InitRoute
@@ -24,7 +24,7 @@ fun initHomePage(ctx: InitRouteContext) {
 fun HomePage() {
     HeroSection()
     PlaygroundSection()
-    GetStartedSection()
+    InstallSection()
     HowToUseSection()
-    FeaturesSection()
+    CapabilitiesSection()
 }

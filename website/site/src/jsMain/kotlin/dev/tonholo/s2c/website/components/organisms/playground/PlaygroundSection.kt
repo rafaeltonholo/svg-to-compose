@@ -8,18 +8,12 @@ import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.Overflow
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
-import com.varabyte.kobweb.compose.css.autoLength
-import com.varabyte.kobweb.compose.css.functions.LinearGradient
-import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundImage
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
@@ -27,7 +21,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.flex
-import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
@@ -39,7 +32,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.minWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.setVariable
+import com.varabyte.kobweb.compose.ui.modifiers.role
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -49,55 +43,35 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
-import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.worker.rememberWorker
-import dev.tonholo.s2c.website.GradientTextStyle
-import dev.tonholo.s2c.website.HeadlineTextStyle
+import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
-import dev.tonholo.s2c.website.SubheadlineTextStyle
-import dev.tonholo.s2c.website.components.atoms.AnimateOnScroll
 import dev.tonholo.s2c.website.components.molecules.OptionsSection
-import dev.tonholo.s2c.website.components.molecules.SampleButtons
 import dev.tonholo.s2c.website.components.molecules.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.playground.InputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.OutputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.PlaygroundToolbar
 import dev.tonholo.s2c.website.components.molecules.playground.PreviewPanel
-import dev.tonholo.s2c.website.components.organisms.playground.PlaygroundSectionVars.GradientBackground
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.toSitePalette
 import dev.tonholo.s2c.website.worker.ConversionInput
 import dev.tonholo.s2c.website.worker.ConversionOutput
 import dev.tonholo.s2c.website.worker.IconConvertWorker
-import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.deg
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Span
-import org.jetbrains.compose.web.dom.Text
 
 // region Styles
 
-object PlaygroundSectionVars {
-    val GradientBackground by StyleVariable<LinearGradient>()
-}
-
-/** Styles the playground heading area with centered column layout and bottom margin. */
+/** Styles the playground heading area with bottom margin. */
 val PlaygroundHeadingContainerStyle = CssStyle.base {
-    Modifier
-        .display(DisplayStyle.Flex)
-        .flexDirection(FlexDirection.Column)
-        .alignItems(AlignItems.Center)
-        .gap(1.cssRem)
-        .margin(bottom = 2.cssRem)
+    Modifier.margin(bottom = 1.cssRem)
 }
 
 /** Styles the editor panel wrapper with rounded border and hidden overflow. */
@@ -105,23 +79,31 @@ val EditorPanelStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .borderRadius(0.75.cssRem)
-        .border(1.px, LineStyle.Solid, colorMode.toSitePalette().borderStrong)
+        .border(1.px, LineStyle.Solid, colorMode.toSitePalette().outlineVariant)
         .overflow(Overflow.Hidden)
 }
 
-/** Styles the gradient purple convert action button. */
-val ConvertButtonStyle = CssStyle.base {
-    Modifier
-        .backgroundImage(GradientBackground.value())
-        .color(Colors.White)
-        .borderRadius(0.5.cssRem)
-        .padding(topBottom = 0.375.cssRem, leftRight = 1.cssRem)
-        .fontWeight(FontWeight.SemiBold)
-        .fontSize(0.8.cssRem)
-        .cursor(Cursor.Pointer)
-        .border(0.px, LineStyle.None, Colors.Transparent)
-        .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
-        .margin(left = autoLength)
+/** Styles the solid purple convert action button. */
+val ConvertButtonStyle = CssStyle {
+    base {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .backgroundColor(palette.primary)
+            .color(palette.onPrimary)
+            .borderRadius(0.5.cssRem)
+            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .fontWeight(FontWeight.SemiBold)
+            .fontSize(0.8.cssRem)
+            .cursor(Cursor.Pointer)
+            .border(0.px, LineStyle.None, Colors.Transparent)
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
+    }
+    cssRule(":hover") {
+        Modifier.backgroundColor(colorMode.toSitePalette().primaryContainer)
+    }
 }
 
 /** Styles the three-column desktop grid layout for input, preview, and output panels. */
@@ -147,10 +129,10 @@ val MobileTabBarStyle = CssStyle.base {
         .display(DisplayStyle.Flex)
         .gap(0.25.cssRem)
         .padding(0.5.cssRem)
-        .backgroundColor(colorMode.toSitePalette().surfaceHeader)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
-/** Styles individual mobile tab buttons with active-state gradient highlight. */
+/** Styles individual mobile tab buttons with active-state highlight. */
 val MobileTabStyle = CssStyle {
     base {
         Modifier
@@ -160,17 +142,21 @@ val MobileTabStyle = CssStyle {
             .fontWeight(FontWeight.Medium)
             .fontSize(0.8.cssRem)
             .border(0.px, LineStyle.None, Colors.Transparent)
-            .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
             .flex(1)
             .textAlign(TextAlign.Center)
             .backgroundColor(Colors.Transparent)
-            .color(colorMode.toSitePalette().muted)
+            .color(colorMode.toSitePalette().onSurfaceVariant)
     }
 
     cssRule(".active") {
+        val palette = colorMode.toSitePalette()
         Modifier
-            .backgroundImage(GradientBackground.value())
-            .color(Colors.White)
+            .backgroundColor(palette.primary)
+            .color(palette.onPrimary)
     }
 }
 
@@ -178,7 +164,7 @@ val MobileTabStyle = CssStyle {
 val MobilePanelContentStyle = CssStyle.base {
     Modifier
         .minHeight(300.px)
-        .backgroundColor(colorMode.toSitePalette().surfaceAlt)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
 // endregion
@@ -190,19 +176,9 @@ val MobilePanelContentStyle = CssStyle.base {
  */
 @Composable
 fun PlaygroundSection() {
-    val purple = SiteTheme.palette.brand.purple
-    val deepPurple = SiteTheme.palette.brand.purpleDeep
     SectionContainer(
         id = "playground",
-        contentModifier = Modifier
-            .maxWidth(96.cssRem)
-            .setVariable(
-                GradientBackground,
-                linearGradient(angle = 135.deg) {
-                    add(color = purple)
-                    add(color = deepPurple)
-                },
-            ),
+        contentModifier = Modifier.maxWidth(96.cssRem),
     ) {
         var state by remember { mutableStateOf(PlaygroundState()) }
 
@@ -261,32 +237,13 @@ fun PlaygroundSection() {
         }
 
         // Heading
-        AnimateOnScroll {
-            Div(attrs = PlaygroundHeadingContainerStyle.toModifier().toAttrs()) {
-                Div(attrs = HeadlineTextStyle.toAttrs()) {
-                    Span(attrs = GradientTextStyle.toModifier().toAttrs()) {
-                        Text("Playground")
-                    }
-                }
-                Div(attrs = SubheadlineTextStyle.toAttrs()) {
-                    SpanText(
-                        "Paste your SVG or AVG code and see the generated Kotlin ImageVector instantly.",
-                    )
-                }
-            }
+        Div(attrs = PlaygroundHeadingContainerStyle.toModifier().toAttrs()) {
+            SpanText(
+                "Try it",
+                modifier = LabelTextStyle.toModifier()
+                    .color(SiteTheme.palette.onSurfaceVariant),
+            )
         }
-
-        // Sample buttons
-        SampleButtons(
-            sampleNames = samples.map { it.name },
-            selectedSample = state.selectedSample,
-            onSelect = { index ->
-                state = state.copy(
-                    selectedSample = index,
-                    inputCode = samples[index].svgCode,
-                )
-            },
-        )
 
         // Editor panel
         Div(attrs = EditorPanelStyle.toModifier().toAttrs()) {
@@ -294,6 +251,14 @@ fun PlaygroundSection() {
                 inputMode = state.inputMode,
                 extension = state.extension,
                 isConverting = state.isConverting,
+                sampleNames = samples.map { it.name },
+                selectedSample = state.selectedSample,
+                onSampleSelect = { index ->
+                    state = state.copy(
+                        selectedSample = index,
+                        inputCode = samples[index].svgCode,
+                    )
+                },
                 onInputModeChange = { state = state.copy(inputMode = it) },
                 onExtensionChange = { state = state.copy(extension = it) },
                 onConvert = onConvert,
@@ -349,15 +314,41 @@ private fun MobilePanels(
     val mobileTabs = listOf("Input", "Preview", "Output")
     Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
         // Tab bar
-        Div(attrs = MobileTabBarStyle.toModifier().toAttrs()) {
+        Div(
+            attrs = MobileTabBarStyle.toModifier()
+                .role("tablist")
+                .toAttrs(),
+        ) {
             mobileTabs.forEachIndexed { index, tab ->
+                val isSelected = index == state.activePanel
                 Div(
                     attrs = MobileTabStyle
                         .toModifier()
                         .onClick { onPanelSelect(index) }
+                        .tabIndex(if (isSelected) 0 else -1)
                         .toAttrs {
-                            if (index == state.activePanel) {
+                            attr("role", "tab")
+                            attr("aria-selected", isSelected.toString())
+                            if (isSelected) {
                                 classes("active")
+                            }
+                            onKeyDown { event ->
+                                when (event.key) {
+                                    "ArrowLeft" -> {
+                                        event.preventDefault()
+                                        val prev = if (index > 0) index - 1 else mobileTabs.lastIndex
+                                        onPanelSelect(prev)
+                                    }
+                                    "ArrowRight" -> {
+                                        event.preventDefault()
+                                        val next = if (index < mobileTabs.lastIndex) index + 1 else 0
+                                        onPanelSelect(next)
+                                    }
+                                    " ", "Enter" -> {
+                                        event.preventDefault()
+                                        onPanelSelect(index)
+                                    }
+                                }
                             }
                         },
                 ) {
@@ -366,7 +357,11 @@ private fun MobilePanels(
             }
         }
         // Active panel content
-        Div(attrs = MobilePanelContentStyle.toModifier().toAttrs()) {
+        Div(
+            attrs = MobilePanelContentStyle.toModifier().toAttrs {
+                attr("role", "tabpanel")
+            },
+        ) {
             when (state.activePanel) {
                 0 -> InputPanel(state.inputCode, onInputChange)
                 1 -> PreviewPanel(

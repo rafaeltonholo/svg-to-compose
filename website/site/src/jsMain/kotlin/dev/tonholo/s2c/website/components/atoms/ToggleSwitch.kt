@@ -5,7 +5,7 @@ import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Colors
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
@@ -14,17 +14,16 @@ import com.varabyte.kobweb.compose.ui.modifiers.left
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.size
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.width
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -35,18 +34,18 @@ import org.jetbrains.compose.web.dom.Div
 fun ToggleSwitch(
     checked: Boolean = false,
     onCheckedChange: ((Boolean) -> Unit)? = null,
+    label: String? = null,
 ) {
     val palette = ColorMode.current.toSitePalette()
     val trackColor = if (checked) {
-        palette.brand.purple
+        palette.primary
     } else {
-        palette.brand.purple.toRgb().copyf(alpha = 0.2f)
+        palette.primary.toRgb().copyf(alpha = 0.2f)
     }
-    val thumbTranslateX = if (checked) "calc(100% - 2px)" else "2px"
     Div(
         attrs = Modifier
-            .width(2.5.cssRem)
-            .height(1.25.cssRem)
+            .width(2.75.cssRem)
+            .height(1.5.cssRem)
             .borderRadius(9999.px)
             .backgroundColor(trackColor)
             .cursor(Cursor.Pointer)
@@ -59,20 +58,36 @@ fun ToggleSwitch(
                 ),
             )
             .onClick { onCheckedChange?.invoke(!checked) }
-            .toAttrs(),
+            .tabIndex(0)
+            .let { mod -> if (label != null) mod.ariaLabel(label) else mod }
+            .toAttrs {
+                attr("role", "switch")
+                attr("aria-checked", checked.toString())
+                onKeyDown { event ->
+                    when (event.key) {
+                        " ", "Enter" -> {
+                            event.preventDefault()
+                            onCheckedChange?.invoke(!checked)
+                        }
+                    }
+                }
+            },
     ) {
         val halfSize = 50.percent
         Div(
             attrs = Modifier
-                .size(1.cssRem)
+                .size(1.125.cssRem)
                 .borderRadius(50.percent)
-                .backgroundColor(Colors.White)
+                .backgroundColor(palette.onPrimary)
                 .position(Position.Absolute)
                 .top(halfSize)
-                .transition(Transition.of("left", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
-                .left(if (checked) 100.percent - 1.2.cssRem else .2.cssRem)
+                .left(.2.cssRem)
+                .transition(
+                    Transition.of("transform", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+                )
                 .transform {
                     translateY(-halfSize)
+                    if (checked) translateX(1.2.cssRem)
                 }
                 .toAttrs(),
         )

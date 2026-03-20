@@ -12,6 +12,7 @@ import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.BorderSideScope
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
 import com.varabyte.kobweb.compose.ui.modifiers.borderLeft
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -39,7 +40,6 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
-import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -63,15 +63,16 @@ val ToolbarStyle = CssStyle.base {
         .flexWrap(FlexWrap.Wrap)
         .gap(0.75.cssRem)
         .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
-        .backgroundColor(colorMode.toSitePalette().surfaceHeader)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
+
 /** Styles the grouped button row with connected border-radius on first/last children. */
 val ToolbarButtonRowStyle = CssStyle {
     val borderRadius = 0.375.cssRem
     fun BorderSideScope.applyBorder() {
         width(1.px)
         style(LineStyle.Solid)
-        color(colorMode.toSitePalette().brand.purple.darkened(byPercent = .75f))
+        color(colorMode.toSitePalette().primary.darkened(byPercent = .75f))
     }
     cssRule("> :first-child") {
         Modifier
@@ -97,6 +98,41 @@ val ToolbarButtonRowStyle = CssStyle {
     }
 }
 
+/** Styles sample name buttons with outline border and active-state highlight. */
+val SampleButtonStyle = CssStyle {
+    base {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .border(1.px, LineStyle.Solid, palette.outline)
+            .borderRadius(0.5.cssRem)
+            .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
+            .fontSize(0.75.cssRem)
+            .fontWeight(FontWeight.Medium)
+            .color(palette.onSurfaceVariant)
+            .backgroundColor(palette.surface)
+            .cursor(Cursor.Pointer)
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("border-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
+    }
+    cssRule(":hover") {
+        Modifier.color(colorMode.toSitePalette().primary)
+    }
+    cssRule(".active") {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .backgroundColor(palette.primary)
+            .color(palette.onPrimary)
+            .border(1.px, LineStyle.Solid, palette.primary)
+    }
+    cssRule(".active:hover") {
+        val palette = colorMode.toSitePalette()
+        Modifier.backgroundColor(palette.primaryContainer)
+    }
+}
+
 /** Component kind marker for toolbar toggle buttons. */
 sealed interface ToolbarButtonKind : ComponentKind
 
@@ -105,46 +141,77 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
     base {
         val sitePalette = colorMode.toSitePalette()
         Modifier
-            .backgroundColor(sitePalette.nearBackground)
-            .padding(topBottom = 0.375.cssRem, leftRight = 0.75.cssRem)
+            .backgroundColor(sitePalette.surface)
+            .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
             .fontSize(0.75.cssRem)
             .cursor(Cursor.Pointer)
-            .color(sitePalette.nearBackground.inverted())
+            .color(sitePalette.surface.inverted())
             .fontWeight(FontWeight.Medium)
-            .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
+    }
+    cssRule(":hover") {
+        Modifier.color(colorMode.toSitePalette().primary)
     }
     cssRule(".active") {
         val sitePalette = colorMode.toSitePalette()
         Modifier
-            .backgroundColor(sitePalette.brand.purple.darkened(byPercent = .65f))
-            .color(sitePalette.brand.purple.lightened(byPercent = .5f))
-    }
-}
-
-/** Variant that uses teal brand colour for the active state instead of purple. */
-val TealToolButtonStyle = ToolbarButtonStyle.addVariant {
-    cssRule(".active") {
-        val sitePalette = colorMode.toSitePalette()
-        Modifier
-            .backgroundColor(sitePalette.brand.teal.darkened(byPercent = .65f))
-            .color(sitePalette.brand.teal.lightened(byPercent = .5f))
+            .backgroundColor(sitePalette.primary.darkened(byPercent = .65f))
+            .color(sitePalette.primary.lightened(byPercent = .5f))
     }
 }
 
 /**
- * Toolbar row with input-mode toggle (paste/upload), format selector (SVG/AVG),
- * and a convert button that triggers the conversion worker.
+ * Toolbar row with sample selector, input-mode toggle (paste/upload),
+ * format selector (SVG/AVG), and a convert button.
  */
 @Composable
 fun PlaygroundToolbar(
     inputMode: String,
     extension: String,
     isConverting: Boolean,
+    sampleNames: List<String>,
+    selectedSample: Int,
+    onSampleSelect: (Int) -> Unit,
     onInputModeChange: (String) -> Unit,
     onExtensionChange: (String) -> Unit,
     onConvert: () -> Unit,
 ) {
     Div(attrs = ToolbarStyle.toModifier().toAttrs()) {
+        // Sample buttons
+        Div(
+            attrs = Modifier
+                .display(DisplayStyle.Flex)
+                .flexWrap(FlexWrap.Wrap)
+                .gap(0.375.cssRem)
+                .toAttrs(),
+        ) {
+            sampleNames.forEachIndexed { index, name ->
+                Button(
+                    attrs = SampleButtonStyle.toModifier()
+                        .onClick { onSampleSelect(index) }
+                        .toAttrs {
+                            if (index == selectedSample) {
+                                classes("active")
+                            }
+                        },
+                ) {
+                    SpanText(name)
+                }
+            }
+        }
+
+        // Separator
+        Div(
+            attrs = Modifier
+                .width(1.px)
+                .height(1.cssRem)
+                .backgroundColor(ColorMode.current.toSitePalette().outline)
+                .toAttrs(),
+        )
+
         // Input mode buttons
         ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
             ToolbarButton(
@@ -169,7 +236,7 @@ fun PlaygroundToolbar(
             attrs = Modifier
                 .width(1.px)
                 .height(1.cssRem)
-                .backgroundColor(ColorMode.current.toSitePalette().border)
+                .backgroundColor(ColorMode.current.toSitePalette().outline)
                 .toAttrs(),
         )
 
@@ -178,14 +245,12 @@ fun PlaygroundToolbar(
             ToolbarButton(
                 active = extension == "svg",
                 onClick = { onExtensionChange("svg") },
-                variant = TealToolButtonStyle,
             ) {
                 SpanText("SVG")
             }
             ToolbarButton(
                 active = extension == "avg",
                 onClick = { onExtensionChange("avg") },
-                variant = TealToolButtonStyle,
             ) {
                 SpanText("AVG (Android XML)")
             }

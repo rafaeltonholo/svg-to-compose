@@ -30,17 +30,17 @@ import org.jetbrains.compose.web.css.ms
 val AttributionStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .fontFamily("Inter")
+        .fontFamily("IBM Plex Sans")
         .fontSize(0.75.cssRem)
         .lineHeight(1.125.cssRem)
-        .color(palette.muted)
+        .color(palette.onSurfaceVariant)
 }
 
 val AttributionLinkVariant = LinkStyle.addVariant {
     base {
         Modifier
             .textDecorationLine(TextDecorationLine.None)
-            .color(colorMode.toSitePalette().link)
+            .color(colorMode.toSitePalette().primary)
             .fontWeight(FontWeight.SemiBold)
             .transition {
                 property("color")
@@ -51,7 +51,7 @@ val AttributionLinkVariant = LinkStyle.addVariant {
 
     hover {
         Modifier
-            .color(colorMode.toSitePalette().link.lightened(byPercent = 0.5f))
+            .color(colorMode.toSitePalette().primary.lightened(byPercent = 0.5f))
     }
 }
 

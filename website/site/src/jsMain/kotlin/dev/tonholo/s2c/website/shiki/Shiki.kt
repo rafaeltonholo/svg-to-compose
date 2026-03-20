@@ -26,7 +26,6 @@ class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
 
         operator fun invoke(api: ShikiApi) {
             if (::instance.isInitialized) return
-            console.log("initialize Shiki", api)
             instance = Shiki(api)
             document.dispatchEvent(Event(SHIKI_LOADED_EVENT))
         }
@@ -46,7 +45,6 @@ class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
             document.addEventListener(
                 SHIKI_LOADED_EVENT,
                 callback = {
-                    println("shiki loaded.")
                     continuation.resume(instance)
                 },
                 false

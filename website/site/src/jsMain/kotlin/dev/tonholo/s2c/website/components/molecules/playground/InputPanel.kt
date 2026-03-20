@@ -81,8 +81,8 @@ private const val TAB_INDENT = "  "
 
 val InputPanelStyle = CssStyle.base {
     Modifier
-        .backgroundColor(colorMode.toSitePalette().surfaceAlt)
-        .borderRight(width = 1.px, style = LineStyle.Solid, color = colorMode.toSitePalette().borderStrong)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
+        .borderRight(width = 1.px, style = LineStyle.Solid, color = colorMode.toSitePalette().outlineVariant)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
 }
@@ -139,15 +139,15 @@ val EditorTextareaStyle = CssStyle {
             .lineHeight(value = 1.6)
             .padding(1.cssRem)
             .backgroundColor(Colors.Transparent)
-            .color(colorMode.toSitePalette().muted)
+            .color(colorMode.toSitePalette().onSurfaceVariant)
             .border(0.px, LineStyle.None, Colors.Transparent)
             .outline("none".unsafeCast<Outline>())
-            .caretColor(colorMode.toSitePalette().brand.purple)
+            .caretColor(colorMode.toSitePalette().primary)
             .whiteSpace(WhiteSpace.Pre)
             .overflow(Overflow.Auto)
     }
     cssRule("::placeholder") {
-        Modifier.color(colorMode.toSitePalette().muted)
+        Modifier.color(colorMode.toSitePalette().onSurfaceVariant)
     }
 }
 

@@ -48,7 +48,8 @@ private const val S2C_CONVERT_DIRECTORY = """
 |  -o ./output \
 |  -p com.app.icons \
 |  -t com.app.theme.AppTheme \
-|  ./icons/ -r
+|  -r \
+|  ./icons/
 """
 
 // language=sh
@@ -75,6 +76,14 @@ val UsageCardGridStyle = CssStyle {
     Breakpoint.MD {
         Modifier
             .gridTemplateColumns {
+                repeat(count = 2) {
+                    minmax(0.px, 1.fr)
+                }
+            }
+    }
+    Breakpoint.LG {
+        Modifier
+            .gridTemplateColumns {
                 repeat(count = 3) {
                     minmax(0.px, 1.fr)
                 }
@@ -85,7 +94,7 @@ val UsageCardGridStyle = CssStyle {
 val OptionsTableStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .background(colorMode.toSitePalette().surfaceHeader)
+        .background(colorMode.toSitePalette().surfaceVariant)
 }
 
 @Composable
@@ -126,7 +135,7 @@ fun CliUsageContent() {
     Div(attrs = Modifier.margin(top = 1.5.cssRem).fillMaxWidth().toAttrs()) {
         CollapsibleSection(
             title = "All CLI Options Reference",
-            leadingIcon = { FaTerminal(size = IconSize.SM, modifier = Modifier.color(SiteTheme.palette.brand.purple)) },
+            leadingIcon = { FaTerminal(size = IconSize.SM, modifier = Modifier.color(SiteTheme.palette.primary)) },
         ) {
             Column(modifier = OptionsTableStyle.toModifier()) {
                 OptionsHeaderRow()

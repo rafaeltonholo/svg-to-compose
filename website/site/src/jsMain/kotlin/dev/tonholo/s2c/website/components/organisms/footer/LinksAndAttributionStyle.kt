@@ -39,7 +39,7 @@ fun LinksAndAttribution() {
                 .margin(0.px)
                 .setVariable(
                     DividerVars.Color,
-                    ColorMode.current.toSitePalette().brand.violet.darkened(byPercent = 0.9f),
+                    ColorMode.current.toSitePalette().outlineVariant,
                 ),
         )
         Attribution()

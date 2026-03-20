@@ -74,7 +74,7 @@ val ShikiCodeBlockStyle = CssStyle {
             .margin(right = 1.25.cssRem)
             .display(DisplayStyle.InlineBlock)
             .textAlign(TextAlign.Right)
-            .color(colorMode.toSitePalette().mutedStrong)
+            .color(colorMode.toSitePalette().onSurfaceVariant)
     }
 }
 
@@ -99,7 +99,6 @@ fun ShikiCodeBlock(
                 ONE_LIGHT_BACKGROUND to SitePalettes.dark.surface.toHexString(),
             ),
         )
-        console.log("Parsing code with options:", options)
         parsedCode = Shiki.instance.codeToHtml(code, options)
     }
 

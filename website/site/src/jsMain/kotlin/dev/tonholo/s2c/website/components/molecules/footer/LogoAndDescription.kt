@@ -13,9 +13,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.GradientTextStyle
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.cssRem
 
@@ -30,7 +28,8 @@ fun LogoAndDescription() {
         ) {
             SpanText(
                 "s2c",
-                modifier = GradientTextStyle.toModifier()
+                modifier = Modifier
+                    .color(ColorMode.current.toSitePalette().primary)
                     .fontWeight(FontWeight.Bold)
                     .fontSize(1.125.cssRem)
                     .fontFamily("JetBrains Mono", "monospace"),
@@ -48,7 +47,7 @@ fun LogoAndDescription() {
                 "`ImageVector` code.",
             modifier = Modifier
                 .fontSize(0.8.cssRem)
-                .color(ColorMode.current.toSitePalette().muted)
+                .color(ColorMode.current.toSitePalette().onSurfaceVariant)
                 .maxWidth(28.cssRem),
         )
     }

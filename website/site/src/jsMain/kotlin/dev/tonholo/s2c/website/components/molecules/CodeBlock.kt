@@ -17,7 +17,28 @@ import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.border
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.modifiers.minWidth
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.overflow
+import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.position
+import com.varabyte.kobweb.compose.ui.modifiers.right
+import com.varabyte.kobweb.compose.ui.modifiers.textAlign
+import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.modifiers.userSelect
+import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -28,7 +49,12 @@ import dev.tonholo.s2c.website.shiki.ShikiCodeBlock
 import dev.tonholo.s2c.website.toSitePalette
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.Position
+import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Code
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Pre
@@ -40,9 +66,8 @@ val CodeBlockContainerStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .backgroundColor(palette.surfaceAlt)
-        .border(1.px, LineStyle.Solid, palette.borderStrong)
-        .borderRadius(0.75.cssRem)
+        .backgroundColor(palette.surfaceVariant)
+        .border(1.px, LineStyle.Solid, palette.outlineVariant)
         .overflow(Overflow.Hidden)
 }
 
@@ -50,7 +75,7 @@ val CodeBlockHeaderStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .backgroundColor(palette.surfaceHeader)
+        .backgroundColor(palette.surfaceVariant)
         .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
 }
 
@@ -59,18 +84,22 @@ val CopyButtonStyle = CssStyle.base {
     Modifier
         .padding(topBottom = 0.25.cssRem, leftRight = 0.5.cssRem)
         .borderRadius(0.375.cssRem)
-        .border(1.px, LineStyle.Solid, palette.border)
-        .backgroundColor(palette.surfaceAlt)
-        .color(palette.muted)
+        .border(1.px, LineStyle.Solid, palette.outline)
+        .backgroundColor(palette.surfaceVariant)
+        .color(palette.onSurfaceVariant)
         .cursor(Cursor.Pointer)
         .fontSize(0.7.cssRem)
-        .fontFamily("Inter", "sans-serif")
-        .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
+        .fontFamily("IBM Plex Sans", "sans-serif")
+        .transition(
+            Transition.of("background-color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+            Transition.of("color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+            Transition.of("border-color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+        )
 }
 
 val LineNumberStyle = CssStyle.base {
     Modifier
-        .color(colorMode.toSitePalette().muted)
+        .color(colorMode.toSitePalette().onSurfaceVariant)
         .userSelect(UserSelect.None)
         .textAlign(TextAlign.End)
         .padding(right = 1.cssRem)
@@ -105,7 +134,7 @@ fun CodeBlock(
                     modifier = Modifier
                         .fontFamily("JetBrains Mono", "monospace")
                         .fontSize(0.75.cssRem)
-                        .color(ColorMode.current.toSitePalette().muted)
+                        .color(ColorMode.current.toSitePalette().onSurfaceVariant)
                 )
                 Spacer()
                 if (showCopyButton) {

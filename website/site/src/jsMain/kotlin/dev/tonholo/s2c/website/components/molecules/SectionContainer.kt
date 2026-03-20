@@ -28,16 +28,16 @@ val SectionContainerStyle = CssStyle {
     base {
         Modifier
             .fillMaxWidth()
-            .padding(topBottom = 5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = 3.cssRem, leftRight = 1.cssRem)
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
     }
     Breakpoint.SM {
-        Modifier.padding(topBottom = 5.cssRem, leftRight = 1.5.cssRem)
+        Modifier.padding(topBottom = 3.cssRem, leftRight = 1.5.cssRem)
     }
     Breakpoint.MD {
-        Modifier.padding(topBottom = 5.cssRem, leftRight = 2.cssRem)
+        Modifier.padding(topBottom = 4.cssRem, leftRight = 2.cssRem)
     }
 }
 
@@ -63,7 +63,7 @@ fun SectionContainer(
             .id(id)
             .then(
                 if (altBackground) {
-                    Modifier.backgroundColor(palette.nearBackground)
+                    Modifier.backgroundColor(palette.surfaceVariant)
                 } else {
                     Modifier
                 },
@@ -73,7 +73,7 @@ fun SectionContainer(
     ) {
         Column(
             modifier = SectionContentStyle.toModifier().then(contentModifier),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
         ) {
             content()
         }

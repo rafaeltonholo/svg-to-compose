@@ -4,7 +4,6 @@ import com.varabyte.kobweb.compose.css.Animation
 import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ScrollBehavior
-import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.css.TextTransform
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -12,22 +11,20 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
-import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.textTransform
 import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.modifiers.transition
-import com.varabyte.kobweb.compose.ui.modifiers.translateY
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
 import com.varabyte.kobweb.silk.components.layout.HorizontalDividerStyle
@@ -40,6 +37,7 @@ import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.theme.modifyStyleBase
 import org.jetbrains.compose.web.css.CSSMediaQuery
+import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.deg
@@ -50,22 +48,6 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
 
 // Animation keyframes
-val FadeInUpKeyframes = Keyframes {
-    from { Modifier.opacity(0).translateY(20.px) }
-    to { Modifier.opacity(1).translateY(0.px) }
-}
-
-val FadeInKeyframes = Keyframes {
-    from { Modifier.opacity(0) }
-    to { Modifier.opacity(1) }
-}
-
-val PulseKeyframes = Keyframes {
-    from { Modifier.opacity(1) }
-    50.percent { Modifier.opacity(value = 0.5) }
-    to { Modifier.opacity(1) }
-}
-
 val SpinKeyframes = Keyframes {
     from { Modifier.transform { rotate(0.deg) } }
     to { Modifier.transform { rotate(360.deg) } }
@@ -97,9 +79,20 @@ fun initSiteStyles(ctx: InitSilkContext) {
 
     ctx.stylesheet.registerStyleBase("body") {
         Modifier
-            .fontFamily("Inter", "sans-serif")
+            .fontFamily("IBM Plex Sans", "sans-serif")
             .fontSize(value = 16.px)
             .lineHeight(value = 1.5)
+    }
+
+    ctx.stylesheet.registerStyleBase(":focus-visible") {
+        Modifier
+            .outline(width = 2.px, style = LineStyle.Solid, color = SitePalettes.light.primary)
+            .outlineOffset(2.px)
+            .borderRadius(2.px)
+    }
+
+    ctx.stylesheet.registerStyleBase(":focus:not(:focus-visible)") {
+        Modifier.outline(style = LineStyle.None)
     }
 
     ctx.theme.modifyStyleBase(HorizontalDividerStyle) {
@@ -110,27 +103,24 @@ fun initSiteStyles(ctx: InitSilkContext) {
 // Typography
 val DisplayTextStyle = CssStyle.base {
     Modifier
-        .fontSize(clamp(2.5.cssRem, 6.vw, 5.cssRem))
+        .fontSize(clamp(1.75.cssRem, 5.vw, 3.5.cssRem))
         .fontWeight(FontWeight.Bold)
         .lineHeight(1.1)
         .letterSpacing((-0.02).em)
-        .textAlign(TextAlign.Center)
 }
 
 val HeadlineTextStyle = CssStyle.base {
     Modifier
-        .fontSize(clamp(1.8.cssRem, 4.vw, 2.8.cssRem))
+        .fontSize(clamp(1.4.cssRem, 3.vw, 2.cssRem))
         .fontWeight(FontWeight.Bold)
         .lineHeight(1.2)
-        .textAlign(TextAlign.Center)
 }
 
 val SubheadlineTextStyle = CssStyle.base {
     Modifier
-        .fontSize(clamp(1.cssRem, 2.vw, 1.2.cssRem))
+        .fontSize(clamp(0.9.cssRem, 2.vw, 1.1.cssRem))
         .lineHeight(1.7)
-        .textAlign(TextAlign.Center)
-        .color(colorMode.toSitePalette().muted)
+        .color(colorMode.toSitePalette().onSurfaceVariant)
 }
 
 val MonospaceTextStyle = CssStyle.base {
@@ -138,16 +128,6 @@ val MonospaceTextStyle = CssStyle.base {
         .fontFamily("JetBrains Mono", "monospace")
         .fontSize(value = 0.75.cssRem)
         .lineHeight(value = 1.6)
-}
-
-val GradientTextStyle = CssStyle.base {
-    Modifier
-        .styleModifier { property("background-image", "linear-gradient(135deg, #7F52FF 0%, #00D4AA 100%)") }
-        .styleModifier {
-            property("-webkit-background-clip", "text")
-            property("-webkit-text-fill-color", "transparent")
-            property("background-clip", "text")
-        }
 }
 
 val LabelTextStyle = CssStyle.base {

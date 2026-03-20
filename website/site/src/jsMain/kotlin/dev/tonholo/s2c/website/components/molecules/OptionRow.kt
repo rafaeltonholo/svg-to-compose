@@ -34,10 +34,9 @@ import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
-private val headerBorderColor = Color.rgba(127, 82, 255, 0.2f)
-
 val OptionsHeaderRowStyle = CssStyle {
     base {
+        val palette = colorMode.toSitePalette()
         Modifier
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
@@ -46,8 +45,12 @@ val OptionsHeaderRowStyle = CssStyle {
             .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
             .fontSize(0.75.cssRem)
             .lineHeight(1.5)
-            .backgroundColor(Color.rgba(127, 82, 255, 0.08f))
-            .borderBottom(width = 1.px, style = LineStyle.Solid, color = headerBorderColor)
+            .backgroundColor(palette.primary.toRgb().copyf(alpha = 0.08f))
+            .borderBottom(
+                width = 1.px,
+                style = LineStyle.Solid,
+                color = palette.primary.toRgb().copyf(alpha = 0.2f),
+            )
     }
     Breakpoint.MD {
         Modifier.gridTemplateColumns {
@@ -84,7 +87,7 @@ val OptionsRowStyle = CssStyle<OptionsRowKind> {
 }
 
 val OddRowVariant = OptionsRowStyle.addVariantBase {
-    Modifier.backgroundColor(Color.rgba(0, 0, 0, 0.15f))
+    Modifier.backgroundColor(colorMode.toSitePalette().onBackground.toRgb().copyf(alpha = 0.06f))
 }
 
 @Composable
@@ -92,7 +95,7 @@ fun OptionsHeaderRow() {
     val palette = ColorMode.current.toSitePalette()
     val headerModifier = Modifier
         .fontWeight(FontWeight.SemiBold)
-        .color(palette.muted)
+        .color(palette.onSurfaceVariant)
     Div(attrs = OptionsHeaderRowStyle.toModifier().toAttrs()) {
         SpanText("Flag", modifier = headerModifier)
         SpanText("Type", modifier = headerModifier)
@@ -109,15 +112,15 @@ fun OptionRow(flag: String, type: String, description: String, index: Int) {
             flag,
             modifier = Modifier
                 .fontWeight(FontWeight.Medium)
-                .color(palette.brand.blue),
+                .color(palette.primary),
         )
         SpanText(
             type,
-            modifier = Modifier.color(palette.brand.orange),
+            modifier = Modifier.color(palette.primary),
         )
         SpanText(
             description,
-            modifier = Modifier.color(palette.muted),
+            modifier = Modifier.color(palette.onSurfaceVariant),
         )
     }
 }

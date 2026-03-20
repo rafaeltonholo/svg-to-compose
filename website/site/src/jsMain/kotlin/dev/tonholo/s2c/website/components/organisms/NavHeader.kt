@@ -43,7 +43,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.translateX
 import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
@@ -66,7 +65,6 @@ import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.GradientTextStyle
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
 import dev.tonholo.s2c.website.toSitePalette
@@ -84,29 +82,18 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Nav
 
 val NavHeaderStyle = CssStyle.base {
+    val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
         .padding(leftRight = 1.cssRem, topBottom = 0.75.cssRem)
         .position(Position.Fixed)
         .top(0.px)
         .zIndex(value = 1000)
-        .backgroundColor(
-            when (colorMode) {
-                ColorMode.LIGHT -> com.varabyte.kobweb.compose.ui.graphics.Color.rgba(255, 255, 255, 0.92f)
-                ColorMode.DARK -> com.varabyte.kobweb.compose.ui.graphics.Color.rgba(10, 10, 18, 0.92f)
-            },
-        )
-        .styleModifier {
-            property("backdrop-filter", "blur(16px)")
-            property("-webkit-backdrop-filter", "blur(16px)")
-        }
+        .backgroundColor(colorMode.toSitePalette().background)
         .borderBottom(
             width = 1.px,
             style = LineStyle.Solid,
-            color = when (colorMode) {
-                ColorMode.LIGHT -> com.varabyte.kobweb.compose.ui.graphics.Color.rgba(0, 0, 0, 0.1f)
-                ColorMode.DARK -> com.varabyte.kobweb.compose.ui.graphics.Color.rgba(127, 82, 255, 0.15f)
-            },
+            color = palette.outline,
         )
 }
 
@@ -161,7 +148,8 @@ private fun S2CLogo() {
     ) {
         SpanText(
             "s2c",
-            modifier = GradientTextStyle.toModifier()
+            modifier = Modifier
+                .color(ColorMode.current.toSitePalette().primary)
                 .fontWeight(FontWeight.Bold)
                 .fontSize(1.25.cssRem)
                 .fontFamily("JetBrains Mono", "monospace"),
@@ -181,25 +169,41 @@ private fun MenuItems() {
     NavLink("#playground", "Playground")
     NavLink("#install", "Install")
     NavLink("#usage", "Usage")
-    NavLink("#features", "Features")
+    NavLink("#capabilities", "Capabilities")
+}
+
+val GitHubButtonStyle = CssStyle {
+    base {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .textDecorationLine(TextDecorationLine.None)
+            .display(DisplayStyle.Flex)
+            .alignItems(AlignItems.Center)
+            .gap(0.4.cssRem)
+            .padding(leftRight = 0.75.cssRem, topBottom = 0.5.cssRem)
+            .borderRadius(0.5.cssRem)
+            .border(1.px, LineStyle.Solid, palette.outline)
+            .fontSize(0.8.cssRem)
+            .fontWeight(FontWeight.Medium)
+            .color(palette.onSurfaceVariant)
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("border-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
+    }
+    cssRule(":hover") {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .color(palette.primary)
+            .border(1.px, LineStyle.Solid, palette.primary)
+    }
 }
 
 @Composable
 private fun GitHubButton() {
     Link(
         "https://github.com/rafaeltonholo/svg-to-compose",
-        modifier = Modifier
-            .textDecorationLine(TextDecorationLine.None)
-            .display(DisplayStyle.Flex)
-            .alignItems(AlignItems.Center)
-            .gap(0.4.cssRem)
-            .padding(leftRight = 0.75.cssRem, topBottom = 0.375.cssRem)
-            .borderRadius(0.5.cssRem)
-            .border(1.px, LineStyle.Solid, ColorMode.current.toSitePalette().border)
-            .fontSize(0.8.cssRem)
-            .fontWeight(FontWeight.Medium)
-            .color(ColorMode.current.toSitePalette().muted)
-            .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease)),
+        modifier = GitHubButtonStyle.toModifier(),
         variant = UncoloredLinkVariant,
     ) {
         FaGithub()
@@ -210,7 +214,7 @@ private fun GitHubButton() {
 @Composable
 private fun ColorModeButton() {
     var colorMode by ColorMode.currentState
-    IconButton(onClick = { colorMode = colorMode.opposite }) {
+    IconButton(onClick = { colorMode = colorMode.opposite }, ariaLabel = "Toggle color mode") {
         if (colorMode.isLight) MoonIcon() else SunIcon()
     }
     Tooltip(ElementTarget.PreviousSibling, "Toggle color mode", placement = PopupPlacement.BottomRight)
@@ -218,14 +222,14 @@ private fun ColorModeButton() {
 
 @Composable
 private fun HamburgerButton(onClick: () -> Unit) {
-    IconButton(onClick) {
+    IconButton(onClick, ariaLabel = "Open menu") {
         HamburgerIcon()
     }
 }
 
 @Composable
 private fun CloseButton(onClick: () -> Unit) {
-    IconButton(onClick) {
+    IconButton(onClick, ariaLabel = "Close menu") {
         CloseIcon()
     }
 }
@@ -266,7 +270,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                     .align(Alignment.CenterEnd)
                     .padding(top = 1.cssRem, leftRight = 1.cssRem)
                     .gap(1.5.cssRem)
-                    .backgroundColor(ColorMode.current.toSitePalette().nearBackground)
+                    .backgroundColor(ColorMode.current.toSitePalette().surface)
                     .animation(
                         SideMenuSlideInAnim.toAnimation(
                             duration = 200.ms,
@@ -296,7 +300,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                             .display(DisplayStyle.Flex)
                             .alignItems(AlignItems.Center)
                             .gap(0.4.cssRem)
-                            .color(ColorMode.current.toSitePalette().muted),
+                            .color(ColorMode.current.toSitePalette().onSurfaceVariant),
                         variant = UncoloredLinkVariant,
                     ) {
                         FaGithub()

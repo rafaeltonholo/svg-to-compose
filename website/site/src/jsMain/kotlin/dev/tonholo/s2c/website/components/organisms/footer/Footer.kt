@@ -35,7 +35,7 @@ val FooterStyle = CssStyle {
             .borderTop(
                 width = 1.px,
                 style = LineStyle.Solid,
-                color = palette.border,
+                color = palette.outline,
             )
     }
     Breakpoint.MD {

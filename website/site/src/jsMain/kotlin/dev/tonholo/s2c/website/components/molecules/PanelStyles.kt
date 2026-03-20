@@ -18,12 +18,12 @@ val PanelHeaderStyle = CssStyle.base {
     Modifier
         .fontFamily("JetBrains Mono", "monospace")
         .fontSize(0.75.cssRem)
-        .color(colorMode.toSitePalette().muted)
+        .color(colorMode.toSitePalette().onSurfaceVariant)
         .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
-        .backgroundColor(colorMode.toSitePalette().surfaceAlt)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
         .borderBottom {
             width(1.px)
             style(LineStyle.Solid)
-            color(colorMode.toSitePalette().borderStrong)
+            color(colorMode.toSitePalette().outlineVariant)
         }
 }

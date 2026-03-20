@@ -16,7 +16,7 @@ import org.w3c.dom.svg.SVGGElement
 
 @Composable
 fun GithubSvg(
-    color: Color = Color.rgb(value = 0x8A8AA0),
+    color: Color = Color.rgb(value = 0x78716C),
 ) {
     Svg(
         attrs = {

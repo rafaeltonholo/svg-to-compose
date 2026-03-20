@@ -33,8 +33,8 @@ import org.jetbrains.compose.web.dom.Div
 val UsageCardStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .backgroundColor(palette.surfaceAlt)
-        .border(1.px, LineStyle.Solid, palette.borderStrong)
+        .backgroundColor(palette.surfaceVariant)
+        .border(1.px, LineStyle.Solid, palette.outlineVariant)
         .borderRadius(0.75.cssRem)
         .padding(1.cssRem)
         .display(DisplayStyle.Flex)
@@ -70,7 +70,7 @@ fun UsageCard(
             description,
             modifier = Modifier
                 .fontSize(0.875.cssRem)
-                .color(ColorMode.current.toSitePalette().muted),
+                .color(ColorMode.current.toSitePalette().onSurfaceVariant),
         )
         content()
     }

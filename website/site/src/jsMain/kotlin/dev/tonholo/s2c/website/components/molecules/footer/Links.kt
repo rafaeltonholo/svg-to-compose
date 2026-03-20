@@ -18,6 +18,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
+import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
@@ -43,11 +44,11 @@ fun Links() {
             variant = UncoloredLinkVariant,
         ) {
             Badge(
-                color = palette.brand.purple,
+                color = palette.primary,
                 variant = SquaredBadge,
             ) {
                 GithubSvg(
-                    color = palette.brand.purple,
+                    color = palette.primary,
                 )
                 SpanText("GitHub")
                 FaArrowUpRightFromSquare(size = IconSize.SM)
@@ -60,7 +61,7 @@ fun Links() {
             variant = UncoloredLinkVariant,
         ) {
             Badge(
-                color = palette.brand.orange,
+                color = palette.primary,
                 variant = SquaredBadge,
             ) {
                 SpanText("Maven Central")
@@ -69,12 +70,12 @@ fun Links() {
         }
         Badge(
             text = "MIT License",
-            color = palette.brand.green,
+            color = palette.primary,
             variant = SquaredBadge,
         )
         Badge(
-            text = "v2.1.2",
-            color = palette.brand.violet,
+            text = SiteTheme.VERSION,
+            color = palette.primary,
             variant = SquaredBadge,
         )
     }

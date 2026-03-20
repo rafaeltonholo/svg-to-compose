@@ -14,7 +14,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
@@ -26,13 +25,16 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.maxHeight
+import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateRows
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaChevronDown
@@ -48,16 +50,16 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.deg
+import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
-private val containerBorderColor = Color.rgba(127, 82, 255, 0.2f)
-
 val CollapsibleContainerStyle = CssStyle.base {
+    val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .border(1.px, LineStyle.Solid, containerBorderColor)
+        .border(1.px, LineStyle.Solid, palette.primary.toRgb().copyf(alpha = 0.2f))
         .borderRadius(0.5.cssRem)
         .overflow(Overflow.Hidden)
 }
@@ -67,7 +69,7 @@ val CollapsibleHeaderStyle = CssStyle.base {
         .fillMaxWidth()
         .padding(1.cssRem)
         .cursor(Cursor.Pointer)
-        .backgroundColor(colorMode.toSitePalette().surfaceHeader)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
         .display(DisplayStyle.Flex)
         .alignItems(AlignItems.Center)
         .fontSize(0.875.cssRem)
@@ -86,7 +88,20 @@ fun CollapsibleSection(
     Div(attrs = CollapsibleContainerStyle.toModifier().toAttrs()) {
         Row(
             modifier = CollapsibleHeaderStyle.toModifier()
-                .onClick { expanded = !expanded },
+                .onClick { expanded = !expanded }
+                .tabIndex(0)
+                .ariaLabel(title)
+                .attrsModifier {
+                    attr("aria-expanded", expanded.toString())
+                    onKeyDown { event ->
+                        when (event.key) {
+                            " ", "Enter" -> {
+                                event.preventDefault()
+                                expanded = !expanded
+                            }
+                        }
+                    }
+                },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
@@ -99,7 +114,7 @@ fun CollapsibleSection(
             FaChevronDown(
                 size = IconSize.SM,
                 modifier = Modifier
-                    .color(ColorMode.current.toSitePalette().muted)
+                    .color(ColorMode.current.toSitePalette().onSurfaceVariant)
                     .transition(
                         Transition.of(
                             "transform",
@@ -110,20 +125,27 @@ fun CollapsibleSection(
                     .thenIf(expanded, Modifier.transform { rotate(180.deg) }),
             )
         }
+        // grid-template-rows transition: 0fr → 1fr for smooth GPU-composited expand
         Div(
             attrs = Modifier
-                .fillMaxWidth()
-                .overflow(Overflow.Hidden)
-                .opacity(if (expanded) 1 else 0)
+                .display(DisplayStyle.Grid)
+                .gridTemplateRows {
+                    if (expanded) size(1.fr) else size(0.fr)
+                }
                 .transition(
-                    Transition.of("max-height", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
+                    Transition.of("grid-template-rows", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
                     Transition.of("opacity", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
                 )
-                .thenIf(expanded, Modifier.maxHeight(200.cssRem))
-                .thenIf(!expanded, Modifier.maxHeight(0.px))
+                .opacity(if (expanded) 1 else 0)
                 .toAttrs(),
         ) {
-            content()
+            Div(
+                attrs = Modifier
+                    .overflow(Overflow.Hidden)
+                    .toAttrs(),
+            ) {
+                content()
+            }
         }
     }
 }

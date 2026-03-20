@@ -15,7 +15,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.alignSelf
@@ -31,6 +30,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
@@ -42,6 +42,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.SvgPreview
@@ -64,7 +65,7 @@ val PreviewPanelStyle = CssStyle.base {
         .borderRight {
             width(1.px)
             style(LineStyle.Solid)
-            color(colorMode.toSitePalette().borderStrong)
+            color(colorMode.toSitePalette().outlineVariant)
         }
 }
 
@@ -115,7 +116,7 @@ fun PreviewPanel(svgCode: String, iconFileContentsJson: String? = null) {
         ) {
             PanelHeader(
                 icon = { FaEye() },
-                title = "Source Preview",
+                title = "SVG (browser)",
             )
             PanelPreview {
                 SvgPreview(svgCode = svgCode)
@@ -123,7 +124,7 @@ fun PreviewPanel(svgCode: String, iconFileContentsJson: String? = null) {
         }
 
         // Divider
-        HorizontalDivider(modifier = Modifier.padding(0.px))
+        HorizontalDivider(modifier = Modifier.margin(0.px))
 
         // Bottom half: Compose Preview (Wasm Compose render via iframe)
         Column(
@@ -133,7 +134,7 @@ fun PreviewPanel(svgCode: String, iconFileContentsJson: String? = null) {
                 icon = {
                     SpanText(
                         "\u25CF",
-                        modifier = Modifier.color(Color.rgb(0x7F52FF))
+                        modifier = Modifier.color(SiteTheme.palette.primary)
                             .fontSize(0.5.cssRem),
                     )
                 },
@@ -143,11 +144,11 @@ fun PreviewPanel(svgCode: String, iconFileContentsJson: String? = null) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        SpanText("Compose Preview")
+                        SpanText("ImageVector (WASM)")
                         if (iconFileContentsJson != null) {
                             Badge(
                                 text = "ImageVector",
-                                color = Color.rgb(value = 0x00D4AA),
+                                color = SiteTheme.palette.primary,
                                 modifier = Modifier.alignSelf(AlignSelf.FlexEnd),
                                 variant = SquaredBadge,
                             )
@@ -181,6 +182,7 @@ private fun ComposePreviewIframe(iconFileContentsJson: String?) {
     Iframe(
         attrs = ComposePreviewIframeStyle.toModifier().toAttrs {
             attr("src", "/editor/index.html?preview=true&color_mode=${colorMode.name.lowercase()}")
+            attr("title", "Compose ImageVector preview")
         },
     ) {
         DisposableEffect(Unit) {

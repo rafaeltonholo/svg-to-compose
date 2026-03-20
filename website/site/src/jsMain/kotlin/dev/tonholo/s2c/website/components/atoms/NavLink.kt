@@ -12,10 +12,26 @@ import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
+
+val NavLinkStyle = CssStyle {
+    base {
+        Modifier
+            .color(colorMode.toSitePalette().onSurfaceVariant)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(0.875.cssRem)
+            .transition(
+                Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
+    }
+    cssRule(":hover") {
+        Modifier.color(colorMode.toSitePalette().primary)
+    }
+}
 
 @Composable
 fun NavLink(href: String, text: String) {
@@ -23,10 +39,6 @@ fun NavLink(href: String, text: String) {
         href,
         text,
         variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-        modifier = Modifier
-            .color(ColorMode.current.toSitePalette().muted)
-            .fontWeight(FontWeight.Medium)
-            .fontSize(0.875.cssRem)
-            .transition(Transition.of("color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease)),
+        modifier = NavLinkStyle.toModifier(),
     )
 }
