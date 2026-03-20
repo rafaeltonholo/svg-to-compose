@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.website.editor.mapper.toImageVector
+import dev.tonholo.s2c.website.editor.ui.modifier.checkerboardBackground
 import kotlinx.browser.window
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -61,7 +62,12 @@ internal fun PreviewApp() {
     Surface(modifier = Modifier.fillMaxSize()) {
         val iconFileContents = previewState
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .checkerboardBackground(
+                    checkerColor = MaterialTheme.colorScheme.surface to MaterialTheme.colorScheme.surfaceVariant,
+                    cellSize = 8.dp,
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Crossfade(
