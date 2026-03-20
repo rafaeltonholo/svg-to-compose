@@ -59,8 +59,8 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.molecules.PanelHeaderStyle
 import dev.tonholo.s2c.website.shiki.DARK_THEME
 import dev.tonholo.s2c.website.shiki.LIGHT_THEME
-import dev.tonholo.s2c.website.shiki.ONE_DARK_PRO_BACKGROUND
-import dev.tonholo.s2c.website.shiki.ONE_LIGHT_BACKGROUND
+import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_DARK_BACKGROUND
+import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_LIGHT_BACKGROUND
 import dev.tonholo.s2c.website.shiki.Shiki
 import dev.tonholo.s2c.website.shiki.codeToHtmlOptions
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
@@ -286,8 +286,8 @@ class InputPanelState {
                 lightTheme = LIGHT_THEME,
                 darkTheme = DARK_THEME,
                 colorReplacements = mapOf(
-                    ONE_DARK_PRO_BACKGROUND to "transparent",
-                    ONE_LIGHT_BACKGROUND to "transparent",
+                    SHIKI_CODE_BLOCK_DARK_BACKGROUND to "transparent",
+                    SHIKI_CODE_BLOCK_LIGHT_BACKGROUND to "transparent",
                 ),
             )
             Shiki.instance.codeToHtml(inputCode, options)

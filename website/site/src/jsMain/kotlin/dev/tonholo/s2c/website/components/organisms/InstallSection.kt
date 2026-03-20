@@ -73,11 +73,17 @@ fun InstallSection(modifier: Modifier = Modifier) {
                 CodeBlock(
                     language = "bash",
                     // language=sh
-                    code = """
-                        |curl -o s2c https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
-                        |chmod +x s2c
-                        |./s2c --help"""
-                        .trimMargin(),
+                    code = $$"""
+                        |# Download the s2c wrapper script directly from GitHub.
+                        |curl -o your/target/path/s2c \ 
+                        |     https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
+                        |# Add execution permission to the script.
+                        |chmod +x your/target/path/s2c
+                        |# Add s2c to your path, so you can use it anywhere.
+                        |export PATH="your/target/path/s2c:$PATH"
+                        |# Call s2c
+                        |s2c --help
+                    """.trimMargin(),
                 )
             }
 

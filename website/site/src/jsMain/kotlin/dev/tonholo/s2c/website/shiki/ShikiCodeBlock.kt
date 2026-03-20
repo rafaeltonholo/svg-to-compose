@@ -36,12 +36,11 @@ import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
-internal const val LIGHT_THEME = "one-light"
-internal const val DARK_THEME = "one-dark-pro"
-
+internal const val LIGHT_THEME = "catppuccin-latte"
+internal const val DARK_THEME = "catppuccin-frappe"
 // Original theme backgrounds → site palette backgrounds
-internal const val ONE_DARK_PRO_BACKGROUND = "#282c34"
-internal const val ONE_LIGHT_BACKGROUND = "#FAFAFA"
+internal const val SHIKI_CODE_BLOCK_DARK_BACKGROUND = "#303446"
+internal const val SHIKI_CODE_BLOCK_LIGHT_BACKGROUND = "#eff1f5"
 
 val ShikiCodeBlockStyle = CssStyle {
     base {
@@ -92,8 +91,8 @@ fun ShikiCodeBlock(language: String, code: String, modifier: Modifier = Modifier
             lightTheme = LIGHT_THEME,
             darkTheme = DARK_THEME,
             colorReplacements = mapOf(
-                ONE_DARK_PRO_BACKGROUND to SitePalettes.dark.surface.toHexString(),
-                ONE_LIGHT_BACKGROUND to SitePalettes.dark.surface.toHexString(),
+                SHIKI_CODE_BLOCK_DARK_BACKGROUND to SitePalettes.dark.surface.toHexString(),
+                SHIKI_CODE_BLOCK_LIGHT_BACKGROUND to SitePalettes.light.surface.toHexString(),
             ),
         )
         parsedCode = Shiki.instance.codeToHtml(code, options)
