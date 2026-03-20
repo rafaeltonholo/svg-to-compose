@@ -11,25 +11,31 @@ import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
-import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.flex
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
+import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.size
 import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.SitePalette
@@ -40,15 +46,22 @@ import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.molecules.playground.ZoomControls
 import dev.tonholo.s2c.website.state.playground.preview.SourcePreviewContent
 import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.util.rememberElementSize
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Iframe
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.events.MouseEvent
 
 private const val VIEWBOX_PARTS_COUNT = 4
+private const val MAX_PREVIEW_WIDTH_PX = 512
 
 val ComparisonStripStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
@@ -58,9 +71,38 @@ val ComparisonStripStyle = CssStyle.base {
         .backgroundColor(palette.surfaceVariant)
 }
 
+/** Layout for the preview row: vertical on mobile, horizontal on desktop. */
+val ComparisonRowStyle = CssStyle {
+    base {
+        Modifier
+            .fillMaxWidth()
+            .display(DisplayStyle.Flex)
+            .flexDirection(FlexDirection.Column)
+            .alignItems(AlignItems.Center)
+            .justifyContent(JustifyContent.Center)
+            .gap(1.5.cssRem)
+    }
+    Breakpoint.MD {
+        Modifier.flexDirection(FlexDirection.Row)
+    }
+}
+
+/** Constrains each preview column so it fills available space up to a max width. */
+val PreviewColumnStyle = CssStyle {
+    base {
+        Modifier
+            .fillMaxWidth()
+            .flex(1)
+    }
+    Breakpoint.MD {
+        Modifier.maxWidth(MAX_PREVIEW_WIDTH_PX.px)
+    }
+}
+
 /**
- * Horizontal comparison strip showing the source SVG preview and the
- * converted ImageVector (WASM) preview side-by-side.
+ * Responsive comparison strip showing the source SVG preview and the
+ * converted ImageVector (WASM) preview. Stacks vertically on mobile,
+ * side-by-side on desktop.
  */
 @Composable
 fun ComparisonStrip(
@@ -70,12 +112,15 @@ fun ComparisonStrip(
     zoomLevel: Float,
     onZoomChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
-    previewSizePx: Int = 128,
 ) {
     val palette = ColorMode.current.toSitePalette()
 
-    val nativeScale = remember(svgCode, previewSizePx) {
-        computeNativeScale(svgCode, previewSizePx)
+    // Observe the source preview element to get the measured pixel width
+    var previewElement by remember { mutableStateOf<HTMLElement?>(null) }
+    val measuredSize = rememberElementSize(previewElement)
+
+    val nativeScale = remember(svgCode, measuredSize.width) {
+        if (measuredSize.width > 0) computeNativeScale(svgCode, measuredSize.width) else null
     }
 
     // Shared pan offset — synced between both previews
@@ -92,11 +137,7 @@ fun ComparisonStrip(
         modifier = ComparisonStripStyle.toModifier().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier.gap(1.5.cssRem),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center,
-        ) {
+        Div(attrs = ComparisonRowStyle.toModifier().toAttrs()) {
             SourcePreviewColumn(
                 svgCode = svgCode,
                 extension = extension,
@@ -107,7 +148,7 @@ fun ComparisonStrip(
                     panX += dx
                     panY += dy
                 },
-                previewSizePx = previewSizePx,
+                onElementRef = { previewElement = it },
                 palette = palette,
             )
             ConvertedPreviewColumn(
@@ -115,7 +156,6 @@ fun ComparisonStrip(
                 zoomLevel = zoomLevel,
                 panX = panX,
                 panY = panY,
-                previewSizePx = previewSizePx,
             )
         }
 
@@ -137,14 +177,14 @@ private fun SourcePreviewColumn(
     panX: Float,
     panY: Float,
     onPan: (dx: Float, dy: Float) -> Unit,
-    previewSizePx: Int,
+    onElementRef: (HTMLElement?) -> Unit,
     palette: SitePalette,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.gap(0.5.cssRem),
+        modifier = PreviewColumnStyle.toModifier().gap(0.5.cssRem),
     ) {
-        CheckerboardPreview(sizePx = previewSizePx) {
+        CheckerboardPreview(onElementRef = onElementRef) {
             SourcePreviewContent(
                 state = SourcePreviewContent(
                     svgCode = svgCode,
@@ -152,69 +192,77 @@ private fun SourcePreviewColumn(
                     zoomLevel = zoomLevel,
                     panX = panX,
                     panY = panY,
-                    containerSizePx = previewSizePx,
                 ),
                 onPan = onPan,
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.gap(0.5.cssRem),
-        ) {
-            SpanText(
-                "Source",
-                modifier = Modifier
-                    .fontSize(0.7.cssRem)
-                    .color(palette.onSurfaceVariant),
-            )
-            Badge(
-                text = extension.uppercase(),
-                color = palette.onSurfaceVariant,
-                variant = SquaredBadge,
-            )
-        }
+        SourceLabel(extension = extension, palette = palette)
     }
 }
 
 @Composable
-private fun ConvertedPreviewColumn(
-    iconFileContentsJson: String?,
-    zoomLevel: Float,
-    panX: Float,
-    panY: Float,
-    previewSizePx: Int,
-) {
+private fun SourceLabel(extension: String, palette: SitePalette) {
+    Div(
+        attrs = Modifier
+            .display(DisplayStyle.Flex)
+            .alignItems(AlignItems.Center)
+            .gap(0.5.cssRem)
+            .toAttrs(),
+    ) {
+        SpanText(
+            "Source",
+            modifier = Modifier
+                .fontSize(0.7.cssRem)
+                .color(palette.onSurfaceVariant),
+        )
+        Badge(
+            text = extension.uppercase(),
+            color = palette.onSurfaceVariant,
+            variant = SquaredBadge,
+        )
+    }
+}
+
+@Composable
+private fun ConvertedPreviewColumn(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float) {
     val palette = ColorMode.current.toSitePalette()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.gap(0.5.cssRem),
+        modifier = PreviewColumnStyle.toModifier().gap(0.5.cssRem),
     ) {
-        CheckerboardPreview(sizePx = previewSizePx) {
+        CheckerboardPreview {
             ComparisonIframe(
                 iconFileContentsJson = iconFileContentsJson,
                 zoomLevel = zoomLevel,
                 panX = panX,
                 panY = panY,
-                sizePx = previewSizePx,
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.gap(0.5.cssRem),
-        ) {
-            SpanText(
-                "Converted",
-                modifier = Modifier
-                    .fontSize(0.7.cssRem)
-                    .color(palette.onSurfaceVariant),
+        ConvertedLabel(iconFileContentsJson = iconFileContentsJson, palette = palette)
+    }
+}
+
+@Composable
+private fun ConvertedLabel(iconFileContentsJson: String?, palette: SitePalette) {
+    Div(
+        attrs = Modifier
+            .display(DisplayStyle.Flex)
+            .alignItems(AlignItems.Center)
+            .gap(0.5.cssRem)
+            .toAttrs(),
+    ) {
+        SpanText(
+            "Converted",
+            modifier = Modifier
+                .fontSize(0.7.cssRem)
+                .color(palette.onSurfaceVariant),
+        )
+        if (iconFileContentsJson != null) {
+            Badge(
+                text = "ImageVector",
+                color = SiteTheme.palette.primary,
+                variant = SquaredBadge,
             )
-            if (iconFileContentsJson != null) {
-                Badge(
-                    text = "ImageVector",
-                    color = SiteTheme.palette.primary,
-                    variant = SquaredBadge,
-                )
-            }
         }
     }
 }
@@ -239,7 +287,7 @@ private fun computeNativeScale(svgCode: String, containerSizePx: Int): Float? {
 private fun SourcePreviewContent(state: SourcePreviewContent, onPan: (dx: Float, dy: Float) -> Unit) {
     if (state.extension == "avg") {
         Column(
-            modifier = Modifier.size(state.containerSizePx.px),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -262,13 +310,12 @@ private fun SourcePreviewContent(state: SourcePreviewContent, onPan: (dx: Float,
             panX = state.panX,
             panY = state.panY,
             onPan = onPan,
-            containerSizePx = state.containerSizePx,
         )
     }
 }
 
 /**
- * Renders SVG at container size with CSS transform for zoom and pan.
+ * Renders SVG filling its parent with CSS transform for zoom and pan.
  * Drag-to-pan is enabled when zoomed in (zoomLevel > 1).
  */
 @Composable
@@ -277,14 +324,13 @@ private fun FittedSvgPreview(
     zoomLevel: Float,
     panX: Float,
     panY: Float,
-    containerSizePx: Int,
     onPan: (dx: Float, dy: Float) -> Unit = { _, _ -> },
 ) {
     var isDragging by remember { mutableStateOf(false) }
 
     Div(
         attrs = Modifier
-            .size(containerSizePx.px)
+            .fillMaxSize()
             .cursor(if (zoomLevel > 1f) Cursor.Grab else Cursor.Default)
             .transform {
                 scale(zoomLevel)
@@ -342,7 +388,7 @@ private fun org.jetbrains.compose.web.attributes.AttrsScope<*>.attachDragHandler
 }
 
 @Composable
-private fun ComparisonIframe(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float, sizePx: Int) {
+private fun ComparisonIframe(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float) {
     var iframeLoaded by remember { mutableStateOf(false) }
     val iframeRef = remember { mutableStateOf<HTMLIFrameElement?>(null) }
 
@@ -368,7 +414,7 @@ private fun ComparisonIframe(iconFileContentsJson: String?, zoomLevel: Float, pa
     val colorMode = ColorMode.current
     Iframe(
         attrs = Modifier
-            .size(sizePx.px)
+            .fillMaxSize()
             .border(0.px, LineStyle.None, Colors.Transparent)
             .backgroundColor(Colors.Transparent)
             .toAttrs {

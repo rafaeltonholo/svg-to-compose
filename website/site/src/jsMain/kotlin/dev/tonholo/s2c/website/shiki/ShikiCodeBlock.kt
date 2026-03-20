@@ -38,6 +38,7 @@ import org.jetbrains.compose.web.dom.Div
 
 internal const val LIGHT_THEME = "catppuccin-latte"
 internal const val DARK_THEME = "catppuccin-frappe"
+
 // Original theme backgrounds → site palette backgrounds
 internal const val SHIKI_CODE_BLOCK_DARK_BACKGROUND = "#303446"
 internal const val SHIKI_CODE_BLOCK_LIGHT_BACKGROUND = "#eff1f5"

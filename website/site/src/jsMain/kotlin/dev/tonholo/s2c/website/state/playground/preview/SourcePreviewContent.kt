@@ -6,5 +6,4 @@ internal data class SourcePreviewContent(
     val zoomLevel: Float,
     val panX: Float,
     val panY: Float,
-    val containerSizePx: Int,
 )

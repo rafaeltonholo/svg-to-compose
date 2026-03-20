@@ -270,26 +270,13 @@ private fun PreviewSection(state: PlaygroundState, dispatch: (PlaygroundAction) 
         expanded = state.previewExpanded,
         onExpandedChange = { dispatch(PlaygroundAction.ChangePreviewExpanded(it)) },
     ) {
-        Div(attrs = Modifier.displayIfAtLeast(Breakpoint.MD).toAttrs()) {
-            ComparisonStrip(
-                svgCode = state.inputCode,
-                extension = state.extension,
-                iconFileContentsJson = state.iconFileContentsJson,
-                zoomLevel = state.zoomLevel,
-                onZoomChange = { dispatch(PlaygroundAction.ChangeZoom(it)) },
-                previewSizePx = 512,
-            )
-        }
-        Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
-            ComparisonStrip(
-                svgCode = state.inputCode,
-                extension = state.extension,
-                iconFileContentsJson = state.iconFileContentsJson,
-                zoomLevel = state.zoomLevel,
-                onZoomChange = { dispatch(PlaygroundAction.ChangeZoom(it)) },
-                previewSizePx = 140,
-            )
-        }
+        ComparisonStrip(
+            svgCode = state.inputCode,
+            extension = state.extension,
+            iconFileContentsJson = state.iconFileContentsJson,
+            zoomLevel = state.zoomLevel,
+            onZoomChange = { dispatch(PlaygroundAction.ChangeZoom(it)) },
+        )
     }
 }
 
