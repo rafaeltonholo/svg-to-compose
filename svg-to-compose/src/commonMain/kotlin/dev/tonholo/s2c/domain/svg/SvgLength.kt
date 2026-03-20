@@ -44,22 +44,43 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
     fun toInt(baseDimension: Int): Int = toInt(baseDimension.toFloat())
     fun toIntOrNull(baseDimension: Int?): Int? = toIntOrNull(baseDimension?.toFloat())
 
+    fun toDouble(baseDimension: Double): Double = toDoubleOrNull(baseDimension)
+        ?: throw NumberFormatException("$value is not a Number")
+
+    fun toDoubleOrNull(baseDimension: Double?): Double? = toFloatingPointOrNull(
+        baseDimension = baseDimension,
+        toTNumberOrNull = String::toDoubleOrNull,
+        toTNumber = String::toDouble,
+        calculatePercentage = { dimension, percentValue -> (percentValue / 100.0 * dimension) },
+    )
+
     fun toFloat(baseDimension: Float): Float = toFloatOrNull(baseDimension)
         ?: throw NumberFormatException("$value is not a Number")
 
-    fun toFloatOrNull(baseDimension: Float?): Float? {
-        val directParse = value.toFloatOrNull()
+    fun toFloatOrNull(baseDimension: Float?): Float? = toFloatingPointOrNull(
+        baseDimension = baseDimension,
+        toTNumberOrNull = String::toFloatOrNull,
+        toTNumber = String::toFloat,
+        calculatePercentage = { dimension, percentValue -> (percentValue / 100f * dimension) },
+    )
+
+    private fun <TNumber : Number> toFloatingPointOrNull(
+        baseDimension: TNumber?,
+        toTNumberOrNull: String.() -> TNumber?,
+        toTNumber: String.() -> TNumber,
+        calculatePercentage: (baseDimension: TNumber, percentValue: TNumber) -> TNumber,
+    ): TNumber? {
+        val directParse = value.toTNumberOrNull()
         return when {
             directParse != null -> directParse
 
             value.length > 1 && value.endsWith(PERCENT) && baseDimension != null -> {
                 val value = value.removeSuffix(PERCENT)
-                @Suppress("MagicNumber")
-                (value.toFloat() / 100f * baseDimension)
+                calculatePercentage(baseDimension, value.toTNumber())
             }
 
             value.length > 2 && value.substring(value.length - 2) in possibleUnits ->
-                value.substring(0, value.length - 2).toFloat()
+                value.substring(0, value.length - 2).toTNumber()
 
             else -> null
         }
