@@ -2,8 +2,11 @@ package dev.tonholo.s2c.website.editor
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,7 +42,6 @@ private val json = Json {
 }
 
 /** Root composable that renders the current [previewState] as a Compose ImageVector. */
-@OptIn(ExperimentalWasmJsInterop::class)
 @Composable
 internal fun PreviewApp() {
     var previewState by remember { mutableStateOf<IconFileContents?>(null) }
@@ -58,7 +60,7 @@ internal fun PreviewApp() {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         val iconFileContents = previewState
-        Box(
+        BoxWithConstraints(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
@@ -72,10 +74,16 @@ internal fun PreviewApp() {
                         imageVector = imageVector,
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxSize()
+                            // Allow the Image to exceed its parent bounds when
+                            // zoomed in, so the vector is re-rendered at the
+                            // larger resolution instead of scaling a raster.
+                            .wrapContentSize(unbounded = true)
+                            .size(
+                                width = maxWidth * zoomScale,
+                                height = maxHeight * zoomScale,
+                            )
+                            .aspectRatio(imageVector.viewportWidth / imageVector.viewportHeight)
                             .graphicsLayer {
-                                scaleX = zoomScale
-                                scaleY = zoomScale
                                 // Convert CSS px pan offset to Compose px
                                 with(density) {
                                     translationX = panXPx.dp.toPx() * zoomScale
@@ -115,6 +123,7 @@ private fun OnMessageEffect(
     }
 }
 
+@OptIn(ExperimentalWasmJsInterop::class)
 private fun handleMessageEvent(
     event: Event,
     expectedOrigin: String,

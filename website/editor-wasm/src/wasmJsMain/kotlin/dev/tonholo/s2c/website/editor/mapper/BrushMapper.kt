@@ -19,24 +19,61 @@ internal fun ComposeBrush.toBrush(): Brush? = when (this) {
         color?.let { SolidColor(it) }
     }
 
-    is ComposeBrush.Gradient.Linear -> Brush.linearGradient(
-        colors = colors.mapNotNull { parseColor(it) },
-        start = start.toOffset(),
-        end = end.toOffset(),
-        tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
-    )
+    is ComposeBrush.Gradient.Linear -> {
+        val parsedColors = colors.mapNotNull { parseColor(it) }
+        val localStops = stops
+        if (!localStops.isNullOrEmpty()) {
+            Brush.linearGradient(
+                colorStops = localStops.zip(parsedColors).map { (s, c) -> s to c }.toTypedArray(),
+                start = start.toOffset(),
+                end = end.toOffset(),
+                tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
+            )
+        } else {
+            Brush.linearGradient(
+                colors = parsedColors,
+                start = start.toOffset(),
+                end = end.toOffset(),
+                tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
+            )
+        }
+    }
 
-    is ComposeBrush.Gradient.Radial -> Brush.radialGradient(
-        colors = colors.mapNotNull { parseColor(it) },
-        center = center?.toOffset() ?: Offset.Unspecified,
-        radius = radius ?: Float.POSITIVE_INFINITY,
-        tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
-    )
+    is ComposeBrush.Gradient.Radial -> {
+        val parsedColors = colors.mapNotNull { parseColor(it) }
+        val localStops = stops
+        if (!localStops.isNullOrEmpty()) {
+            Brush.radialGradient(
+                colorStops = localStops.zip(parsedColors).map { (s, c) -> s to c }.toTypedArray(),
+                center = center?.toOffset() ?: Offset.Unspecified,
+                radius = radius ?: Float.POSITIVE_INFINITY,
+                tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
+            )
+        } else {
+            Brush.radialGradient(
+                colors = parsedColors,
+                center = center?.toOffset() ?: Offset.Unspecified,
+                radius = radius ?: Float.POSITIVE_INFINITY,
+                tileMode = tileMode?.toTileMode() ?: TileMode.Clamp,
+            )
+        }
+    }
 
-    is ComposeBrush.Gradient.Sweep -> Brush.sweepGradient(
-        colors = colors.mapNotNull { parseColor(it) },
-        center = center?.toOffset() ?: Offset.Unspecified,
-    )
+    is ComposeBrush.Gradient.Sweep -> {
+        val parsedColors = colors.mapNotNull { parseColor(it) }
+        val localStops = stops
+        if (!localStops.isNullOrEmpty()) {
+            Brush.sweepGradient(
+                colorStops = localStops.zip(parsedColors).map { (s, c) -> s to c }.toTypedArray(),
+                center = center?.toOffset() ?: Offset.Unspecified,
+            )
+        } else {
+            Brush.sweepGradient(
+                colors = parsedColors,
+                center = center?.toOffset() ?: Offset.Unspecified,
+            )
+        }
+    }
 }
 
 /** Parses a [ComposeColor] hex string into a Compose [Color], returning null for unparseable values. */
