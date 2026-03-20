@@ -2,15 +2,14 @@ package dev.tonholo.s2c.website.components.organisms
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
+import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.base
-import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.style.toModifier
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.components.icons.fa.FaAndroid
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowsRotate
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
@@ -23,7 +22,11 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaFileZipper
 import com.varabyte.kobweb.silk.components.icons.fa.FaGem
 import com.varabyte.kobweb.silk.components.icons.fa.FaPaintbrush
 import com.varabyte.kobweb.silk.components.icons.fa.FaTag
-
+import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.FeatureColors
 import dev.tonholo.s2c.website.HeadlineTextStyle
 import dev.tonholo.s2c.website.SubheadlineTextStyle
@@ -34,7 +37,9 @@ import dev.tonholo.s2c.website.components.molecules.SectionContainer
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.dom.Div
 
@@ -44,16 +49,16 @@ val FeatureGridStyle = CssStyle {
             .display(DisplayStyle.Grid)
             .gap(1.cssRem)
             .fillMaxWidth()
-            .styleModifier { property("grid-template-columns", "1fr") }
+            .gridTemplateColumns { size(value = 1.fr) }
     }
     Breakpoint.SM {
-        Modifier.styleModifier { property("grid-template-columns", "repeat(2, 1fr)") }
+        Modifier.gridTemplateColumns { repeat(count = 2) { size(value = 1.fr) } }
     }
     Breakpoint.LG {
-        Modifier.styleModifier { property("grid-template-columns", "repeat(3, 1fr)") }
+        Modifier.gridTemplateColumns { repeat(count = 3) { size(value = 1.fr) } }
     }
     Breakpoint.XL {
-        Modifier.styleModifier { property("grid-template-columns", "repeat(4, 1fr)") }
+        Modifier.gridTemplateColumns { repeat(count = 4) { size(value = 1.fr) } }
     }
 }
 
@@ -67,7 +72,7 @@ fun FeaturesSection() {
                 attrs = Modifier
                     .fillMaxWidth()
                     .display(DisplayStyle.Flex)
-                    .styleModifier { property("flex-direction", "column") }
+                    .flexDirection(FlexDirection.Column)
                     .alignItems(AlignItems.Center)
                     .toAttrs(),
             ) {

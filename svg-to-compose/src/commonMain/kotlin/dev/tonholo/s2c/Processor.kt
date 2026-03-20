@@ -34,7 +34,7 @@ class Processor(
     private val iconWriter: IconWriter,
     @Assisted @param:TempDirectory private val tempDirectory: Path?,
     private val optimizers: Optimizer.Factory,
-    private val parser: ImageParser.Factory,
+    private val parser: ImageParser,
     private val codeEmitterFactory: CodeEmitterFactory,
     private val editorConfigReader: EditorConfigReader,
 ) {

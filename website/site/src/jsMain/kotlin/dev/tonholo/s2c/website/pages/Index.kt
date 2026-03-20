@@ -11,7 +11,7 @@ import dev.tonholo.s2c.website.components.organisms.FeaturesSection
 import dev.tonholo.s2c.website.components.organisms.GetStartedSection
 import dev.tonholo.s2c.website.components.organisms.HeroSection
 import dev.tonholo.s2c.website.components.organisms.HowToUseSection
-import dev.tonholo.s2c.website.components.organisms.PlaygroundSection
+import dev.tonholo.s2c.website.components.organisms.playground.PlaygroundSection
 
 @InitRoute
 fun initHomePage(ctx: InitRouteContext) {

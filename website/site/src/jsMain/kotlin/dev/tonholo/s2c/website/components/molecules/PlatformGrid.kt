@@ -16,9 +16,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaApple
 import com.varabyte.kobweb.silk.components.icons.fa.FaLinux
@@ -28,13 +28,13 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
@@ -44,13 +44,13 @@ val PlatformGridStyle = CssStyle {
             .display(DisplayStyle.Grid)
             .gap(0.5.cssRem)
             .fillMaxWidth()
-            .styleModifier { property("grid-template-columns", "repeat(2, 1fr)") }
+            .gridTemplateColumns { repeat(count = 2) { size(1.fr) } }
     }
     Breakpoint.SM {
-        Modifier.styleModifier { property("grid-template-columns", "repeat(3, 1fr)") }
+        Modifier.gridTemplateColumns { repeat(count = 3) { size(1.fr) } }
     }
     Breakpoint.MD {
-        Modifier.styleModifier { property("grid-template-columns", "repeat(5, 1fr)") }
+        Modifier.gridTemplateColumns { repeat(count = 5) { size(1.fr) } }
     }
 }
 

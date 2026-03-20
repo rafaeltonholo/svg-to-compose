@@ -1,8 +1,11 @@
 package dev.tonholo.s2c.domain.compose
 
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import dev.tonholo.s2c.serializer.domain.compose.GradientTileModeSerializer
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
+@Serializable(with = GradientTileModeSerializer::class)
 @JvmInline
 value class GradientTileMode private constructor(override val value: String) :
     ComposeType<String>,

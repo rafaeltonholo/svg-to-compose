@@ -10,12 +10,15 @@ import com.varabyte.kobweb.compose.ui.modifiers.bottom
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.id
+import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
 import com.varabyte.kobweb.compose.ui.modifiers.left
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.position
@@ -46,6 +49,8 @@ import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AnimationFillMode
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
@@ -67,10 +72,8 @@ val HeroSectionStyle = CssStyle {
             .position(Position.Relative)
             .overflow(Overflow.Hidden)
             .display(DisplayStyle.Flex)
-            .styleModifier {
-                property("flex-direction", "column")
-                property("justify-content", "center")
-            }
+            .flexDirection(FlexDirection.Column)
+            .justifyContent(JustifyContent.Center)
             .alignItems(AlignItems.Center)
             .padding(top = 6.cssRem, bottom = 0.cssRem, leftRight = 1.cssRem)
     }
@@ -87,7 +90,7 @@ val HeroContentStyle = CssStyle.base {
         .fillMaxWidth()
         .maxWidth(72.cssRem)
         .display(DisplayStyle.Flex)
-        .styleModifier { property("flex-direction", "column") }
+        .flexDirection(FlexDirection.Column)
         .alignItems(AlignItems.Center)
         .gap(2.cssRem)
         .position(Position.Relative)
@@ -168,7 +171,7 @@ fun HeroSection() {
         Div(attrs = HeroContentStyle.toModifier().toAttrs()) {
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 500.ms,
@@ -182,7 +185,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 600.ms,
@@ -196,7 +199,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 600.ms,
@@ -210,7 +213,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 600.ms,
@@ -224,7 +227,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 600.ms,
@@ -238,7 +241,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 800.ms,
@@ -252,7 +255,7 @@ fun HeroSection() {
             }
             Div(
                 attrs = Modifier
-                    .styleModifier { property("opacity", "0") }
+                    .opacity(0)
                     .animation(
                         FadeInUpKeyframes.toAnimation(
                             duration = 600.ms,

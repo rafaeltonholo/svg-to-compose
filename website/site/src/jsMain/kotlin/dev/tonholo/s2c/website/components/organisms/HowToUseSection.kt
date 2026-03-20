@@ -10,8 +10,8 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaBookOpen
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
@@ -32,6 +32,7 @@ import dev.tonholo.s2c.website.components.organisms.howtouse.CliUsageContent
 import dev.tonholo.s2c.website.components.organisms.howtouse.GradleUsageContent
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
 
@@ -49,7 +50,7 @@ fun HowToUseSection() {
                 attrs = Modifier
                     .fillMaxWidth()
                     .display(DisplayStyle.Flex)
-                    .styleModifier { property("flex-direction", "column") }
+                    .flexDirection(FlexDirection.Column)
                     .alignItems(AlignItems.Center)
                     .toAttrs(),
             ) {

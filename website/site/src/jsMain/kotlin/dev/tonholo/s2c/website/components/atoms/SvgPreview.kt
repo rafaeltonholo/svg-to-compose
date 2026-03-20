@@ -3,12 +3,16 @@ package dev.tonholo.s2c.website.components.atoms
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
+import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
 
@@ -30,16 +34,14 @@ fun SvgPreview(
         attrs = modifier
             .fillMaxWidth()
             .display(DisplayStyle.Flex)
-            .styleModifier {
-                property("justify-content", "center")
-                property("align-items", "center")
-            }
+            .justifyContent(JustifyContent.Center)
+            .alignItems(AlignItems.Center)
             .padding(1.cssRem)
             .toAttrs(),
     ) {
         Div(
             attrs = Modifier
-                .styleModifier { property("line-height", "0") }
+                .lineHeight(0)
                 .toAttrs(),
         ) {
             DisposableEffect(svgCode) {

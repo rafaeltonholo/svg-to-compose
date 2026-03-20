@@ -15,7 +15,10 @@ import dev.tonholo.s2c.geom.applyTransformations
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 sealed interface ImageVectorNode : MethodSizeAccountable {
     val transformations: List<AffineTransformation>?
     val imports: Set<String>
@@ -57,11 +60,12 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         }
     } ?: this
 
+    @Serializable
     data class Path(
         val params: Params,
         val wrapper: NodeWrapper,
         val minified: Boolean,
-        override val transformations: List<AffineTransformation>? = null,
+        @Transient override val transformations: List<AffineTransformation>? = null,
     ) : ImageVectorNode,
         MethodSizeAccountable {
         companion object {
@@ -73,8 +77,9 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             private const val PATH_APPROXIMATE_BYTE_SIZE = 133
         }
 
+        @Serializable
         data class Params(
-            val fill: ComposeBrush?,
+            val fill: ComposeBrush? = null,
             val fillAlpha: Float? = null,
             val pathFillType: PathFillType? = null,
             val stroke: ComposeBrush? = null,
@@ -129,11 +134,12 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
         override fun materialize(): String = ImageVectorNodeEmitter().emit(this)
     }
 
+    @Serializable
     data class Group(
         val commands: List<ImageVectorNode>,
         val minified: Boolean,
         val params: Params = Params(),
-        override val transformations: List<AffineTransformation>? = null,
+        @Transient override val transformations: List<AffineTransformation>? = null,
     ) : ImageVectorNode,
         MethodSizeAccountable {
         companion object {
@@ -141,6 +147,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
             private const val CLIP_PATH_APPROXIMATE_BYTE_SIZE = 30
         }
 
+        @Serializable
         data class Params(
             val clipPath: NodeWrapper? = null,
             val rotate: Float? = null,
@@ -204,6 +211,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     /**
      * A Chunk function wrapper to separate the icon instructions in smaller pieces.
      */
+    @Serializable
     data class ChunkFunction(val functionName: String, val nodes: List<ImageVectorNode>) : ImageVectorNode {
         override val transformations: List<AffineTransformation>
             get() = error("Transformation should be applied before creating chunk functions.")
@@ -239,6 +247,7 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
     }
 
     // Support class to Paths. It should not be inherited from ImageVectorNode
+    @Serializable
     data class NodeWrapper(val normalizedPath: String, val nodes: List<PathNodes>) {
         operator fun plus(other: NodeWrapper): NodeWrapper = NodeWrapper(
             normalizedPath = "$normalizedPath ${other.normalizedPath}",

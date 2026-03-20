@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.modifiers.opacity
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.animation.toAnimation
@@ -53,7 +52,7 @@ fun AnimateOnScroll(
                 ),
             )
         } else {
-            Modifier.styleModifier { property("opacity", "0") }
+            Modifier.opacity(0)
         }
     )
 

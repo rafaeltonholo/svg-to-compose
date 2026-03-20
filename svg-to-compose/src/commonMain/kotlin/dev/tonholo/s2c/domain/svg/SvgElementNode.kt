@@ -6,6 +6,7 @@ import dev.tonholo.s2c.domain.xml.XmlElementNode
 import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.logger.Logger
+import kotlin.js.JsName
 
 typealias SvgElementNodeConstructorFn<T> = (
     parent: XmlParentNode,
@@ -21,6 +22,7 @@ abstract class SvgElementNode<out T>(
 ) : XmlElementNode(parent, children, attributes, tagName),
     SvgNode
     where T : SvgNode, T : XmlParentNode {
+    @JsName("nodeConstructor")
     protected abstract val constructor: SvgElementNodeConstructorFn<T>
     override val transform: SvgTransform? by lazy {
         stackedTransform(parent)

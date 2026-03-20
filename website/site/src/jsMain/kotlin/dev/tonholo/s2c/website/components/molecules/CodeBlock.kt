@@ -14,9 +14,10 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.css.TextAlign
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -64,9 +65,7 @@ val CopyButtonStyle = CssStyle.base {
         .cursor(Cursor.Pointer)
         .fontSize(0.7.cssRem)
         .fontFamily("Inter", "sans-serif")
-        .styleModifier {
-            property("transition", "all 0.2s ease")
-        }
+        .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
 }
 
 val LineNumberStyle = CssStyle.base {

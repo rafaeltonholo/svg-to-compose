@@ -19,7 +19,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaWandMagicSparkles
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
@@ -84,10 +83,8 @@ fun GradlePluginTabContent() {
 
         Div(
             attrs = SubHeadingStyle.toModifier()
-                .styleModifier {
-                    property("display", "inline-flex")
-                    property("align-items", "center")
-                }
+                .display(DisplayStyle.LegacyInlineFlex)
+                .alignItems(AlignItems.Center)
                 .gap(0.5.cssRem)
                 .toAttrs(),
         ) {

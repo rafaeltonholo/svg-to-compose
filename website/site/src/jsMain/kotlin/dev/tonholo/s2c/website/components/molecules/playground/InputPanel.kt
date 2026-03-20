@@ -41,6 +41,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.right
 import com.varabyte.kobweb.compose.ui.modifiers.scrollbarWidth
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
+import com.varabyte.kobweb.compose.ui.modifiers.borderRight
+import com.varabyte.kobweb.compose.ui.modifiers.flex
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -61,6 +64,7 @@ import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
@@ -78,16 +82,16 @@ private const val TAB_INDENT = "  "
 val InputPanelStyle = CssStyle.base {
     Modifier
         .backgroundColor(colorMode.toSitePalette().surfaceAlt)
-        .styleModifier { property("border-right", "1px solid ${colorMode.toSitePalette().borderStrong}") }
+        .borderRight(width = 1.px, style = LineStyle.Solid, color = colorMode.toSitePalette().borderStrong)
         .display(DisplayStyle.Flex)
-        .styleModifier { property("flex-direction", "column") }
+        .flexDirection(FlexDirection.Column)
 }
 
 val EditorContainerStyle = CssStyle.base {
     Modifier
         .position(Position.Relative)
         .fillMaxWidth()
-        .styleModifier { property("flex", "1") }
+        .flex(1)
         .overflow(Overflow.Hidden)
 }
 

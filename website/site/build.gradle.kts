@@ -36,6 +36,17 @@ kobweb {
     }
 }
 
+val copyEditorWasm by tasks.registering(Copy::class) {
+    dependsOn(":editor-wasm:wasmJsBrowserDistribution")
+    from(project(":editor-wasm").layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
+    into(layout.projectDirectory.dir("src/jsMain/resources/public/editor"))
+}
+tasks.configureEach {
+    if (name == "jsProcessResources") {
+        dependsOn(copyEditorWasm)
+    }
+}
+
 kotlin {
     configAsKobwebApplication("website")
 
@@ -46,6 +57,8 @@ kotlin {
             implementation(libs.kobweb.core)
             implementation(libs.kobweb.silk)
             implementation(libs.silk.icons.fa)
+            implementation(libs.dev.tonholo.s2c)
+            implementation(project(":worker"))
         }
     }
 }

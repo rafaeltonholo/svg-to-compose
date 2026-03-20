@@ -1,3 +1,4 @@
 # Kobweb ignores
 .kobweb/*
 !.kobweb/conf.yaml
+src/jsMain/resources/public/editor

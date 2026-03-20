@@ -5,16 +5,17 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.ComponentKind
@@ -22,7 +23,9 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.toModifier
+import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.CSSLengthValue
+import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
@@ -42,10 +45,8 @@ object BadgeVars {
 val BadgeStyle = CssStyle<BadgeKind> {
     base {
         Modifier
-            .styleModifier {
-                property("display", "inline-flex")
-                property("align-items", "center")
-            }
+            .display(DisplayStyle.LegacyInlineFlex)
+            .alignItems(AlignItems.Center)
             .gap(0.375.cssRem)
             .borderRadius(BadgeVars.BorderRadius.value(100.px))
             .padding(

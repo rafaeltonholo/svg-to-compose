@@ -2,19 +2,39 @@ package dev.tonholo.s2c.website.components.molecules
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
-import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.border
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
+import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.size
+import com.varabyte.kobweb.compose.ui.modifiers.transform
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.toSitePalette
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.JustifyContent
+import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
 val FeatureCardStyle = CssStyle {
@@ -22,15 +42,20 @@ val FeatureCardStyle = CssStyle {
         Modifier
             .padding(1.25.cssRem)
             .borderRadius(0.75.cssRem)
-            .styleModifier {
-                property("transition", "transform 0.2s ease, box-shadow 0.2s ease")
-            }
+            .transition(
+                Transition.of("transform", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("box-shadow", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
+            )
     }
     cssRule(":hover") {
-        Modifier.styleModifier {
-            property("transform", "scale(1.02) translateY(-4px)")
-            property("box-shadow", "0 0 32px var(--card-glow-color)")
-        }
+        Modifier
+            .transform {
+                scale(sx = 1.02f)
+                translateY(ty = (-4).px)
+            }
+            .styleModifier {
+                property("box-shadow", "0 0 32px var(--card-glow-color)")
+            }
     }
 }
 
@@ -54,7 +79,7 @@ fun FeatureCard(
             .styleModifier {
                 property("--card-glow-color", borderColor.toString())
             }
-            .toAttrs()
+            .toAttrs(),
     ) {
         Div(
             attrs = Modifier
@@ -66,7 +91,7 @@ fun FeatureCard(
                 .justifyContent(JustifyContent.Center)
                 .fontSize(1.25.cssRem)
                 .color(color)
-                .toAttrs()
+                .toAttrs(),
         ) {
             icon()
         }
@@ -76,7 +101,7 @@ fun FeatureCard(
                 .display(DisplayStyle.Block)
                 .fontSize(1.cssRem)
                 .fontWeight(FontWeight.SemiBold)
-                .margin(top = 0.75.cssRem)
+                .margin(top = 0.75.cssRem),
         )
         SpanText(
             description,
@@ -85,7 +110,7 @@ fun FeatureCard(
                 .fontSize(0.875.cssRem)
                 .color(palette.muted)
                 .margin(top = 0.375.cssRem)
-                .lineHeight(1.5)
+                .lineHeight(value = 1.5),
         )
     }
 }

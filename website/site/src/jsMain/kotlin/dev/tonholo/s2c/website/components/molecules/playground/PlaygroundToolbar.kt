@@ -3,6 +3,8 @@ package dev.tonholo.s2c.website.components.molecules.playground
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.RowScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -18,17 +20,20 @@ import com.varabyte.kobweb.compose.ui.modifiers.borderTop
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.flexWrap
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.width
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaClipboard
 import com.varabyte.kobweb.silk.components.icons.fa.FaPlay
+import com.varabyte.kobweb.silk.components.icons.fa.FaSpinner
 import com.varabyte.kobweb.silk.components.icons.fa.FaUpload
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.ComponentKind
@@ -38,25 +43,29 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.components.organisms.ConvertButtonStyle
+import dev.tonholo.s2c.website.components.organisms.playground.ConvertButtonStyle
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexWrap
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 
+/** Styles the toolbar container with flex layout, gap, and header background. */
 val ToolbarStyle = CssStyle.base {
     Modifier
         .display(DisplayStyle.Flex)
         .alignItems(AlignItems.Center)
-        .styleModifier { property("flex-wrap", "wrap") }
+        .flexWrap(FlexWrap.Wrap)
         .gap(0.75.cssRem)
         .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
         .backgroundColor(colorMode.toSitePalette().surfaceHeader)
 }
+/** Styles the grouped button row with connected border-radius on first/last children. */
 val ToolbarButtonRowStyle = CssStyle {
     val borderRadius = 0.375.cssRem
     fun BorderSideScope.applyBorder() {
@@ -88,8 +97,10 @@ val ToolbarButtonRowStyle = CssStyle {
     }
 }
 
+/** Component kind marker for toolbar toggle buttons. */
 sealed interface ToolbarButtonKind : ComponentKind
 
+/** Styles individual toolbar buttons with active-state highlight. */
 val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
     base {
         val sitePalette = colorMode.toSitePalette()
@@ -100,7 +111,7 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
             .cursor(Cursor.Pointer)
             .color(sitePalette.nearBackground.inverted())
             .fontWeight(FontWeight.Medium)
-            .styleModifier { property("transition", "all 0.2s ease") }
+            .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease))
     }
     cssRule(".active") {
         val sitePalette = colorMode.toSitePalette()
@@ -110,6 +121,7 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
     }
 }
 
+/** Variant that uses teal brand colour for the active state instead of purple. */
 val TealToolButtonStyle = ToolbarButtonStyle.addVariant {
     cssRule(".active") {
         val sitePalette = colorMode.toSitePalette()
@@ -119,8 +131,19 @@ val TealToolButtonStyle = ToolbarButtonStyle.addVariant {
     }
 }
 
+/**
+ * Toolbar row with input-mode toggle (paste/upload), format selector (SVG/AVG),
+ * and a convert button that triggers the conversion worker.
+ */
 @Composable
-fun PlaygroundToolbar(inputMode: String, extension: String, onInputModeChange: (String) -> Unit) {
+fun PlaygroundToolbar(
+    inputMode: String,
+    extension: String,
+    isConverting: Boolean,
+    onInputModeChange: (String) -> Unit,
+    onExtensionChange: (String) -> Unit,
+    onConvert: () -> Unit,
+) {
     Div(attrs = ToolbarStyle.toModifier().toAttrs()) {
         // Input mode buttons
         ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
@@ -154,14 +177,14 @@ fun PlaygroundToolbar(inputMode: String, extension: String, onInputModeChange: (
         ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
             ToolbarButton(
                 active = extension == "svg",
-                onClick = { },
+                onClick = { onExtensionChange("svg") },
                 variant = TealToolButtonStyle,
             ) {
                 SpanText("SVG")
             }
             ToolbarButton(
                 active = extension == "avg",
-                onClick = { },
+                onClick = { onExtensionChange("avg") },
                 variant = TealToolButtonStyle,
             ) {
                 SpanText("AVG (Android XML)")
@@ -172,14 +195,22 @@ fun PlaygroundToolbar(inputMode: String, extension: String, onInputModeChange: (
         Button(
             attrs = ConvertButtonStyle.toModifier()
                 .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.4.cssRem)
+                .let { if (isConverting) it.opacity(value = 0.7f).cursor(Cursor.Default) else it }
+                .onClick { if (!isConverting) onConvert() }
                 .toAttrs(),
         ) {
-            FaPlay()
-            SpanText("Convert")
+            if (isConverting) {
+                FaSpinner(modifier = SpinnerIconStyle.toModifier())
+                SpanText("Converting...")
+            } else {
+                FaPlay()
+                SpanText("Convert")
+            }
         }
     }
 }
 
+/** Row wrapper that applies [ToolbarButtonRowStyle] for grouped button layout. */
 @Composable
 fun ToolbarButtonRow(
     modifier: Modifier = Modifier,
@@ -188,6 +219,7 @@ fun ToolbarButtonRow(
     Row(modifier = ToolbarButtonRowStyle.toModifier().then(modifier), content = content)
 }
 
+/** Styled button that toggles an `active` CSS class based on the [active] flag. */
 @Composable
 fun ToolbarButton(
     active: Boolean,

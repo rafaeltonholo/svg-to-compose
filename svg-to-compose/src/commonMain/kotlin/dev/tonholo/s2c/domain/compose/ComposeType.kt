@@ -9,6 +9,10 @@ import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Bevel
 import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Miter
 import dev.tonholo.s2c.domain.compose.StrokeJoin.Companion.Round
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import dev.tonholo.s2c.serializer.domain.compose.PathFillTypeSerializer
+import dev.tonholo.s2c.serializer.domain.compose.StrokeCapSerializer
+import dev.tonholo.s2c.serializer.domain.compose.StrokeJoinSerializer
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 /**
@@ -59,6 +63,7 @@ fun <T> ComposeType<T>.lowercase(): String = value.toString().lowercase()
  * The [toString] method is overridden to return the encapsulated
  * string value.
  */
+@Serializable(with = PathFillTypeSerializer::class)
 @JvmInline
 value class PathFillType private constructor(override val value: String) :
     ComposeType<String>,
@@ -125,6 +130,7 @@ value class PathFillType private constructor(override val value: String) :
  * The [toString] method is overridden to return the encapsulated
  * string value.
  */
+@Serializable(with = StrokeCapSerializer::class)
 @JvmInline
 value class StrokeCap private constructor(override val value: String) :
     ComposeType<String>,
@@ -193,6 +199,7 @@ value class StrokeCap private constructor(override val value: String) :
  * The [toString] method is overridden to return the encapsulated
  * string value.
  */
+@Serializable(with = StrokeJoinSerializer::class)
 @JvmInline
 value class StrokeJoin private constructor(override val value: String) :
     ComposeType<String>,

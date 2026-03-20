@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.browser.dom.ElementTarget
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TextDecorationLine
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
@@ -39,6 +41,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.translateX
 import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -196,9 +199,7 @@ private fun GitHubButton() {
             .fontSize(0.8.cssRem)
             .fontWeight(FontWeight.Medium)
             .color(ColorMode.current.toSitePalette().muted)
-            .styleModifier {
-                property("transition", "all 0.2s ease")
-            },
+            .transition(Transition.all(duration = 200.ms, timingFunction = TransitionTimingFunction.Ease)),
         variant = UncoloredLinkVariant,
     ) {
         FaGithub()

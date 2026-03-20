@@ -2,6 +2,8 @@ package dev.tonholo.s2c.domain
 
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
 import dev.tonholo.s2c.logger.NoOpLogger
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 val defaultImports = setOf(
     "androidx.compose.ui.graphics.vector.ImageVector",
@@ -49,20 +51,21 @@ val materialReceiverTypeImport = setOf(
  * @property makeInternal Whether to make the icon internal.
  * @property imports The set of imports to include in the generated code.
  */
+@Serializable
 data class IconFileContents(
-    val pkg: String,
-    val iconName: String,
-    val theme: String,
+    @Transient val pkg: String = "",
+    @Transient val iconName: String = "",
+    @Transient val theme: String = "",
     val width: Float,
     val height: Float,
     val viewportWidth: Float = width,
     val viewportHeight: Float = height,
     val nodes: List<ImageVectorNode>,
-    val receiverType: String? = null,
-    val addToMaterial: Boolean = false,
-    val noPreview: Boolean = false,
-    val makeInternal: Boolean = false,
-    val imports: Set<String> = defaultImports,
+    @Transient val receiverType: String? = null,
+    @Transient val addToMaterial: Boolean = false,
+    @Transient val noPreview: Boolean = false,
+    @Transient val makeInternal: Boolean = false,
+    @Transient val imports: Set<String> = defaultImports,
 ) {
     /**
      * Generates the Kotlin code for the icon.

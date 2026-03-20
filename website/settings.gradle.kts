@@ -1,11 +1,14 @@
 pluginManagement {
     repositories {
+        maven { url = uri("../build/localMaven") }
+        mavenCentral()
         gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
     repositories {
+        maven { url = uri("../build/localMaven") }
         mavenCentral()
         google()
     }
@@ -29,4 +32,13 @@ gradle.settingsEvaluated {
 
 rootProject.name = "website"
 
+includeBuild("..") {
+    dependencySubstitution {
+        substitute(module("dev.tonholo.s2c:svg-to-compose"))
+            .using(project(":svg-to-compose"))
+    }
+}
+
 include(":site")
+include(":worker")
+include(":editor-wasm")

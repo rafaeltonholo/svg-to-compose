@@ -1,7 +1,9 @@
 package dev.tonholo.s2c.domain.compose
 
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ComposeOffset(val x: Float?, val y: Float?) :
     ComposeType<Pair<Float?, Float?>>,
     MethodSizeAccountable {

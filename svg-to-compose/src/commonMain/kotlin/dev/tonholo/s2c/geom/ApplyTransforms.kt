@@ -10,6 +10,8 @@ import dev.tonholo.s2c.geom.transform.QuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveCurveTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveQuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.VerticalLineTransformation.applyTransformation
+import dev.tonholo.s2c.serializer.geom.AffineTransformationSerializer
+import kotlinx.serialization.Serializable
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -17,6 +19,7 @@ import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
 
+@Serializable(with = AffineTransformationSerializer::class)
 sealed class AffineTransformation(vararg matrix: DoubleArray) {
     val matrix: Array<out DoubleArray>
 

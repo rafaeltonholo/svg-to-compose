@@ -3,12 +3,14 @@ package dev.tonholo.s2c.website.components.molecules
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.borderRight
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
@@ -17,12 +19,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -43,6 +47,7 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.em
+import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -67,10 +72,13 @@ val CodePreviewGridStyle = CssStyle {
     base {
         Modifier
             .display(DisplayStyle.Grid)
-            .styleModifier { property("grid-template-columns", "1fr") }
+            .gridTemplateColumns { size(1.fr) }
     }
     Breakpoint.MD {
-        Modifier.styleModifier { property("grid-template-columns", "1fr 1fr") }
+        Modifier.gridTemplateColumns {
+            size(1.fr)
+            size(1.fr)
+        }
     }
 }
 
@@ -92,7 +100,7 @@ val CodePanelStyle = CssStyle.base {
         .lineHeight(value = 1.6)
         .overflow(Overflow.Auto)
         .margin(0.px)
-        .styleModifier { property("white-space", "pre") }
+        .whiteSpace(WhiteSpace.Pre)
 }
 
 val CodePreviewBadgeStyle = CssStyle.base {
@@ -163,7 +171,7 @@ fun CodePreview() {
             Div(
                 attrs = Modifier
                     .backgroundColor(palette.surfaceAlt)
-                    .styleModifier { property("border-right", "1px solid ${palette.borderStrong}") }
+                    .borderRight(width = 1.px, style = LineStyle.Solid, color = palette.borderStrong)
                     .toAttrs(),
             ) {
                 CodePreviewPanel(

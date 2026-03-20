@@ -57,3 +57,16 @@ fun KotlinMultiplatformExtension.useWindows(): List<KotlinNativeTargetWithHostTe
 fun KotlinMultiplatformExtension.useJvm() {
     jvm()
 }
+
+fun KotlinMultiplatformExtension.useJs() {
+    js {
+        browser()
+    }
+}
+
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+fun KotlinMultiplatformExtension.useWasmJs() {
+    wasmJs {
+        browser()
+    }
+}

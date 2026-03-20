@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -24,10 +26,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.maxHeight
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.transform
+import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaChevronDown
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
@@ -41,6 +47,8 @@ import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.deg
+import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
@@ -92,28 +100,27 @@ fun CollapsibleSection(
                 size = IconSize.SM,
                 modifier = Modifier
                     .color(ColorMode.current.toSitePalette().muted)
-                    .styleModifier {
-                        property("transition", "transform 0.3s ease")
-                        if (expanded) {
-                            property("transform", "rotate(180deg)")
-                        }
-                    },
+                    .transition(
+                        Transition.of(
+                            "transform",
+                            duration = 300.ms,
+                            timingFunction = TransitionTimingFunction.Ease,
+                        ),
+                    )
+                    .thenIf(expanded, Modifier.transform { rotate(180.deg) }),
             )
         }
         Div(
             attrs = Modifier
                 .fillMaxWidth()
                 .overflow(Overflow.Hidden)
-                .styleModifier {
-                    if (expanded) {
-                        property("max-height", "200rem")
-                        property("opacity", "1")
-                    } else {
-                        property("max-height", "0")
-                        property("opacity", "0")
-                    }
-                    property("transition", "max-height 0.3s ease, opacity 0.3s ease")
-                }
+                .opacity(if (expanded) 1 else 0)
+                .transition(
+                    Transition.of("max-height", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
+                    Transition.of("opacity", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
+                )
+                .thenIf(expanded, Modifier.maxHeight(200.cssRem))
+                .thenIf(!expanded, Modifier.maxHeight(0.px))
                 .toAttrs(),
         ) {
             content()

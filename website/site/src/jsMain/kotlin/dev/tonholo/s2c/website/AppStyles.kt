@@ -1,11 +1,15 @@
 package dev.tonholo.s2c.website
 
+import com.varabyte.kobweb.compose.css.Animation
+import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.ScrollBehavior
 import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.css.TextTransform
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
+import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
@@ -20,6 +24,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.textTransform
+import com.varabyte.kobweb.compose.ui.modifiers.transform
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.translateY
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
@@ -36,7 +42,9 @@ import com.varabyte.kobweb.silk.theme.modifyStyleBase
 import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.css.deg
 import org.jetbrains.compose.web.css.em
+import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
@@ -54,25 +62,36 @@ val FadeInKeyframes = Keyframes {
 
 val PulseKeyframes = Keyframes {
     from { Modifier.opacity(1) }
-    50.percent { Modifier.opacity(0.5) }
+    50.percent { Modifier.opacity(value = 0.5) }
     to { Modifier.opacity(1) }
+}
+
+val SpinKeyframes = Keyframes {
+    from { Modifier.transform { rotate(0.deg) } }
+    to { Modifier.transform { rotate(360.deg) } }
 }
 
 @InitSilk
 fun initSiteStyles(ctx: InitSilkContext) {
     ctx.stylesheet.registerStyle("html") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
-            Modifier.scrollBehavior(com.varabyte.kobweb.compose.css.ScrollBehavior.Smooth)
+            Modifier.scrollBehavior(ScrollBehavior.Smooth)
         }
     }
 
     ctx.stylesheet.registerStyle("*") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("reduce"))) {
-            Modifier.styleModifier {
-                property("animation-duration", "0.01ms !important")
-                property("animation-iteration-count", "1 !important")
-                property("transition-duration", "0.01ms !important")
-            }
+            Modifier
+                .animation(
+                    Animation.of(
+                        duration = 0.01.ms,
+                        iterationCount = AnimationIterationCount.of(1),
+                        name = "reduced-motion",
+                    ),
+                )
+                .transition {
+                    duration(0.01.ms)
+                }
         }
     }
 
