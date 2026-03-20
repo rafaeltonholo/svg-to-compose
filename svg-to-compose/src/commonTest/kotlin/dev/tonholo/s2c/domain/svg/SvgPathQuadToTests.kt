@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -81,10 +82,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 element = """
                 |// Q $this
                 |quadTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
-                |    x2 = ${x2}f,
-                |    y2 = ${y2}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
+                |    x2 = ${x2.toStringConsistent()}f,
+                |    y2 = ${y2.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -96,10 +97,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 element = """
                 |// q $this
                 |quadToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
-                |    dx2 = ${x2}f,
-                |    dy2 = ${y2}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
+                |    dx2 = ${x2.toStringConsistent()}f,
+                |    dy2 = ${y2.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -137,10 +138,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 element = """
                 |// Q ${this}z
                 |quadTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
-                |    x2 = ${x2}f,
-                |    y2 = ${y2}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
+                |    x2 = ${x2.toStringConsistent()}f,
+                |    y2 = ${y2.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -153,10 +154,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 element = """
                 |// q ${this}z
                 |quadToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
-                |    dx2 = ${x2}f,
-                |    dy2 = ${y2}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
+                |    dx2 = ${x2.toStringConsistent()}f,
+                |    dy2 = ${y2.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -194,10 +195,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("quadTo(")
-                    append("x1 = ${x1}f,")
-                    append(" y1 = ${y1}f,")
-                    append(" x2 = ${x2}f,")
-                    append(" y2 = ${y2}f")
+                    append("x1 = ${x1.toStringConsistent()}f,")
+                    append(" y1 = ${y1.toStringConsistent()}f,")
+                    append(" x2 = ${x2.toStringConsistent()}f,")
+                    append(" y2 = ${y2.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -207,10 +208,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("quadToRelative(")
-                    append("dx1 = ${x1}f,")
-                    append(" dy1 = ${y1}f,")
-                    append(" dx2 = ${x2}f,")
-                    append(" dy2 = ${y2}f")
+                    append("dx1 = ${x1.toStringConsistent()}f,")
+                    append(" dy1 = ${y1.toStringConsistent()}f,")
+                    append(" dx2 = ${x2.toStringConsistent()}f,")
+                    append(" dy2 = ${y2.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -246,10 +247,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("quadTo(")
-                    append("x1 = ${x1}f,")
-                    append(" y1 = ${y1}f,")
-                    append(" x2 = ${x2}f,")
-                    append(" y2 = ${y2}f")
+                    append("x1 = ${x1.toStringConsistent()}f,")
+                    append(" y1 = ${y1.toStringConsistent()}f,")
+                    append(" x2 = ${x2.toStringConsistent()}f,")
+                    append(" y2 = ${y2.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")
@@ -261,10 +262,10 @@ class SvgPathQuadToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("quadToRelative(")
-                    append("dx1 = ${x1}f,")
-                    append(" dy1 = ${y1}f,")
-                    append(" dx2 = ${x2}f,")
-                    append(" dy2 = ${y2}f")
+                    append("dx1 = ${x1.toStringConsistent()}f,")
+                    append(" dy1 = ${y1.toStringConsistent()}f,")
+                    append(" dx2 = ${x2.toStringConsistent()}f,")
+                    append(" dy2 = ${y2.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")

@@ -10,13 +10,22 @@ import dev.tonholo.s2c.geom.transform.QuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveCurveTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.ReflectiveQuadTransformation.applyTransformation
 import dev.tonholo.s2c.geom.transform.VerticalLineTransformation.applyTransformation
+import dev.tonholo.s2c.serializer.geom.AffineTransformationSerializer
+import kotlinx.serialization.Serializable
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
+private const val DEGREES_IN_HALF_CIRCLE = 180.0
 
+/**
+ * Converts degrees to radians.
+ */
+private val Double.rad: Double get() = this * PI / DEGREES_IN_HALF_CIRCLE
+
+@Serializable(with = AffineTransformationSerializer::class)
 sealed class AffineTransformation(vararg matrix: DoubleArray) {
     val matrix: Array<out DoubleArray>
 
@@ -53,10 +62,6 @@ sealed class AffineTransformation(vararg matrix: DoubleArray) {
                 calculateMatrixElement(row = 2, column = 2, matrix, other.matrix),
             ),
         )
-    }
-
-    companion object {
-        private inline val Double.rad: Double get() = this * PI / 180.0
     }
 
     class Matrix(vararg matrix: DoubleArray) : AffineTransformation(matrix = matrix) {

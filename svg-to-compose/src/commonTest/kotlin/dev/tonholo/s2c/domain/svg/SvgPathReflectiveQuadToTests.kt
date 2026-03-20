@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -77,8 +78,8 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 element = """
                 |// T $this
                 |reflectiveQuadTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -90,8 +91,8 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 element = """
                 |// t $this
                 |reflectiveQuadToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -125,8 +126,8 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 element = """
                 |// T ${this}z
                 |reflectiveQuadTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -139,8 +140,8 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
                 element = """
                 |// t ${this}z
                 |reflectiveQuadToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -172,13 +173,13 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "reflectiveQuadTo(x1 = ${x1}f, y1 = ${y1}f)",
+                element = "reflectiveQuadTo(x1 = ${x1.toStringConsistent()}f, y1 = ${y1.toStringConsistent()}f)",
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "reflectiveQuadToRelative(dx1 = ${x1}f, dy1 = ${y1}f)",
+                element = "reflectiveQuadToRelative(dx1 = ${x1.toStringConsistent()}f, dy1 = ${y1.toStringConsistent()}f)",
             )
         }
     }
@@ -207,7 +208,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |reflectiveQuadTo(x1 = ${x1}f, y1 = ${y1}f)
+                    |reflectiveQuadTo(x1 = ${x1.toStringConsistent()}f, y1 = ${y1.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )
@@ -216,7 +217,7 @@ class SvgPathReflectiveQuadToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |reflectiveQuadToRelative(dx1 = ${x1}f, dy1 = ${y1}f)
+                    |reflectiveQuadToRelative(dx1 = ${x1.toStringConsistent()}f, dy1 = ${y1.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )

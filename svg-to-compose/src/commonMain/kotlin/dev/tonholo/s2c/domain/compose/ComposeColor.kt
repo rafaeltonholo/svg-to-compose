@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain.compose
 
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 import kotlin.math.roundToInt
 
@@ -14,6 +15,7 @@ private const val RGB_MAX_VALUE = 255
 /**
  * Converts a hexadecimal color into a Color object
  */
+@Serializable
 @JvmInline
 value class ComposeColor(override val value: String) : ComposeType<String> {
     companion object {

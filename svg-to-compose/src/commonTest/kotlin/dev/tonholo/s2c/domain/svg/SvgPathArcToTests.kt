@@ -4,6 +4,7 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -134,13 +135,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 element = """
                 |// A $this
                 |arcTo(
-                |    horizontalEllipseRadius = ${a}f,
-                |    verticalEllipseRadius = ${b}f,
-                |    theta = ${theta}f,
+                |    horizontalEllipseRadius = ${a.toStringConsistent()}f,
+                |    verticalEllipseRadius = ${b.toStringConsistent()}f,
+                |    theta = ${theta.toStringConsistent()}f,
                 |    isMoreThanHalf = $isMoreThanHalf,
                 |    isPositiveArc = $isPositiveArc,
-                |    x1 = ${x}f,
-                |    y1 = ${y}f,
+                |    x1 = ${x.toStringConsistent()}f,
+                |    y1 = ${y.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -152,13 +153,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 element = """
                 |// a $this
                 |arcToRelative(
-                |    a = ${a}f,
-                |    b = ${b}f,
-                |    theta = ${theta}f,
+                |    a = ${a.toStringConsistent()}f,
+                |    b = ${b.toStringConsistent()}f,
+                |    theta = ${theta.toStringConsistent()}f,
                 |    isMoreThanHalf = $isMoreThanHalf,
                 |    isPositiveArc = $isPositiveArc,
-                |    dx1 = ${x}f,
-                |    dy1 = ${y}f,
+                |    dx1 = ${x.toStringConsistent()}f,
+                |    dy1 = ${y.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -204,13 +205,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 element = """
                 |// A ${this}z
                 |arcTo(
-                |    horizontalEllipseRadius = ${a}f,
-                |    verticalEllipseRadius = ${b}f,
-                |    theta = ${theta}f,
+                |    horizontalEllipseRadius = ${a.toStringConsistent()}f,
+                |    verticalEllipseRadius = ${b.toStringConsistent()}f,
+                |    theta = ${theta.toStringConsistent()}f,
                 |    isMoreThanHalf = $isMoreThanHalf,
                 |    isPositiveArc = $isPositiveArc,
-                |    x1 = ${x}f,
-                |    y1 = ${y}f,
+                |    x1 = ${x.toStringConsistent()}f,
+                |    y1 = ${y.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -223,13 +224,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 element = """
                 |// a ${this}z
                 |arcToRelative(
-                |    a = ${a}f,
-                |    b = ${b}f,
-                |    theta = ${theta}f,
+                |    a = ${a.toStringConsistent()}f,
+                |    b = ${b.toStringConsistent()}f,
+                |    theta = ${theta.toStringConsistent()}f,
                 |    isMoreThanHalf = $isMoreThanHalf,
                 |    isPositiveArc = $isPositiveArc,
-                |    dx1 = ${x}f,
-                |    dy1 = ${y}f,
+                |    dx1 = ${x.toStringConsistent()}f,
+                |    dy1 = ${y.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -275,13 +276,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("arcTo(")
-                    append("horizontalEllipseRadius = ${a}f,")
-                    append(" verticalEllipseRadius = ${b}f,")
-                    append(" theta = ${theta}f,")
+                    append("horizontalEllipseRadius = ${a.toStringConsistent()}f,")
+                    append(" verticalEllipseRadius = ${b.toStringConsistent()}f,")
+                    append(" theta = ${theta.toStringConsistent()}f,")
                     append(" isMoreThanHalf = $isMoreThanHalf,")
                     append(" isPositiveArc = $isPositiveArc,")
-                    append(" x1 = ${x}f,")
-                    append(" y1 = ${y}f")
+                    append(" x1 = ${x.toStringConsistent()}f,")
+                    append(" y1 = ${y.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -291,13 +292,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("arcToRelative(")
-                    append("a = ${a}f,")
-                    append(" b = ${b}f,")
-                    append(" theta = ${theta}f,")
+                    append("a = ${a.toStringConsistent()}f,")
+                    append(" b = ${b.toStringConsistent()}f,")
+                    append(" theta = ${theta.toStringConsistent()}f,")
                     append(" isMoreThanHalf = $isMoreThanHalf,")
                     append(" isPositiveArc = $isPositiveArc,")
-                    append(" dx1 = ${x}f,")
-                    append(" dy1 = ${y}f")
+                    append(" dx1 = ${x.toStringConsistent()}f,")
+                    append(" dy1 = ${y.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -341,13 +342,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("arcTo(")
-                    append("horizontalEllipseRadius = ${a}f,")
-                    append(" verticalEllipseRadius = ${b}f,")
-                    append(" theta = ${theta}f,")
+                    append("horizontalEllipseRadius = ${a.toStringConsistent()}f,")
+                    append(" verticalEllipseRadius = ${b.toStringConsistent()}f,")
+                    append(" theta = ${theta.toStringConsistent()}f,")
                     append(" isMoreThanHalf = $isMoreThanHalf,")
                     append(" isPositiveArc = $isPositiveArc,")
-                    append(" x1 = ${x}f,")
-                    append(" y1 = ${y}f")
+                    append(" x1 = ${x.toStringConsistent()}f,")
+                    append(" y1 = ${y.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")
@@ -359,13 +360,13 @@ class SvgPathArcToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("arcToRelative(")
-                    append("a = ${a}f,")
-                    append(" b = ${b}f,")
-                    append(" theta = ${theta}f,")
+                    append("a = ${a.toStringConsistent()}f,")
+                    append(" b = ${b.toStringConsistent()}f,")
+                    append(" theta = ${theta.toStringConsistent()}f,")
                     append(" isMoreThanHalf = $isMoreThanHalf,")
                     append(" isPositiveArc = $isPositiveArc,")
-                    append(" dx1 = ${x}f,")
-                    append(" dy1 = ${y}f")
+                    append(" dx1 = ${x.toStringConsistent()}f,")
+                    append(" dy1 = ${y.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")

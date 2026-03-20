@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -74,7 +75,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// H $this
-                |horizontalLineTo(x = ${x}f)
+                |horizontalLineTo(x = ${x.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -84,7 +85,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// h $this
-                |horizontalLineToRelative(dx = ${x}f)
+                |horizontalLineToRelative(dx = ${x.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -114,7 +115,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// H ${this}z
-                |horizontalLineTo(x = ${x}f)
+                |horizontalLineTo(x = ${x.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -125,7 +126,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// h ${this}z
-                |horizontalLineToRelative(dx = ${x}f)
+                |horizontalLineToRelative(dx = ${x.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -154,13 +155,13 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "horizontalLineTo(x = ${x}f)",
+                element = "horizontalLineTo(x = ${x.toStringConsistent()}f)",
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "horizontalLineToRelative(dx = ${x}f)",
+                element = "horizontalLineToRelative(dx = ${x.toStringConsistent()}f)",
             )
         }
     }
@@ -187,7 +188,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                |horizontalLineTo(x = ${x}f)
+                |horizontalLineTo(x = ${x.toStringConsistent()}f)
                 |close()
                 """.trimMargin(),
             )
@@ -196,7 +197,7 @@ class SvgPathHorizontalLineToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                |horizontalLineToRelative(dx = ${x}f)
+                |horizontalLineToRelative(dx = ${x.toStringConsistent()}f)
                 |close()
                 """.trimMargin(),
             )

@@ -24,3 +24,5 @@ include(
     ":svg-to-compose",
     ":svg-to-compose-gradle-plugin",
 )
+
+includeBuild("website")

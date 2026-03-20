@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -93,7 +94,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// M $this
-                |moveTo(x = ${x}f, y = ${y}f)
+                |moveTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -105,7 +106,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// m $this
-                |moveToRelative(dx = ${x}f, dy = ${y}f)
+                |moveToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -136,7 +137,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// M ${this}z
-                |moveTo(x = ${x}f, y = ${y}f)
+                |moveTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -149,7 +150,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// m ${this}z
-                |moveToRelative(dx = ${x}f, dy = ${y}f)
+                |moveToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -179,7 +180,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             val y = this.y.toFloat()
             assertContains(
                 array = materialized,
-                element = "moveTo(x = ${x}f, y = ${y}f)",
+                element = "moveTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)",
             )
         }
         with(relativeMoveToParams) {
@@ -187,7 +188,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             val y = this.y.toFloat()
             assertContains(
                 array = materialized,
-                element = "moveToRelative(dx = ${x}f, dy = ${y}f)",
+                element = "moveToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)",
             )
         }
     }
@@ -215,7 +216,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |moveTo(x = ${x}f, y = ${y}f)
+                    |moveTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )
@@ -226,7 +227,7 @@ class SvgPathMoveToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |moveToRelative(dx = ${x}f, dy = ${y}f)
+                    |moveToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )

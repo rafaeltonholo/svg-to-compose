@@ -2,11 +2,15 @@ package dev.tonholo.s2c.domain.compose
 
 import dev.tonholo.s2c.extensions.indented
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
+import dev.tonholo.s2c.serializer.domain.compose.ComposeBrushSerializer
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
+@Serializable(with = ComposeBrushSerializer::class)
 sealed interface ComposeBrush :
     ComposeType<String>,
     MethodSizeAccountable {
+    @Serializable
     @JvmInline
     value class SolidColor(override val value: String) : ComposeBrush {
         companion object {
@@ -34,6 +38,7 @@ sealed interface ComposeBrush :
         override fun toString(): String = value
     }
 
+    @Serializable
     sealed interface Gradient : ComposeBrush {
         companion object {
             private const val NAME = "Brush"
@@ -82,6 +87,7 @@ sealed interface ComposeBrush :
             }
         }
 
+        @Serializable
         data class Linear(
             val start: ComposeOffset,
             val end: ComposeOffset,
@@ -128,6 +134,7 @@ sealed interface ComposeBrush :
             }
         }
 
+        @Serializable
         data class Radial(
             val radius: Float?,
             val center: ComposeOffset?,
@@ -167,6 +174,7 @@ sealed interface ComposeBrush :
             }
         }
 
+        @Serializable
         data class Sweep(
             val center: ComposeOffset?,
             override val colors: List<ComposeColor>,

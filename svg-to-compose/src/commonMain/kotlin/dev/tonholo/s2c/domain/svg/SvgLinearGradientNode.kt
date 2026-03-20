@@ -35,17 +35,16 @@ class SvgLinearGradientNode(
         return referenced.copy(attributes = mergedAttributes)
     }
 
-    private fun buildMergedAttributes(
-        referencedGradient: SvgLinearGradientNode,
-    ): MutableMap<String, String> = referencedGradient.attributes.toMutableMap().apply {
-        remove(SvgUseNode.HREF_ATTR_KEY)
-        // Overlay this node's attributes onto referenced, so local values override inherited ones
-        for ((key, value) in this@SvgLinearGradientNode.attributes) {
-            if (key != SvgUseNode.HREF_ATTR_KEY) {
-                put(key, value)
+    private fun buildMergedAttributes(referencedGradient: SvgLinearGradientNode): MutableMap<String, String> =
+        referencedGradient.attributes.toMutableMap().apply {
+            remove(SvgUseNode.HREF_ATTR_KEY)
+            // Overlay this node's attributes onto referenced, so local values override inherited ones
+            for ((key, value) in this@SvgLinearGradientNode.attributes) {
+                if (key != SvgUseNode.HREF_ATTR_KEY) {
+                    put(key, value)
+                }
             }
         }
-    }
 
     private fun createLinearGradientBrush(target: List<PathNodes>): ComposeBrush.Gradient.Linear {
         val (colors, stops) = colorStops

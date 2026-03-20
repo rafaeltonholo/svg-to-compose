@@ -109,11 +109,10 @@ abstract class SvgGraphicNode<out T>(
         val gradientId = fillColor.normalizedId()
         val gradient = root.gradients[gradientId] ?: return null
         val transformations = transform?.toTransformations()
-            ?.plus(gradient.gradientTransform?.toTransformations().orEmpty())
             ?.toTypedArray()
             .orEmpty()
 
-        return root.gradients[gradientId]?.toBrush(
+        return gradient.toBrush(
             target = nodes
                 .applyTransformations(transformations = transformations)
                 .toList()
