@@ -31,6 +31,30 @@ kobweb {
                         "&display=swap"
                     rel = "stylesheet"
                 }
+                link {
+                    rel = "icon"
+                    type = "image/png"
+                    href = basePath.prependTo("/favicon-96x96.png")
+                    sizes = "96x96"
+                }
+                link {
+                    rel = "icon"
+                    type = "image/svg+xml"
+                    href = basePath.prependTo("/favicon.svg")
+                }
+                link {
+                    rel = "shortcut icon"
+                    href = basePath.prependTo("/favicon.ico")
+                }
+                link {
+                    rel = "apple-touch-icon"
+                    sizes = "180x180"
+                    href = basePath.prependTo("/apple-touch-icon.png")
+                }
+                link {
+                    rel = "manifest"
+                    href = basePath.prependTo("/site.webmanifest")
+                }
             }
         }
     }
