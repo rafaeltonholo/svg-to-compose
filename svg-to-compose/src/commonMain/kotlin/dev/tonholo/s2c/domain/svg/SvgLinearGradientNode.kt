@@ -26,10 +26,13 @@ class SvgLinearGradientNode(
     private fun resolveReferencedGradient(): SvgLinearGradientNode {
         val root = rootParent as SvgRootNode
         val hrefId = checkNotNull(href).normalizedId()
-        val referencedGradient = checkNotNull(root.gradients[hrefId]) as SvgLinearGradientNode
-        val mergedAttributes = buildMergedAttributes(referencedGradient)
+        val referenced = checkNotNull(root.gradients[hrefId])
+        check(referenced is SvgLinearGradientNode) {
+            "linearGradient href='#$hrefId' references a ${referenced::class.simpleName} instead of a linearGradient"
+        }
+        val mergedAttributes = buildMergedAttributes(referenced)
 
-        return referencedGradient.copy(attributes = mergedAttributes) as SvgLinearGradientNode
+        return referenced.copy(attributes = mergedAttributes)
     }
 
     private fun buildMergedAttributes(

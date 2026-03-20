@@ -3,8 +3,11 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class SvgLinearGradientNodeTest : BaseSvgTest() {
 
@@ -326,5 +329,34 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
             expected = ComposeOffset(x = 100f, y = 50f),
             actual = brush.end,
         )
+    }
+
+    @Test
+    fun `given linearGradient href referencing a radialGradient - when toBrush is called - then throws IllegalStateException`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val radialGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf("id" to "radGrad1"),
+        )
+        root.gradients["radGrad1"] = radialGradient
+        val linearGradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "linGradRef",
+                "xlink:href" to "#radGrad1",
+            ),
+        )
+
+        // Act & Assert
+        val exception = assertFailsWith<IllegalStateException> {
+            linearGradient.toBrush(target = emptyList())
+        }
+        val message = exception.message
+        assertNotNull(message)
+        assertContains(message, "radGrad1")
+        assertContains(message, "SvgRadialGradientNode")
     }
 }
