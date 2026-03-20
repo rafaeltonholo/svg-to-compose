@@ -8,8 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
-import dev.tonholo.s2c.website.worker.ConversionInput
 import dev.tonholo.s2c.website.worker.ConversionOutput
+import dev.tonholo.s2c.website.worker.IconConvertWorker
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 
@@ -20,16 +20,10 @@ import kotlinx.coroutines.await
  *
  * UI code dispatches [PlaygroundAction]s via [dispatch]. The only
  * methods beyond dispatch handle side-effect-producing operations
- * (worker I/O, batch index tracking) that can't be pure reducers.
+ * (worker I/O, batch pool management) that can't be pure reducers.
  */
 internal class PlaygroundViewModel : ViewModel() {
     var state by mutableStateOf(PlaygroundState())
-        private set
-
-    var batchConvertIndex by mutableStateOf(-1)
-        private set
-
-    var pendingBatchFile by mutableStateOf<UploadedFileInfo?>(null)
         private set
 
     private var filesToConvert: List<UploadedFileInfo> = emptyList()
@@ -39,11 +33,39 @@ internal class PlaygroundViewModel : ViewModel() {
     private val _completedResultsByKey = mutableStateMapOf<String, BatchConversionResult>()
     val completedResultsByKey: Map<String, BatchConversionResult> get() = _completedResultsByKey
 
+    private var singleWorker: IconConvertWorker? = null
+    private var workerPool: WorkerPool? = null
+
     val selectedCountByFolder: Map<String, Int>
         get() = state.uploadedFiles
             .filter { it.fileKey() in state.selectedFiles }
             .groupingBy { it.relativePath }
             .eachCount()
+
+    /**
+     * Initialises the single-file worker and the batch worker pool.
+     * Must be called once from a [DisposableEffect] in the
+     * Composable that hosts this ViewModel.
+     */
+    fun initWorkers(poolSize: Int = WorkerPool.DEFAULT_POOL_SIZE) {
+        if (singleWorker != null) return
+        singleWorker = IconConvertWorker { output ->
+            dispatch(PlaygroundAction.ConversionOutputReceived(output))
+        }
+        workerPool = WorkerPool(
+            poolSize = poolSize,
+            onOutput = ::handleBatchOutput,
+            onDrained = ::onBatchDrained,
+        )
+    }
+
+    /** Terminates all workers. Call from [DisposableEffect.onDispose]. */
+    fun cleanupWorkers() {
+        singleWorker?.terminate()
+        singleWorker = null
+        workerPool?.terminate()
+        workerPool = null
+    }
 
     fun dispatch(action: PlaygroundAction) {
         state = PlaygroundReducer.reduce(state, action)
@@ -63,18 +85,12 @@ internal class PlaygroundViewModel : ViewModel() {
         )
     }
 
-    fun onWorkerOutput(output: ConversionOutput) {
-        val batchFile = pendingBatchFile
-        if (batchFile != null) {
-            handleBatchOutput(output, batchFile)
-        } else {
-            dispatch(PlaygroundAction.ConversionOutputReceived(output))
-        }
-    }
-
-    fun buildConvertInput(): ConversionInput {
+    /** Converts the current editor content (single-file mode). */
+    fun convertSingle() {
+        val worker = singleWorker ?: return
         dispatch(PlaygroundAction.StartConversion)
-        return ConversionInputFactory.fromState(state)
+        val input = ConversionInputFactory.fromState(state)
+        worker.postInput(input)
     }
 
     fun loadFiles(files: List<UploadedFileInfo>) {
@@ -82,6 +98,7 @@ internal class PlaygroundViewModel : ViewModel() {
     }
 
     fun startBatchConversion() {
+        val pool = workerPool ?: return
         filesToConvert = state.uploadedFiles.filter { file ->
             file.fileKey() in state.selectedFiles
         }
@@ -89,32 +106,20 @@ internal class PlaygroundViewModel : ViewModel() {
         _completedCountByFolder.clear()
         _completedResultsByKey.clear()
         dispatch(PlaygroundAction.StartBatchConversion)
-        batchConvertIndex = 0
+
+        val inputs = filesToConvert.mapIndexed { index, file ->
+            index to ConversionInputFactory.fromUploadedFile(file, state.options)
+        }
+        pool.submitAll(inputs)
     }
 
     fun cancelBatch() {
-        batchConvertIndex = -1
+        workerPool?.cancel()
         dispatch(PlaygroundAction.CancelBatch)
     }
 
-    /**
-     * Called by a LaunchedEffect when [batchConvertIndex] changes.
-     * Returns the [ConversionInput] for the next file, or null if
-     * batch conversion is complete.
-     */
-    fun prepareNextBatchFile(): ConversionInput? {
-        if (batchConvertIndex < 0) return null
-        val nextFile = filesToConvert.getOrNull(batchConvertIndex)
-        if (nextFile == null) {
-            dispatch(PlaygroundAction.BatchCompleted(batchResults.toList()))
-            batchConvertIndex = -1
-            return null
-        }
-        pendingBatchFile = nextFile
-        return ConversionInputFactory.fromUploadedFile(nextFile, state.options)
-    }
-
-    private fun handleBatchOutput(output: ConversionOutput, batchFile: UploadedFileInfo) {
+    private fun handleBatchOutput(fileIndex: Int, output: ConversionOutput) {
+        val batchFile = filesToConvert.getOrNull(fileIndex) ?: return
         when (output) {
             is ConversionOutput.Progress -> {
                 dispatch(PlaygroundAction.BatchFileProgress(batchFile.name, output.stage))
@@ -130,7 +135,6 @@ internal class PlaygroundViewModel : ViewModel() {
                     iconFileContentsJson = output.iconFileContentsJson,
                 )
                 addResult(result)
-                advanceOrCancel()
             }
 
             is ConversionOutput.Error -> {
@@ -142,8 +146,16 @@ internal class PlaygroundViewModel : ViewModel() {
                     error = output.message,
                 )
                 addResult(result)
-                advanceOrCancel()
             }
+        }
+    }
+
+    private fun onBatchDrained() {
+        val phase = state.batchPhase
+        if (phase is BatchPhase.Converting && phase.cancelling) {
+            dispatch(PlaygroundAction.BatchCancelled(batchResults.toList()))
+        } else {
+            dispatch(PlaygroundAction.BatchCompleted(batchResults.toList()))
         }
     }
 
@@ -153,16 +165,5 @@ internal class PlaygroundViewModel : ViewModel() {
         _completedCountByFolder[folder] = (_completedCountByFolder[folder] ?: 0) + 1
         _completedResultsByKey[result.resultKey()] = result
         dispatch(PlaygroundAction.BatchFileCompleted(result))
-    }
-
-    private fun advanceOrCancel() {
-        pendingBatchFile = null
-        val phase = state.batchPhase
-        if (phase is BatchPhase.Converting && phase.cancelling) {
-            dispatch(PlaygroundAction.BatchCancelled(batchResults.toList()))
-            batchConvertIndex = -1
-        } else {
-            batchConvertIndex++
-        }
     }
 }

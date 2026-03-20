@@ -2,7 +2,6 @@ package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +33,6 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.style.toModifier
-import com.varabyte.kobweb.worker.rememberWorker
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.FilePickerInput
@@ -51,7 +49,6 @@ import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.sample
 import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
 import dev.tonholo.s2c.website.toSitePalette
 import dev.tonholo.s2c.website.util.handleDrop
-import dev.tonholo.s2c.website.worker.IconConvertWorker
 import dev.tonholo.s2c.website.zip.downloadAsZip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -130,13 +127,9 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
         var fileInputRef by remember { mutableStateOf<HTMLInputElement?>(null) }
         var folderInputRef by remember { mutableStateOf<HTMLInputElement?>(null) }
 
-        val worker = rememberWorker {
-            IconConvertWorker { output -> vm.onWorkerOutput(output) }
-        }
-
-        LaunchedEffect(vm.batchConvertIndex) {
-            val input = vm.prepareNextBatchFile() ?: return@LaunchedEffect
-            worker.postInput(input)
+        DisposableEffect(vm) {
+            vm.initWorkers()
+            onDispose { vm.cleanupWorkers() }
         }
 
         val onSelectFiles = rememberFileSelectedHandler(scope, vm)
@@ -164,7 +157,7 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
             selectedCountByFolder = vm.selectedCountByFolder,
             isDragOver = isDragOver,
             onSampleSelect = { scope.launch { vm.selectSample(it) } },
-            onConvert = { worker.postInput(vm.buildConvertInput()) },
+            onConvert = { vm.convertSingle() },
             onStartBatchConversion = vm::startBatchConversion,
             onCancelBatch = vm::cancelBatch,
             fileInputRef = fileInputRef,
