@@ -18,11 +18,12 @@ import kotlin.math.sin
 import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
+private const val DEGREES_IN_HALF_CIRCLE = 180.0
 
 /**
  * Converts degrees to radians.
  */
-private val Double.rad: Double get() = this * PI / 180.0
+private val Double.rad: Double get() = this * PI / DEGREES_IN_HALF_CIRCLE
 
 @Serializable(with = AffineTransformationSerializer::class)
 sealed class AffineTransformation(vararg matrix: DoubleArray) {
