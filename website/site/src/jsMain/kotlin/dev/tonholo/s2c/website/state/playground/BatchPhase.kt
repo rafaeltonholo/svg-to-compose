@@ -50,7 +50,16 @@ internal data class FileGroup(val folderPath: String, val files: List<UploadedFi
  * Builds a file key for selection tracking.
  * Format: `"relativePath/name"` or just `"name"` for root files.
  */
-internal fun UploadedFileInfo.fileKey(): String = if (relativePath.isNotEmpty()) "$relativePath/$name" else name
+internal fun UploadedFileInfo.fileKey(): String = buildFileKey(relativePath, name)
+
+/**
+ * Builds a result key for completed conversion result lookup.
+ * Uses the same format as [fileKey] so map lookups match.
+ */
+internal fun BatchConversionResult.resultKey(): String = buildFileKey(relativePath, fileName)
+
+private fun buildFileKey(relativePath: String, name: String): String =
+    if (relativePath.isNotEmpty()) "$relativePath/$name" else name
 
 /**
  * Groups [UploadedFileInfo] by [UploadedFileInfo.relativePath],

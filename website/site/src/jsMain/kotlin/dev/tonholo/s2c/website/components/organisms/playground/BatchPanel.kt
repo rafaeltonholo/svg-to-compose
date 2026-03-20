@@ -24,6 +24,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.components.atoms.IntersectionObserverTrigger
 import dev.tonholo.s2c.website.components.molecules.playground.FileGroupHeader
 import dev.tonholo.s2c.website.components.molecules.playground.FileRow
 import dev.tonholo.s2c.website.state.playground.BatchConversionResult
@@ -41,7 +42,8 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vh
 
-private const val MAX_VISIBLE_FILES = 100
+private const val INITIAL_VISIBLE_FILES = 50
+private const val LOAD_MORE_CHUNK_SIZE = 100
 
 val BatchPanelStyle = CssStyle.base {
     Modifier.fillMaxWidth()
@@ -72,6 +74,8 @@ val BatchPanelFileListStyle = CssStyle.base {
 internal fun BatchPanel(
     state: PlaygroundState,
     completedCountByFolder: Map<String, Int>,
+    completedResultsByKey: Map<String, BatchConversionResult>,
+    selectedCountByFolder: Map<String, Int>,
     modifier: Modifier = Modifier,
     onToggleSelectAll: () -> Unit = {},
     onToggleFileSelection: (String) -> Unit = {},
@@ -90,11 +94,6 @@ internal fun BatchPanel(
     val totalFiles = state.uploadedFiles.size
     val selectedCount = state.selectedFiles.size
     val allSelected = totalFiles > 0 && selectedCount == totalFiles
-
-    val completedResults = when (phase) {
-        is BatchPhase.Results -> phase.completed
-        else -> emptyList()
-    }
 
     // Shift+click range selection for folders
     var lastClickedFolderIndex by remember { mutableStateOf(-1) }
@@ -122,8 +121,9 @@ internal fun BatchPanel(
             state = BatchFileListState(
                 playgroundState = state,
                 phase = phase,
-                completedResults = completedResults,
+                completedResultsByKey = completedResultsByKey,
                 completedCountByFolder = completedCountByFolder,
+                selectedCountByFolder = selectedCountByFolder,
                 folderPaths = folderPaths,
                 lastClickedFolderIndex = lastClickedFolderIndex,
             ),
@@ -154,7 +154,7 @@ private fun BatchFileList(
                     group = group,
                     phase = state.phase,
                     selectedFiles = state.playgroundState.selectedFiles,
-                    completedResults = state.completedResults,
+                    completedResultsByKey = state.completedResultsByKey,
                     onToggleFileSelection = onToggleFileSelection,
                     onInspect = onInspect,
                 )
@@ -166,8 +166,9 @@ private fun BatchFileList(
                         phase = state.phase,
                         selectedFiles = state.playgroundState.selectedFiles,
                         expandedFolders = state.playgroundState.expandedFolders,
-                        completedResults = state.completedResults,
+                        completedResultsByKey = state.completedResultsByKey,
                         completedCountByFolder = state.completedCountByFolder,
+                        selectedCountForFolder = state.selectedCountByFolder[group.folderPath] ?: 0,
                     ),
                     onToggleFolderExpand = onToggleFolderExpand,
                     onToggleFolderSelection = { shiftKey ->
@@ -196,12 +197,12 @@ private fun RootFileRows(
     group: FileGroup,
     phase: BatchPhase,
     selectedFiles: Set<String>,
-    completedResults: List<BatchConversionResult>,
+    completedResultsByKey: Map<String, BatchConversionResult>,
     onToggleFileSelection: (String) -> Unit = {},
     onInspect: (BatchConversionResult) -> Unit = {},
 ) {
     for (file in group.files) {
-        val result = completedResults.find { it.fileName == file.name && it.relativePath == file.relativePath }
+        val result = completedResultsByKey[file.fileKey()]
         FileRow(
             file = file,
             phase = phase,
@@ -223,13 +224,10 @@ private fun FolderGroup(
     onInspect: (BatchConversionResult) -> Unit = {},
 ) {
     val isExpanded = state.group.folderPath in state.expandedFolders
-    val groupSelectedCount = state.group.files.count { file -> file.fileKey() in state.selectedFiles }
     val groupCompletedCount = when (state.phase) {
-        is BatchPhase.Converting -> state.completedCountByFolder[state.group.folderPath] ?: 0
-
-        is BatchPhase.Results -> state.completedResults.count { result ->
-            state.group.files.any { file -> file.name == result.fileName && file.relativePath == result.relativePath }
-        }
+        is BatchPhase.Converting,
+        is BatchPhase.Results,
+        -> state.completedCountByFolder[state.group.folderPath] ?: 0
 
         else -> 0
     }
@@ -239,7 +237,7 @@ private fun FolderGroup(
             state = FileGroupHeaderState(
                 groupState = state,
                 isExpanded = isExpanded,
-                selectedCount = groupSelectedCount,
+                selectedCount = state.selectedCountForFolder,
                 completedCount = groupCompletedCount,
             ),
             onToggleExpand = { onToggleFolderExpand(state.group.folderPath) },
@@ -251,7 +249,7 @@ private fun FolderGroup(
                 group = state.group,
                 phase = state.phase,
                 selectedFiles = state.selectedFiles,
-                completedResults = state.completedResults,
+                completedResultsByKey = state.completedResultsByKey,
                 onToggleFileSelection = onToggleFileSelection,
                 onInspect = onInspect,
             )
@@ -264,21 +262,19 @@ private fun ExpandedFolderFiles(
     group: FileGroup,
     phase: BatchPhase,
     selectedFiles: Set<String>,
-    completedResults: List<BatchConversionResult>,
+    completedResultsByKey: Map<String, BatchConversionResult>,
     onToggleFileSelection: (String) -> Unit = {},
     onInspect: (BatchConversionResult) -> Unit = {},
 ) {
-    var showAll by remember { mutableStateOf(false) }
-    val filesToShow = if (showAll || group.files.size <= MAX_VISIBLE_FILES) {
+    var visibleCount by remember(group.folderPath) { mutableStateOf(INITIAL_VISIBLE_FILES) }
+    val filesToShow = if (group.files.size <= visibleCount) {
         group.files
     } else {
-        group.files.take(MAX_VISIBLE_FILES)
+        group.files.take(visibleCount)
     }
     Column(modifier = Modifier.fillMaxWidth()) {
         for (file in filesToShow) {
-            val result = completedResults.find {
-                it.fileName == file.name && it.relativePath == file.relativePath
-            }
+            val result = completedResultsByKey[file.fileKey()]
             FileRow(
                 file = file,
                 phase = phase,
@@ -292,21 +288,33 @@ private fun ExpandedFolderFiles(
                 },
             )
         }
-        if (!showAll && group.files.size > MAX_VISIBLE_FILES) {
-            SpanText(
-                "Show all ${group.files.size} files",
-                modifier = Modifier
-                    .padding {
-                        topBottom(0.375.cssRem)
-                        left(1.5.cssRem)
-                    }
-                    .fontSize(0.75.cssRem)
-                    .color(ColorMode.current.toSitePalette().primary)
-                    .cursor(Cursor.Pointer)
-                    .onClick { showAll = true },
+        if (visibleCount < group.files.size) {
+            LoadMoreTrigger(
+                visibleCount = visibleCount,
+                totalCount = group.files.size,
+                onLoadMore = {
+                    visibleCount = minOf(visibleCount + LOAD_MORE_CHUNK_SIZE, group.files.size)
+                },
             )
         }
     }
+}
+
+@Composable
+private fun LoadMoreTrigger(visibleCount: Int, totalCount: Int, onLoadMore: () -> Unit) {
+    IntersectionObserverTrigger(onVisible = onLoadMore)
+    SpanText(
+        "Show more ($visibleCount/$totalCount)",
+        modifier = Modifier
+            .padding {
+                topBottom(0.375.cssRem)
+                left(1.5.cssRem)
+            }
+            .fontSize(0.75.cssRem)
+            .color(ColorMode.current.toSitePalette().primary)
+            .cursor(Cursor.Pointer)
+            .onClick { onLoadMore() },
+    )
 }
 
 /**

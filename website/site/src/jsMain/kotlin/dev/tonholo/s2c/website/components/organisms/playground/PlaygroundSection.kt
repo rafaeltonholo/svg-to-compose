@@ -43,6 +43,7 @@ import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
 import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
 import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
+import dev.tonholo.s2c.website.state.playground.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
@@ -159,6 +160,8 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
             dispatch = vm::dispatch,
             scope = scope,
             completedCountByFolder = vm.completedCountByFolder,
+            completedResultsByKey = vm.completedResultsByKey,
+            selectedCountByFolder = vm.selectedCountByFolder,
             isDragOver = isDragOver,
             onSampleSelect = { scope.launch { vm.selectSample(it) } },
             onConvert = { worker.postInput(vm.buildConvertInput()) },
@@ -208,6 +211,8 @@ private fun PlaygroundEditorPanel(
     dispatch: (PlaygroundAction) -> Unit,
     scope: CoroutineScope,
     completedCountByFolder: Map<String, Int>,
+    completedResultsByKey: Map<String, BatchConversionResult>,
+    selectedCountByFolder: Map<String, Int>,
     isDragOver: Boolean,
     onSampleSelect: (Int) -> Unit,
     onConvert: () -> Unit,
@@ -255,6 +260,8 @@ private fun PlaygroundEditorPanel(
             dispatch = dispatch,
             scope = scope,
             completedCountByFolder = completedCountByFolder,
+            completedResultsByKey = completedResultsByKey,
+            selectedCountByFolder = selectedCountByFolder,
             onStartBatchConversion = onStartBatchConversion,
             onCancelBatch = onCancelBatch,
             fileInputRef = fileInputRef,
@@ -300,6 +307,8 @@ private fun BatchOrCodePanels(
     dispatch: (PlaygroundAction) -> Unit,
     scope: CoroutineScope,
     completedCountByFolder: Map<String, Int>,
+    completedResultsByKey: Map<String, BatchConversionResult>,
+    selectedCountByFolder: Map<String, Int>,
     onStartBatchConversion: () -> Unit,
     onCancelBatch: () -> Unit,
     fileInputRef: HTMLInputElement?,
@@ -323,6 +332,8 @@ private fun BatchOrCodePanels(
         BatchPanel(
             state = state,
             completedCountByFolder = completedCountByFolder,
+            completedResultsByKey = completedResultsByKey,
+            selectedCountByFolder = selectedCountByFolder,
             onToggleSelectAll = { dispatch(PlaygroundAction.ToggleSelectAll) },
             onToggleFileSelection = { dispatch(PlaygroundAction.ToggleFileSelection(it)) },
             onToggleFolderSelection = { dispatch(PlaygroundAction.ToggleFolderSelection(it)) },

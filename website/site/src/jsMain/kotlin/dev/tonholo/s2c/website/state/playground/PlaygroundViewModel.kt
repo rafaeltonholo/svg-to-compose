@@ -36,6 +36,14 @@ internal class PlaygroundViewModel : ViewModel() {
     val batchResults: SnapshotStateList<BatchConversionResult> = mutableStateListOf()
     private val _completedCountByFolder = mutableStateMapOf<String, Int>()
     val completedCountByFolder: Map<String, Int> get() = _completedCountByFolder
+    private val _completedResultsByKey = mutableStateMapOf<String, BatchConversionResult>()
+    val completedResultsByKey: Map<String, BatchConversionResult> get() = _completedResultsByKey
+
+    val selectedCountByFolder: Map<String, Int>
+        get() = state.uploadedFiles
+            .filter { it.fileKey() in state.selectedFiles }
+            .groupingBy { it.relativePath }
+            .eachCount()
 
     fun dispatch(action: PlaygroundAction) {
         state = PlaygroundReducer.reduce(state, action)
@@ -79,6 +87,7 @@ internal class PlaygroundViewModel : ViewModel() {
         }
         batchResults.clear()
         _completedCountByFolder.clear()
+        _completedResultsByKey.clear()
         dispatch(PlaygroundAction.StartBatchConversion)
         batchConvertIndex = 0
     }
@@ -142,6 +151,7 @@ internal class PlaygroundViewModel : ViewModel() {
         batchResults.add(result)
         val folder = result.relativePath
         _completedCountByFolder[folder] = (_completedCountByFolder[folder] ?: 0) + 1
+        _completedResultsByKey[result.resultKey()] = result
         dispatch(PlaygroundAction.BatchFileCompleted(result))
     }
 

@@ -9,6 +9,7 @@ internal data class FolderGroupState(
     val phase: BatchPhase,
     val selectedFiles: Set<String>,
     val expandedFolders: Set<String>,
-    val completedResults: List<BatchConversionResult>,
+    val completedResultsByKey: Map<String, BatchConversionResult>,
     val completedCountByFolder: Map<String, Int>,
+    val selectedCountForFolder: Int,
 )

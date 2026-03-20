@@ -49,7 +49,6 @@ import dev.tonholo.s2c.website.SitePalette
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.FileGroup
-import dev.tonholo.s2c.website.state.playground.fileKey
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
@@ -189,12 +188,9 @@ private fun TrailingContent(state: FileGroupHeaderState, fileGroup: FileGroup, p
         }
 
         is BatchPhase.Results -> {
-            val selectedInGroup = fileGroup.files.count { file ->
-                file.fileKey() in state.groupState.selectedFiles
-            }
             FileGroupResultsTrailing(
                 completedCount = state.completedCount,
-                selectedCount = selectedInGroup,
+                selectedCount = state.selectedCount,
                 palette = palette,
             )
         }
