@@ -7,6 +7,7 @@ package dev.tonholo.s2c.domain
 import dev.tonholo.s2c.emitter.imagevector.PathNodeEmitter
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toInt
+import dev.tonholo.s2c.extensions.toStringConsistent
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.BOOLEAN_APPROXIMATE_BYTE_SIZE
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable.Companion.FLOAT_APPROXIMATE_BYTE_SIZE
@@ -122,8 +123,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x = ${x.toFloat()}f",
-                "${relativePrefix}y = ${y.toFloat()}f",
+                "${relativePrefix}x = ${x.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y = ${y.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -239,16 +240,17 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            val a = (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a.toFloat()}f"
-            val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b.toFloat()}f"
+            val a =
+                (if (isRelative) "a" else "horizontalEllipseRadius") + " = ${this.a.toFloat().toStringConsistent()}f"
+            val b = (if (isRelative) "b" else "verticalEllipseRadius") + " = ${this.b.toFloat().toStringConsistent()}f"
             return setOf(
                 a,
                 b,
-                "theta = ${theta.toFloat()}f",
+                "theta = ${theta.toFloat().toStringConsistent()}f",
                 "isMoreThanHalf = $isMoreThanHalf",
                 "isPositiveArc = $isPositiveArc",
-                "${relativePrefix}x1 = ${x.toFloat()}f",
-                "${relativePrefix}y1 = ${y.toFloat()}f",
+                "${relativePrefix}x1 = ${x.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y1 = ${y.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -351,7 +353,7 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            return setOf("${relativePrefix}y = ${y.toFloat()}f")
+            return setOf("${relativePrefix}y = ${y.toFloat().toStringConsistent()}f")
         }
 
         override fun toString(): String = "$realCommand ${y.toFloat()}" + super.toString()
@@ -422,7 +424,7 @@ sealed class PathNodes(
 
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
-            return setOf("${relativePrefix}x = ${x.toFloat()}f")
+            return setOf("${relativePrefix}x = ${x.toFloat().toStringConsistent()}f")
         }
 
         override fun toString(): String = "$realCommand ${x.toFloat()}" + super.toString()
@@ -503,8 +505,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x = ${x.toFloat()}f",
-                "${relativePrefix}y = ${y.toFloat()}f",
+                "${relativePrefix}x = ${x.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y = ${y.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -588,12 +590,12 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1.toFloat()}f",
-                "${relativePrefix}y1 = ${y1.toFloat()}f",
-                "${relativePrefix}x2 = ${x2.toFloat()}f",
-                "${relativePrefix}y2 = ${y2.toFloat()}f",
-                "${relativePrefix}x3 = ${x3.toFloat()}f",
-                "${relativePrefix}y3 = ${y3.toFloat()}f",
+                "${relativePrefix}x1 = ${x1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y1 = ${y1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}x2 = ${x2.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y2 = ${y2.toFloat().toStringConsistent()}f",
+                "${relativePrefix}x3 = ${x3.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y3 = ${y3.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -693,10 +695,10 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1.toFloat()}f",
-                "${relativePrefix}y1 = ${y1.toFloat()}f",
-                "${relativePrefix}x2 = ${x2.toFloat()}f",
-                "${relativePrefix}y2 = ${y2.toFloat()}f",
+                "${relativePrefix}x1 = ${x1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y1 = ${y1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}x2 = ${x2.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y2 = ${y2.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -785,10 +787,10 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1.toFloat()}f",
-                "${relativePrefix}y1 = ${y1.toFloat()}f",
-                "${relativePrefix}x2 = ${x2.toFloat()}f",
-                "${relativePrefix}y2 = ${y2.toFloat()}f",
+                "${relativePrefix}x1 = ${x1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y1 = ${y1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}x2 = ${x2.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y2 = ${y2.toFloat().toStringConsistent()}f",
             )
         }
 
@@ -877,8 +879,8 @@ sealed class PathNodes(
         override fun buildParameters(): Set<String> {
             val relativePrefix = if (isRelative) "d" else ""
             return setOf(
-                "${relativePrefix}x1 = ${x1.toFloat()}f",
-                "${relativePrefix}y1 = ${y1.toFloat()}f",
+                "${relativePrefix}x1 = ${x1.toFloat().toStringConsistent()}f",
+                "${relativePrefix}y1 = ${y1.toFloat().toStringConsistent()}f",
             )
         }
 

@@ -6,6 +6,7 @@ import dev.tonholo.s2c.emitter.CodeEmitter
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.extensions.camelCase
 import dev.tonholo.s2c.extensions.pascalCase
+import dev.tonholo.s2c.extensions.toStringConsistent
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import kotlin.math.ceil
@@ -64,10 +65,10 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
             |
             |${level2}return ImageVector.Builder(
             |${level3}name = "${contents.theme}.${contents.iconName.pascalCase()}",
-            |${level3}defaultWidth = ${contents.width}.dp,
-            |${level3}defaultHeight = ${contents.height}.dp,
-            |${level3}viewportWidth = ${contents.viewportWidth}f,
-            |${level3}viewportHeight = ${contents.viewportHeight}f,
+            |${level3}defaultWidth = ${contents.width.toStringConsistent()}.dp,
+            |${level3}defaultHeight = ${contents.height.toStringConsistent()}.dp,
+            |${level3}viewportWidth = ${contents.viewportWidth.toStringConsistent()}f,
+            |${level3}viewportHeight = ${contents.viewportHeight.toStringConsistent()}f,
             |$level2).apply {
             |$pathNodes
             |$level2}.build().also { _${contents.iconName.camelCase()} = it }
@@ -131,8 +132,8 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
             |${level4}imageVector = $iconPropertyName,
             |${level4}contentDescription = null,
             |${level4}modifier = Modifier
-            |$level5.width((${max(contents.width, contents.viewportWidth)}).dp)
-            |$level5.height((${max(contents.height, contents.viewportHeight)}).dp),
+            |$level5.width((${max(contents.width, contents.viewportWidth).toStringConsistent()}).dp)
+            |$level5.height((${max(contents.height, contents.viewportHeight).toStringConsistent()}).dp),
             |$level3)
             |$level2}
             |$level1}

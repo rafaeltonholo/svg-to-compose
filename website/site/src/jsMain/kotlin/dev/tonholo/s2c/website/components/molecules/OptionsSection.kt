@@ -144,9 +144,65 @@ fun OptionsSection(
     }
 }
 
+/**
+ * Options body content without outer container. Intended to be wrapped
+ * by a CollapsibleSection or similar container.
+ */
+@Composable
+fun OptionsContent(
+    options: PlaygroundOptions,
+    onOptionsChange: (PlaygroundOptions) -> Unit,
+) {
+    Div(
+        attrs = Modifier
+            .padding(1.cssRem)
+            .display(DisplayStyle.Flex)
+            .flexDirection(FlexDirection.Column)
+            .gap(1.cssRem)
+            .toAttrs(),
+    ) {
+        // Toggle switches row
+        Div(
+            attrs = Modifier
+                .display(DisplayStyle.Flex)
+                .flexWrap(FlexWrap.Wrap)
+                .gap(1.5.cssRem)
+                .toAttrs(),
+        ) {
+            OptionToggle("Optimize", options.optimize) {
+                onOptionsChange(options.copy(optimize = it))
+            }
+            OptionToggle("Minify", options.minified) {
+                onOptionsChange(options.copy(minified = it))
+            }
+            OptionToggle("KMP Compatible", options.kmpPreview) {
+                onOptionsChange(options.copy(kmpPreview = it))
+            }
+            OptionToggle("No Preview", options.noPreview) {
+                onOptionsChange(options.copy(noPreview = it))
+            }
+            OptionToggle("Make Internal", options.makeInternal) {
+                onOptionsChange(options.copy(makeInternal = it))
+            }
+        }
+        // Text inputs grid
+        Div(attrs = OptionsInputGridStyle.toModifier().toAttrs()) {
+            OptionInput("Package Name", options.pkg, "com.example.icons") {
+                onOptionsChange(options.copy(pkg = it))
+            }
+            OptionInput("Theme", options.theme, "com.example.theme.AppTheme") {
+                onOptionsChange(options.copy(theme = it))
+            }
+            OptionInput("Receiver Type", options.receiverType, "Icons.Filled (optional)") {
+                onOptionsChange(options.copy(receiverType = it))
+            }
+        }
+    }
+}
+
 /** Labeled toggle switch for a single boolean option. */
 @Composable
-private fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+internal fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val palette = ColorMode.current.toSitePalette()
     Div(
         attrs = Modifier
@@ -171,7 +227,7 @@ private fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Bool
 
 /** Labeled text input for a single string option. */
 @Composable
-private fun OptionInput(
+internal fun OptionInput(
     label: String,
     value: String,
     placeholderText: String,

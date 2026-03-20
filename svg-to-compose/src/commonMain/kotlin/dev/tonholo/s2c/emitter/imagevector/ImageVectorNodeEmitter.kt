@@ -4,6 +4,7 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.svg.SvgColor
 import dev.tonholo.s2c.domain.svg.toBrush
 import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.extensions.toStringConsistent
 /**
  * Emits Kotlin code for [ImageVectorNode] instances (Path, Group, ChunkFunction).
  *
@@ -116,7 +117,7 @@ internal class ImageVectorNodeEmitter(
                 brush.toCompose()?.let { add("fill" to it) }
             }
             fillAlpha?.let {
-                add("fillAlpha" to "${it}f")
+                add("fillAlpha" to "${it.toStringConsistent()}f")
             }
             pathFillType?.let {
                 add("pathFillType" to "${it.toCompose()}")
@@ -125,7 +126,7 @@ internal class ImageVectorNodeEmitter(
                 stroke.toCompose()?.let { add("stroke" to it) }
             }
             strokeAlpha?.let {
-                add("strokeAlpha" to "${it}f")
+                add("strokeAlpha" to "${it.toStringConsistent()}f")
             }
             strokeLineCap?.let {
                 add("strokeLineCap" to "${it.toCompose()}")
@@ -134,10 +135,10 @@ internal class ImageVectorNodeEmitter(
                 add("strokeLineJoin" to "${it.toCompose()}")
             }
             strokeMiterLimit?.let {
-                add("strokeLineMiter" to "${it}f")
+                add("strokeLineMiter" to "${it.toStringConsistent()}f")
             }
             strokeLineWidth?.let {
-                add("strokeLineWidth" to "${it}f")
+                add("strokeLineWidth" to "${it.toStringConsistent()}f")
             }
 
             if (fill == null && stroke == null) {
@@ -164,13 +165,13 @@ internal class ImageVectorNodeEmitter(
                     .trimMargin()
                 add(CLIP_PATH_PARAM_NAME to value)
             }
-            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate}f") }
-            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX}f") }
-            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY}f") }
-            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX}f") }
-            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY}f") }
-            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX}f") }
-            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY}f") }
+            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate.toStringConsistent()}f") }
+            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX.toStringConsistent()}f") }
+            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY.toStringConsistent()}f") }
+            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX.toStringConsistent()}f") }
+            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY.toStringConsistent()}f") }
+            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX.toStringConsistent()}f") }
+            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY.toStringConsistent()}f") }
         }
     }
 

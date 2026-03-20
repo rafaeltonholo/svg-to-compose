@@ -32,6 +32,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.left
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
@@ -85,13 +86,20 @@ val InputPanelStyle = CssStyle.base {
         .borderRight(width = 1.px, style = LineStyle.Solid, color = colorMode.toSitePalette().outlineVariant)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
+        .flex(1)
+        // min-height: 0 prevents flex children from overflowing their
+        // grid/flex parent — a common CSS gotcha with nested flex layouts.
+        .minHeight(0.px)
 }
 
 val EditorContainerStyle = CssStyle.base {
     Modifier
         .position(Position.Relative)
         .fillMaxWidth()
+        .display(DisplayStyle.Flex)
+        .flexDirection(FlexDirection.Column)
         .flex(1)
+        .minHeight(0.px)
         .overflow(Overflow.Hidden)
 }
 
@@ -131,7 +139,7 @@ val EditorTextareaStyle = CssStyle {
     base {
         Modifier
             .fillMaxWidth()
-            .height(100.percent)
+            .flex(1)
             .position(Position.Relative)
             .zIndex(1)
             .fontFamily("JetBrains Mono", "monospace")

@@ -19,6 +19,11 @@ import kotlin.math.tan
 
 private const val MATRIX_SIZE = 3
 
+/**
+ * Converts degrees to radians.
+ */
+private val Double.rad: Double get() = this * PI / 180.0
+
 @Serializable(with = AffineTransformationSerializer::class)
 sealed class AffineTransformation(vararg matrix: DoubleArray) {
     val matrix: Array<out DoubleArray>
@@ -56,10 +61,6 @@ sealed class AffineTransformation(vararg matrix: DoubleArray) {
                 calculateMatrixElement(row = 2, column = 2, matrix, other.matrix),
             ),
         )
-    }
-
-    companion object {
-        private inline val Double.rad: Double get() = this * PI / 180.0
     }
 
     class Matrix(vararg matrix: DoubleArray) : AffineTransformation(matrix = matrix) {

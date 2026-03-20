@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -76,7 +77,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// L $this
-                |lineTo(x = ${x}f, y = ${y}f)
+                |lineTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -86,7 +87,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// l $this
-                |lineToRelative(dx = ${x}f, dy = ${y}f)
+                |lineToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                 |
                 """.trimMargin(),
             )
@@ -118,7 +119,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// L ${this}z
-                |lineTo(x = ${x}f, y = ${y}f)
+                |lineTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -129,7 +130,7 @@ class SvgPathLineToTests : BaseSvgTest() {
                 array = materialized,
                 element = """
                 |// l ${this}z
-                |lineToRelative(dx = ${x}f, dy = ${y}f)
+                |lineToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                 |close()
                 |
                 """.trimMargin(),
@@ -160,13 +161,13 @@ class SvgPathLineToTests : BaseSvgTest() {
         with(nonRelative) {
             assertContains(
                 array = materialized,
-                element = "lineTo(x = ${x}f, y = ${y}f)",
+                element = "lineTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)",
             )
         }
         with(relative) {
             assertContains(
                 array = materialized,
-                element = "lineToRelative(dx = ${x}f, dy = ${y}f)",
+                element = "lineToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)",
             )
         }
     }
@@ -195,7 +196,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |lineTo(x = ${x}f, y = ${y}f)
+                    |lineTo(x = ${x.toStringConsistent()}f, y = ${y.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )
@@ -204,7 +205,7 @@ class SvgPathLineToTests : BaseSvgTest() {
             assertContains(
                 array = materialized,
                 element = """
-                    |lineToRelative(dx = ${x}f, dy = ${y}f)
+                    |lineToRelative(dx = ${x.toStringConsistent()}f, dy = ${y.toStringConsistent()}f)
                     |close()
                 """.trimMargin(),
             )

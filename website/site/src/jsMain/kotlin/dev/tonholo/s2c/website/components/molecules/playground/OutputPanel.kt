@@ -71,6 +71,7 @@ val OutputPanelStyle = CssStyle.base {
         .backgroundColor(colorMode.toSitePalette().surface)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
+        .flex(1)
 }
 
 /** Styles the spinner icon with a continuous rotation animation. */
@@ -82,6 +83,7 @@ val SpinnerIconStyle = CssStyle.base {
                 timingFunction = AnimationTimingFunction.Linear,
             ),
         )
+        // No native Kobweb modifier for animation-iteration-count
         .styleModifier {
             property("animation-iteration-count", "infinite")
         }

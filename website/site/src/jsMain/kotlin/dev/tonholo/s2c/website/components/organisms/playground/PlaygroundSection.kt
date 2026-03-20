@@ -21,10 +21,12 @@ import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.flex
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
+import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
@@ -33,6 +35,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.role
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.transition
@@ -47,12 +50,13 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.worker.rememberWorker
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
-import dev.tonholo.s2c.website.components.molecules.OptionsSection
+import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
+import dev.tonholo.s2c.website.components.molecules.OptionsContent
 import dev.tonholo.s2c.website.components.molecules.SectionContainer
+import dev.tonholo.s2c.website.components.molecules.playground.ComparisonStrip
 import dev.tonholo.s2c.website.components.molecules.playground.InputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.OutputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.PlaygroundToolbar
-import dev.tonholo.s2c.website.components.molecules.playground.PreviewPanel
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.toSitePalette
@@ -60,10 +64,12 @@ import dev.tonholo.s2c.website.worker.ConversionInput
 import dev.tonholo.s2c.website.worker.ConversionOutput
 import dev.tonholo.s2c.website.worker.IconConvertWorker
 import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
@@ -106,15 +112,19 @@ val ConvertButtonStyle = CssStyle {
     }
 }
 
-/** Styles the three-column desktop grid layout for input, preview, and output panels. */
+/** Styles the two-column desktop grid for input and output panels. */
 val DesktopPanelsStyle = CssStyle {
     base {
         Modifier
             .display(DisplayStyle.Grid)
-            .gridTemplateColumns { repeat(3) { size(1.fr) } }
+            .gridTemplateColumns { size(2.fr); size(3.fr) }
             .minWidth(0.px)
-            .minHeight(460.px)
+            .minHeight(300.px)
             .overflow(Overflow.Hidden)
+            // No native Kobweb modifier for max-height with this value
+            .styleModifier {
+                property("max-height", "500px")
+            }
     }
     cssRule(" > *") {
         Modifier
@@ -160,10 +170,13 @@ val MobileTabStyle = CssStyle {
     }
 }
 
-/** Styles the mobile panel content area with minimum height and alt background. */
+/** Styles the mobile panel content area with explicit height so child
+ * panels (InputPanel, OutputPanel) can flex to fill the space. */
 val MobilePanelContentStyle = CssStyle.base {
     Modifier
-        .minHeight(300.px)
+        .height(50.vh)
+        .display(DisplayStyle.Flex)
+        .flexDirection(FlexDirection.Column)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
@@ -218,6 +231,7 @@ fun PlaygroundSection() {
                 isConverting = true,
                 conversionError = null,
                 conversionProgress = "Starting conversion...",
+                zoomLevel = 1f,
             )
             worker.postInput(
                 ConversionInput(
@@ -263,6 +277,39 @@ fun PlaygroundSection() {
                 onExtensionChange = { state = state.copy(extension = it) },
                 onConvert = onConvert,
             )
+
+            // Collapsible options
+            CollapsibleSection(title = "Options") {
+                OptionsContent(
+                    options = state.options,
+                    onOptionsChange = { state = state.copy(options = it) },
+                )
+            }
+
+            // Desktop comparison strip (200px)
+            Div(attrs = Modifier.displayIfAtLeast(Breakpoint.MD).toAttrs()) {
+                ComparisonStrip(
+                    svgCode = state.inputCode,
+                    extension = state.extension,
+                    iconFileContentsJson = state.iconFileContentsJson,
+                    zoomLevel = state.zoomLevel,
+                    onZoomChange = { state = state.copy(zoomLevel = it) },
+                    previewSizePx = 200,
+                )
+            }
+
+            // Mobile comparison strip (140px)
+            Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
+                ComparisonStrip(
+                    svgCode = state.inputCode,
+                    extension = state.extension,
+                    iconFileContentsJson = state.iconFileContentsJson,
+                    zoomLevel = state.zoomLevel,
+                    onZoomChange = { state = state.copy(zoomLevel = it) },
+                    previewSizePx = 140,
+                )
+            }
+
             DesktopPanels(
                 state = state,
                 onInputChange = { state = state.copy(inputCode = it) },
@@ -273,16 +320,10 @@ fun PlaygroundSection() {
                 onInputChange = { state = state.copy(inputCode = it) },
             )
         }
-
-        // Options
-        OptionsSection(
-            options = state.options,
-            onOptionsChange = { state = state.copy(options = it) },
-        )
     }
 }
 
-/** Desktop three-column grid containing input, preview, and output panels. */
+/** Desktop two-column grid containing input and output panels. */
 @Composable
 private fun DesktopPanels(
     state: PlaygroundState,
@@ -294,7 +335,6 @@ private fun DesktopPanels(
             .toAttrs(),
     ) {
         InputPanel(state.inputCode, onInputChange)
-        PreviewPanel(svgCode = state.inputCode, iconFileContentsJson = state.iconFileContentsJson)
         OutputPanel(
             kotlinCode = state.convertedKotlinCode,
             isConverting = state.isConverting,
@@ -304,14 +344,14 @@ private fun DesktopPanels(
     }
 }
 
-/** Mobile tabbed view switching between input, preview, and output panels. */
+/** Mobile tabbed view switching between input and output panels. */
 @Composable
 private fun MobilePanels(
     state: PlaygroundState,
     onPanelSelect: (Int) -> Unit,
     onInputChange: (String) -> Unit,
 ) {
-    val mobileTabs = listOf("Input", "Preview", "Output")
+    val mobileTabs = listOf("Input", "Output")
     Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
         // Tab bar
         Div(
@@ -364,12 +404,7 @@ private fun MobilePanels(
         ) {
             when (state.activePanel) {
                 0 -> InputPanel(state.inputCode, onInputChange)
-                1 -> PreviewPanel(
-                    svgCode = state.inputCode,
-                    iconFileContentsJson = state.iconFileContentsJson,
-                )
-
-                2 -> OutputPanel(
+                1 -> OutputPanel(
                     kotlinCode = state.convertedKotlinCode,
                     isConverting = state.isConverting,
                     conversionProgress = state.conversionProgress,

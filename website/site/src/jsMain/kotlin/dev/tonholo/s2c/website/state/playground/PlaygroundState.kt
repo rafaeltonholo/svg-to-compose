@@ -13,6 +13,7 @@ internal data class PlaygroundState(
     val isConverting: Boolean = false,
     val conversionProgress: String = "",
     val conversionError: String? = null,
+    val zoomLevel: Float = 1f,
 ) {
     companion object {
         // region Sample Data

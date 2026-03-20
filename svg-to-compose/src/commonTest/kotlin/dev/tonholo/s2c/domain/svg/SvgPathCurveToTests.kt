@@ -3,6 +3,7 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.extensions.removeTrailingZero
+import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -92,12 +93,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 element = """
                 |// C $this
                 |curveTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
-                |    x2 = ${x2}f,
-                |    y2 = ${y2}f,
-                |    x3 = ${x3}f,
-                |    y3 = ${y3}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
+                |    x2 = ${x2.toStringConsistent()}f,
+                |    y2 = ${y2.toStringConsistent()}f,
+                |    x3 = ${x3.toStringConsistent()}f,
+                |    y3 = ${y3.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -109,12 +110,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 element = """
                 |// c $this
                 |curveToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
-                |    dx2 = ${x2}f,
-                |    dy2 = ${y2}f,
-                |    dx3 = ${x3}f,
-                |    dy3 = ${y3}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
+                |    dx2 = ${x2.toStringConsistent()}f,
+                |    dy2 = ${y2.toStringConsistent()}f,
+                |    dx3 = ${x3.toStringConsistent()}f,
+                |    dy3 = ${y3.toStringConsistent()}f,
                 |)
                 |
                 """.trimMargin(),
@@ -156,12 +157,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 element = """
                 |// C ${this}z
                 |curveTo(
-                |    x1 = ${x1}f,
-                |    y1 = ${y1}f,
-                |    x2 = ${x2}f,
-                |    y2 = ${y2}f,
-                |    x3 = ${x3}f,
-                |    y3 = ${y3}f,
+                |    x1 = ${x1.toStringConsistent()}f,
+                |    y1 = ${y1.toStringConsistent()}f,
+                |    x2 = ${x2.toStringConsistent()}f,
+                |    y2 = ${y2.toStringConsistent()}f,
+                |    x3 = ${x3.toStringConsistent()}f,
+                |    y3 = ${y3.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -174,12 +175,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 element = """
                 |// c ${this}z
                 |curveToRelative(
-                |    dx1 = ${x1}f,
-                |    dy1 = ${y1}f,
-                |    dx2 = ${x2}f,
-                |    dy2 = ${y2}f,
-                |    dx3 = ${x3}f,
-                |    dy3 = ${y3}f,
+                |    dx1 = ${x1.toStringConsistent()}f,
+                |    dy1 = ${y1.toStringConsistent()}f,
+                |    dx2 = ${x2.toStringConsistent()}f,
+                |    dy2 = ${y2.toStringConsistent()}f,
+                |    dx3 = ${x3.toStringConsistent()}f,
+                |    dy3 = ${y3.toStringConsistent()}f,
                 |)
                 |close()
                 |
@@ -221,12 +222,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("curveTo(")
-                    append("x1 = ${x1}f,")
-                    append(" y1 = ${y1}f,")
-                    append(" x2 = ${x2}f,")
-                    append(" y2 = ${y2}f,")
-                    append(" x3 = ${x3}f,")
-                    append(" y3 = ${y3}f")
+                    append("x1 = ${x1.toStringConsistent()}f,")
+                    append(" y1 = ${y1.toStringConsistent()}f,")
+                    append(" x2 = ${x2.toStringConsistent()}f,")
+                    append(" y2 = ${y2.toStringConsistent()}f,")
+                    append(" x3 = ${x3.toStringConsistent()}f,")
+                    append(" y3 = ${y3.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -236,12 +237,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("curveToRelative(")
-                    append("dx1 = ${x1}f,")
-                    append(" dy1 = ${y1}f,")
-                    append(" dx2 = ${x2}f,")
-                    append(" dy2 = ${y2}f,")
-                    append(" dx3 = ${x3}f,")
-                    append(" dy3 = ${y3}f")
+                    append("dx1 = ${x1.toStringConsistent()}f,")
+                    append(" dy1 = ${y1.toStringConsistent()}f,")
+                    append(" dx2 = ${x2.toStringConsistent()}f,")
+                    append(" dy2 = ${y2.toStringConsistent()}f,")
+                    append(" dx3 = ${x3.toStringConsistent()}f,")
+                    append(" dy3 = ${y3.toStringConsistent()}f")
                     append(")")
                 },
             )
@@ -281,12 +282,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("curveTo(")
-                    append("x1 = ${x1}f,")
-                    append(" y1 = ${y1}f,")
-                    append(" x2 = ${x2}f,")
-                    append(" y2 = ${y2}f,")
-                    append(" x3 = ${x3}f,")
-                    append(" y3 = ${y3}f")
+                    append("x1 = ${x1.toStringConsistent()}f,")
+                    append(" y1 = ${y1.toStringConsistent()}f,")
+                    append(" x2 = ${x2.toStringConsistent()}f,")
+                    append(" y2 = ${y2.toStringConsistent()}f,")
+                    append(" x3 = ${x3.toStringConsistent()}f,")
+                    append(" y3 = ${y3.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")
@@ -298,12 +299,12 @@ class SvgPathCurveToTests : BaseSvgTest() {
                 array = materialized,
                 element = buildString {
                     append("curveToRelative(")
-                    append("dx1 = ${x1}f,")
-                    append(" dy1 = ${y1}f,")
-                    append(" dx2 = ${x2}f,")
-                    append(" dy2 = ${y2}f,")
-                    append(" dx3 = ${x3}f,")
-                    append(" dy3 = ${y3}f")
+                    append("dx1 = ${x1.toStringConsistent()}f,")
+                    append(" dy1 = ${y1.toStringConsistent()}f,")
+                    append(" dx2 = ${x2.toStringConsistent()}f,")
+                    append(" dy2 = ${y2.toStringConsistent()}f,")
+                    append(" dx3 = ${x3.toStringConsistent()}f,")
+                    append(" dy3 = ${y3.toStringConsistent()}f")
                     append(")")
                     appendLine()
                     append("close()")

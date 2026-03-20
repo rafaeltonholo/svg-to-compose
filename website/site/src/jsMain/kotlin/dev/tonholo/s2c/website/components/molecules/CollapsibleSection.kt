@@ -16,8 +16,6 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.border
-import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
@@ -37,7 +35,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.fa.FaChevronDown
+import com.varabyte.kobweb.silk.components.icons.fa.FaChevronRight
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -47,20 +45,15 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.deg
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
 val CollapsibleContainerStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .border(1.px, LineStyle.Solid, palette.primary.toRgb().copyf(alpha = 0.2f))
-        .borderRadius(0.5.cssRem)
         .overflow(Overflow.Hidden)
 }
 
@@ -111,7 +104,7 @@ fun CollapsibleSection(
                     .fontWeight(FontWeight.SemiBold),
             )
             Spacer()
-            FaChevronDown(
+            FaChevronRight(
                 size = IconSize.SM,
                 modifier = Modifier
                     .color(ColorMode.current.toSitePalette().onSurfaceVariant)
@@ -122,7 +115,7 @@ fun CollapsibleSection(
                             timingFunction = TransitionTimingFunction.Ease,
                         ),
                     )
-                    .thenIf(expanded, Modifier.transform { rotate(180.deg) }),
+                    .thenIf(expanded, Modifier.transform { rotate(90.deg) }),
             )
         }
         // grid-template-rows transition: 0fr → 1fr for smooth GPU-composited expand
