@@ -52,9 +52,9 @@ val SectionContentStyle = CssStyle {
 @Composable
 fun SectionContainer(
     id: String,
-    altBackground: Boolean = false,
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
+    altBackground: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val palette = ColorMode.current.toSitePalette()

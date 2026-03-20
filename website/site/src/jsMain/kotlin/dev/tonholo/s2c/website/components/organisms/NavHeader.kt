@@ -39,9 +39,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
 import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.translateX
 import com.varabyte.kobweb.compose.ui.modifiers.width
-import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
@@ -67,6 +67,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AnimationDirection
@@ -98,9 +99,9 @@ val NavHeaderStyle = CssStyle.base {
 }
 
 @Composable
-fun NavHeader() {
+fun NavHeader(modifier: Modifier = Modifier) {
     Nav(
-        attrs = Modifier.fillMaxWidth().toAttrs(),
+        attrs = modifier.fillMaxWidth().toAttrs(),
     ) {
         Row(NavHeaderStyle.toModifier(), verticalAlignment = Alignment.CenterVertically) {
             S2CLogo()
@@ -152,7 +153,7 @@ private fun S2CLogo() {
                 .color(ColorMode.current.toSitePalette().primary)
                 .fontWeight(FontWeight.Bold)
                 .fontSize(1.25.cssRem)
-                .fontFamily("JetBrains Mono", "monospace"),
+                .fontFamily(values = FontFamilies.mono),
         )
         SpanText(
             "svg-to-compose",
@@ -247,7 +248,10 @@ enum class SideMenuState {
     CLOSED,
     OPEN,
 
-    CLOSING;
+    CLOSING,
+
+    ;
+
     fun close() = when (this) {
         CLOSED -> CLOSED
         OPEN -> CLOSING
@@ -274,8 +278,20 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                     .animation(
                         SideMenuSlideInAnim.toAnimation(
                             duration = 200.ms,
-                            timingFunction = if (menuState == SideMenuState.OPEN) AnimationTimingFunction.EaseOut else AnimationTimingFunction.EaseIn,
-                            direction = if (menuState == SideMenuState.OPEN) AnimationDirection.Normal else AnimationDirection.Reverse,
+                            timingFunction = if (menuState ==
+                                SideMenuState.OPEN
+                            ) {
+                                AnimationTimingFunction.EaseOut
+                            } else {
+                                AnimationTimingFunction.EaseIn
+                            },
+                            direction = if (menuState ==
+                                SideMenuState.OPEN
+                            ) {
+                                AnimationDirection.Normal
+                            } else {
+                                AnimationDirection.Reverse
+                            },
                             fillMode = AnimationFillMode.Forwards,
                         ),
                     )

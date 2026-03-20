@@ -1,9 +1,13 @@
 package dev.tonholo.s2c.website.components.organisms.playground
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
@@ -15,6 +19,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
+import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
@@ -31,12 +36,10 @@ import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.minWidth
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.role
-import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
+import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -50,46 +53,66 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.worker.rememberWorker
 import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.components.atoms.FileDropOverlay
+import dev.tonholo.s2c.website.components.atoms.FilePickerInput
+import dev.tonholo.s2c.website.components.atoms.MobileTabBar
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.OptionsContent
 import dev.tonholo.s2c.website.components.molecules.SectionContainer
+import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
 import dev.tonholo.s2c.website.components.molecules.playground.ComparisonStrip
 import dev.tonholo.s2c.website.components.molecules.playground.InputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.OutputPanel
 import dev.tonholo.s2c.website.components.molecules.playground.PlaygroundToolbar
+import dev.tonholo.s2c.website.components.molecules.playground.UploadPanel
+import dev.tonholo.s2c.website.state.playground.BatchPhase
+import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
+import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
+import dev.tonholo.s2c.website.state.playground.detectExtension
 import dev.tonholo.s2c.website.toSitePalette
-import dev.tonholo.s2c.website.worker.ConversionInput
-import dev.tonholo.s2c.website.worker.ConversionOutput
+import dev.tonholo.s2c.website.util.handleDrop
+import dev.tonholo.s2c.website.util.readFileAsText
 import dev.tonholo.s2c.website.worker.IconConvertWorker
+import dev.tonholo.s2c.website.zip.ZipLimitCheck
+import dev.tonholo.s2c.website.zip.checkZipFileCountLimit
+import dev.tonholo.s2c.website.zip.checkZipSizeLimit
+import dev.tonholo.s2c.website.zip.downloadAsZip
+import dev.tonholo.s2c.website.zip.extractFilesFromParsedZip
+import dev.tonholo.s2c.website.zip.parseZipEntries
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.ms
-import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.dom.Div
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.events.Event
+import org.w3c.files.File
 
 // region Styles
 
-/** Styles the playground heading area with bottom margin. */
 val PlaygroundHeadingContainerStyle = CssStyle.base {
     Modifier.margin(bottom = 1.cssRem)
 }
 
-/** Styles the editor panel wrapper with rounded border and hidden overflow. */
 val EditorPanelStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
+        .position(Position.Relative)
         .borderRadius(0.75.cssRem)
         .border(1.px, LineStyle.Solid, colorMode.toSitePalette().outlineVariant)
         .overflow(Overflow.Hidden)
 }
 
-/** Styles the solid purple convert action button. */
 val ConvertButtonStyle = CssStyle {
     base {
         val palette = colorMode.toSitePalette()
@@ -110,30 +133,33 @@ val ConvertButtonStyle = CssStyle {
     cssRule(":hover") {
         Modifier.backgroundColor(colorMode.toSitePalette().primaryContainer)
     }
+    cssRule(":focus-visible") {
+        val palette = colorMode.toSitePalette()
+        Modifier
+            .outline(2.px, LineStyle.Solid, palette.onPrimary)
+            .backgroundColor(palette.primaryContainer)
+    }
 }
 
-/** Styles the two-column desktop grid for input and output panels. */
 val DesktopPanelsStyle = CssStyle {
     base {
         Modifier
             .display(DisplayStyle.Grid)
-            .gridTemplateColumns { size(2.fr); size(3.fr) }
-            .minWidth(0.px)
-            .minHeight(300.px)
-            .overflow(Overflow.Hidden)
-            // No native Kobweb modifier for max-height with this value
-            .styleModifier {
-                property("max-height", "500px")
+            .gridTemplateColumns {
+                size(2.fr)
+                size(3.fr)
             }
+            .minWidth(0.px)
+            .height(500.px)
     }
     cssRule(" > *") {
         Modifier
             .overflow(Overflow.Auto)
             .minWidth(0.px)
+            .minHeight(0.px)
     }
 }
 
-/** Styles the mobile tab bar row with compact gap and header background. */
 val MobileTabBarStyle = CssStyle.base {
     Modifier
         .display(DisplayStyle.Flex)
@@ -142,36 +168,35 @@ val MobileTabBarStyle = CssStyle.base {
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
-/** Styles individual mobile tab buttons with active-state highlight. */
 val MobileTabStyle = CssStyle {
     base {
+        val palette = colorMode.toSitePalette()
         Modifier
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
-            .borderRadius(0.5.cssRem)
+            .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
             .cursor(Cursor.Pointer)
             .fontWeight(FontWeight.Medium)
             .fontSize(0.8.cssRem)
             .border(0.px, LineStyle.None, Colors.Transparent)
+            .borderBottom(width = 2.px, style = LineStyle.Solid, color = Colors.Transparent)
+            .borderRadius(0.px)
             .transition(
                 Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
-                Transition.of("background-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
+                Transition.of("border-bottom-color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
             )
             .flex(1)
             .textAlign(TextAlign.Center)
             .backgroundColor(Colors.Transparent)
-            .color(colorMode.toSitePalette().onSurfaceVariant)
+            .color(palette.onSurfaceVariant)
     }
-
     cssRule(".active") {
         val palette = colorMode.toSitePalette()
         Modifier
-            .backgroundColor(palette.primary)
-            .color(palette.onPrimary)
+            .color(palette.primary)
+            .fontWeight(FontWeight.SemiBold)
+            .borderBottom(width = 2.px, style = LineStyle.Solid, color = palette.primary)
     }
 }
 
-/** Styles the mobile panel content area with explicit height so child
- * panels (InputPanel, OutputPanel) can flex to fill the space. */
 val MobilePanelContentStyle = CssStyle.base {
     Modifier
         .height(50.vh)
@@ -182,75 +207,34 @@ val MobilePanelContentStyle = CssStyle.base {
 
 // endregion
 
-
 /**
  * Full-width playground section containing the code editor, live preview,
  * output panel, sample selector, and conversion options.
  */
 @Composable
-fun PlaygroundSection() {
+fun PlaygroundSection(modifier: Modifier = Modifier) {
     SectionContainer(
         id = "playground",
+        modifier = modifier,
         contentModifier = Modifier.maxWidth(96.cssRem),
     ) {
-        var state by remember { mutableStateOf(PlaygroundState()) }
+        val vm = remember { PlaygroundViewModel() }
+        val scope = rememberCoroutineScope()
+        var isDragOver by remember { mutableStateOf(false) }
+        var fileInputRef by remember { mutableStateOf<HTMLInputElement?>(null) }
+        var folderInputRef by remember { mutableStateOf<HTMLInputElement?>(null) }
 
         val worker = rememberWorker {
-            IconConvertWorker { output ->
-                when (output) {
-                    is ConversionOutput.Progress -> {
-                        state = state.copy(
-                            isConverting = true,
-                            conversionProgress = output.stage,
-                        )
-                    }
-
-                    is ConversionOutput.Success -> {
-                        state = state.copy(
-                            convertedKotlinCode = output.kotlinCode,
-                            iconFileContentsJson = output.iconFileContentsJson,
-                            isConverting = false,
-                            conversionProgress = "",
-                            conversionError = null,
-                        )
-                    }
-
-                    is ConversionOutput.Error -> {
-                        state = state.copy(
-                            isConverting = false,
-                            conversionProgress = "",
-                            conversionError = output.message,
-                        )
-                    }
-                }
-            }
+            IconConvertWorker { output -> vm.onWorkerOutput(output) }
         }
 
-        val onConvert = {
-            state = state.copy(
-                isConverting = true,
-                conversionError = null,
-                conversionProgress = "Starting conversion...",
-                zoomLevel = 1f,
-            )
-            worker.postInput(
-                ConversionInput(
-                    svgContent = state.inputCode,
-                    iconName = "MyIcon",
-                    fileType = state.extension,
-                    optimize = state.options.optimize,
-                    pkg = state.options.pkg,
-                    theme = state.options.theme,
-                    noPreview = state.options.noPreview,
-                    makeInternal = state.options.makeInternal,
-                    minified = state.options.minified,
-                    kmpPreview = state.options.kmpPreview,
-                    receiverType = state.options.receiverType,
-                ),
-            )
+        LaunchedEffect(vm.batchConvertIndex) {
+            val input = vm.prepareNextBatchFile() ?: return@LaunchedEffect
+            worker.postInput(input)
         }
 
-        // Heading
+        val onSelectFiles = rememberFileSelectedHandler(scope, vm)
+
         Div(attrs = PlaygroundHeadingContainerStyle.toModifier().toAttrs()) {
             SpanText(
                 "Try it",
@@ -259,158 +243,425 @@ fun PlaygroundSection() {
             )
         }
 
-        // Editor panel
-        Div(attrs = EditorPanelStyle.toModifier().toAttrs()) {
-            PlaygroundToolbar(
-                inputMode = state.inputMode,
-                extension = state.extension,
-                isConverting = state.isConverting,
-                sampleNames = samples.map { it.name },
-                selectedSample = state.selectedSample,
-                onSampleSelect = { index ->
-                    state = state.copy(
-                        selectedSample = index,
-                        inputCode = samples[index].svgCode,
+        HiddenFilePickers(
+            onFileInputRef = { fileInputRef = it },
+            onFolderInputRef = { folderInputRef = it },
+            onSelectFiles = onSelectFiles,
+        )
+
+        PlaygroundEditorPanel(
+            state = vm.state,
+            dispatch = vm::dispatch,
+            scope = scope,
+            completedCountByFolder = vm.completedCountByFolder,
+            isDragOver = isDragOver,
+            onConvert = { worker.postInput(vm.buildConvertInput()) },
+            onStartBatchConversion = vm::startBatchConversion,
+            onCancelBatch = vm::cancelBatch,
+            fileInputRef = fileInputRef,
+            folderInputRef = folderInputRef,
+            onDragOverChange = { isDragOver = it },
+            onSelectFiles = onSelectFiles,
+        )
+    }
+}
+
+@Composable
+private fun rememberFileSelectedHandler(
+    scope: CoroutineScope,
+    vm: PlaygroundViewModel,
+): (List<File>, Map<String, String>) -> Unit = remember(scope, vm) {
+    { files: List<File>, paths: Map<String, String> ->
+        val zipFile = files.firstOrNull { file ->
+            file.name.endsWith(".zip", ignoreCase = true)
+        }
+        if (zipFile != null) {
+            scope.launch {
+                when (val result = processZipUpload(zipFile)) {
+                    is ZipUploadResult.Success ->
+                        vm.loadFiles(result.files)
+
+                    is ZipUploadResult.Error ->
+                        vm.dispatch(PlaygroundAction.ZipUploadError(result.message))
+                }
+            }
+        } else {
+            val validFiles = files.filter { file ->
+                file.name.endsWith(".svg", ignoreCase = true) ||
+                    file.name.endsWith(".xml", ignoreCase = true)
+            }
+            when {
+                validFiles.size == 1 -> scope.launch {
+                    val file = validFiles.first()
+                    val content = readFileAsText(file)
+                    vm.dispatch(
+                        PlaygroundAction.SingleFileLoaded(file.name, content),
                     )
-                },
-                onInputModeChange = { state = state.copy(inputMode = it) },
-                onExtensionChange = { state = state.copy(extension = it) },
-                onConvert = onConvert,
+                }
+
+                validFiles.size > 1 -> scope.launch {
+                    val uploadedInfos = validFiles.map { file ->
+                        val content = readFileAsText(file)
+                        UploadedFileInfo(
+                            name = file.name,
+                            content = content,
+                            detectedExtension = detectExtension(content)
+                                ?: "svg",
+                            relativePath = paths[file.name] ?: "",
+                        )
+                    }
+                    vm.loadFiles(uploadedInfos)
+                }
+            }
+        }
+    }
+}
+
+private sealed interface ZipUploadResult {
+    data class Success(val files: List<UploadedFileInfo>) : ZipUploadResult
+    data class Error(val message: String) : ZipUploadResult
+}
+
+private suspend fun processZipUpload(file: File): ZipUploadResult {
+    val sizeCheck = checkZipSizeLimit(file)
+    if (sizeCheck is ZipLimitCheck.SizeWarning) {
+        val sizeMb = sizeCheck.sizeBytes / (1024 * 1024)
+        console.warn(
+            "Zip file is ${sizeMb.toInt()} MB, " +
+                "which exceeds the 50 MB soft limit.",
+        )
+    }
+
+    val parsedZip = try {
+        parseZipEntries(file)
+    } catch (e: IllegalStateException) {
+        console.error(e.message)
+        return ZipUploadResult.Error(
+            e.message ?: "Failed to read the zip file.",
+        )
+    }
+
+    val countCheck = checkZipFileCountLimit(parsedZip)
+    if (countCheck is ZipLimitCheck.FileCountWarning) {
+        console.warn(
+            "Zip contains ${countCheck.count} matching files, " +
+                "which exceeds the 200 file soft limit.",
+        )
+    }
+
+    val result = extractFilesFromParsedZip(parsedZip)
+    if (result.files.isEmpty() && result.errors.isEmpty()) {
+        return ZipUploadResult.Error(
+            "No SVG or Android Vector Drawable files found in the zip.",
+        )
+    }
+    return ZipUploadResult.Success(result.files)
+}
+
+@Composable
+private fun HiddenFilePickers(
+    onFileInputRef: (HTMLInputElement?) -> Unit,
+    onFolderInputRef: (HTMLInputElement?) -> Unit,
+    onSelectFiles: (List<File>, Map<String, String>) -> Unit,
+) {
+    FilePickerInput(
+        directory = false,
+        accept = ".svg,.xml,.zip",
+        inputRef = onFileInputRef,
+        onSelectFiles = { files -> onSelectFiles(files, emptyMap()) },
+    )
+    FilePickerInput(
+        directory = true,
+        inputRef = onFolderInputRef,
+        onSelectFiles = { files ->
+            val paths = mutableMapOf<String, String>()
+            files.forEach { file ->
+                val relPath = file.asDynamic().webkitRelativePath as? String ?: ""
+                val parts = relPath.split("/")
+                if (parts.size > 2) {
+                    paths[file.name] = parts.drop(1).dropLast(1).joinToString("/")
+                }
+            }
+            onSelectFiles(files, paths)
+        },
+    )
+}
+
+@Composable
+@Suppress("LongParameterList")
+private fun PlaygroundEditorPanel(
+    state: PlaygroundState,
+    dispatch: (PlaygroundAction) -> Unit,
+    scope: CoroutineScope,
+    completedCountByFolder: Map<String, Int>,
+    isDragOver: Boolean,
+    onConvert: () -> Unit,
+    onStartBatchConversion: () -> Unit,
+    onCancelBatch: () -> Unit,
+    fileInputRef: HTMLInputElement?,
+    folderInputRef: HTMLInputElement?,
+    onDragOverChange: (Boolean) -> Unit,
+    onSelectFiles: (List<File>, Map<String, String>) -> Unit,
+) {
+    var editorPanelElement by remember { mutableStateOf<HTMLElement?>(null) }
+
+    Div(
+        attrs = EditorPanelStyle.toModifier().toAttrs {
+            ref { element ->
+                editorPanelElement = element
+                onDispose { editorPanelElement = null }
+            }
+        },
+    ) {
+        DragAndDropEffect(editorPanelElement, scope, onSelectFiles, onDragOverChange)
+
+        if (isDragOver) FileDropOverlay()
+
+        PlaygroundToolbar(
+            inputMode = state.inputMode,
+            isConverting = state.isConverting,
+            sampleNames = samples.map { it.name },
+            selectedSample = state.selectedSample,
+            onSampleSelect = { dispatch(PlaygroundAction.SelectSample(it)) },
+            onInputModeChange = { dispatch(PlaygroundAction.ChangeInputMode(it)) },
+            onConvert = onConvert,
+        )
+
+        CollapsibleSection(title = "Options") {
+            OptionsContent(
+                options = state.options,
+                onOptionsChange = { dispatch(PlaygroundAction.ChangeOptions(it)) },
             )
+        }
 
-            // Collapsible options
-            CollapsibleSection(title = "Options") {
-                OptionsContent(
-                    options = state.options,
-                    onOptionsChange = { state = state.copy(options = it) },
-                )
-            }
+        PreviewSection(state, dispatch)
+        BatchOrCodePanels(
+            state = state,
+            dispatch = dispatch,
+            scope = scope,
+            completedCountByFolder = completedCountByFolder,
+            onStartBatchConversion = onStartBatchConversion,
+            onCancelBatch = onCancelBatch,
+            fileInputRef = fileInputRef,
+            folderInputRef = folderInputRef,
+        )
+    }
+}
 
-            // Desktop comparison strip (200px)
-            Div(attrs = Modifier.displayIfAtLeast(Breakpoint.MD).toAttrs()) {
-                ComparisonStrip(
-                    svgCode = state.inputCode,
-                    extension = state.extension,
-                    iconFileContentsJson = state.iconFileContentsJson,
-                    zoomLevel = state.zoomLevel,
-                    onZoomChange = { state = state.copy(zoomLevel = it) },
-                    previewSizePx = 200,
-                )
-            }
-
-            // Mobile comparison strip (140px)
-            Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
-                ComparisonStrip(
-                    svgCode = state.inputCode,
-                    extension = state.extension,
-                    iconFileContentsJson = state.iconFileContentsJson,
-                    zoomLevel = state.zoomLevel,
-                    onZoomChange = { state = state.copy(zoomLevel = it) },
-                    previewSizePx = 140,
-                )
-            }
-
-            DesktopPanels(
-                state = state,
-                onInputChange = { state = state.copy(inputCode = it) },
+@Composable
+private fun PreviewSection(state: PlaygroundState, dispatch: (PlaygroundAction) -> Unit) {
+    CollapsibleSection(
+        title = "Preview",
+        expanded = state.previewExpanded,
+        onExpandedChange = { dispatch(PlaygroundAction.ChangePreviewExpanded(it)) },
+    ) {
+        Div(attrs = Modifier.displayIfAtLeast(Breakpoint.MD).toAttrs()) {
+            ComparisonStrip(
+                svgCode = state.inputCode,
+                extension = state.extension,
+                iconFileContentsJson = state.iconFileContentsJson,
+                zoomLevel = state.zoomLevel,
+                onZoomChange = { dispatch(PlaygroundAction.ChangeZoom(it)) },
+                previewSizePx = 512,
             )
-            MobilePanels(
-                state = state,
-                onPanelSelect = { state = state.copy(activePanel = it) },
-                onInputChange = { state = state.copy(inputCode = it) },
+        }
+        Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
+            ComparisonStrip(
+                svgCode = state.inputCode,
+                extension = state.extension,
+                iconFileContentsJson = state.iconFileContentsJson,
+                zoomLevel = state.zoomLevel,
+                onZoomChange = { dispatch(PlaygroundAction.ChangeZoom(it)) },
+                previewSizePx = 140,
             )
         }
     }
 }
 
-/** Desktop two-column grid containing input and output panels. */
+@Composable
+@Suppress("LongParameterList")
+private fun BatchOrCodePanels(
+    state: PlaygroundState,
+    dispatch: (PlaygroundAction) -> Unit,
+    scope: CoroutineScope,
+    completedCountByFolder: Map<String, Int>,
+    onStartBatchConversion: () -> Unit,
+    onCancelBatch: () -> Unit,
+    fileInputRef: HTMLInputElement?,
+    folderInputRef: HTMLInputElement?,
+) {
+    val results = (state.batchPhase as? BatchPhase.Results)?.completed
+
+    if (state.viewingBatchResult && results != null) {
+        BatchNavigationBar(
+            viewingIndex = state.viewingBatchIndex,
+            totalResults = results.size,
+            onBack = { dispatch(PlaygroundAction.BackToBatchList) },
+            onPrev = { dispatch(PlaygroundAction.NavigatePrev) },
+            onNext = { dispatch(PlaygroundAction.NavigateNext) },
+        )
+    }
+
+    val showBatchPanel = state.batchPhase != null && !state.viewingBatchResult
+
+    if (showBatchPanel) {
+        BatchPanel(
+            state = state,
+            completedCountByFolder = completedCountByFolder,
+            onToggleSelectAll = { dispatch(PlaygroundAction.ToggleSelectAll) },
+            onToggleFileSelection = { dispatch(PlaygroundAction.ToggleFileSelection(it)) },
+            onToggleFolderSelection = { dispatch(PlaygroundAction.ToggleFolderSelection(it)) },
+            onSetFoldersSelection = { paths, selected ->
+                dispatch(PlaygroundAction.SetFoldersSelection(paths, selected))
+            },
+            onToggleFolderExpand = { dispatch(PlaygroundAction.ToggleFolderExpanded(it)) },
+            onStartConversion = onStartBatchConversion,
+            onCancel = onCancelBatch,
+            onDownload = {
+                val downloadResults = (state.batchPhase as? BatchPhase.Results)?.completed
+                if (downloadResults != null) {
+                    scope.launch { downloadAsZip(downloadResults) }
+                }
+            },
+            onRestart = { dispatch(PlaygroundAction.RestartBatch) },
+            onClear = { dispatch(PlaygroundAction.ClearBatchResults) },
+            onInspect = { dispatch(PlaygroundAction.InspectBatchResult(it)) },
+        )
+    } else {
+        DesktopPanels(state, dispatch, fileInputRef, folderInputRef)
+        MobilePanels(state, dispatch, fileInputRef, folderInputRef)
+    }
+}
+
 @Composable
 private fun DesktopPanels(
     state: PlaygroundState,
-    onInputChange: (String) -> Unit,
+    dispatch: (PlaygroundAction) -> Unit,
+    fileInputRef: HTMLInputElement?,
+    folderInputRef: HTMLInputElement?,
 ) {
     Div(
         attrs = DesktopPanelsStyle.toModifier()
             .displayIfAtLeast(Breakpoint.MD)
             .toAttrs(),
     ) {
-        InputPanel(state.inputCode, onInputChange)
+        InputOrUploadPanel(state, dispatch, fileInputRef, folderInputRef)
         OutputPanel(
             kotlinCode = state.convertedKotlinCode,
             isConverting = state.isConverting,
             conversionProgress = state.conversionProgress,
             conversionError = state.conversionError,
+            fileName = state.outputFileName,
         )
     }
 }
 
-/** Mobile tabbed view switching between input and output panels. */
 @Composable
 private fun MobilePanels(
     state: PlaygroundState,
-    onPanelSelect: (Int) -> Unit,
-    onInputChange: (String) -> Unit,
+    dispatch: (PlaygroundAction) -> Unit,
+    fileInputRef: HTMLInputElement?,
+    folderInputRef: HTMLInputElement?,
 ) {
-    val mobileTabs = listOf("Input", "Output")
     Div(attrs = Modifier.displayUntil(Breakpoint.MD).toAttrs()) {
-        // Tab bar
-        Div(
-            attrs = MobileTabBarStyle.toModifier()
-                .role("tablist")
-                .toAttrs(),
-        ) {
-            mobileTabs.forEachIndexed { index, tab ->
-                val isSelected = index == state.activePanel
-                Div(
-                    attrs = MobileTabStyle
-                        .toModifier()
-                        .onClick { onPanelSelect(index) }
-                        .tabIndex(if (isSelected) 0 else -1)
-                        .toAttrs {
-                            attr("role", "tab")
-                            attr("aria-selected", isSelected.toString())
-                            if (isSelected) {
-                                classes("active")
-                            }
-                            onKeyDown { event ->
-                                when (event.key) {
-                                    "ArrowLeft" -> {
-                                        event.preventDefault()
-                                        val prev = if (index > 0) index - 1 else mobileTabs.lastIndex
-                                        onPanelSelect(prev)
-                                    }
-                                    "ArrowRight" -> {
-                                        event.preventDefault()
-                                        val next = if (index < mobileTabs.lastIndex) index + 1 else 0
-                                        onPanelSelect(next)
-                                    }
-                                    " ", "Enter" -> {
-                                        event.preventDefault()
-                                        onPanelSelect(index)
-                                    }
-                                }
-                            }
-                        },
-                ) {
-                    SpanText(tab)
-                }
-            }
-        }
-        // Active panel content
+        MobileTabBar(
+            tabs = listOf("Input", "Output"),
+            activePanel = state.activePanel,
+            onPanelSelect = { dispatch(PlaygroundAction.SelectMobilePanel(it)) },
+        )
         Div(
             attrs = MobilePanelContentStyle.toModifier().toAttrs {
                 attr("role", "tabpanel")
             },
         ) {
             when (state.activePanel) {
-                0 -> InputPanel(state.inputCode, onInputChange)
+                0 -> InputOrUploadPanel(state, dispatch, fileInputRef, folderInputRef)
+
                 1 -> OutputPanel(
                     kotlinCode = state.convertedKotlinCode,
                     isConverting = state.isConverting,
                     conversionProgress = state.conversionProgress,
                     conversionError = state.conversionError,
+                    fileName = state.outputFileName,
                 )
             }
         }
     }
 }
+
+@Composable
+private fun InputOrUploadPanel(
+    state: PlaygroundState,
+    dispatch: (PlaygroundAction) -> Unit,
+    fileInputRef: HTMLInputElement?,
+    folderInputRef: HTMLInputElement?,
+) {
+    if (state.inputMode == "upload") {
+        UploadPanel(
+            onFilePickerClick = { fileInputRef?.click() },
+            onFolderPickerClick = { folderInputRef?.click() },
+        )
+    } else {
+        InputPanel(
+            state.inputCode,
+            onInputChange = { dispatch(PlaygroundAction.UpdateInputCode(it)) },
+            onPaste = { dispatch(PlaygroundAction.LoadContent(it)) },
+            fileName = state.inputFileName,
+        )
+    }
+}
+
+// region Drag and drop
+
+@Composable
+private fun DragAndDropEffect(
+    element: HTMLElement?,
+    scope: CoroutineScope,
+    onSelectFiles: (List<File>, Map<String, String>) -> Unit,
+    onDragOverChange: (Boolean) -> Unit,
+) {
+    val currentOnSelectFiles by rememberUpdatedState(onSelectFiles)
+    val currentOnDragOverChange by rememberUpdatedState(onDragOverChange)
+
+    DisposableEffect(element) {
+        val el = element ?: return@DisposableEffect onDispose { }
+        var counter = 0
+
+        val onDragEnter: (Event) -> Unit = { e ->
+            e.preventDefault()
+            e.stopPropagation()
+            counter++
+            currentOnDragOverChange(true)
+        }
+        val onDragOver: (Event) -> Unit = { e -> e.preventDefault() }
+        val onDragLeave: (Event) -> Unit = { e ->
+            e.preventDefault()
+            e.stopPropagation()
+            counter--
+            if (counter <= 0) {
+                counter = 0
+                currentOnDragOverChange(false)
+            }
+        }
+        val onDrop: (Event) -> Unit = { e ->
+            e.preventDefault()
+            e.stopPropagation()
+            currentOnDragOverChange(false)
+            counter = 0
+            handleDrop(e, scope, currentOnSelectFiles)
+        }
+
+        el.addEventListener("dragenter", onDragEnter)
+        el.addEventListener("dragover", onDragOver)
+        el.addEventListener("dragleave", onDragLeave)
+        el.addEventListener("drop", onDrop)
+        onDispose {
+            el.removeEventListener("dragenter", onDragEnter)
+            el.removeEventListener("dragover", onDragOver)
+            el.removeEventListener("dragleave", onDragLeave)
+            el.removeEventListener("drop", onDrop)
+        }
+    }
+}
+
+// endregion

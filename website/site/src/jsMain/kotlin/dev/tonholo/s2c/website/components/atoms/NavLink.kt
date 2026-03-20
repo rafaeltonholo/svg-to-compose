@@ -34,11 +34,11 @@ val NavLinkStyle = CssStyle {
 }
 
 @Composable
-fun NavLink(href: String, text: String) {
+fun NavLink(href: String, text: String, modifier: Modifier = Modifier) {
     Link(
         href,
         text,
         variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-        modifier = NavLinkStyle.toModifier(),
+        modifier = NavLinkStyle.toModifier().then(modifier),
     )
 }

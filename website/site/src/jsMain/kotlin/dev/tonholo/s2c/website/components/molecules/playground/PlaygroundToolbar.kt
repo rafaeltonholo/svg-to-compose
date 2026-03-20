@@ -105,8 +105,8 @@ val SampleButtonStyle = CssStyle {
         Modifier
             .border(1.px, LineStyle.Solid, palette.outline)
             .borderRadius(0.5.cssRem)
-            .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
-            .fontSize(0.75.cssRem)
+            .padding(topBottom = 0.75.cssRem, leftRight = 0.875.cssRem)
+            .fontSize(0.8.cssRem)
             .fontWeight(FontWeight.Medium)
             .color(palette.onSurfaceVariant)
             .backgroundColor(palette.surface)
@@ -170,117 +170,97 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
 @Composable
 fun PlaygroundToolbar(
     inputMode: String,
-    extension: String,
     isConverting: Boolean,
     sampleNames: List<String>,
     selectedSample: Int,
     onSampleSelect: (Int) -> Unit,
     onInputModeChange: (String) -> Unit,
-    onExtensionChange: (String) -> Unit,
     onConvert: () -> Unit,
 ) {
     Div(attrs = ToolbarStyle.toModifier().toAttrs()) {
-        // Sample buttons
-        Div(
-            attrs = Modifier
-                .display(DisplayStyle.Flex)
-                .flexWrap(FlexWrap.Wrap)
-                .gap(0.375.cssRem)
-                .toAttrs(),
+        SampleButtons(sampleNames, selectedSample, onSampleSelect)
+        ToolbarSeparator()
+        InputModeButtons(inputMode, onInputModeChange)
+        ConvertButton(isConverting, onConvert)
+    }
+}
+
+@Composable
+private fun SampleButtons(sampleNames: List<String>, selectedSample: Int, onSampleSelect: (Int) -> Unit) {
+    Div(
+        attrs = Modifier
+            .display(DisplayStyle.Flex)
+            .flexWrap(FlexWrap.Wrap)
+            .gap(0.375.cssRem)
+            .toAttrs(),
+    ) {
+        sampleNames.forEachIndexed { index, name ->
+            Button(
+                attrs = SampleButtonStyle.toModifier()
+                    .onClick { onSampleSelect(index) }
+                    .toAttrs {
+                        if (index == selectedSample) classes("active")
+                    },
+            ) {
+                SpanText(name)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToolbarSeparator() {
+    Div(
+        attrs = Modifier
+            .width(1.px)
+            .height(1.cssRem)
+            .backgroundColor(ColorMode.current.toSitePalette().outline)
+            .toAttrs(),
+    )
+}
+
+@Composable
+private fun InputModeButtons(inputMode: String, onInputModeChange: (String) -> Unit) {
+    ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
+        ToolbarButton(
+            active = inputMode == "paste",
+            onClick = { onInputModeChange("paste") },
         ) {
-            sampleNames.forEachIndexed { index, name ->
-                Button(
-                    attrs = SampleButtonStyle.toModifier()
-                        .onClick { onSampleSelect(index) }
-                        .toAttrs {
-                            if (index == selectedSample) {
-                                classes("active")
-                            }
-                        },
-                ) {
-                    SpanText(name)
-                }
-            }
+            FaClipboard()
+            SpanText("Paste Code")
         }
-
-        // Separator
-        Div(
-            attrs = Modifier
-                .width(1.px)
-                .height(1.cssRem)
-                .backgroundColor(ColorMode.current.toSitePalette().outline)
-                .toAttrs(),
-        )
-
-        // Input mode buttons
-        ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
-            ToolbarButton(
-                active = inputMode == "paste",
-                onClick = { onInputModeChange("paste") },
-            ) {
-                FaClipboard()
-                SpanText("Paste Code")
-            }
-
-            ToolbarButton(
-                active = inputMode == "upload",
-                onClick = { onInputModeChange("upload") },
-            ) {
-                FaUpload()
-                SpanText("Upload File")
-            }
-        }
-
-        // Separator
-        Div(
-            attrs = Modifier
-                .width(1.px)
-                .height(1.cssRem)
-                .backgroundColor(ColorMode.current.toSitePalette().outline)
-                .toAttrs(),
-        )
-
-        // Format buttons
-        ToolbarButtonRow(modifier = ToolbarButtonRowStyle.toModifier()) {
-            ToolbarButton(
-                active = extension == "svg",
-                onClick = { onExtensionChange("svg") },
-            ) {
-                SpanText("SVG")
-            }
-            ToolbarButton(
-                active = extension == "avg",
-                onClick = { onExtensionChange("avg") },
-            ) {
-                SpanText("AVG (Android XML)")
-            }
-        }
-
-        // Convert button
-        Button(
-            attrs = ConvertButtonStyle.toModifier()
-                .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.4.cssRem)
-                .let { if (isConverting) it.opacity(value = 0.7f).cursor(Cursor.Default) else it }
-                .onClick { if (!isConverting) onConvert() }
-                .toAttrs(),
+        ToolbarButton(
+            active = inputMode == "upload",
+            onClick = { onInputModeChange("upload") },
         ) {
-            if (isConverting) {
-                FaSpinner(modifier = SpinnerIconStyle.toModifier())
-                SpanText("Converting...")
-            } else {
-                FaPlay()
-                SpanText("Convert")
-            }
+            FaUpload()
+            SpanText("Upload File")
+        }
+    }
+}
+
+@Composable
+private fun ConvertButton(isConverting: Boolean, onConvert: () -> Unit) {
+    Button(
+        attrs = ConvertButtonStyle.toModifier()
+            .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.4.cssRem)
+            .let { if (isConverting) it.opacity(value = 0.7f).cursor(Cursor.Default) else it }
+            .onClick { if (!isConverting) onConvert() }
+            .toAttrs(),
+    ) {
+        if (isConverting) {
+            FaSpinner(modifier = SpinnerIconStyle.toModifier())
+            SpanText("Converting...")
+        } else {
+            FaPlay()
+            SpanText("Convert")
         }
     }
 }
 
 /** Row wrapper that applies [ToolbarButtonRowStyle] for grouped button layout. */
 @Composable
-fun ToolbarButtonRow(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit,
-) {
+fun ToolbarButtonRow(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(modifier = ToolbarButtonRowStyle.toModifier().then(modifier), content = content)
 }
 
@@ -293,7 +273,6 @@ fun ToolbarButton(
     variant: CssStyleVariant<ToolbarButtonKind>? = null,
     content: @Composable () -> Unit,
 ) {
-
     Button(
         attrs = ToolbarButtonStyle
             .toModifier(variant)

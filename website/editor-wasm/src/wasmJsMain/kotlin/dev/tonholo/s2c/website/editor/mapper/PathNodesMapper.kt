@@ -38,15 +38,21 @@ private fun PathBuilder.handleVerticalLineTo(node: PathNodes.VerticalLineTo) {
 private fun PathBuilder.handleCurveTo(node: PathNodes.CurveTo) {
     if (node.isRelative) {
         curveToRelative(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
-            node.x3.toFloat(), node.y3.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
+            node.x3.toFloat(),
+            node.y3.toFloat(),
         )
     } else {
         curveTo(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
-            node.x3.toFloat(), node.y3.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
+            node.x3.toFloat(),
+            node.y3.toFloat(),
         )
     }
 }
@@ -54,13 +60,17 @@ private fun PathBuilder.handleCurveTo(node: PathNodes.CurveTo) {
 private fun PathBuilder.handleReflectiveCurveTo(node: PathNodes.ReflectiveCurveTo) {
     if (node.isRelative) {
         reflectiveCurveToRelative(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
         )
     } else {
         reflectiveCurveTo(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
         )
     }
 }
@@ -68,13 +78,17 @@ private fun PathBuilder.handleReflectiveCurveTo(node: PathNodes.ReflectiveCurveT
 private fun PathBuilder.handleQuadTo(node: PathNodes.QuadTo) {
     if (node.isRelative) {
         quadToRelative(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
         )
     } else {
         quadTo(
-            node.x1.toFloat(), node.y1.toFloat(),
-            node.x2.toFloat(), node.y2.toFloat(),
+            node.x1.toFloat(),
+            node.y1.toFloat(),
+            node.x2.toFloat(),
+            node.y2.toFloat(),
         )
     }
 }

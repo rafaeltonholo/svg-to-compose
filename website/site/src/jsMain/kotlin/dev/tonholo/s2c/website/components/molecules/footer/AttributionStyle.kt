@@ -23,6 +23,7 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
@@ -30,7 +31,7 @@ import org.jetbrains.compose.web.css.ms
 val AttributionStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .fontFamily("IBM Plex Sans")
+        .fontFamily(values = FontFamilies.sans)
         .fontSize(0.75.cssRem)
         .lineHeight(1.125.cssRem)
         .color(palette.onSurfaceVariant)
@@ -56,10 +57,10 @@ val AttributionLinkVariant = LinkStyle.addVariant {
 }
 
 @Composable
-fun Attribution() {
+fun Attribution(modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(0.375.cssRem),
-        modifier = AttributionStyle.toModifier(),
+        modifier = AttributionStyle.toModifier().then(modifier),
     ) {
         SpanText("Built with ❤️ by")
         Link(path = "https://rafael.tonholo.dev", text = "Rafael Tonholo", variant = AttributionLinkVariant)

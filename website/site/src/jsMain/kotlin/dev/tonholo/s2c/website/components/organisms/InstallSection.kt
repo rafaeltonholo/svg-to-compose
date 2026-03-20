@@ -2,6 +2,7 @@ package dev.tonholo.s2c.website.components.organisms
 
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
@@ -12,7 +13,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.minWidth
-import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -48,9 +48,9 @@ val InstallGridStyle = CssStyle {
 }
 
 @Composable
-fun InstallSection() {
+fun InstallSection(modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
-    SectionContainer(id = "install", altBackground = true) {
+    SectionContainer(id = "install", modifier = modifier, altBackground = true) {
         SpanText(
             "Install",
             modifier = LabelTextStyle.toModifier()

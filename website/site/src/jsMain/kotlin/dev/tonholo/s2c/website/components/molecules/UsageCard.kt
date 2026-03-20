@@ -47,10 +47,11 @@ val UsageCardStyle = CssStyle.base {
 fun UsageCard(
     title: String,
     description: String,
+    modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Div(attrs = UsageCardStyle.toModifier().toAttrs()) {
+    Div(attrs = UsageCardStyle.toModifier().then(modifier).toAttrs()) {
         Div(
             attrs = Modifier
                 .display(DisplayStyle.Flex)

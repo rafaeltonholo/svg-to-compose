@@ -62,7 +62,6 @@ private const val S2C_CONVERT_MATERIAL_ICON_RECEIVER = """
 |  icon.svg
 """
 
-
 val UsageCardGridStyle = CssStyle {
     base {
         Modifier
@@ -98,8 +97,8 @@ val OptionsTableStyle = CssStyle.base {
 }
 
 @Composable
-fun CliUsageContent() {
-    Div(attrs = UsageCardGridStyle.toModifier().toAttrs()) {
+fun CliUsageContent(modifier: Modifier = Modifier) {
+    Div(attrs = UsageCardGridStyle.toModifier().then(modifier).toAttrs()) {
         UsageCard(
             title = "Convert a Single File",
             description = "Convert a single SVG file to a Kotlin ImageVector.",

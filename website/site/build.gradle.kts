@@ -26,7 +26,7 @@ kobweb {
                 }
                 link {
                     href = "https://fonts.googleapis.com/css2" +
-                        "?family=IBM+Plex+Sans:wght@400;500;600;700" +
+                        "?family=Space+Grotesk:wght@400;500;600;700" +
                         "&family=JetBrains+Mono:wght@400;500;700" +
                         "&display=swap"
                     rel = "stylesheet"
@@ -54,11 +54,13 @@ kotlin {
         jsMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.html.core)
+            implementation(libs.compose.viewmodel)
             implementation(libs.kobweb.core)
             implementation(libs.kobweb.silk)
             implementation(libs.silk.icons.fa)
             implementation(libs.dev.tonholo.s2c)
             implementation(project(":worker"))
+            implementation(npm("jszip", libs.versions.jszip.get()))
         }
     }
 }

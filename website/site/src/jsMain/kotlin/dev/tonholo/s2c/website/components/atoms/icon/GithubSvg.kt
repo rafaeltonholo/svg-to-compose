@@ -15,9 +15,7 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.w3c.dom.svg.SVGGElement
 
 @Composable
-fun GithubSvg(
-    color: Color = Color.rgb(value = 0x78716C),
-) {
+fun GithubSvg(color: Color = Color.rgb(value = 0x78716C)) {
     Svg(
         attrs = {
             viewBox(x = 0, y = 0, width = 13, height = 13)

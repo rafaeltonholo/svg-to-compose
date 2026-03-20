@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,7 +24,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.size
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -45,6 +46,8 @@ import org.jetbrains.compose.web.dom.Iframe
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.events.MouseEvent
 
+private const val VIEWBOX_PARTS_COUNT = 4
+
 val ComparisonStripStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
@@ -64,7 +67,8 @@ fun ComparisonStrip(
     iconFileContentsJson: String?,
     zoomLevel: Float,
     onZoomChange: (Float) -> Unit,
-    previewSizePx: Int = 96,
+    modifier: Modifier = Modifier,
+    previewSizePx: Int = 128,
 ) {
     val palette = ColorMode.current.toSitePalette()
 
@@ -73,8 +77,8 @@ fun ComparisonStrip(
     }
 
     // Shared pan offset — synced between both previews
-    var panX by remember { mutableStateOf(0f) }
-    var panY by remember { mutableStateOf(0f) }
+    var panX by remember { mutableFloatStateOf(0f) }
+    var panY by remember { mutableFloatStateOf(0f) }
 
     // Reset pan when zoom changes
     LaunchedEffect(zoomLevel) {
@@ -83,7 +87,7 @@ fun ComparisonStrip(
     }
 
     Column(
-        modifier = ComparisonStripStyle.toModifier(),
+        modifier = ComparisonStripStyle.toModifier().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
@@ -110,22 +114,23 @@ fun ComparisonStrip(
                         containerSizePx = previewSizePx,
                     )
                 }
-                SpanText(
-                    "Source",
-                    modifier = Modifier
-                        .fontSize(0.7.cssRem)
-                        .color(palette.onSurfaceVariant),
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.gap(0.5.cssRem),
+                ) {
+                    SpanText(
+                        "Source",
+                        modifier = Modifier
+                            .fontSize(0.7.cssRem)
+                            .color(palette.onSurfaceVariant),
+                    )
+                    Badge(
+                        text = extension.uppercase(),
+                        color = palette.onSurfaceVariant,
+                        variant = SquaredBadge,
+                    )
+                }
             }
-
-            // "vs" label
-            SpanText(
-                "vs",
-                modifier = Modifier
-                    .fontSize(0.7.cssRem)
-                    .color(palette.onSurfaceVariant)
-                    .padding(top = (previewSizePx / 2 - 8).px),
-            )
 
             // Converted preview
             Column(
@@ -181,7 +186,7 @@ private fun computeNativeScale(svgCode: String, containerSizePx: Int): Float? {
     val match = viewBoxRegex.find(svgCode) ?: return null
     val parts = match.groupValues[1].split(Regex("[\\s,]+"))
         .mapNotNull { it.trim().toDoubleOrNull() }
-    if (parts.size < 4) return null
+    if (parts.size < VIEWBOX_PARTS_COUNT) return null
     val svgWidth = parts[2]
     if (svgWidth <= 0) return null
     return (svgWidth / containerSizePx).toFloat()
@@ -246,51 +251,25 @@ private fun FittedSvgPreview(
         attrs = Modifier
             .size(containerSizePx.px)
             .cursor(if (zoomLevel > 1f) Cursor.Grab else Cursor.Default)
-            .styleModifier {
-                // Visual zoom + pan via CSS transform. No layout change —
-                // the container clips overflow and drag-to-pan moves the view.
-                property(
-                    "transform",
-                    "scale($zoomLevel) translate(${panX}px, ${panY}px)",
-                )
-                property("transform-origin", "center center")
+            .transform {
+                scale(zoomLevel)
+                translate(panX.px, panY.px)
             }
             .toAttrs {
                 if (zoomLevel > 1f) {
-                    onMouseDown { event ->
-                        isDragging = true
-                        event.preventDefault()
-                        (event.currentTarget as? org.w3c.dom.HTMLElement)
-                            ?.style?.cursor = "grabbing"
-                    }
-                    onMouseMove { event ->
-                        if (isDragging) {
-                            val mouseEvent = event.nativeEvent as? MouseEvent
-                            if (mouseEvent != null) {
-                                // Movement delta divided by zoom so pan speed
-                                // matches cursor movement at the zoomed scale.
-                                onPan(
-                                    mouseEvent.asDynamic().movementX as Float / zoomLevel,
-                                    mouseEvent.asDynamic().movementY as Float / zoomLevel,
-                                )
-                            }
-                        }
-                    }
-                    onMouseUp {
-                        isDragging = false
-                        (it.currentTarget as? org.w3c.dom.HTMLElement)
-                            ?.style?.cursor = "grab"
-                    }
-                    onMouseLeave {
-                        isDragging = false
-                    }
+                    attachDragHandlers(
+                        isDragging = isDragging,
+                        zoomLevel = zoomLevel,
+                        onDragStart = { isDragging = true },
+                        onDragEnd = { isDragging = false },
+                        onPan = onPan,
+                    )
                 }
             },
     ) {
         DisposableEffect(svgCode) {
             scopeElement.innerHTML = svgCode
-            val svg = scopeElement.querySelector("svg")
-            if (svg != null) {
+            scopeElement.querySelector("svg")?.let { svg ->
                 svg.setAttribute("width", "100%")
                 svg.setAttribute("height", "100%")
                 svg.asDynamic().style.display = "block"
@@ -300,14 +279,35 @@ private fun FittedSvgPreview(
     }
 }
 
-@Composable
-private fun ComparisonIframe(
-    iconFileContentsJson: String?,
+private fun org.jetbrains.compose.web.attributes.AttrsScope<*>.attachDragHandlers(
+    isDragging: Boolean,
     zoomLevel: Float,
-    panX: Float,
-    panY: Float,
-    sizePx: Int,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
+    onPan: (Float, Float) -> Unit,
 ) {
+    onMouseDown { event ->
+        onDragStart()
+        event.preventDefault()
+        (event.currentTarget as? org.w3c.dom.HTMLElement)?.style?.cursor = "grabbing"
+    }
+    onMouseMove { event ->
+        if (!isDragging) return@onMouseMove
+        val mouseEvent = event.nativeEvent as? MouseEvent ?: return@onMouseMove
+        onPan(
+            mouseEvent.asDynamic().movementX as Float / zoomLevel,
+            mouseEvent.asDynamic().movementY as Float / zoomLevel,
+        )
+    }
+    onMouseUp {
+        onDragEnd()
+        (it.currentTarget as? org.w3c.dom.HTMLElement)?.style?.cursor = "grab"
+    }
+    onMouseLeave { onDragEnd() }
+}
+
+@Composable
+private fun ComparisonIframe(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float, sizePx: Int) {
     var iframeLoaded by remember { mutableStateOf(false) }
     val iframeRef = remember { mutableStateOf<HTMLIFrameElement?>(null) }
 

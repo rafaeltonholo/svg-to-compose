@@ -9,6 +9,7 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeColor
 import dev.tonholo.s2c.domain.compose.GradientTileMode
 
+private const val HEX_RADIX = 16
 private val commentRegex = "/\\*.*?\\*/".toRegex()
 
 /** Converts a [ComposeBrush] domain model to a Compose [Brush]. */
@@ -44,14 +45,13 @@ private fun parseColor(composeColor: ComposeColor): Color? {
     if (hex.lowercase() == "none") return null
     return try {
         val cleaned = hex.replace(commentRegex, "").trim()
-        Color(cleaned.toLong(16).toInt())
+        Color(cleaned.toLong(HEX_RADIX).toInt())
     } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
         // Return null so the brush factory can skip unparseable colors
         // rather than silently rendering black.
         null
     }
 }
-
 
 /** Converts a [GradientTileMode] domain value to a Compose [TileMode]. */
 private fun GradientTileMode.toTileMode(): TileMode = when (value.lowercase()) {

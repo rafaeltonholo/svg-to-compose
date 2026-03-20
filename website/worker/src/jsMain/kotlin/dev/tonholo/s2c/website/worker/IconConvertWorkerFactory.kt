@@ -68,8 +68,11 @@ private const val PROGRESS_GENERATING = 80
 /** Maps a [ConversionStep] to a [ConversionOutput] for the UI. */
 private fun ConversionStep.toConversionOutput(json: Json): ConversionOutput = when (this) {
     is ConversionStep.Optimizing -> ConversionOutput.Progress(message, percent = PROGRESS_OPTIMIZING)
+
     is ConversionStep.Parsing -> ConversionOutput.Progress(message, percent = PROGRESS_PARSING)
+
     is ConversionStep.Generating -> ConversionOutput.Progress(message, percent = PROGRESS_GENERATING)
+
     is ConversionStep.Complete -> ConversionOutput.Success(
         kotlinCode = result.kotlinCode,
         iconFileContentsJson = json.encodeToString(

@@ -24,9 +24,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.role
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -37,6 +37,7 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 
 val TabBarContainerStyle = CssStyle.base {
     Modifier
@@ -94,54 +95,24 @@ fun TabPanel(
     tabs: List<String>,
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     tabContent: ((index: Int, label: String) -> @Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Div(attrs = Modifier.fillMaxWidth().toAttrs()) {
+    Div(attrs = modifier.fillMaxWidth().toAttrs()) {
         Div(attrs = TabBarContainerStyle.toModifier().toAttrs()) {
             Row(
                 modifier = TabBarStyle.toModifier().role("tablist"),
             ) {
                 tabs.forEachIndexed { index, tab ->
-                    val isSelected = index == selectedIndex
-                    val style = if (isSelected) ActiveTabStyle else InactiveTabStyle
-                    Div(
-                        attrs = style.toModifier()
-                            .onClick { onSelect(index) }
-                            .tabIndex(if (isSelected) 0 else -1)
-                            .display(DisplayStyle.LegacyInlineFlex)
-                            .alignItems(AlignItems.Center)
-                            .gap(0.375.cssRem)
-                            .toAttrs {
-                                attr("role", "tab")
-                                attr("aria-selected", isSelected.toString())
-                                onKeyDown { event ->
-                                    when (event.key) {
-                                        "ArrowLeft" -> {
-                                            event.preventDefault()
-                                            val prev = if (index > 0) index - 1 else tabs.lastIndex
-                                            onSelect(prev)
-                                        }
-                                        "ArrowRight" -> {
-                                            event.preventDefault()
-                                            val next = if (index < tabs.lastIndex) index + 1 else 0
-                                            onSelect(next)
-                                        }
-                                        " ", "Enter" -> {
-                                            event.preventDefault()
-                                            onSelect(index)
-                                        }
-                                    }
-                                }
-                            },
-                    ) {
-                        val customContent = tabContent?.invoke(index, tab)
-                        if (customContent != null) {
-                            customContent()
-                        } else {
-                            SpanText(tab)
-                        }
-                    }
+                    TabItem(
+                        tab = tab,
+                        index = index,
+                        isSelected = index == selectedIndex,
+                        tabs = tabs,
+                        onSelect = onSelect,
+                        tabContent = tabContent,
+                    )
                 }
             }
         }
@@ -154,6 +125,61 @@ fun TabPanel(
                 },
         ) {
             content()
+        }
+    }
+}
+
+@Composable
+private fun TabItem(
+    tab: String,
+    index: Int,
+    isSelected: Boolean,
+    tabs: List<String>,
+    onSelect: (Int) -> Unit,
+    tabContent: ((index: Int, label: String) -> @Composable () -> Unit)?,
+) {
+    val style = if (isSelected) ActiveTabStyle else InactiveTabStyle
+    Div(
+        attrs = style.toModifier()
+            .onClick { onSelect(index) }
+            .tabIndex(if (isSelected) 0 else -1)
+            .display(DisplayStyle.LegacyInlineFlex)
+            .alignItems(AlignItems.Center)
+            .gap(0.375.cssRem)
+            .toAttrs {
+                attr("role", "tab")
+                attr("aria-selected", isSelected.toString())
+                onKeyDown { event ->
+                    handleTabKeyDown(event, index, tabs, onSelect)
+                }
+            },
+    ) {
+        val customContent = tabContent?.invoke(index, tab)
+        if (customContent != null) {
+            customContent()
+        } else {
+            SpanText(tab)
+        }
+    }
+}
+
+private fun handleTabKeyDown(event: SyntheticKeyboardEvent, index: Int, tabs: List<String>, onSelect: (Int) -> Unit) {
+    when (event.key) {
+        "ArrowLeft" -> {
+            event.preventDefault()
+            val prev = if (index > 0) index - 1 else tabs.lastIndex
+            onSelect(prev)
+        }
+
+        "ArrowRight" -> {
+            event.preventDefault()
+            val next = if (index < tabs.lastIndex) index + 1 else 0
+            onSelect(next)
+        }
+
+        " ", "Enter" -> {
+            event.preventDefault()
+            onSelect(index)
         }
     }
 }

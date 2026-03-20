@@ -2,7 +2,7 @@ package dev.tonholo.s2c.website.components.organisms
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -33,8 +33,8 @@ val UsageTabContentStyle = CssStyle.base {
 }
 
 @Composable
-fun HowToUseSection() {
-    SectionContainer(id = "usage") {
+fun HowToUseSection(modifier: Modifier = Modifier) {
+    SectionContainer(id = "usage", modifier = modifier) {
         SpanText(
             "Usage",
             modifier = LabelTextStyle.toModifier()
@@ -42,7 +42,7 @@ fun HowToUseSection() {
                 .margin(bottom = 1.cssRem),
         )
 
-        var selectedTab by remember { mutableStateOf(0) }
+        var selectedTab by remember { mutableIntStateOf(0) }
         TabPanel(
             tabs = listOf("CLI", "Gradle Plugin"),
             selectedIndex = selectedTab,
@@ -51,8 +51,15 @@ fun HowToUseSection() {
                 {
                     when (index) {
                         0 -> FaTerminal(size = IconSize.SM)
+
                         1 -> GradleSvg(
-                            color = if (selectedTab == index) SiteTheme.palette.onPrimary else SiteTheme.palette.onSurfaceVariant,
+                            color = if (selectedTab ==
+                                index
+                            ) {
+                                SiteTheme.palette.onPrimary
+                            } else {
+                                SiteTheme.palette.onSurfaceVariant
+                            },
                             width = 16,
                             height = 16,
                         )

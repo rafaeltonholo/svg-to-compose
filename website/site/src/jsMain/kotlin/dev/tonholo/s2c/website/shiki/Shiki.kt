@@ -2,20 +2,16 @@ package dev.tonholo.s2c.website.shiki
 
 import kotlinx.browser.document
 import kotlinx.coroutines.await
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.w3c.dom.HTMLScriptElement
 import org.w3c.dom.events.Event
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.suspendCancellableCoroutine
 
 @JsExport
 @OptIn(ExperimentalJsExport::class)
 class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
     @JsExport.Ignore
-    suspend fun codeToHtml(
-        code: String,
-        options: dynamic,
-    ): String = codeToHtmlPromise(code, options).await()
+    suspend fun codeToHtml(code: String, options: dynamic): String = codeToHtmlPromise(code, options).await()
 
     companion object {
         private const val SHIKI_VERSION = "4.0.2"
@@ -47,7 +43,7 @@ class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
                 callback = {
                     continuation.resume(instance)
                 },
-                false
+                false,
             )
 
             val isLoaderNotPresent =

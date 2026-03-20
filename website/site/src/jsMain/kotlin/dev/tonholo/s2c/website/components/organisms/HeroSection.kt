@@ -16,7 +16,6 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.DisplayTextStyle
@@ -24,6 +23,7 @@ import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.SubheadlineTextStyle
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.molecules.CtaButtons
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -59,11 +59,12 @@ val IntroContentStyle = CssStyle.base {
 }
 
 @Composable
-fun HeroSection() {
+fun HeroSection(modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
     Section(
         attrs = CompactIntroStyle.toModifier()
             .id("hero")
+            .then(modifier)
             .toAttrs(),
     ) {
         Div(attrs = IntroContentStyle.toModifier().toAttrs()) {
@@ -79,7 +80,7 @@ fun HeroSection() {
                 Badge(
                     text = SiteTheme.VERSION,
                     color = palette.onSurfaceVariant,
-                    modifier = Modifier.fontFamily("JetBrains Mono", "monospace"),
+                    modifier = Modifier.fontFamily(values = FontFamilies.mono),
                 )
             }
             Div(

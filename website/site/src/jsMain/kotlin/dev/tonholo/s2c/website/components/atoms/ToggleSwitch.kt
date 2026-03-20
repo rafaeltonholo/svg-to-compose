@@ -32,6 +32,7 @@ import org.jetbrains.compose.web.dom.Div
 
 @Composable
 fun ToggleSwitch(
+    modifier: Modifier = Modifier,
     checked: Boolean = false,
     onCheckedChange: ((Boolean) -> Unit)? = null,
     label: String? = null,
@@ -43,7 +44,7 @@ fun ToggleSwitch(
         palette.primary.toRgb().copyf(alpha = 0.2f)
     }
     Div(
-        attrs = Modifier
+        attrs = modifier
             .width(2.75.cssRem)
             .height(1.5.cssRem)
             .borderRadius(9999.px)

@@ -6,6 +6,8 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -17,8 +19,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
-import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
-import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -44,7 +44,13 @@ val ZoomButtonStyle = CssStyle.base {
         .cursor(Cursor.Pointer)
 }
 
-private val ZOOM_LEVELS = floatArrayOf(0.25f, 0.5f, 1f, 2f, 4f, 8f)
+private const val ZOOM_QUARTER = 0.25f
+private const val ZOOM_HALF = 0.5f
+private const val ZOOM_QUADRUPLE = 4f
+private const val ZOOM_OCTUPLE = 8f
+private const val PERCENT_MULTIPLIER = 100
+
+private val ZOOM_LEVELS = floatArrayOf(ZOOM_QUARTER, ZOOM_HALF, 1f, 2f, ZOOM_QUADRUPLE, ZOOM_OCTUPLE)
 
 /** Finds the previous zoom level, handling arbitrary values not in ZOOM_LEVELS. */
 private fun previousZoom(current: Float): Float? {
@@ -75,8 +81,8 @@ private fun nextZoom(current: Float): Float? {
 fun ZoomControls(
     zoomLevel: Float,
     onZoomChange: (Float) -> Unit,
-    nativeScale: Float? = null,
     modifier: Modifier = Modifier,
+    nativeScale: Float? = null,
 ) {
     val palette = ColorMode.current.toSitePalette()
 
@@ -90,10 +96,12 @@ fun ZoomControls(
                             event.preventDefault()
                             previousZoom(zoomLevel)?.let(onZoomChange)
                         }
+
                         "+", "=" -> {
                             event.preventDefault()
                             nextZoom(zoomLevel)?.let(onZoomChange)
                         }
+
                         "0" -> {
                             event.preventDefault()
                             onZoomChange(1f)
@@ -112,7 +120,7 @@ fun ZoomControls(
             SpanText("\u2212") // minus sign
         }
         SpanText(
-            "${(zoomLevel * 100).toInt()}%",
+            "${(zoomLevel * PERCENT_MULTIPLIER).toInt()}%",
             modifier = Modifier.fontSize(0.7.cssRem).color(palette.onSurfaceVariant),
         )
         Button(

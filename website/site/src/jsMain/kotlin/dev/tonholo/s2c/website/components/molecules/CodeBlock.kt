@@ -7,15 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Cursor
-import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.TextAlign
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
-import com.varabyte.kobweb.compose.css.TextAlign
-import com.varabyte.kobweb.compose.css.Transition
-import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
@@ -46,6 +45,7 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.shiki.ShikiCodeBlock
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
@@ -61,6 +61,7 @@ import org.jetbrains.compose.web.dom.Pre
 import org.jetbrains.compose.web.dom.Text
 
 private const val COPY_FEEDBACK_DURATION_MS = 2000L
+private const val CODE_LINE_HEIGHT = 1.6
 
 val CodeBlockContainerStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
@@ -89,7 +90,7 @@ val CopyButtonStyle = CssStyle.base {
         .color(palette.onSurfaceVariant)
         .cursor(Cursor.Pointer)
         .fontSize(0.7.cssRem)
-        .fontFamily("IBM Plex Sans", "sans-serif")
+        .fontFamily(values = FontFamilies.sans)
         .transition(
             Transition.of("background-color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
             Transition.of("color", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
@@ -110,6 +111,7 @@ val LineNumberStyle = CssStyle.base {
 @Composable
 fun CodeBlock(
     code: String,
+    modifier: Modifier = Modifier,
     language: String = "",
     filename: String? = null,
     showCopyButton: Boolean = true,
@@ -123,78 +125,119 @@ fun CodeBlock(
         }
     }
 
-    Div(attrs = CodeBlockContainerStyle.toModifier().toAttrs()) {
+    Div(attrs = CodeBlockContainerStyle.toModifier().then(modifier).toAttrs()) {
         if (filename != null) {
-            Row(
-                modifier = CodeBlockHeaderStyle.toModifier(),
-                verticalAlignment = Alignment.CenterVertically,
+            CodeBlockHeader(
+                filename = filename,
+                code = code,
+                copied = copied,
+                showCopyButton = showCopyButton,
+                onCopy = { copied = true },
+            )
+        }
+        CodeBlockBody(
+            code = code,
+            language = language,
+            hasHeader = filename != null,
+            showCopyButton = showCopyButton,
+            copied = copied,
+            onCopy = { copied = true },
+        )
+    }
+}
+
+@Composable
+private fun CodeBlockHeader(
+    filename: String,
+    code: String,
+    copied: Boolean,
+    showCopyButton: Boolean,
+    onCopy: () -> Unit,
+) {
+    Row(
+        modifier = CodeBlockHeaderStyle.toModifier(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SpanText(
+            filename,
+            modifier = Modifier
+                .fontFamily(values = FontFamilies.mono)
+                .fontSize(0.75.cssRem)
+                .color(ColorMode.current.toSitePalette().onSurfaceVariant),
+        )
+        Spacer()
+        if (showCopyButton) {
+            CopyButton(code = code, copied = copied, onCopy = onCopy)
+        }
+    }
+}
+
+@Composable
+private fun CodeBlockBody(
+    code: String,
+    language: String,
+    hasHeader: Boolean,
+    showCopyButton: Boolean,
+    copied: Boolean,
+    onCopy: () -> Unit,
+) {
+    Div(
+        attrs = Modifier
+            .position(Position.Relative)
+            .toAttrs(),
+    ) {
+        if (!hasHeader && showCopyButton) {
+            Div(
+                attrs = Modifier
+                    .position(Position.Absolute)
+                    .top(0.5.cssRem)
+                    .right(0.5.cssRem)
+                    .zIndex(1)
+                    .toAttrs(),
             ) {
-                SpanText(
-                    filename,
-                    modifier = Modifier
-                        .fontFamily("JetBrains Mono", "monospace")
-                        .fontSize(0.75.cssRem)
-                        .color(ColorMode.current.toSitePalette().onSurfaceVariant)
-                )
-                Spacer()
-                if (showCopyButton) {
-                    CopyButton(code = code, copied = copied) { copied = true }
-                }
+                CopyButton(code = code, copied = copied, onCopy = onCopy)
             }
         }
-        Div(
+        if (language.isNotEmpty()) {
+            ShikiCodeBlock(
+                language = language,
+                code = code,
+                modifier = Modifier.margin(0.px),
+            )
+        } else {
+            PlainCodeBlock(code = code)
+        }
+    }
+}
+
+@Composable
+private fun PlainCodeBlock(code: String) {
+    Pre(
+        attrs = Modifier
+            .margin(0.px)
+            .padding(1.cssRem)
+            .overflow { x(Overflow.Auto) }
+            .toAttrs(),
+    ) {
+        Code(
             attrs = Modifier
-                .position(Position.Relative)
-                .toAttrs()
+                .fontFamily(values = FontFamilies.mono)
+                .fontSize(0.75.cssRem)
+                .lineHeight(CODE_LINE_HEIGHT)
+                .toAttrs(),
         ) {
-            if (filename == null && showCopyButton) {
+            val lines = code.split("\n")
+            lines.forEachIndexed { index, line ->
                 Div(
                     attrs = Modifier
-                        .position(Position.Absolute)
-                        .top(0.5.cssRem)
-                        .right(0.5.cssRem)
-                        .zIndex(1)
-                        .toAttrs()
+                        .display(DisplayStyle.Flex)
+                        .toAttrs(),
                 ) {
-                    CopyButton(code = code, copied = copied) { copied = true }
-                }
-            }
-            if (language.isNotEmpty()) {
-                ShikiCodeBlock(
-                    language = language,
-                    code = code,
-                    modifier = Modifier.margin(0.px),
-                )
-            } else {
-                Pre(
-                    attrs = Modifier
-                        .margin(0.px)
-                        .padding(1.cssRem)
-                        .overflow { x(Overflow.Auto) }
-                        .toAttrs()
-                ) {
-                    Code(
-                        attrs = Modifier
-                            .fontFamily("JetBrains Mono", "monospace")
-                            .fontSize(0.75.cssRem)
-                            .lineHeight(1.6)
-                            .toAttrs()
-                    ) {
-                        val lines = code.split("\n")
-                        lines.forEachIndexed { index, line ->
-                            Div(
-                                attrs = Modifier
-                                    .display(DisplayStyle.Flex)
-                                    .toAttrs()
-                            ) {
-                                SpanText(
-                                    "${index + 1}",
-                                    modifier = LineNumberStyle.toModifier(),
-                                )
-                                Text(line)
-                            }
-                        }
-                    }
+                    SpanText(
+                        "${index + 1}",
+                        modifier = LineNumberStyle.toModifier(),
+                    )
+                    Text(line)
                 }
             }
         }
@@ -209,7 +252,7 @@ private fun CopyButton(code: String, copied: Boolean, onCopy: () -> Unit) {
                 window.navigator.clipboard.writeText(code)
                 onCopy()
             }
-            .toAttrs()
+            .toAttrs(),
     ) {
         SpanText(if (copied) "Copied!" else "Copy")
     }

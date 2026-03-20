@@ -30,6 +30,8 @@ import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 
+private const val CAPABILITIES_COLUMN_COUNT = 3
+
 val CapabilitiesGridStyle = CssStyle {
     base {
         Modifier
@@ -42,14 +44,11 @@ val CapabilitiesGridStyle = CssStyle {
         Modifier.gridTemplateColumns { repeat(2) { size(1.fr) } }
     }
     Breakpoint.MD {
-        Modifier.gridTemplateColumns { repeat(3) { size(1.fr) } }
+        Modifier.gridTemplateColumns { repeat(CAPABILITIES_COLUMN_COUNT) { size(1.fr) } }
     }
 }
 
-private data class CapabilityCategory(
-    val title: String,
-    val items: List<String>,
-)
+private data class CapabilityCategory(val title: String, val items: List<String>)
 
 private val categories = listOf(
     CapabilityCategory(
@@ -83,9 +82,9 @@ private val categories = listOf(
 )
 
 @Composable
-fun CapabilitiesSection() {
+fun CapabilitiesSection(modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
-    SectionContainer(id = "capabilities", altBackground = true) {
+    SectionContainer(id = "capabilities", modifier = modifier, altBackground = true) {
         SpanText(
             "Capabilities",
             modifier = LabelTextStyle.toModifier()

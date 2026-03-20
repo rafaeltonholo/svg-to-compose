@@ -4,10 +4,7 @@ import kotlin.js.Promise
 
 external interface ShikiApi {
     @JsName("codeToHtml")
-    fun codeToHtmlPromise(
-        code: String,
-        options: dynamic,
-    ): Promise<String>
+    fun codeToHtmlPromise(code: String, options: dynamic): Promise<String>
 }
 
 fun codeToHtmlOptions(

@@ -14,13 +14,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.cssRem
 
 @Composable
-fun LogoAndDescription() {
+fun LogoAndDescription(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier.gap(0.5.cssRem),
+        modifier = modifier.gap(0.5.cssRem),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -32,7 +33,7 @@ fun LogoAndDescription() {
                     .color(ColorMode.current.toSitePalette().primary)
                     .fontWeight(FontWeight.Bold)
                     .fontSize(1.125.cssRem)
-                    .fontFamily("JetBrains Mono", "monospace"),
+                    .fontFamily(values = FontFamilies.mono),
             )
             SpanText(
                 "svg-to-compose",

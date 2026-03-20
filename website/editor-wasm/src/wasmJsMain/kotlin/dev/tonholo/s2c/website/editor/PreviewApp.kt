@@ -10,8 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,9 +43,9 @@ private val json = Json {
 @Composable
 internal fun PreviewApp() {
     var previewState by remember { mutableStateOf<IconFileContents?>(null) }
-    var zoomScale by remember { mutableStateOf(1f) }
-    var panXPx by remember { mutableStateOf(0f) }
-    var panYPx by remember { mutableStateOf(0f) }
+    var zoomScale by remember { mutableFloatStateOf(1f) }
+    var panXPx by remember { mutableFloatStateOf(0f) }
+    var panYPx by remember { mutableFloatStateOf(0f) }
 
     OnMessageEffect(
         onIconData = { previewState = it },
@@ -99,36 +101,47 @@ private fun OnMessageEffect(
     onIconData: (IconFileContents) -> Unit,
     onZoom: (level: Float, panX: Float, panY: Float) -> Unit,
 ) {
+    val currentOnIconData by rememberUpdatedState(onIconData)
+    val currentOnZoom by rememberUpdatedState(onZoom)
     DisposableEffect(window) {
         val expectedOrigin = window.location.origin
-        fun onMessageEvent(event: Event) {
-            val messageEvent = event as? MessageEvent ?: return
-            if (messageEvent.origin != expectedOrigin) return
-            val data = messageEvent.data ?: return
-            val jsonString = data.toString()
-            if (jsonString.isEmpty() || !jsonString.startsWith("{")) return
-
-            try {
-                val jsonElement = json.parseToJsonElement(jsonString)
-                val obj = jsonElement.jsonObject
-                if (obj["type"]?.jsonPrimitive?.content == "zoom") {
-                    val level = obj["level"]?.jsonPrimitive?.float ?: return
-                    val px = obj["panX"]?.jsonPrimitive?.float ?: 0f
-                    val py = obj["panY"]?.jsonPrimitive?.float ?: 0f
-                    onZoom(level, px, py)
-                    return
-                }
-                onIconData(json.decodeFromJsonElement<IconFileContents>(jsonElement))
-            } catch (e: SerializationException) {
-                println("Error parsing message: ${e.message}")
-            } catch (e: IllegalArgumentException) {
-                println("Invalid message content: ${e.message}")
-            }
+        val listener: (Event) -> Unit = { event ->
+            handleMessageEvent(event, expectedOrigin, currentOnIconData, currentOnZoom)
         }
-
-        window.addEventListener("message", ::onMessageEvent)
+        window.addEventListener("message", listener)
         onDispose {
-            window.removeEventListener("message", ::onMessageEvent)
+            window.removeEventListener("message", listener)
         }
+    }
+}
+
+private fun handleMessageEvent(
+    event: Event,
+    expectedOrigin: String,
+    onIconData: (IconFileContents) -> Unit,
+    onZoom: (level: Float, panX: Float, panY: Float) -> Unit,
+) {
+    val messageEvent = event as? MessageEvent ?: return
+    val data = messageEvent.data
+    val jsonString = data?.toString().orEmpty()
+    if (messageEvent.origin != expectedOrigin || jsonString.isEmpty() || !jsonString.startsWith("{")) return
+
+    try {
+        val jsonElement = json.parseToJsonElement(jsonString)
+        val obj = jsonElement.jsonObject
+        if (obj["type"]?.jsonPrimitive?.content == "zoom") {
+            val level = obj["level"]?.jsonPrimitive?.float
+            if (level != null) {
+                val px = obj["panX"]?.jsonPrimitive?.float ?: 0f
+                val py = obj["panY"]?.jsonPrimitive?.float ?: 0f
+                onZoom(level, px, py)
+            }
+        } else {
+            onIconData(json.decodeFromJsonElement<IconFileContents>(jsonElement))
+        }
+    } catch (e: SerializationException) {
+        println("Error parsing message: ${e.message}")
+    } catch (e: IllegalArgumentException) {
+        println("Invalid message content: ${e.message}")
     }
 }

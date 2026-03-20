@@ -21,17 +21,20 @@ internal interface WorkerGraph {
 
     @Binds
     val ConsoleLogger.bind: Logger
+
     @Binds
     val DefaultConverter.bind: Converter
 
     @Provides
-    fun provideContentParsers(
-        svgParser: SvgContentParser,
-        avgParser: AvgContentParser,
-    ): Map<FileType, ContentParser> = mapOf(
-        FileType.Svg to svgParser,
-        FileType.Avg to avgParser,
-    )
+    @EnableDebugQualifier
+    val enableDebug: Boolean get() = false
+
+    @Provides
+    fun provideContentParsers(svgParser: SvgContentParser, avgParser: AvgContentParser): Map<FileType, ContentParser> =
+        mapOf(
+            FileType.Svg to svgParser,
+            FileType.Avg to avgParser,
+        )
 
     @Provides
     fun provideJson(): Json = Json { ignoreUnknownKeys = true }

@@ -60,3 +60,6 @@ bin/
 .venv/
 
 *.local.json
+.impeccable.*
+.superpowers
+docs/**/superpowers

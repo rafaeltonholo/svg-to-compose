@@ -14,21 +14,24 @@ import com.varabyte.kobweb.compose.css.Outline
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.PointerEvents
 import com.varabyte.kobweb.compose.css.ScrollbarWidth
+import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
+import com.varabyte.kobweb.compose.ui.modifiers.borderRight
 import com.varabyte.kobweb.compose.ui.modifiers.bottom
 import com.varabyte.kobweb.compose.ui.modifiers.caretColor
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.flex
+import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.left
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
@@ -40,11 +43,10 @@ import com.varabyte.kobweb.compose.ui.modifiers.pointerEvents
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.right
 import com.varabyte.kobweb.compose.ui.modifiers.scrollbarWidth
+import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
-import com.varabyte.kobweb.compose.ui.modifiers.borderRight
-import com.varabyte.kobweb.compose.ui.modifiers.flex
-import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
+import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -61,6 +63,7 @@ import dev.tonholo.s2c.website.shiki.ONE_DARK_PRO_BACKGROUND
 import dev.tonholo.s2c.website.shiki.ONE_LIGHT_BACKGROUND
 import dev.tonholo.s2c.website.shiki.Shiki
 import dev.tonholo.s2c.website.shiki.codeToHtmlOptions
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
@@ -101,6 +104,7 @@ val EditorContainerStyle = CssStyle.base {
         .flex(1)
         .minHeight(0.px)
         .overflow(Overflow.Hidden)
+        .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
 val EditorBackdropStyle = CssStyle {
@@ -111,7 +115,7 @@ val EditorBackdropStyle = CssStyle {
             .left(value = 0.px)
             .right(value = 0.px)
             .bottom(value = 0.px)
-            .fontFamily("JetBrains Mono", "monospace")
+            .fontFamily(values = FontFamilies.mono)
             .fontSize(value = 0.75.cssRem)
             .lineHeight(value = 1.6)
             .padding(all = 1.cssRem)
@@ -132,6 +136,27 @@ val EditorBackdropStyle = CssStyle {
             .margin(all = 0.px)
             .padding(all = 0.px)
             .backgroundColor(Colors.Transparent)
+            .minHeight(100.percent)
+    }
+    // Line numbers via CSS counters — same approach as ShikiCodeBlock
+    cssRule(" code") {
+        Modifier
+            .styleModifier {
+                property("counter-reset", "step")
+                property("counter-increment", "step 0")
+            }
+    }
+    cssRule(" code .line::before") {
+        Modifier
+            .styleModifier {
+                property("content", "counter(step)")
+                property("counter-increment", "step")
+            }
+            .width(1.cssRem)
+            .margin(right = 1.25.cssRem)
+            .display(DisplayStyle.InlineBlock)
+            .textAlign(TextAlign.Right)
+            .color(colorMode.toSitePalette().onSurfaceVariant)
     }
 }
 
@@ -142,14 +167,19 @@ val EditorTextareaStyle = CssStyle {
             .flex(1)
             .position(Position.Relative)
             .zIndex(1)
-            .fontFamily("JetBrains Mono", "monospace")
+            .fontFamily(values = FontFamilies.mono)
             .fontSize(0.75.cssRem)
             .lineHeight(value = 1.6)
-            .padding(1.cssRem)
+            // Extra left padding to align with backdrop text after line numbers
+            // (1rem base + 1rem number width + 1.25rem number margin = 3.25rem)
+            .padding(top = 1.cssRem, right = 1.cssRem, bottom = 1.cssRem, left = 3.25.cssRem)
             .backgroundColor(Colors.Transparent)
             .color(colorMode.toSitePalette().onSurfaceVariant)
             .border(0.px, LineStyle.None, Colors.Transparent)
             .outline("none".unsafeCast<Outline>())
+            // Disable native textarea appearance so browser doesn't
+            // draw its own background over the transparent one.
+            .styleModifier { property("appearance", "none") }
             .caretColor(colorMode.toSitePalette().primary)
             .whiteSpace(WhiteSpace.Pre)
             .overflow(Overflow.Auto)
@@ -160,7 +190,12 @@ val EditorTextareaStyle = CssStyle {
 }
 
 @Composable
-fun InputPanel(inputCode: String, onInputChange: (String) -> Unit) {
+fun InputPanel(
+    inputCode: String,
+    onInputChange: (String) -> Unit,
+    onPaste: ((String) -> Unit)? = null,
+    fileName: String = "input.svg",
+) {
     val colorMode = ColorMode.current
     val state = remember { InputPanelState() }
     var textareaElement by remember { mutableStateOf<HTMLTextAreaElement?>(null) }
@@ -178,7 +213,7 @@ fun InputPanel(inputCode: String, onInputChange: (String) -> Unit) {
                 .toAttrs(),
         ) {
             FaCode()
-            SpanText("input.svg")
+            SpanText(fileName)
         }
         Div(attrs = EditorContainerStyle.toModifier().toAttrs()) {
             Div(
@@ -191,6 +226,12 @@ fun InputPanel(inputCode: String, onInputChange: (String) -> Unit) {
             ) {
                 DisposableEffect(state.highlightedHtml) {
                     scopeElement.innerHTML = state.highlightedHtml
+                    // Strip Shiki's inline background-color on <pre> so our
+                    // CSS rule (transparent) takes effect. Inline styles have
+                    // higher specificity than class-based rules.
+                    scopeElement.querySelector("pre")?.let { pre ->
+                        pre.asDynamic().style.backgroundColor = ""
+                    }
                     onDispose { }
                 }
             }
@@ -201,6 +242,7 @@ fun InputPanel(inputCode: String, onInputChange: (String) -> Unit) {
                     onDispose { textareaElement = null }
                 },
                 onInputChange,
+                onPaste,
             )
         }
     }
@@ -260,6 +302,7 @@ private fun CodeEditorTextarea(
     inputCode: String,
     onEffect: DisposableEffectScope.(HTMLTextAreaElement) -> DisposableEffectResult,
     onInputChange: (String) -> Unit,
+    onPaste: ((String) -> Unit)? = null,
 ) {
     TextArea(
         value = inputCode,
@@ -268,37 +311,56 @@ private fun CodeEditorTextarea(
                 placeholder("Paste your SVG code here...")
                 attr("spellcheck", "false")
                 onInput { onInputChange(it.value) }
-                onKeyDown { event ->
-                    if (event.key != "Tab") return@onKeyDown
-                    event.preventDefault()
-                    val textarea = event.target as? HTMLTextAreaElement ?: return@onKeyDown
-                    val start = textarea.selectionStart ?: 0
-                    val end = textarea.selectionEnd ?: 0
-                    val value = textarea.value
-
-                    if (event.shiftKey) {
-                        val lineStart = value.lastIndexOf('\n', start - 1) + 1
-                        if (value.substring(lineStart).startsWith(TAB_INDENT)) {
-                            val newValue = value.substring(0, lineStart) +
-                                value.substring(lineStart + TAB_INDENT.length)
-                            val newPos = maxOf(lineStart, start - TAB_INDENT.length)
-                            textarea.value = newValue
-                            textarea.setSelectionRange(newPos, newPos)
-                            onInputChange(newValue)
-                        }
-                    } else {
-                        val newValue = value.substring(0, start) +
-                            TAB_INDENT +
-                            value.substring(end)
-                        val newPos = start + TAB_INDENT.length
-                        textarea.value = newValue
-                        textarea.setSelectionRange(newPos, newPos)
-                        onInputChange(newValue)
+                if (onPaste != null) {
+                    addEventListener("paste") { event ->
+                        val pastedText = event.asDynamic().clipboardData
+                            ?.getData("text/plain") as? String
+                        if (pastedText != null) onPaste(pastedText)
                     }
+                }
+                onKeyDown { event ->
+                    handleEditorTab(event, onInputChange)
                 }
                 ref(onEffect)
             },
     )
+}
+
+private fun handleEditorTab(
+    event: org.jetbrains.compose.web.events.SyntheticKeyboardEvent,
+    onInputChange: (String) -> Unit,
+) {
+    if (event.key != "Tab") return
+    event.preventDefault()
+    val textarea = event.target as? HTMLTextAreaElement ?: return
+    val start = textarea.selectionStart ?: 0
+    val end = textarea.selectionEnd ?: 0
+    val value = textarea.value
+
+    val (newValue, newPos) = if (event.shiftKey) {
+        computeOutdent(value, start)
+    } else {
+        computeIndent(value, start, end)
+    } ?: return
+
+    textarea.value = newValue
+    textarea.setSelectionRange(newPos, newPos)
+    onInputChange(newValue)
+}
+
+private data class EditorEdit(val newValue: String, val newPos: Int)
+
+private fun computeOutdent(value: String, start: Int): EditorEdit? {
+    val lineStart = value.lastIndexOf('\n', start - 1) + 1
+    if (!value.substring(lineStart).startsWith(TAB_INDENT)) return null
+    val newValue = value.substring(0, lineStart) + value.substring(lineStart + TAB_INDENT.length)
+    val newPos = maxOf(lineStart, start - TAB_INDENT.length)
+    return EditorEdit(newValue, newPos)
+}
+
+private fun computeIndent(value: String, start: Int, end: Int): EditorEdit {
+    val newValue = value.substring(0, start) + TAB_INDENT + value.substring(end)
+    return EditorEdit(newValue, start + TAB_INDENT.length)
 }
 
 @Composable

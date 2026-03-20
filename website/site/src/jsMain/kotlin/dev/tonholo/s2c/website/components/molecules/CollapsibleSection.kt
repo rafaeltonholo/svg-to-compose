@@ -11,10 +11,11 @@ import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.foundation.layout.Row
-import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
@@ -24,7 +25,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateRows
-import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
@@ -32,7 +32,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.transform
 import com.varabyte.kobweb.compose.ui.modifiers.transition
-import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaChevronRight
@@ -72,25 +71,38 @@ val CollapsibleHeaderStyle = CssStyle.base {
 @Composable
 fun CollapsibleSection(
     title: String,
+    modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
+    expanded: Boolean? = null,
+    onExpandedChange: ((Boolean) -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    var internalExpanded by remember { mutableStateOf(initiallyExpanded) }
+    val isExpanded = expanded ?: internalExpanded
+    val toggleExpanded = {
+        val newValue = !isExpanded
+        internalExpanded = newValue
+        onExpandedChange?.invoke(newValue)
+    }
 
-    Div(attrs = CollapsibleContainerStyle.toModifier().toAttrs()) {
+    val contentId = "collapsible-${title.lowercase().replace(" ", "-")}"
+
+    Div(attrs = CollapsibleContainerStyle.toModifier().then(modifier).toAttrs()) {
         Row(
             modifier = CollapsibleHeaderStyle.toModifier()
-                .onClick { expanded = !expanded }
+                .onClick { toggleExpanded() }
                 .tabIndex(0)
                 .ariaLabel(title)
                 .attrsModifier {
-                    attr("aria-expanded", expanded.toString())
+                    attr("id", "header-$contentId")
+                    attr("aria-expanded", isExpanded.toString())
+                    attr("aria-controls", contentId)
                     onKeyDown { event ->
                         when (event.key) {
                             " ", "Enter" -> {
                                 event.preventDefault()
-                                expanded = !expanded
+                                toggleExpanded()
                             }
                         }
                     }
@@ -103,7 +115,6 @@ fun CollapsibleSection(
                 modifier = Modifier
                     .fontWeight(FontWeight.SemiBold),
             )
-            Spacer()
             FaChevronRight(
                 size = IconSize.SM,
                 modifier = Modifier
@@ -115,7 +126,7 @@ fun CollapsibleSection(
                             timingFunction = TransitionTimingFunction.Ease,
                         ),
                     )
-                    .thenIf(expanded, Modifier.transform { rotate(90.deg) }),
+                    .thenIf(isExpanded, Modifier.transform { rotate(90.deg) }),
             )
         }
         // grid-template-rows transition: 0fr → 1fr for smooth GPU-composited expand
@@ -123,14 +134,22 @@ fun CollapsibleSection(
             attrs = Modifier
                 .display(DisplayStyle.Grid)
                 .gridTemplateRows {
-                    if (expanded) size(1.fr) else size(0.fr)
+                    if (isExpanded) size(1.fr) else size(0.fr)
                 }
                 .transition(
-                    Transition.of("grid-template-rows", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
+                    Transition.of(
+                        "grid-template-rows",
+                        duration = 300.ms,
+                        timingFunction = TransitionTimingFunction.Ease,
+                    ),
                     Transition.of("opacity", duration = 300.ms, timingFunction = TransitionTimingFunction.Ease),
                 )
-                .opacity(if (expanded) 1 else 0)
-                .toAttrs(),
+                .opacity(if (isExpanded) 1 else 0)
+                .toAttrs {
+                    id(contentId)
+                    attr("role", "region")
+                    attr("aria-labelledby", "header-$contentId")
+                },
         ) {
             Div(
                 attrs = Modifier

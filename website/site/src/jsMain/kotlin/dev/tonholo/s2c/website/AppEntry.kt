@@ -2,7 +2,6 @@ package dev.tonholo.s2c.website
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
@@ -25,6 +24,7 @@ fun initColorMode(ctx: InitSilkContext) {
 
 @App
 @Composable
+@Suppress("ModifierMissing")
 fun AppEntry(content: @Composable () -> Unit) {
     SilkApp {
         val colorMode = ColorMode.current

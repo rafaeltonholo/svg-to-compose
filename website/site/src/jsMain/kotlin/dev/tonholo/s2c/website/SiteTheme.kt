@@ -65,11 +65,9 @@ object SitePalettes {
     )
 }
 
-fun ColorMode.toSitePalette(): SitePalette {
-    return when (this) {
-        ColorMode.LIGHT -> SitePalettes.light
-        ColorMode.DARK -> SitePalettes.dark
-    }
+fun ColorMode.toSitePalette(): SitePalette = when (this) {
+    ColorMode.LIGHT -> SitePalettes.light
+    ColorMode.DARK -> SitePalettes.dark
 }
 
 @InitSilk

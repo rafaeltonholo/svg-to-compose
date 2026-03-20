@@ -55,4 +55,3 @@ fun Footer(modifier: Modifier = Modifier) {
         LinksAndAttribution()
     }
 }
-

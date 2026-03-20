@@ -85,8 +85,8 @@ val SecondaryCtaStyle = CssStyle {
 }
 
 @Composable
-fun CtaButtons() {
-    Div(attrs = CtaRowStyle.toModifier().toAttrs()) {
+fun CtaButtons(modifier: Modifier = Modifier) {
+    Div(attrs = CtaRowStyle.toModifier().then(modifier).toAttrs()) {
         Link(
             path = "#install",
             modifier = PrimaryCtaStyle.toModifier(),

@@ -28,6 +28,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.SitePalettes
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -45,7 +46,7 @@ internal const val ONE_LIGHT_BACKGROUND = "#FAFAFA"
 val ShikiCodeBlockStyle = CssStyle {
     base {
         Modifier
-            .fontFamily("JetBrains Mono", "monospace")
+            .fontFamily(values = FontFamilies.mono)
             .fontSize(value = 0.75.cssRem)
             .lineHeight(value = 1.6)
             .overflow { x(Overflow.Auto) }
@@ -79,11 +80,7 @@ val ShikiCodeBlockStyle = CssStyle {
 }
 
 @Composable
-fun ShikiCodeBlock(
-    language: String,
-    code: String,
-    modifier: Modifier = Modifier,
-) {
+fun ShikiCodeBlock(language: String, code: String, modifier: Modifier = Modifier) {
     val colorMode = ColorMode.current
     var parsedCode by remember { mutableStateOf("") }
 
@@ -124,5 +121,4 @@ private val format = HexFormat {
     }
 }
 
-private fun Color.toHexString(): String =
-    (toRgb().value and MAX_COLOR_VALUE).toHexString(format)
+private fun Color.toHexString(): String = (toRgb().value and MAX_COLOR_VALUE).toHexString(format)

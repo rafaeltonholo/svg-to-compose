@@ -29,9 +29,9 @@ val LinksAndAttributionStyle = CssStyle {
 }
 
 @Composable
-fun LinksAndAttribution() {
+fun LinksAndAttribution(modifier: Modifier = Modifier) {
     Column(
-        modifier = LinksAndAttributionStyle.toModifier(),
+        modifier = LinksAndAttributionStyle.toModifier().then(modifier),
     ) {
         Links()
         HorizontalDivider(

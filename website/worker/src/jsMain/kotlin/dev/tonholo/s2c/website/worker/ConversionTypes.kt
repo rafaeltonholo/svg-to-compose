@@ -44,10 +44,7 @@ sealed interface ConversionOutput {
     data class Progress(val stage: String, val percent: Int) : ConversionOutput
 
     @Serializable
-    data class Success(
-        val kotlinCode: String,
-        val iconFileContentsJson: String? = null,
-    ) : ConversionOutput
+    data class Success(val kotlinCode: String, val iconFileContentsJson: String? = null) : ConversionOutput
 
     @Serializable
     data class Error(val message: String) : ConversionOutput
@@ -71,5 +68,4 @@ internal fun ConversionInput.resolveFileType(): FileType =
     FileType.entries.find { it.name.equals(fileType, ignoreCase = true) } ?: FileType.Svg
 
 /** Returns [JsContentOptimizer] when [ConversionInput.optimize] is true, null otherwise. */
-internal fun ConversionInput.resolveOptimizer(): ContentOptimizer? =
-    if (optimize) JsContentOptimizer else null
+internal fun ConversionInput.resolveOptimizer(): ContentOptimizer? = if (optimize) JsContentOptimizer else null

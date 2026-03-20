@@ -11,14 +11,14 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.outline
-import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
@@ -36,6 +36,7 @@ import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.theme.modifyStyleBase
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.StylePropertyValue
@@ -79,7 +80,7 @@ fun initSiteStyles(ctx: InitSilkContext) {
 
     ctx.stylesheet.registerStyleBase("body") {
         Modifier
-            .fontFamily("IBM Plex Sans", "sans-serif")
+            .fontFamily(values = FontFamilies.sans)
             .fontSize(value = 16.px)
             .lineHeight(value = 1.5)
     }
@@ -101,31 +102,38 @@ fun initSiteStyles(ctx: InitSilkContext) {
 }
 
 // Typography
+private const val DISPLAY_LINE_HEIGHT = 1.1
+private const val DISPLAY_LETTER_SPACING = -0.02
+
 val DisplayTextStyle = CssStyle.base {
     Modifier
         .fontSize(clamp(1.75.cssRem, 5.vw, 3.5.cssRem))
         .fontWeight(FontWeight.Bold)
-        .lineHeight(1.1)
-        .letterSpacing((-0.02).em)
+        .lineHeight(DISPLAY_LINE_HEIGHT)
+        .letterSpacing(DISPLAY_LETTER_SPACING.em)
 }
+
+private const val HEADLINE_LINE_HEIGHT = 1.2
 
 val HeadlineTextStyle = CssStyle.base {
     Modifier
         .fontSize(clamp(1.4.cssRem, 3.vw, 2.cssRem))
         .fontWeight(FontWeight.Bold)
-        .lineHeight(1.2)
+        .lineHeight(HEADLINE_LINE_HEIGHT)
 }
+
+private const val SUBHEADLINE_LINE_HEIGHT = 1.7
 
 val SubheadlineTextStyle = CssStyle.base {
     Modifier
         .fontSize(clamp(0.9.cssRem, 2.vw, 1.1.cssRem))
-        .lineHeight(1.7)
+        .lineHeight(SUBHEADLINE_LINE_HEIGHT)
         .color(colorMode.toSitePalette().onSurfaceVariant)
 }
 
 val MonospaceTextStyle = CssStyle.base {
     Modifier
-        .fontFamily("JetBrains Mono", "monospace")
+        .fontFamily(values = FontFamilies.mono)
         .fontSize(value = 0.75.cssRem)
         .lineHeight(value = 1.6)
 }

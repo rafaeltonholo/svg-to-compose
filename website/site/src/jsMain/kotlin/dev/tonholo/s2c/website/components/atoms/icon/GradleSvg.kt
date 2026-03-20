@@ -8,11 +8,7 @@ import com.varabyte.kobweb.compose.dom.svg.Svg
 import com.varabyte.kobweb.compose.ui.graphics.Color
 
 @Composable
-fun GradleSvg(
-    color: Color = Color.rgb(value = 0x02303A),
-    width: Int = 512,
-    height: Int = 512,
-) {
+fun GradleSvg(color: Color = Color.rgb(value = 0x02303A), width: Int = 512, height: Int = 512) {
     Svg(
         attrs = {
             viewBox(x = 0, y = 0, width = 512, height = 512)

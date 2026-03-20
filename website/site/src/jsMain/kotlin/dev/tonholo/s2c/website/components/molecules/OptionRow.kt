@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
 import com.varabyte.kobweb.compose.ui.modifiers.color
@@ -26,6 +25,7 @@ import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
@@ -33,6 +33,8 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
+
+private const val OPTIONS_LINE_HEIGHT = 1.5
 
 val OptionsHeaderRowStyle = CssStyle {
     base {
@@ -44,7 +46,7 @@ val OptionsHeaderRowStyle = CssStyle {
             .gap(0.5.cssRem)
             .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
             .fontSize(0.75.cssRem)
-            .lineHeight(1.5)
+            .lineHeight(OPTIONS_LINE_HEIGHT)
             .backgroundColor(palette.primary.toRgb().copyf(alpha = 0.08f))
             .borderBottom(
                 width = 1.px,
@@ -71,7 +73,7 @@ val OptionsRowStyle = CssStyle<OptionsRowKind> {
             .gridTemplateColumns { size(1.fr) }
             .gap(0.5.cssRem)
             .padding(topBottom = 0.625.cssRem, leftRight = 1.cssRem)
-            .fontFamily("JetBrains Mono", "monospace")
+            .fontFamily(values = FontFamilies.mono)
             .fontWeight(FontWeight.Medium)
             .whiteSpace(WhiteSpace.NoWrap)
             .fontSize(0.75.cssRem)
@@ -91,12 +93,12 @@ val OddRowVariant = OptionsRowStyle.addVariantBase {
 }
 
 @Composable
-fun OptionsHeaderRow() {
+fun OptionsHeaderRow(modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
     val headerModifier = Modifier
         .fontWeight(FontWeight.SemiBold)
         .color(palette.onSurfaceVariant)
-    Div(attrs = OptionsHeaderRowStyle.toModifier().toAttrs()) {
+    Div(attrs = OptionsHeaderRowStyle.toModifier().then(modifier).toAttrs()) {
         SpanText("Flag", modifier = headerModifier)
         SpanText("Type", modifier = headerModifier)
         SpanText("Description", modifier = headerModifier)
@@ -104,10 +106,10 @@ fun OptionsHeaderRow() {
 }
 
 @Composable
-fun OptionRow(flag: String, type: String, description: String, index: Int) {
+fun OptionRow(flag: String, type: String, description: String, index: Int, modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
     val variant = if (index % 2 != 0) OddRowVariant else null
-    Div(attrs = OptionsRowStyle.toModifier(variant).toAttrs()) {
+    Div(attrs = OptionsRowStyle.toModifier(variant).then(modifier).toAttrs()) {
         SpanText(
             flag,
             modifier = Modifier

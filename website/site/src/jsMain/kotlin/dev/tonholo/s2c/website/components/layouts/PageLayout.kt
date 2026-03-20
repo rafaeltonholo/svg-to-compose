@@ -15,8 +15,8 @@ import com.varabyte.kobweb.core.data.getValue
 import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.components.organisms.footer.Footer
 import dev.tonholo.s2c.website.components.organisms.NavHeader
+import dev.tonholo.s2c.website.components.organisms.footer.Footer
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.vh
@@ -27,12 +27,16 @@ val RootStyle = CssStyle {
         Modifier
             .fillMaxWidth()
             .minHeight(100.vh)
-            .gridTemplateRows { size(1.fr); size(minContent) }
+            .gridTemplateRows {
+                size(1.fr)
+                size(minContent)
+            }
     }
 }
 
 @Composable
 @Layout
+@Suppress("ModifierMissing")
 fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
     val data = ctx.data.getValue<PageLayoutData>()
     LaunchedEffect(data.title) {

@@ -13,12 +13,13 @@ import org.jetbrains.compose.web.css.em
 @Composable
 fun IconButton(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     ariaLabel: String? = null,
     content: @Composable () -> Unit,
 ) {
     Button(
         onClick = { onClick() },
-        Modifier
+        modifier
             .setVariable(ButtonVars.FontSize, 1.em)
             .let { mod -> if (ariaLabel != null) mod.ariaLabel(ariaLabel) else mod },
         variant = CircleButtonVariant.then(UncoloredButtonVariant),

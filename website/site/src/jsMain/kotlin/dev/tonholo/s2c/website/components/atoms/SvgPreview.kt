@@ -16,6 +16,27 @@ import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
 
+private const val VIEWBOX_MIN_PARTS = 4
+private const val VIEWBOX_HEIGHT_INDEX = 3
+
+private data class SvgDimensions(val width: Double, val height: Double)
+
+private fun parseSvgDimensions(svg: org.w3c.dom.Element): SvgDimensions? {
+    val attrWidth = svg.getAttribute("width")
+        ?.replace("px", "")?.trim()?.toDoubleOrNull()
+    val attrHeight = svg.getAttribute("height")
+        ?.replace("px", "")?.trim()?.toDoubleOrNull()
+    if (attrWidth != null && attrHeight != null) {
+        return SvgDimensions(attrWidth, attrHeight)
+    }
+
+    val viewBox = svg.getAttribute("viewBox") ?: return null
+    val parts = viewBox.split(Regex("[\\s,]+"))
+        .mapNotNull { it.trim().toDoubleOrNull() }
+    if (parts.size < VIEWBOX_MIN_PARTS) return null
+    return SvgDimensions(parts[2], parts[VIEWBOX_HEIGHT_INDEX])
+}
+
 /**
  * Renders an SVG string at its actual pixel size, centered in a
  * full-width container.
@@ -26,10 +47,7 @@ import org.jetbrains.compose.web.dom.Div
  * within the full-width container with padding.
  */
 @Composable
-fun SvgPreview(
-    svgCode: String,
-    modifier: Modifier = Modifier,
-) {
+fun SvgPreview(svgCode: String, modifier: Modifier = Modifier) {
     Div(
         attrs = modifier
             .fillMaxWidth()
@@ -48,26 +66,10 @@ fun SvgPreview(
                 scopeElement.innerHTML = svgCode
                 val svg = scopeElement.querySelector("svg")
                 if (svg != null) {
-                    val viewBox = svg.getAttribute("viewBox")
-                    val attrWidth = svg.getAttribute("width")
-                        ?.replace("px", "")?.trim()?.toDoubleOrNull()
-                    val attrHeight = svg.getAttribute("height")
-                        ?.replace("px", "")?.trim()?.toDoubleOrNull()
-
-                    val (w, h) = when {
-                        attrWidth != null && attrHeight != null -> attrWidth to attrHeight
-                        viewBox != null -> {
-                            val parts = viewBox.split(Regex("[\\s,]+"))
-                                .mapNotNull { it.trim().toDoubleOrNull() }
-                            if (parts.size >= 4) parts[2] to parts[3]
-                            else null to null
-                        }
-                        else -> null to null
-                    }
-
-                    if (w != null && h != null) {
-                        svg.setAttribute("width", "${w}px")
-                        svg.setAttribute("height", "${h}px")
+                    val dimensions = parseSvgDimensions(svg)
+                    if (dimensions != null) {
+                        svg.setAttribute("width", "${dimensions.width}px")
+                        svg.setAttribute("height", "${dimensions.height}px")
                     }
                     svg.asDynamic().style.display = "block"
                 }

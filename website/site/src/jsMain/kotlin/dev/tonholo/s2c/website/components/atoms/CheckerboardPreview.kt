@@ -3,10 +3,10 @@ package dev.tonholo.s2c.website.components.atoms
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.display
-import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.size
@@ -56,11 +56,7 @@ val CheckerboardPreviewStyle = CssStyle.base {
  * @param content The preview content (SVG element, iframe, or placeholder).
  */
 @Composable
-fun CheckerboardPreview(
-    sizePx: Int,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
+fun CheckerboardPreview(sizePx: Int, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Div(
         attrs = CheckerboardPreviewStyle.toModifier()
             .size(sizePx.px)
