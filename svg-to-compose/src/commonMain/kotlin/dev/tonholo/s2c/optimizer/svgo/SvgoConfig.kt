@@ -131,7 +131,7 @@ private fun StringBuilder.emitPlugin(plugin: SvgoPlugin) {
             appendLine(
                 """
                 |    {
-                |      name: \"${plugin.name}\",
+                |      name: "${plugin.name}",
                 |      params: {
                 |        leadingZero: ${plugin.leadingZero},
                 |        floatPrecision: ${plugin.floatPrecision},
@@ -145,8 +145,8 @@ private fun StringBuilder.emitPlugin(plugin: SvgoPlugin) {
             appendLine(
                 """
                 |    {
-                |      name: \"${plugin.name}\",
-                |      description: \"${plugin.description}\",
+                |      name: "${plugin.name}",
+                |      description: "${plugin.description}",
                 |      fn: () => {
                 |        return {
                 |          element: {
@@ -154,7 +154,7 @@ private fun StringBuilder.emitPlugin(plugin: SvgoPlugin) {
                 |              const fill = node.attributes.fill;
                 |              if (!fill && _shapes.indexOf(node.name) !== -1) {
                 |                // by default, shapes has color black when not specified
-                |                node.attributes.fill = \"#000\";
+                |                node.attributes.fill = "#000";
                 |              }
                 |            },
                 |          },
