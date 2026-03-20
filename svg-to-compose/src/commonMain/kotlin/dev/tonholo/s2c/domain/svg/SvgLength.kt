@@ -77,7 +77,6 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
     fun toDoubleOrNull(baseDimension: Double?): Double? = toFloatingPointOrNull(
         baseDimension = baseDimension,
         toTNumberOrNull = String::toDoubleOrNull,
-        toTNumber = String::toDouble,
         calculatePercentage = { dimension, percentValue -> (percentValue / 100.0 * dimension) },
     )
 
@@ -113,7 +112,6 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
     fun toFloatOrNull(baseDimension: Float?): Float? = toFloatingPointOrNull(
         baseDimension = baseDimension,
         toTNumberOrNull = String::toFloatOrNull,
-        toTNumber = String::toFloat,
         calculatePercentage = { dimension, percentValue -> (percentValue / 100f * dimension) },
     )
 
@@ -130,8 +128,6 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
      *  percentage-based conversions will return null.
      * @param toTNumberOrNull A function that attempts to convert a String to TNumber, returning null
      *  if the conversion fails
-     * @param toTNumber A function that converts a String to TNumber, throwing an exception if the
-     *  conversion fails
      * @param calculatePercentage A function that calculates the percentage value based on the base
      *  dimension and the parsed percentage value
      * @return The TNumber representation of this SvgLength object, or null if the conversion fails
@@ -140,7 +136,6 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
     private fun <TNumber : Number> toFloatingPointOrNull(
         baseDimension: TNumber?,
         toTNumberOrNull: String.() -> TNumber?,
-        toTNumber: String.() -> TNumber,
         calculatePercentage: (baseDimension: TNumber, percentValue: TNumber) -> TNumber,
     ): TNumber? {
         val directParse = value.toTNumberOrNull()
@@ -149,11 +144,11 @@ internal value class SvgLength(private val value: String) : Comparable<String> b
 
             value.length > 1 && value.endsWith(PERCENT) && baseDimension != null -> {
                 val value = value.removeSuffix(PERCENT)
-                calculatePercentage(baseDimension, value.toTNumber())
+                value.toTNumberOrNull()?.let { calculatePercentage(baseDimension, it) }
             }
 
             value.length > 2 && value.substring(value.length - 2) in possibleUnits ->
-                value.substring(0, value.length - 2).toTNumber()
+                value.substring(0, value.length - 2).toTNumberOrNull()
 
             else -> null
         }

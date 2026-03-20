@@ -146,15 +146,26 @@ sealed class SvgGradient<out T>(
      * @param length the SVG length value to convert to a coordinate
      * @param target the list of path nodes used to calculate the bounding box when
      *  [gradientUnits] is "objectBoundingBox"
+     * @param translateByBoundingBoxOrigin whether to add the bounding box origin offset
+     *  to the result. Should be `true` for positional coordinates (e.g., cx, cy) and
+     *  `false` for size-based values (e.g., radius r).
      * @return the calculated coordinate value as a Double
      */
-    internal fun calculateGradientXYCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Double {
+    internal fun calculateGradientXYCoordinate(
+        length: SvgLength,
+        target: List<PathNodes> = emptyList(),
+        translateByBoundingBoxOrigin: Boolean = true,
+    ): Double {
         val root = rootParent as SvgRootNode
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
             val boundingBox = target.boundingBox()
-            length.toDouble(max(boundingBox.width, boundingBox.height)) +
-                max(boundingBox.x, boundingBox.y)
+            val value = length.toDouble(max(boundingBox.width, boundingBox.height))
+            if (translateByBoundingBoxOrigin) {
+                value + max(boundingBox.x, boundingBox.y)
+            } else {
+                value
+            }
         } else {
             val baseDimension = max(root.viewportWidth, root.viewportHeight).toDouble()
             length.toDouble(baseDimension)
@@ -169,8 +180,8 @@ sealed class SvgGradient<out T>(
      * attribute is `null`, empty, or if the combined result cannot be represented as a Matrix,
      * the method returns `null` or creates a new Matrix from the transformation's underlying matrix.
      *
-     * @return the combined transformation matrix, or `null` if [gradientTransform] is ` or
-     * contains no transformations
+     * @return the combined transformation matrix, or `null` if [gradientTransform] is `null`,
+     * blank, or contains no valid transformations
      */
     internal fun computeGradientTransformMatrix(): AffineTransformation.Matrix? {
         val transformations = gradientTransform?.toTransformations() ?: return null

@@ -27,7 +27,7 @@ class SvgRadialGradientNode(
 
         var cx = calculateGradientXCoordinate(cx, target)
         var cy = calculateGradientYCoordinate(cy, target)
-        var gradientRadius = calculateGradientXYCoordinate(radius, target)
+        var gradientRadius = calculateGradientXYCoordinate(radius, target, translateByBoundingBoxOrigin = false)
 
         val matrix = computeGradientTransformMatrix()
         if (matrix != null) {

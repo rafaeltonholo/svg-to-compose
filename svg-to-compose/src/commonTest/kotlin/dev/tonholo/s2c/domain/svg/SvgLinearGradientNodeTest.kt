@@ -27,7 +27,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with translate transform, when toBrush is called, then start and end offsets are transformed`() {
+    fun `given userSpaceOnUse linear gradient with translate transform - when toBrush is called - then start and end offsets are transformed`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -61,7 +61,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient without gradientTransform, when toBrush is called, then coordinates pass through unchanged`() {
+    fun `given userSpaceOnUse linear gradient without gradientTransform - when toBrush is called - then coordinates pass through unchanged`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -94,7 +94,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with scale transform, when toBrush is called, then start and end offsets are scaled`() {
+    fun `given userSpaceOnUse linear gradient with scale transform - when toBrush is called - then start and end offsets are scaled`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -128,7 +128,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with rotate transform, when toBrush is called, then start and end offsets are rotated`() {
+    fun `given userSpaceOnUse linear gradient with rotate transform - when toBrush is called - then start and end offsets are rotated`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -158,7 +158,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with non-uniform scale, when toBrush is called, then axes are scaled independently`() {
+    fun `given userSpaceOnUse linear gradient with non-uniform scale - when toBrush is called - then axes are scaled independently`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -192,7 +192,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with combined translate and scale, when toBrush is called, then both transforms apply`() {
+    fun `given userSpaceOnUse linear gradient with combined translate and scale - when toBrush is called - then both transforms apply`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -213,7 +213,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
         // Act
         val brush = gradient.toBrush(target = emptyList())
 
-        // Assert — translate(10,20) then scale(50): (0,0)→(10,20), (1,1)→(60,70)
+        // Assert — scale(50) then translate(10,20): (0,0)→(10,20), (1,1)→(60,70)
         assertIs<ComposeBrush.Gradient.Linear>(brush)
         assertEquals(
             expected = ComposeOffset(x = 10f, y = 20f),
@@ -226,7 +226,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with matrix transform, when toBrush is called, then full matrix is applied`() {
+    fun `given userSpaceOnUse linear gradient with matrix transform - when toBrush is called - then full matrix is applied`() {
         // Arrange — matrix(a,b,c,d,e,f) = matrix(2, 0, 0, 3, 10, 20)
         // This is scale(2,3) + translate(10,20)
         root.attributes["width"] = "100"
@@ -262,7 +262,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse linear gradient with origin at zero and translate, when toBrush is called, then start moves to translate offset`() {
+    fun `given userSpaceOnUse linear gradient with origin at zero and translate - when toBrush is called - then start moves to translate offset`() {
         // Arrange — common pattern: gradient defined at origin, positioned via transform
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -296,7 +296,7 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given non-square viewport with userSpaceOnUse linear gradient, when toBrush is called, then coordinates use correct axis dimensions`() {
+    fun `given non-square viewport with userSpaceOnUse linear gradient - when toBrush is called - then coordinates use correct axis dimensions`() {
         // Arrange — non-square viewport to catch the XY vs Y bug
         root.attributes["width"] = "200"
         root.attributes["height"] = "100"

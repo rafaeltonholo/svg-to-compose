@@ -32,7 +32,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with translate scale transform, when toBrush is called, then center and radius are transformed`() {
+    fun `given userSpaceOnUse radial gradient with translate scale transform - when toBrush is called - then center and radius are transformed`() {
         // Arrange
         root.attributes["width"] = "22"
         root.attributes["height"] = "22"
@@ -65,7 +65,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient without gradientTransform, when toBrush is called, then coordinates pass through unchanged`() {
+    fun `given userSpaceOnUse radial gradient without gradientTransform - when toBrush is called - then coordinates pass through unchanged`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -97,7 +97,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with translate only transform, when toBrush is called, then center is translated and radius unchanged`() {
+    fun `given userSpaceOnUse radial gradient with translate only transform - when toBrush is called - then center is translated and radius unchanged`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -130,7 +130,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with scale only transform, when toBrush is called, then center and radius are scaled`() {
+    fun `given userSpaceOnUse radial gradient with scale only transform - when toBrush is called - then center and radius are scaled`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -163,7 +163,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with non-uniform scale, when toBrush is called, then radius uses RMS approximation`() {
+    fun `given userSpaceOnUse radial gradient with non-uniform scale - when toBrush is called - then radius uses RMS approximation`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -197,7 +197,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with rotate transform, when toBrush is called, then center is rotated and radius unchanged`() {
+    fun `given userSpaceOnUse radial gradient with rotate transform - when toBrush is called - then center is rotated and radius unchanged`() {
         // Arrange — rotation preserves distances, so radius should stay the same
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -226,7 +226,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with matrix transform, when toBrush is called, then full matrix is applied`() {
+    fun `given userSpaceOnUse radial gradient with matrix transform - when toBrush is called - then full matrix is applied`() {
         // Arrange — matrix(2, 0, 0, 3, 10, 20) = scale(2,3) + translate(10,20)
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -260,7 +260,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with origin center and translate scale, when toBrush is called, then center moves to translate offset`() {
+    fun `given userSpaceOnUse radial gradient with origin center and translate scale - when toBrush is called - then center moves to translate offset`() {
         // Arrange — common pattern: gradient at origin, positioned via transform (like kotlin.svg)
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -293,7 +293,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with identity matrix, when toBrush is called, then coordinates pass through unchanged`() {
+    fun `given userSpaceOnUse radial gradient with identity matrix - when toBrush is called - then coordinates pass through unchanged`() {
         // Arrange
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
@@ -326,7 +326,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given non-square viewport with userSpaceOnUse radial gradient, when toBrush is called, then radius uses max dimension`() {
+    fun `given non-square viewport with userSpaceOnUse radial gradient - when toBrush is called - then radius uses max dimension`() {
         // Arrange
         root.attributes["width"] = "200"
         root.attributes["height"] = "100"
@@ -360,7 +360,7 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with percentage coordinates, when toBrush is called, then percentages resolve against viewport`() {
+    fun `given userSpaceOnUse radial gradient with percentage coordinates - when toBrush is called - then percentages resolve against viewport`() {
         // Arrange
         root.attributes["width"] = "200"
         root.attributes["height"] = "100"
