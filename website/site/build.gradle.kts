@@ -1,10 +1,22 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.link
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kobweb.application)
+    alias(libs.plugins.buildconfig)
+}
+
+val appProperties = Properties().apply {
+    rootProject.rootDir.resolve("../app.properties").inputStream().use { load(it) }
+}
+
+buildConfig {
+    packageName("dev.tonholo.s2c.website.config")
+    useKotlinOutput()
+    buildConfigField("VERSION", appProperties["VERSION"].toString())
 }
 
 group = "dev.tonholo.s2c.website"
