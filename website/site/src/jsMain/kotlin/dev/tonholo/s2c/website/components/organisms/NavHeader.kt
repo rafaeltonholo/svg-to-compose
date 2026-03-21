@@ -164,7 +164,7 @@ private fun S2CLogo() {
             },
     ) {
         Image(
-            src = "favicon.svg",
+            src = "images/s2c-icon.svg",
             modifier = Modifier.size(1.25.cssRem),
         )
         SpanText(

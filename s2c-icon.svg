@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="none" viewBox="5.44 -0.75 137 149.93">
+  <title>S2C - SVG to Compose</title>
+  <!-- Three isometric faces filling the hexagon -->
+  <path fill="#ffb13b" d="M73.94 3.25 L138.44 37.1 L73.94 74.22 L9.44 37.1 Z"/>
+  <path fill="#37bf6e" d="M9.44 37.1 L73.94 74.22 L73.94 145.18 L9.44 111.33 Z"/>
+  <path fill="#6b57ff" d="M138.44 37.1 L138.44 111.33 L73.94 145.18 L73.94 74.22 Z"/>
+  <!-- Depth: darker shade overlays -->
+  <path fill="#d09236" d="M74.15 33 L37.5 53.31 L53.81 61.71 L74.26 50.83 Z"/>
+  <path fill="#d09236" d="M109.8 53.32 L74.15 33 L74.26 50.85 L95.01 61.72 Z"/>
+  <path fill="#2c9556" d="M37.5 53.32 L53.81 61.7 L53.81 134.62 L37.5 126.06 Z"/>
+  <path fill="#5e4ce3" d="M109.8 53.32 L95 61.7 L95 134.13 L109.8 126.36 Z"/>
+  <!-- Box interior -->
+  <path fill="#181424" d="M74.26 50.83 L53.81 61.71 L53.81 134.62 L73.94 145.18 L95 134.13 L95 61.72 Z"/>
+</svg>
