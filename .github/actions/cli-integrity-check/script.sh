@@ -1,33 +1,29 @@
 #!/bin/bash
-root_directory=$1
-if [ "$root_directory" == "" ]; then
-  echo "The root directory must be the first parameter."
-  exit 1
-fi
-ext=$2
-if [ "$ext" == "" ]; then
-  echo "The file extension must be the second parameter."
-  exit 1
-fi
+# Parse and validate required parameters
+root_directory="${1:?Error: Root directory must be the first parameter}"
+ext="${2:?Error: File extension must be the second parameter}"
+
+# Parse optimization and rebuild flags (rebuild can be $3 or $4)
 optimize="false"
 suffix="nonoptimized"
+rebuild=""
+
 if [ "$3" == "optimize" ]; then
   optimize="true"
   suffix="optimized"
+  [ "$4" == "--rebuild" ] && rebuild="--upgrade"
+elif [ "$3" == "--rebuild" ]; then
+  rebuild="--upgrade"
 fi
 
-type="svg"
+# Determine file type based on extension
 if [ "$ext" == "xml" ]; then
   type="avg"
 else
+  type="svg"
   ext="svg"
 fi
-rebuild="$4"
-if [ "$rebuild" == "--rebuild" ]; then
-  rebuild="--upgrade"
-else
-  rebuild=""
-fi
+
 rebuild_applied="false"
 
 # Package must match exactly what the Gradle plugin functional tests use so
