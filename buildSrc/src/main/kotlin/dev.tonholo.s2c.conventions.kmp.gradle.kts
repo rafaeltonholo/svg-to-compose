@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun
 
 plugins {
     id("dev.tonholo.s2c.conventions.common")
+    id("dev.tonholo.s2c.conventions.dokka")
     org.jetbrains.kotlin.multiplatform
     com.github.gmazzo.buildconfig
     id("dev.tonholo.s2c.conventions.publication")
