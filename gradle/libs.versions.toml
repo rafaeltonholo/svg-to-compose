@@ -13,7 +13,7 @@ jetbrains-annotation = "26.1.0"
 metro = "0.11.3"
 maven-publish = "0.31.0"
 buildconfig = "6.0.9"
-dokka = "1.9.20"
+dokka = "2.1.0"
 junit-jupiter = "5.14.0"
 
 [libraries]

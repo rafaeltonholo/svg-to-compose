@@ -27,3 +27,6 @@ kotlin-js-store
 
 # Kotlin ignores
 .kotlin
+
+# Generated Dokka API docs (copied from root build)
+site/src/jsMain/resources/public/docs

@@ -1,0 +1,111 @@
+/*
+ * Custom Dokka theme matching the SVG-to-Compose website.
+ *
+ * Overrides Dokka's CSS variables from style.css, main.css, and ui-kit.
+ * Uses !important on key variables because Dokka's runtime-injected
+ * stylesheets load after custom stylesheets and override the cascade.
+ *
+ * Color palette sourced from SiteTheme.kt.
+ * Typography: Space Grotesk (UI) + JetBrains Mono (code).
+ */
+
+@import 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap';
+
+/* ── Light mode (default) ───────────────────────────────────── */
+:root {
+    /* Backgrounds */
+    --color-background-page: #FAFAF9 !important;
+    --color-background-footer: #F5F5F4 !important;
+    --background-color: #FAFAF9 !important;
+    --default-white: #FAFAF9;
+    --default-gray: #F5F5F4;
+    --color-background-code-block: rgba(28, 25, 23, 0.05) !important;
+    --color-background-inline-code: rgba(28, 25, 23, 0.06) !important;
+
+    /* Nav bar stays dark for contrast */
+    --color-background-nav: #1C1917 !important;
+
+    /* Text */
+    --color-text: #1C1917 !important;
+    --color-text-light: #78716C !important;
+    --default-font-color: #1C1917 !important;
+    --header-font-color: #1C1917;
+
+    /* Accent — purple */
+    --color-key-blue: #7C3AED !important;
+    --color-key-blue-hover: #6D28D9;
+    --color-key-blue-50: rgba(124, 58, 237, 0.5);
+
+    /* Borders */
+    --border-color: #D6D3D1;
+
+    /* Navigation / sidebar */
+    --hover-link-color: #6D28D9;
+    --active-section-color: #7C3AED;
+    --sidemenu-section-active-color: #7C3AED;
+    --inactive-section-color: #78716C;
+    --navigation-highlight-color: rgba(124, 58, 237, 0.05);
+    --active-tab-border-color: #7C3AED;
+
+    /* Scrollbar */
+    --color-scrollbar: rgba(28, 25, 23, 0.3);
+    --color-scrollbar-track: #F5F5F4;
+    --blockquote-background: rgba(28, 25, 23, 0.05);
+
+    /* Dark-mode variants (read by Dokka JS when toggling to dark) */
+    --color-background-page-dt: #0C0A09;
+    --color-background-nav-dt: #1C1917;
+    --color-background-footer-dt: #1C1917;
+    --color-text-dt: #E7E5E4;
+    --color-text-light-dt: #A8A29E;
+
+    /* Typography */
+    --default-font-family: 'Space Grotesk', system-ui, -apple-system, 'BlinkMacSystemFont',
+        'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Droid Sans', 'Helvetica Neue',
+        'Arial', sans-serif;
+    --default-monospace-font-family: 'JetBrains Mono', 'SFMono-Regular', 'Consolas',
+        'Liberation Mono', 'Menlo', 'Courier', monospace;
+}
+
+/* ── Dark mode (Dokka toggles .theme-dark on <html>) ────────── */
+.theme-dark {
+    /* Backgrounds */
+    --color-background-page: #0C0A09 !important;
+    --color-background-footer: #1C1917 !important;
+    --background-color: #0C0A09 !important;
+    --color-dark: #1C1917;
+    --color-background-code-block: #1C1917 !important;
+    --color-background-inline-code: rgba(231, 229, 228, 0.08) !important;
+
+    /* Text */
+    --color-text: #E7E5E4 !important;
+    --color-text-light: #A8A29E !important;
+    --default-font-color: #E7E5E4 !important;
+    --header-font-color: #E7E5E4;
+
+    /* Accent — lighter purple */
+    --color-key-blue: #8B5CF6 !important;
+    --color-key-blue-hover: #A78BFA;
+    --color-key-blue-50: rgba(139, 92, 246, 0.5);
+
+    /* Borders */
+    --border-color: #292524;
+
+    /* Navigation / sidebar */
+    --hover-link-color: #A78BFA;
+    --active-section-color: #8B5CF6;
+    --sidemenu-section-active-color: #1C1917;
+    --inactive-section-color: #A8A29E;
+    --navigation-highlight-color: rgba(139, 92, 246, 0.08);
+    --active-tab-border-color: #8B5CF6;
+    --inactive-tab-border-color: rgba(168, 162, 158, 0.4);
+
+    --blockquote-background: rgba(255, 255, 255, 0.05);
+    --copy-icon-color: rgba(231, 229, 228, 0.6);
+    --copy-icon-hover-color: #E7E5E4;
+    --color-scrollbar: rgba(231, 229, 228, 0.3);
+    --color-scrollbar-track: #1C1917;
+    --footer-background: #1C1917;
+    --footer-font-color: #A8A29E;
+    --footer-go-to-top-color: #A8A29E;
+}
