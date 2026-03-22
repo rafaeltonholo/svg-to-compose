@@ -1,93 +1,124 @@
 package dev.tonholo.s2c.website.components.organisms.howtouse
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.compose.foundation.layout.Column
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.UsageCard
-import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.css.cssRem
+
+val GradleUsageCardGridStyle = CssStyle {
+    base {
+        Modifier
+            .gap(1.cssRem)
+    }
+}
 
 @Composable
 fun GradleUsageContent() {
-    Div(attrs = UsageCardGridStyle.toModifier().toAttrs()) {
-        UsageCard(
-            title = "Basic Setup",
-            description = "Minimal configuration to get started.",
-        ) {
-            CodeBlock(
-                code = """svgToCompose {
-    processor {
-        val icons by creating {
-            from(layout.projectDirectory.dir(
-                "src/main/resources/icons"
-            ))
-            destinationPackage(
-                "com.example.app.ui.icons"
-            )
-        }
+    Column(modifier = GradleUsageCardGridStyle.toModifier()) {
+        BasicSetupCard()
+        MultiSourceCard()
+        AdvancedOptionsCard()
     }
-}""",
-                language = "kotlin",
-            )
-        }
-        UsageCard(
-            title = "Multi-source Processing",
-            description = "Process multiple directories with different configurations.",
-        ) {
-            CodeBlock(
-                code = """svgToCompose {
-    processor {
-        val filled by creating {
-            from(layout.projectDirectory.dir(
-                "assets/icons/filled"
-            ))
-            destinationPackage(
-                "com.example.icons.filled"
-            )
-            icons {
-                receiverType("Icons.Filled")
-            }
-        }
-        val outlined by creating {
-            from(layout.projectDirectory.dir(
-                "assets/icons/outlined"
-            ))
-            destinationPackage(
-                "com.example.icons.outlined"
-            )
-            icons {
-                receiverType("Icons.Outlined")
-            }
-        }
+}
+
+@Composable
+private fun BasicSetupCard() {
+    UsageCard(
+        title = "Basic Setup",
+        description = "Minimal configuration to get started.",
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        CodeBlock(
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        val icons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+                |            destinationPackage("com.example.app.ui.icons")
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
+            language = "kotlin",
+        )
     }
-}""",
-                language = "kotlin",
-            )
-        }
-        UsageCard(
-            title = "Advanced Options",
-            description = "Exclude files, rename icons, and use parallel processing.",
-        ) {
-            CodeBlock(
-                code = """svgToCompose {
-    processor {
-        val icons by creating {
-            from(layout.projectDirectory.dir(
-                "src/main/resources/icons"
-            ))
-            destinationPackage(
-                "com.example.app.ui.icons"
-            )
-            optimize(true)
-            icons {
-                theme("...AppTheme")
-                makeInternal(true)
-            }
-        }
+}
+
+@Composable
+private fun MultiSourceCard() {
+    UsageCard(
+        title = "Multi-source Processing",
+        description = "Process multiple directories with different configurations.",
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        CodeBlock(
+            // language=kotlin
+            code = $$"""
+                |svgToCompose {
+                |    processor {
+                |        common {
+                |            recursive()
+                |            optimize(enabled = false)
+                |        }
+                |        val basePackage = "com.example.icons" 
+                |        val filled by creating {
+                |            from(layout.projectDirectory.dir("assets/icons/filled"))
+                |            destinationPackage("$basePackage.filled")
+                |            icons {
+                |                receiverType("Icons.Filled")
+                |            }
+                |        }
+                |        val outlined by creating {
+                |            from(layout.projectDirectory.dir("assets/icons/outlined"))
+                |            destinationPackage("$basePackage.outlined")
+                |            icons {
+                |                receiverType("Icons.Outlined")
+                |            }
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
+            language = "kotlin",
+        )
     }
-}""",
-                language = "kotlin",
-            )
-        }
+}
+
+@Composable
+private fun AdvancedOptionsCard() {
+    UsageCard(
+        title = "Advanced Options",
+        description = "Optimize, theme previews, minify, persist, control visibility, and others. " +
+            "See full documentation for more.",
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        CodeBlock(
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        val icons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+                |            destinationPackage("com.example.app.ui.icons")
+                |            optimize()
+                |            icons {
+                |                theme("com.example.app.ui.AppTheme")
+                |                makeInternal()
+                |                minify()
+                |                @OptIn(DelicateSvg2ComposeApi::class)
+                |                persist()
+                |            }
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
+            language = "kotlin",
+        )
     }
 }

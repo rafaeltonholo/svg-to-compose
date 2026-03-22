@@ -24,6 +24,7 @@ import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
+import dev.tonholo.s2c.website.config.BuildConfig
 import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -102,7 +103,7 @@ fun InstallSection(modifier: Modifier = Modifier) {
                     language = "kotlin",
                     // language=kotlin
                     code = """plugins {
-                            |    id("dev.tonholo.s2c") version "2.1.2"
+                            |    id("dev.tonholo.s2c") version "${BuildConfig.VERSION}"
                             |}
                     """.trimMargin(),
                 )

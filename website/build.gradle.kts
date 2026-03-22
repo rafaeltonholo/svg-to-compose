@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kobweb.worker) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.metro) apply false
+    alias(libs.plugins.buildconfig) apply false
     alias(libs.plugins.detekt) apply false
 }
 

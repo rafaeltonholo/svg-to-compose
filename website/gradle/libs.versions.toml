@@ -1,4 +1,5 @@
 [versions]
+buildconfig = "6.0.9"
 jszip = "3.10.1"
 compose-rules = "0.5.6"
 detekt = "2.0.0-alpha.2"
@@ -11,7 +12,7 @@ kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
 metro = "0.11.3"
-s2c = "2.1.2"
+s2c = "2.1.3"
 
 [libraries]
 dev-tonholo-s2c = { module = "dev.tonholo.s2c:svg-to-compose", version.ref = "s2c" }
@@ -33,6 +34,7 @@ detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper
 io-nlopez-compose-rules-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "compose-rules" }
 
 [plugins]
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 kobweb-application = { id = "com.varabyte.kobweb.application", version.ref = "kobweb" }

@@ -9,9 +9,10 @@ import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.color
+import dev.tonholo.s2c.website.config.BuildConfig
 
 object SiteTheme {
-    const val VERSION = "v2.1.2"
+    const val VERSION = "v${BuildConfig.VERSION}"
 
     val palette: SitePalette
         @Composable

@@ -1,13 +1,14 @@
 # SVG/XML to Compose Gradle Plugin
+
 [![SVG to Compose Gradle Plugin Latest version](https://img.shields.io/maven-central/v/dev.tonholo.s2c/svg-to-compose-gradle-plugin?display_name=tag&label=svg-to-compose-gradle-plugin&logo=apachemaven)](https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose-gradle-plugin)
-[![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](./LICENSE)
+[![LICENSE](https://img.shields.io/github/license/rafaeltonholo/svg-to-compose)](../LICENSE)
 
 ## Table of Contents
 
 - [Motivation](#motivation)
 - [Platform support](#platform-support)
 - [Installation](#installation)
-- [How It Works](#how-it-works) 
+- [How It Works](#how-it-works)
 - [Configuration](#configuration)
 
 ## Motivation
@@ -24,8 +25,9 @@ integration of vector assets into your Compose projects, ensuring a more
 efficient and error-free workflow.
 
 ## Platform support
-| Platform             | Support  |
-|----------------------|:--------:|
+
+| Platform             | Support |
+|----------------------|:-------:|
 | Android              |    ✅    |
 | Kotlin Multiplatform |    ✅    |
 
@@ -201,14 +203,14 @@ Within the `icons` block, you can customize how icons are processed:
   `ImageVector`.
 - **receiverType(String)**: Sets a receiver type for the `ImageVector` property.
 - **addToMaterialIcons()**: Uses Material `Icons` as the receiver type.
-- **mapIconNameTo((String) -> String)**: Customizes icon names using a mapping
+- **mapIconNameTo((String) → String)**: Customizes icon names using a mapping
   function.
 - **exclude(vararg Regex)**: Excludes icons based on filename patterns.
 - **persist()**: Persists generated files in the source set (use with caution).
 
 ### Parallel Processing
 
-You can enable parallel processing to speed up icon generation. The Gradle 
+You can enable parallel processing to speed up icon generation. The Gradle
 plugin uses the Gradle Worker API under the hood.
 
 ```kotlin
@@ -222,9 +224,11 @@ svgToCompose {
 ```
 
 Notes:
+
 - The effective parallelism is bounded by Gradle's global `--max-workers`.
 - If `parallelism` is `0` or `1` (default), processing runs sequentially.
-- Caching is preserved by the plugin's internal cache; unchanged icons are skipped.
+- Caching is preserved by the plugin's internal cache; unchanged icons are
+  skipped.
 
 ### Persistent Generation
 

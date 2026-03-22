@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="s2c-logo.svg" alt="S2C - SVG to Compose" width="150" />
+</p>
+
 # SVG to Compose
 
 [![Built with KMP](https://img.shields.io/badge/Built_with_KMP-gray?logo=kotlin)](https://kotlinlang.org/docs/multiplatform.html)

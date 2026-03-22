@@ -12,6 +12,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.size
+import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
@@ -27,13 +29,9 @@ fun LogoAndDescription(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.gap(0.5.cssRem),
         ) {
-            SpanText(
-                "s2c",
-                modifier = Modifier
-                    .color(ColorMode.current.toSitePalette().primary)
-                    .fontWeight(FontWeight.Bold)
-                    .fontSize(1.125.cssRem)
-                    .fontFamily(values = FontFamilies.mono),
+            Image(
+                src = "images/s2c-icon.svg",
+                modifier = Modifier.size(1.25.cssRem),
             )
             SpanText(
                 "svg-to-compose",

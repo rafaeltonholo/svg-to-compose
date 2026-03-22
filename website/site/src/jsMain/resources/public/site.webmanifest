@@ -1,7 +1,6 @@
 {
   "name": "SVG to Compose",
-  "short_name": "svg-to-compose",
-  "description": "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code",
+  "short_name": "s2c",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -17,6 +16,6 @@
     }
   ],
   "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "background_color": "#181424",
   "display": "standalone"
 }
