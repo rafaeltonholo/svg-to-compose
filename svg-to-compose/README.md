@@ -113,74 +113,53 @@ Help output:
 Usage: s2c [<options>] <path>
 
 Options:
-  -v, --version                Show this CLI version and exit
-* -p, --package=<text>         Specify icons' package. This will replace
-                               package at the top of the icon file
-* -t, --theme=<text>           Specify project's theme name. This will take
-                               place in the Icon Preview composable function
-                               and in the ImageVector Builder's names.
-* -o, --output=<text>          output filename; if no .kt extension specified,
-                               it will be automatically added. In case of the
-                               input is a directory, output MUST also be a
-                               directory.
-  -opt, --optimize=true|false  Enable SVG/AVG optimization before parsing to
-                               Jetpack Compose icon. The optimization process
-                               uses the following programs: svgo, avocado from
-                               NPM Registry (default: true)
-  -rt, --receiver-type=<text>  Adds a receiver type to the Icon definition.
-                               This will generate the Icon as a extension of
-                               the passed argument.
-                               E.g.: s2c <args> -o MyIcon.kt -rt Icons.Filled
-                               my-icon.svg will creates the Compose Icon:
-                               val Icons.Filled.MyIcon: ImageVector.
-  --add-to-material            Add the icon to the Material Icons context
-                               provider.
-  --debug                      Enable debug log.
-  --verbose                    Enable verbose log.
-  --stacktrace                 Print the stacktrace when an error happens.
-  -np, --no-preview            Removes the preview function from the file.
-  --kmp=true|false             Ensures the output is compatible with KMP.
-                               (default: false)
-  --make-internal              Mark the icon as internal
-  --minified                   Remove all comments explaining the path logic
-                               creation and inline all method parameters.
-  -r, --recursive              Enables parsing of all files in the input
-                               directory, including those in subdirectories up
-                               to a maximum depth of 10
-  --recursive-depth, --depth=<int>
-                               The depth level for recursive file search within
-                               directory. The default value is 10. (default:
-                               10)
-  --silent                     Enable silent run mode. This will suppress all
-                               the output logs this CLI provides.
-  --exclude=<text>             A regex used to exclude some icons from the
-                               parsing.
-  --indent-size=<int>          Number of indent characters per level in
-                               generated code. Overrides .editorconfig if
-                               specified.
-  --indent-style=(space|tab)   Indentation style for generated code: 'space' or
-                               'tab'. Overrides .editorconfig if specified.
-  --no-editorconfig            Disable .editorconfig resolution. Uses default
-                               formatting unless --indent-size or
-                               --indent-style are specified.
-  --map-icon-name-from-to, --from-to, --rename=<text>...
-                               Replace the icon's name first value of this
-                               parameter with the second. This is useful when
-                               you want to remove part of the icon's name from
-                               the output icon.
+  -v, --version                                           Show this CLI version and exit
+* -p, --package=<text>                                    Specify icons' package. This will replace package at the top of the icon file
+* -t, --theme=<text>                                      Specify project's theme name. This will take place in the Icon Preview composable function and in
+                                                          the ImageVector Builder's names.
+* -o, --output=<text>                                     output filename; if no .kt extension specified, it will be automatically added. In case of the
+                                                          input is a directory, output MUST also be a directory.
+  -opt, --optimize=true|false                             Enable SVG/AVG optimization before parsing to Jetpack Compose icon. The optimization process uses
+                                                          the following programs: svgo, avocado from NPM Registry (default: true)
+  -rt, --receiver-type=<text>                             Adds a receiver type to the Icon definition. This will generate the Icon as a extension of the
+                                                          passed argument.
+                                                          E.g.: s2c <args> -o MyIcon.kt -rt Icons.Filled my-icon.svg will creates the Compose Icon:
+                                                          val Icons.Filled.MyIcon: ImageVector.
+  --add-to-material                                       Add the icon to the Material Icons context provider.
+  --debug                                                 Enable debug log.
+  --verbose                                               Enable verbose log.
+  --stacktrace                                            Print the stacktrace when an error happens.
+  -np, --no-preview                                       Removes the preview function from the file.
+  --kmp=true|false                                        Ensures the output is compatible with KMP. (default: false)
+  --make-internal                                         Mark the icon as internal
+  --minified                                              Remove all comments explaining the path logic creation and inline all method parameters.
+  -r, --recursive                                         Enables parsing of all files in the input directory, including those in subdirectories up to a
+                                                          maximum depth of 10
+  --recursive-depth, --depth=<int>                        The depth level for recursive file search within directory. The default value is 10. (default:
+                                                          10)
+  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides.
+  --exclude=<text>                                        A regex used to exclude some icons from the parsing.
+  --indent-size=<int>                                     Number of indent characters per level in generated code. Overrides .editorconfig if specified.
+  --indent-style=(space|tab)                              Indentation style for generated code: 'space' or 'tab'. Overrides .editorconfig if specified.
+  --no-editorconfig                                       Disable .editorconfig resolution. Uses default formatting unless --indent-size or --indent-style
+                                                          are specified.
+  --template=<text>                                       Path to an s2c.template.toml file for output customization. When omitted, auto-discovers by
+                                                          walking up from the output directory.
+  --no-template                                           Disable auto-discovery of s2c.template.toml files.
+  --map-icon-name-from-to, --from-to, --rename=<text>...  Replace the icon's name first value of this parameter with the second. This is useful when you
+                                                          want to remove part of the icon's name from the output icon.
 
-                               For example, running the following command:
-                               ╭────────────────────────────────────────────╮
-                               │    s2c <args> \                            │
-                               │        -o ./my-app/src/my/pkg/icons \      │
-                               │        -rt Icons.Filled \                  │
-                               │        --map-icon-name-from-to "_filled" ""│
-                               │        ./my-app/assets/svgs                │
-                               ╰────────────────────────────────────────────╯
+                                                          For example, running the following command:
+                                                          ╭────────────────────────────────────────────╮
+                                                          │    s2c <args> \                            │
+                                                          │        -o ./my-app/src/my/pkg/icons \      │
+                                                          │        -rt Icons.Filled \                  │
+                                                          │        --map-icon-name-from-to "_filled" ""│
+                                                          │        ./my-app/assets/svgs                │
+                                                          ╰────────────────────────────────────────────╯
 
-                               An icon named bright_sun_filled.svg will create
-                               a ImageVector named BrightSun.
-  -h, --help                   Show this message and exit
+                                                          An icon named bright_sun_filled.svg will create a ImageVector named BrightSun.
+  -h, --help                                              Show this message and exit
 
 Arguments:
   <path>  file *.svg | *.xml | directory
