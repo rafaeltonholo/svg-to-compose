@@ -2,3 +2,4 @@
 .kobweb/*
 !.kobweb/conf.yaml
 src/jsMain/resources/public/editor
+src/jsMain/resources/public/dokka

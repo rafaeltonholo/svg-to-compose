@@ -77,9 +77,17 @@ val copyEditorWasm by tasks.registering(Copy::class) {
     from(project(":editor-wasm").layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
     into(layout.projectDirectory.dir("src/jsMain/resources/public/editor"))
 }
+
+val dokkaOutputDir = rootProject.layout.projectDirectory.dir("../build/dokka")
+val copyDokkaHtml by tasks.registering(Sync::class) {
+    from(dokkaOutputDir)
+    into(layout.projectDirectory.dir("src/jsMain/resources/public/docs"))
+}
+
 tasks.configureEach {
     if (name == "jsProcessResources") {
         dependsOn(copyEditorWasm)
+        dependsOn(copyDokkaHtml)
     }
 }
 

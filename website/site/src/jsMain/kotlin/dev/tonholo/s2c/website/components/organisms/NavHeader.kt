@@ -183,6 +183,7 @@ private fun MenuItems() {
     NavLink("#install", "Install")
     NavLink("#usage", "Usage")
     NavLink("#capabilities", "Capabilities")
+    NavLink("/docs/index.html", "API Docs")
 }
 
 val GitHubButtonStyle = CssStyle {
