@@ -10,21 +10,21 @@ import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.Android: ImageVector by lazy {
-    icon(name = Android, viewportWidth = 95.0f, viewportHeight = 95.0f) {
+    icon(name = "Android", viewportWidth = 95.0f, viewportHeight = 95.0f) {
         group() {
             iconPath(
                 fill = Brush.radialGradient(
                     0.307f to Color(0xFF4FAF53),
                     1.0f to Color(0xFF118016),
                     1.0f to Color(0x004FAF53),
-                    center = Offset.Zero,
-                    radius = 1.0f,
+                    center = Offset(x = 47.092957f, y = 55.79932f),
+                    radius = 46.25078f,
                 ),
             ) {
                 // M 86.42 23.58
@@ -282,8 +282,8 @@ val Icons.Android: ImageVector by lazy {
                 fill = Brush.radialGradient(
                     0.0f to Color(0xFFFFFFFF),
                     0.948f to Color(0x00FFFFFF),
-                    center = Offset.Zero,
-                    radius = 1.0f,
+                    center = Offset(x = 22.7829f, y = 27.03815f),
+                    radius = 2.4601667f,
                 ),
                 fillAlpha = 0.9f,
                 strokeAlpha = 0.15f,
@@ -330,8 +330,8 @@ val Icons.Android: ImageVector by lazy {
                 fill = Brush.radialGradient(
                     0.0f to Color(0xFFFFFFFF),
                     0.948f to Color(0x00FFFFFF),
-                    center = Offset.Zero,
-                    radius = 1.0f,
+                    center = Offset(x = 71.951515f, y = 27.260931f),
+                    radius = 2.4601667f,
                 ),
                 fillAlpha = 0.9f,
                 strokeAlpha = 0.15f,
@@ -527,8 +527,8 @@ val Icons.Android: ImageVector by lazy {
             fill = Brush.radialGradient(
                 0.0f to Color(0xFF93E19F),
                 1.0f to Color(0x0093E19F),
-                center = Offset.Zero,
-                radius = 1.0f,
+                center = Offset(x = 31.969488f, y = 54.580315f),
+                radius = 1.4572636f,
             ),
             fillAlpha = 0.7f,
         ) {
@@ -569,8 +569,8 @@ val Icons.Android: ImageVector by lazy {
             fill = Brush.radialGradient(
                 0.0f to Color(0xFF93E19F),
                 1.0f to Color(0x0093E19F),
-                center = Offset.Zero,
-                radius = 1.0f,
+                center = Offset(x = 64.02f, y = 53.387f),
+                radius = 1.456427f,
             ),
             fillAlpha = 0.7f,
         ) {
@@ -1161,9 +1161,9 @@ val Icons.Android: ImageVector by lazy {
 @Preview(name = "Android", showBackground = true)
 @Composable
 private fun AndroidPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = Android,
+            imageVector = Icons.Android,
             contentDescription = null,
         )
     }

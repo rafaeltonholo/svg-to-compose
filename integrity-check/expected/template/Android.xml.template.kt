@@ -9,13 +9,13 @@ import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.Android: ImageVector by lazy {
-    icon(name = Android, viewportWidth = 95.0f, viewportHeight = 95.0f) {
+    icon(name = "Android", viewportWidth = 95.0f, viewportHeight = 95.0f) {
         group() {
             iconPath(
                 fill = Brush.radialGradient(
@@ -1211,9 +1211,9 @@ val Icons.Android: ImageVector by lazy {
 @Preview(name = "Android", showBackground = true)
 @Composable
 private fun AndroidPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = Android,
+            imageVector = Icons.Android,
             contentDescription = null,
         )
     }

@@ -20,6 +20,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.borderRight
 import com.varabyte.kobweb.compose.ui.modifiers.borderTop
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.disabled
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.flexWrap
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
@@ -29,8 +30,10 @@ import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.title
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaClipboard
 import com.varabyte.kobweb.silk.components.icons.fa.FaPlay
@@ -168,6 +171,12 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
 /**
  * Toolbar row with sample selector, input-mode toggle (paste/upload),
  * format selector (SVG/AVG), and a convert button.
+ *
+ * The convert button adapts to the current [inputMode]: in "paste" mode
+ * it triggers single-file conversion via [onConvert]; in "upload" mode
+ * it triggers batch conversion via [onConvert] (caller wires the right
+ * callback). The button is disabled when no files are selected in batch
+ * mode or when template errors are present.
  */
 @Composable
 fun PlaygroundToolbar(
@@ -175,6 +184,8 @@ fun PlaygroundToolbar(
     isConverting: Boolean,
     sampleNames: List<String>,
     selectedSample: Int,
+    hasTemplateErrors: Boolean = false,
+    isBatchReady: Boolean = true,
     onSampleSelect: (Int) -> Unit = {},
     onInputModeChange: (String) -> Unit = {},
     onConvert: () -> Unit = {},
@@ -183,7 +194,11 @@ fun PlaygroundToolbar(
         SampleButtons(sampleNames, selectedSample, onSampleSelect)
         ToolbarSeparator()
         InputModeButtons(inputMode, onInputModeChange)
-        ConvertButton(isConverting, onConvert)
+        ConvertButton(
+            isConverting = isConverting,
+            isDisabled = hasTemplateErrors || (inputMode == "upload" && !isBatchReady),
+            onConvert = onConvert,
+        )
     }
 }
 
@@ -242,12 +257,18 @@ private fun InputModeButtons(inputMode: String, onInputModeChange: (String) -> U
 }
 
 @Composable
-private fun ConvertButton(isConverting: Boolean, onConvert: () -> Unit) {
+private fun ConvertButton(isConverting: Boolean, isDisabled: Boolean, onConvert: () -> Unit) {
+    val inactive = isConverting || isDisabled
     Button(
         attrs = ConvertButtonStyle.toModifier()
             .display(DisplayStyle.Flex).alignItems(AlignItems.Center).gap(0.4.cssRem)
-            .let { if (isConverting) it.opacity(value = 0.7f).cursor(Cursor.Default) else it }
-            .onClick { if (!isConverting) onConvert() }
+            .thenIf(inactive) { Modifier.opacity(value = 0.7f).cursor(Cursor.Default) }
+            .thenIf(isDisabled) {
+                Modifier
+                    .disabled()
+                    .title("Fix template errors before converting")
+            }
+            .onClick { if (!inactive) onConvert() }
             .toAttrs(),
     ) {
         if (isConverting) {

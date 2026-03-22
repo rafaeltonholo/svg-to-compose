@@ -40,7 +40,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaDownload
-import com.varabyte.kobweb.silk.components.icons.fa.FaPlay
 import com.varabyte.kobweb.silk.components.icons.fa.FaRotate
 import com.varabyte.kobweb.silk.components.icons.fa.FaSpinner
 import com.varabyte.kobweb.silk.components.icons.fa.FaSquare
@@ -145,7 +144,6 @@ internal fun BatchPhaseHeader(
     allSelected: Boolean,
     modifier: Modifier = Modifier,
     onToggleSelectAll: () -> Unit = {},
-    onStartConversion: () -> Unit = {},
     onCancel: () -> Unit = {},
     onDownload: () -> Unit = {},
     onRestart: () -> Unit = {},
@@ -160,7 +158,6 @@ internal fun BatchPhaseHeader(
                 selectedCount = selectedCount,
                 allSelected = allSelected,
                 onToggleSelectAll = onToggleSelectAll,
-                onStartConversion = onStartConversion,
             )
 
             is BatchPhase.Converting -> ConvertingPhaseContent(
@@ -185,10 +182,8 @@ private fun SelectPhaseContent(
     selectedCount: Int,
     allSelected: Boolean,
     onToggleSelectAll: () -> Unit,
-    onStartConversion: () -> Unit,
 ) {
     val palette = ColorMode.current.toSitePalette()
-    val canStart = selectedCount > 0
 
     Row(
         modifier = Modifier.fillMaxWidth().gap(0.625.cssRem),
@@ -210,21 +205,6 @@ private fun SelectPhaseContent(
                 .fontSize(0.8.cssRem)
                 .color(palette.onSurfaceVariant),
         )
-        Button(
-            attrs = BatchPhasePrimaryButtonStyle.toModifier()
-                .let { if (!canStart) it.opacity(value = 0.4f).cursor(Cursor.Default) else it }
-                .ariaLabel("Start conversion of $selectedCount selected files")
-                .onClick { if (canStart) onStartConversion() }
-                .toAttrs(),
-        ) {
-            Row(
-                modifier = Modifier.gap(0.35.cssRem),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FaPlay(modifier = Modifier.fontSize(0.7.cssRem))
-                SpanText("Start Conversion")
-            }
-        }
     }
 }
 

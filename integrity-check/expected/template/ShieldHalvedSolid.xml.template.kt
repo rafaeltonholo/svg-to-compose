@@ -5,13 +5,13 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.ShieldHalvedSolid: ImageVector by lazy {
-    icon(name = ShieldHalvedSolid, viewportWidth = 512.0f, viewportHeight = 512.0f) {
+    icon(name = "ShieldHalvedSolid", viewportWidth = 512.0f, viewportHeight = 512.0f) {
         iconPath(fill = SolidColor(Color(0xFF1E3050))) {
             // M 256 0
             moveTo(x = 256.0f, y = 0.0f)
@@ -106,9 +106,9 @@ val Icons.ShieldHalvedSolid: ImageVector by lazy {
 @Preview(name = "ShieldHalvedSolid", showBackground = true)
 @Composable
 private fun ShieldHalvedSolidPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = ShieldHalvedSolid,
+            imageVector = Icons.ShieldHalvedSolid,
             contentDescription = null,
         )
     }

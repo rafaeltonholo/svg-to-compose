@@ -8,13 +8,13 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.LinearGradient01: ImageVector by lazy {
-    icon(name = LinearGradient01, viewportWidth = 800.0f, viewportHeight = 400.0f) {
+    icon(name = "LinearGradient01", viewportWidth = 800.0f, viewportHeight = 400.0f) {
         iconPath() {
             // M 1 1
             moveTo(x = 1.0f, y = 1.0f)
@@ -50,9 +50,9 @@ val Icons.LinearGradient01: ImageVector by lazy {
 @Preview(name = "LinearGradient01", showBackground = true)
 @Composable
 private fun LinearGradient01Preview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = LinearGradient01,
+            imageVector = Icons.LinearGradient01,
             contentDescription = null,
         )
     }

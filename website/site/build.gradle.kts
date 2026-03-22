@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(websiteLibs.plugins.kobweb.application)
+    alias(libs.plugins.org.jetbrains.kotlin.serialization)
     alias(libs.plugins.buildconfig)
 }
 
@@ -235,6 +236,7 @@ kotlin {
             implementation(websiteLibs.silk.icons.fa)
             implementation(websiteLibs.dev.tonholo.s2c)
             implementation(project(":worker"))
+            implementation(websiteLibs.org.jetbrains.kotlinx.kotlinxSerializationJson)
             implementation(npm("jszip", websiteLibs.versions.jszip.get()))
         }
     }

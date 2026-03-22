@@ -141,29 +141,6 @@ internal class IconParserConfigurationImpl(
         return errors
     }
 
-    override fun calculateHash(): Sha256Hash {
-        val raw = buildString {
-            append(receiverType.orNull)
-            append("|")
-            append(addToMaterialIcons.orNull)
-            append("|")
-            append(noPreview.orNull)
-            append("|")
-            append(iconVisibility.orNull)
-            append("|")
-            append(minified.orNull)
-            append("|")
-            append(exclude.orNull)
-            append("|")
-            append(mapIconNameTo.orNull?.let { "fn()" })
-            append("|")
-            append(isCodeGenerationPersistent.orNull)
-            append("|")
-            append(templateFile.orNull?.asFile?.absolutePath)
-        }
-        return raw.sha256()
-    }
-
     internal fun merge(common: IconParserConfigurationImpl) {
         iconVisibility
             .setIfNotPresent(

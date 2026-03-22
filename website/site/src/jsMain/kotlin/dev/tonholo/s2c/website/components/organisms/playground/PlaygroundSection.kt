@@ -235,11 +235,14 @@ private fun PlaygroundEditorPanel(
         PlaygroundToolbar(
             inputMode = state.inputMode,
             isConverting = state.isConverting,
+            hasTemplateErrors = state.templateErrors.isNotEmpty(),
+            isBatchReady = state.inputMode != "upload" ||
+                (state.batchPhase == BatchPhase.Select && state.selectedFiles.isNotEmpty()),
             sampleNames = samples.map { it.name },
             selectedSample = state.selectedSample,
             onSampleSelect = onSampleSelect,
             onInputModeChange = { dispatch(PlaygroundAction.ChangeInputMode(it)) },
-            onConvert = onConvert,
+            onConvert = if (state.inputMode == "upload") onStartBatchConversion else onConvert,
         )
 
         CollapsibleSection(title = "Options") {
@@ -249,6 +252,16 @@ private fun PlaygroundEditorPanel(
             )
         }
 
+        TemplateEditorSection(
+            templateToml = state.templateToml,
+            templateErrors = state.templateErrors,
+            expanded = state.templateExpanded,
+            onExpandedChange = { dispatch(PlaygroundAction.ChangeTemplateExpanded(it)) },
+            onTemplateChange = { dispatch(PlaygroundAction.UpdateTemplateToml(it)) },
+            onTemplateFileLoad = { dispatch(PlaygroundAction.TemplateFileLoaded(it)) },
+            onClear = { dispatch(PlaygroundAction.ClearTemplate) },
+        )
+
         PreviewSection(state, dispatch)
         BatchOrCodePanels(
             state = state,
@@ -257,7 +270,6 @@ private fun PlaygroundEditorPanel(
             completedCountByFolder = completedCountByFolder,
             completedResultsByKey = completedResultsByKey,
             selectedCountByFolder = selectedCountByFolder,
-            onStartBatchConversion = onStartBatchConversion,
             onCancelBatch = onCancelBatch,
             fileInputRef = fileInputRef,
             folderInputRef = folderInputRef,
@@ -291,7 +303,6 @@ private fun BatchOrCodePanels(
     completedCountByFolder: Map<String, Int>,
     completedResultsByKey: Map<String, BatchConversionResult>,
     selectedCountByFolder: Map<String, Int>,
-    onStartBatchConversion: () -> Unit,
     onCancelBatch: () -> Unit,
     fileInputRef: HTMLInputElement?,
     folderInputRef: HTMLInputElement?,
@@ -323,7 +334,6 @@ private fun BatchOrCodePanels(
                 dispatch(PlaygroundAction.SetFoldersSelection(paths, selected))
             },
             onToggleFolderExpand = { dispatch(PlaygroundAction.ToggleFolderExpanded(it)) },
-            onStartConversion = onStartBatchConversion,
             onCancel = onCancelBatch,
             onDownload = {
                 val downloadResults = (state.batchPhase as? BatchPhase.Results)?.completed

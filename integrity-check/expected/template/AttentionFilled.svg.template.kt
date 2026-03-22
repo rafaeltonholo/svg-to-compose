@@ -6,14 +6,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
-import my.custom.app.designsystem.theme.colors.BLACK
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.BLACK
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.AttentionFilled: ImageVector by lazy {
-    icon(name = AttentionFilled, viewportWidth = 24.0f, viewportHeight = 24.0f) {
+    icon(name = "AttentionFilled", viewportWidth = 24.0f, viewportHeight = 24.0f) {
         iconPath(fill = SolidColor(BLACK), pathFillType = PathFillType.EvenOdd) {
             // M 21.5 12
             moveTo(x = 21.5f, y = 12.0f)
@@ -102,9 +102,9 @@ val Icons.AttentionFilled: ImageVector by lazy {
 @Preview(name = "AttentionFilled", showBackground = true)
 @Composable
 private fun AttentionFilledPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = AttentionFilled,
+            imageVector = Icons.AttentionFilled,
             contentDescription = null,
         )
     }

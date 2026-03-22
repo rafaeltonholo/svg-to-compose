@@ -8,18 +8,18 @@ import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.Brasil: ImageVector by lazy {
-    icon(name = Brasil, viewportWidth = 4200.0f, viewportHeight = 2940.0f) {
-        brasilChunk1()
-        brasilChunk2()
+    icon(name = "Brasil", viewportWidth = 4200.0f, viewportHeight = 2940.0f) {
+        brasilPart1()
+        brasilPart2()
     }
 }
 
-private fun ImageVector.Builder.brasilChunk1() {
+private fun ImageVector.Builder.brasilPart1() {
     // <rect width="4200" height="2940" x="-2100.0" y="-1470.0" fill="#009b3a" />
     path(
         fill = SolidColor(Color(0xFF009B3A)),
@@ -2408,7 +2408,7 @@ private fun ImageVector.Builder.brasilChunk1() {
     }
 }
 
-private fun ImageVector.Builder.brasilChunk2() {
+private fun ImageVector.Builder.brasilPart2() {
     // M0 -1 v1 h.5
     path(
         fill = SolidColor(Color(0xFFFFFFFF)),
@@ -4020,9 +4020,9 @@ private fun ImageVector.Builder.brasilChunk2() {
 @Preview(name = "Brasil", showBackground = true)
 @Composable
 private fun BrasilPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = Brasil,
+            imageVector = Icons.Brasil,
             contentDescription = null,
         )
     }

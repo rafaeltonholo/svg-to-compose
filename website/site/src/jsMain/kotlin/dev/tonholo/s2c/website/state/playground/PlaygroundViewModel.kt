@@ -44,6 +44,11 @@ internal class PlaygroundViewModel(
     private var singleWorker: IconConvertWorker? = null
     private var workerPool: WorkerPool? = null
 
+    private val templateHelper = TemplatePersistenceHelper(
+        readState = { state },
+        dispatch = ::dispatch,
+    )
+
     val selectedCountByFolder: Map<String, Int>
         get() = state.uploadedFiles
             .filter { it.fileKey() in state.selectedFiles }
@@ -57,6 +62,7 @@ internal class PlaygroundViewModel(
      */
     fun initWorkers(poolSize: Int = WorkerPool.DEFAULT_POOL_SIZE) {
         if (singleWorker != null) return
+        templateHelper.restorePersistedState()
         singleWorker = IconConvertWorker { output ->
             dispatch(PlaygroundAction.ConversionOutputReceived(output))
         }
@@ -77,6 +83,22 @@ internal class PlaygroundViewModel(
 
     fun dispatch(action: PlaygroundAction) {
         state = reducer.reduce(state, action)
+        when (action) {
+            is PlaygroundAction.UpdateTemplateToml,
+            is PlaygroundAction.TemplateFileLoaded,
+            -> {
+                templateHelper.scheduleTemplateValidation()
+                templateHelper.schedulePersistence()
+            }
+
+            is PlaygroundAction.ChangeOptions,
+            is PlaygroundAction.ClearTemplate,
+            -> {
+                templateHelper.schedulePersistence()
+            }
+
+            else -> Unit
+        }
     }
 
     suspend fun selectSample(index: Int) {
@@ -95,14 +117,18 @@ internal class PlaygroundViewModel(
 
     /** Converts the current editor content (single-file mode). */
     fun convertSingle() {
+        if (state.templateErrors.isNotEmpty()) return
         val worker = singleWorker ?: return
+        dispatch(PlaygroundAction.ChangeTemplateExpanded(expanded = false))
         dispatch(PlaygroundAction.StartConversion)
         val input = ConversionInputFactory.fromState(state)
         worker.postInput(input)
     }
 
     fun startBatchConversion() {
+        if (state.templateErrors.isNotEmpty()) return
         val pool = workerPool ?: return
+        dispatch(PlaygroundAction.ChangeTemplateExpanded(expanded = false))
         filesToConvert = state.uploadedFiles.filter { file ->
             file.fileKey() in state.selectedFiles
         }
@@ -111,8 +137,13 @@ internal class PlaygroundViewModel(
         _completedResultsByKey.clear()
         dispatch(PlaygroundAction.StartBatchConversion)
 
+        val templateToml = with(ConversionInputFactory) { state.templateToml.takeIfUsable() }
         val inputs = filesToConvert.mapIndexed { index, file ->
-            index to ConversionInputFactory.fromUploadedFile(file, state.options)
+            index to ConversionInputFactory.fromUploadedFile(
+                file,
+                state.options,
+                templateToml,
+            )
         }
         pool.submitAll(inputs)
     }
@@ -126,7 +157,12 @@ internal class PlaygroundViewModel(
         val batchFile = filesToConvert.getOrNull(fileIndex) ?: return
         when (output) {
             is ConversionOutput.Progress -> {
-                dispatch(PlaygroundAction.BatchFileProgress(batchFile.name, output.stage))
+                dispatch(
+                    PlaygroundAction.BatchFileProgress(
+                        batchFile.name,
+                        output.stage,
+                    ),
+                )
             }
 
             is ConversionOutput.Success -> {

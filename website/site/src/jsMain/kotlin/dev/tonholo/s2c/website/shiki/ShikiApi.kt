@@ -13,6 +13,7 @@ fun codeToHtmlOptions(
     lightTheme: String,
     darkTheme: String,
     colorReplacements: Map<String, String>? = null,
+    transformers: Array<dynamic>? = null,
 ): dynamic {
     val options = js("({})")
     options.lang = lang
@@ -23,6 +24,9 @@ fun codeToHtmlOptions(
             replacements[from] = to
         }
         options.colorReplacements = replacements
+    }
+    if (transformers != null) {
+        options.transformers = transformers
     }
     return options
 }

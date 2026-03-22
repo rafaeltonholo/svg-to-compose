@@ -14,10 +14,15 @@ internal object ConversionInputFactory {
             iconName = iconName,
             fileType = state.extension,
             options = state.options,
+            templateToml = state.templateToml.takeIfUsable(),
         )
     }
 
-    fun fromUploadedFile(file: UploadedFileInfo, baseOptions: PlaygroundOptions): ConversionInput {
+    fun fromUploadedFile(
+        file: UploadedFileInfo,
+        baseOptions: PlaygroundOptions,
+        templateToml: String? = null,
+    ): ConversionInput {
         val filePackage = computeFilePackage(file.relativePath, baseOptions.pkg)
         val fileOptions = baseOptions.copy(pkg = filePackage)
         return create(
@@ -27,6 +32,7 @@ internal object ConversionInputFactory {
                 .replaceFirstChar { it.uppercase() },
             fileType = file.detectedExtension,
             options = fileOptions,
+            templateToml = templateToml,
         )
     }
 
@@ -39,11 +45,26 @@ internal object ConversionInputFactory {
         return "$basePackage.$subPkg"
     }
 
+    /**
+     * Returns the TOML string only when it contains real configuration
+     * beyond section headers and comments (the default placeholder).
+     */
+    fun String.takeIfUsable(): String? {
+        val trimmed = trim()
+        if (trimmed.isEmpty()) return null
+        val hasContent = trimmed.lines().any { line ->
+            val l = line.trim()
+            l.isNotEmpty() && !l.startsWith("#") && !l.startsWith("[")
+        }
+        return if (hasContent) this else null
+    }
+
     private fun create(
         svgContent: String,
         iconName: String,
         fileType: String,
         options: PlaygroundOptions,
+        templateToml: String? = null,
     ): ConversionInput = ConversionInput(
         svgContent = svgContent,
         iconName = iconName,
@@ -56,5 +77,6 @@ internal object ConversionInputFactory {
         minified = options.minified,
         kmpPreview = options.kmpPreview,
         receiverType = options.receiverType,
+        templateToml = templateToml,
     )
 }

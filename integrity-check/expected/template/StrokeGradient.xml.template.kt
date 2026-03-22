@@ -6,13 +6,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import my.custom.app.designsystem.atom.icon.Icons
-import my.custom.app.designsystem.atom.icon.icon
-import my.custom.app.designsystem.atom.icon.iconPath
-import my.custom.app.designsystem.theme.AppTheme
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
+import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.StrokeGradient: ImageVector by lazy {
-    icon(name = StrokeGradient, viewportWidth = 100.0f, viewportHeight = 100.0f) {
+    icon(name = "StrokeGradient", viewportWidth = 100.0f, viewportHeight = 100.0f) {
         iconPath() {
             // M 50 3
             moveTo(x = 50.0f, y = 3.0f)
@@ -43,9 +43,9 @@ val Icons.StrokeGradient: ImageVector by lazy {
 @Preview(name = "StrokeGradient", showBackground = true)
 @Composable
 private fun StrokeGradientPreview() {
-    AppTheme {
+    SampleAppTheme {
         Image(
-            imageVector = StrokeGradient,
+            imageVector = Icons.StrokeGradient,
             contentDescription = null,
         )
     }

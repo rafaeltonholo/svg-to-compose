@@ -73,6 +73,13 @@ svgToCompose {
                 persist()
             }
         }
+        create("template") {
+            from(layout.projectDirectory.dir("samples/template"))
+            destinationPackage("$basePackage.template.generated")
+            icons {
+                templateFile(rootProject.layout.projectDirectory.file("s2c.template.toml"))
+            }
+        }
     }
 }
 
