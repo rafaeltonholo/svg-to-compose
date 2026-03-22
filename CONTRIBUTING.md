@@ -103,7 +103,7 @@ Useful tasks:
 - Run tests: `./gradlew test`
 - Static analysis (Detekt): `./gradlew detekt`
 - Merge Detekt reports (CI helper): `./gradlew mergeDetektReport` (if available)
-- Generate docs (Dokka): `./gradlew dokkaHtml`
+- Generate docs (Dokka): `./gradlew :docs:dokkaGenerate`
 - Publish to Maven Local (for local testing): `./gradlew publishAllToMavenLocal`
 - Run CLI (help): `./s2c --help`
 
@@ -293,7 +293,7 @@ use the imperative mood.
 ### Updating Docs and Samples
 
 - Module docs live under each module's README. Root README provides overview.
-- API docs are generated via Dokka: `./gradlew dokkaHtml`.
+- API docs are generated via Dokka: `./gradlew :docs:dokkaGenerate`.
 - If you add new flags/behaviors, update examples in `README.md` and module
   READMEs. If you add example assets, place them under `samples/`.
 

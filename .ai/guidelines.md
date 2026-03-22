@@ -77,7 +77,7 @@ To run a specific test class:
 ### Documentation
 
 ```bash
-./gradlew dokkaHtml                    # Generate API docs
+./gradlew :docs:dokkaGenerate          # Generate API docs
 ```
 
 ### CLI

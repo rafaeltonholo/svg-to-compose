@@ -61,6 +61,9 @@ jobs:
       - name: Unzip Kobweb CLI
         run: unzip kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip
 
+      - name: Generate API documentation
+        run: ./gradlew :docs:dokkaGenerate
+
       - name: Export site
         run: |
           cd website/site
