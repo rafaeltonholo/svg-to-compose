@@ -33,7 +33,7 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.ToggleSwitch
 import dev.tonholo.s2c.website.state.playground.PlaygroundOptions
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle

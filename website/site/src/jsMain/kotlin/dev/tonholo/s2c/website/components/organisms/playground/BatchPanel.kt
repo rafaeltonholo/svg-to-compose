@@ -36,7 +36,7 @@ import dev.tonholo.s2c.website.state.playground.batch.BatchFileListState
 import dev.tonholo.s2c.website.state.playground.fileKey
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
 import dev.tonholo.s2c.website.state.playground.folder.FolderGroupState
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px

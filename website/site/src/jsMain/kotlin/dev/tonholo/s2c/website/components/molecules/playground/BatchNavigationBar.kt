@@ -25,7 +25,7 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaChevronRight
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection

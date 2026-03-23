@@ -38,14 +38,14 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SitePalette
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.CheckerboardPreview
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.molecules.playground.ZoomControls
 import dev.tonholo.s2c.website.state.playground.preview.SourcePreviewContent
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.util.rememberElementSize
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle

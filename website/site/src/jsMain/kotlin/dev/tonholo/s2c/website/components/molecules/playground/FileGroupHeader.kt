@@ -45,12 +45,12 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.SitePalette
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.FileGroup
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem

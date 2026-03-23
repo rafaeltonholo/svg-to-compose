@@ -34,7 +34,7 @@ import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.FilePickerInput
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
@@ -47,7 +47,7 @@ import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.util.handleDrop
 import dev.tonholo.s2c.website.zip.downloadAsZip
 import kotlinx.coroutines.CoroutineScope

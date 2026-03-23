@@ -52,10 +52,10 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SitePalette
+import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
 import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position

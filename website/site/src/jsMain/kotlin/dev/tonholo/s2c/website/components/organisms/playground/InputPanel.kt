@@ -64,7 +64,7 @@ import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_LIGHT_BACKGROUND
 import dev.tonholo.s2c.website.shiki.Shiki
 import dev.tonholo.s2c.website.shiki.codeToHtmlOptions
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
