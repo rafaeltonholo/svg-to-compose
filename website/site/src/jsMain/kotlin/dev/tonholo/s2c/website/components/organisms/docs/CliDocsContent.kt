@@ -111,6 +111,8 @@ private const val S2C_DISABLE_OPTIMIZATION = """
 private const val OUTPUT_EXAMPLE = """
 |package com.app.icons
 |
+|import androidx.compose.ui.graphics.Color
+|import androidx.compose.ui.graphics.SolidColor
 |import androidx.compose.ui.graphics.vector.ImageVector
 |import androidx.compose.ui.graphics.vector.path
 |import androidx.compose.ui.unit.dp
@@ -322,7 +324,7 @@ private fun InstallationSection() {
             Text(", then give it execution permission:")
         }
         CodeBlock(
-            code = "chmod +xw s2c",
+            code = "chmod +x s2c",
             language = "console",
         )
         SpanText(
@@ -330,7 +332,7 @@ private fun InstallationSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = $$"export PATH=<s2c path>:$PATH",
+            code = $$"export PATH=\"/path/to/s2c:$PATH\"",
             language = "shell",
         )
     }
