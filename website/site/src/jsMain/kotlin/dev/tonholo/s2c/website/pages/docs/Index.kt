@@ -1,14 +1,17 @@
 package dev.tonholo.s2c.website.pages.docs
 
 import androidx.compose.runtime.Composable
+import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TextDecorationLine
-import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.css.autoLength
+import com.varabyte.kobweb.compose.foundation.layout.Arrangement
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -23,7 +26,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.marginInline
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
+import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.size
 import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.translateY
@@ -34,7 +39,6 @@ import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
-import com.varabyte.kobweb.silk.components.icons.fa.FaGears
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -48,8 +52,10 @@ import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.DisplayTextStyle
 import dev.tonholo.s2c.website.SubheadlineTextStyle
+import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -125,6 +131,15 @@ val DocsCardStyle = CssStyle {
                 timingFunction(TransitionTimingFunction.EaseInOut)
             }
     }
+
+    Breakpoint.MD {
+        Modifier.minHeight(12.1875.cssRem)
+    }
+
+    Breakpoint.LG {
+        Modifier.minHeight(9.375.cssRem)
+    }
+
     hover {
         Modifier
             .border(1.px, LineStyle.Solid, palette.primary)
@@ -153,7 +168,7 @@ fun initDocsPage(ctx: InitRouteContext) {
 @Suppress("ModifierMissing")
 @Composable
 fun DocsPage() {
-    val palette = dev.tonholo.s2c.website.SiteTheme.palette
+    val palette = SiteTheme.palette
     Div(
         attrs = DocsContainerStyle.toModifier()
             .toAttrs(),
@@ -185,7 +200,7 @@ fun DocsPage() {
                 description = "Automate SVG/AVG to Compose conversion in your build pipeline " +
                     "with smart caching and incremental builds.",
                 href = "/docs/gradle-plugin",
-                icon = { FaGears(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
+                icon = { GradleSvg(color = palette.primary, modifier = Modifier.size(1.85.cssRem)) },
             )
             DocsCard(
                 title = "API Reference",
@@ -199,21 +214,26 @@ fun DocsPage() {
 
 @Composable
 private fun DocsCard(title: String, description: String, href: String, icon: @Composable () -> Unit) {
-    val palette = dev.tonholo.s2c.website.SiteTheme.palette
+    val palette = SiteTheme.palette
     Link(
         path = href,
         modifier = Modifier.ariaLabel("$title — $description"),
         variant = DocsCardLinkVariant.then(UncoloredLinkVariant),
     ) {
         Div(attrs = DocsCardStyle.toModifier().toAttrs()) {
-            icon()
-            SpanText(
-                title,
-                modifier = Modifier
-                    .fontSize(1.1.cssRem)
-                    .fontWeight(FontWeight.Bold)
-                    .color(palette.onSurface),
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(.5.cssRem),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                icon()
+                SpanText(
+                    title,
+                    modifier = Modifier
+                        .fontSize(1.1.cssRem)
+                        .fontWeight(FontWeight.Bold)
+                        .color(palette.onSurface),
+                )
+            }
             SpanText(
                 description,
                 modifier = Modifier
