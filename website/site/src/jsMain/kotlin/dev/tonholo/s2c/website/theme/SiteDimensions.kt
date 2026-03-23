@@ -18,6 +18,11 @@ private const val SIZE_PREFIX = "dimension-size"
  * **IMPORTANT**: Must not be called directly. Use the corresponding values from
  * [SiteTheme.dimensions] instead to ensure proper theming and responsiveness.
  */
+object LayoutTokens {
+    /** Maximum width for page-level content containers (80rem = 1280px). */
+    val contentMaxWidth: CSSSizeValue<CSSUnit.rem> get() = 80.cssRem
+}
+
 object SiteDimensions {
     /**
      * Provides access to predefined spacing size values used throughout the site.
@@ -27,6 +32,14 @@ object SiteDimensions {
      * CSS custom properties and can be used to maintain consistent spacing across UI components.
      */
     val size: SizeTokens = SizeTokens
+
+    /**
+     * Fixed layout tokens for content constraints.
+     *
+     * These tokens define maximum widths and other layout constants that do not
+     * vary with breakpoints.
+     */
+    val layout: LayoutTokens = LayoutTokens
 
     /**
      * Semantic margin tokens for layout-level spacing.
