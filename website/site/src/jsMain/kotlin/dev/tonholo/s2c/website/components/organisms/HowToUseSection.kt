@@ -17,7 +17,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.TabPanel

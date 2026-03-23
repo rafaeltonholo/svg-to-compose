@@ -70,7 +70,8 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.components.molecules.DocNavDropdown
+import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AnimationDirection
@@ -155,16 +156,20 @@ private fun S2CLogo() {
             .gap(0.5.cssRem)
             .cursor(Cursor.Pointer)
             .onClick {
-                window.scrollTo(
-                    options = ScrollToOptions(
-                        top = 0.0,
-                        behavior = ScrollBehavior.SMOOTH,
-                    ),
-                )
+                if (window.location.pathname == "/") {
+                    window.scrollTo(
+                        options = ScrollToOptions(
+                            top = 0.0,
+                            behavior = ScrollBehavior.SMOOTH,
+                        ),
+                    )
+                } else {
+                    window.location.href = "/"
+                }
             },
     ) {
         Image(
-            src = "images/s2c-icon.svg",
+            src = "/images/s2c-icon.svg",
             modifier = Modifier.size(1.25.cssRem),
         )
         SpanText(
@@ -183,7 +188,27 @@ private fun MenuItems() {
     NavLink("#install", "Install")
     NavLink("#usage", "Usage")
     NavLink("#capabilities", "Capabilities")
-    NavLink("/docs/index.html", "API Docs")
+    DocNavDropdown()
+}
+
+@Composable
+private fun SideMenuItems() {
+    val palette = ColorMode.current.toSitePalette()
+    NavLink("#playground", "Playground")
+    NavLink("#install", "Install")
+    NavLink("#usage", "Usage")
+    NavLink("#capabilities", "Capabilities")
+    SpanText(
+        "Docs",
+        modifier = Modifier
+            .fontWeight(FontWeight.SemiBold)
+            .color(palette.onSurfaceVariant)
+            .fontSize(0.75.cssRem)
+            .padding(top = 0.5.cssRem),
+    )
+    NavLink("/docs/cli", "CLI")
+    NavLink("/docs/gradle-plugin", "Gradle Plugin")
+    NavLink("/api-docs/index.html", "API Reference")
 }
 
 val GitHubButtonStyle = CssStyle {
@@ -321,7 +346,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                         .fontSize(1.4.cssRem),
                     horizontalAlignment = Alignment.End,
                 ) {
-                    MenuItems()
+                    SideMenuItems()
                     Link(
                         "https://github.com/rafaeltonholo/svg-to-compose",
                         modifier = Modifier

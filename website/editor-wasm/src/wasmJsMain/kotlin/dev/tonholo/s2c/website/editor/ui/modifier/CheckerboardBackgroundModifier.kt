@@ -20,22 +20,20 @@ import androidx.compose.ui.unit.Dp
  * @param cellSize The size of each square cell in the checkerboard grid.
  * @return A modifier that draws a checkerboard pattern background.
  */
-internal fun Modifier.checkerboardBackground(
-    checkerColor: Pair<Color, Color>,
-    cellSize: Dp,
-): Modifier = this then Modifier
-    .drawBehind {
-        val (color1, color2) = checkerColor
-        val cellSize = cellSize.toPx()
-        val cols = (size.width / cellSize).toInt() + 1
-        val rows = (size.height / cellSize).toInt() + 1
-        for (row in 0 until rows) {
-            for (col in 0 until cols) {
-                drawRect(
-                    color = if ((row + col) % 2 == 0) color1 else color2,
-                    topLeft = Offset(col * cellSize, row * cellSize),
-                    size = Size(cellSize, cellSize),
-                )
+internal fun Modifier.checkerboardBackground(checkerColor: Pair<Color, Color>, cellSize: Dp): Modifier =
+    this then Modifier
+        .drawBehind {
+            val (color1, color2) = checkerColor
+            val cellSize = cellSize.toPx()
+            val cols = (size.width / cellSize).toInt() + 1
+            val rows = (size.height / cellSize).toInt() + 1
+            for (row in 0 until rows) {
+                for (col in 0 until cols) {
+                    drawRect(
+                        color = if ((row + col) % 2 == 0) color1 else color2,
+                        topLeft = Offset(col * cellSize, row * cellSize),
+                        size = Size(cellSize, cellSize),
+                    )
+                }
             }
         }
-    }

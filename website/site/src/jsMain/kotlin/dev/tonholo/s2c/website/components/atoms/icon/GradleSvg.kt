@@ -5,12 +5,19 @@ import com.varabyte.kobweb.compose.dom.svg.Path
 import com.varabyte.kobweb.compose.dom.svg.SVGFillType
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
 import com.varabyte.kobweb.compose.dom.svg.Svg
+import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.toAttrs
 
 @Composable
-fun GradleSvg(color: Color = Color.rgb(value = 0x02303A), width: Int = 512, height: Int = 512) {
+fun GradleSvg(
+    color: Color = Color.rgb(value = 0x02303A),
+    width: Int = 512,
+    height: Int = 512,
+    modifier: Modifier = Modifier
+) {
     Svg(
-        attrs = {
+        attrs = modifier.toAttrs {
             viewBox(x = 0, y = 0, width = 512, height = 512)
             fill(SVGFillType.None)
             width(value = width)
@@ -62,4 +69,9 @@ fun GradleSvg(color: Color = Color.rgb(value = 0x02303A), width: Int = 512, heig
             )
         }
     }
+}
+
+@Composable
+fun GradleSvg(color: Color = Color.rgb(value = 0x02303A), size: Int = 512, modifier: Modifier = Modifier) {
+    GradleSvg(color = color, width = size, height = size, modifier = modifier)
 }

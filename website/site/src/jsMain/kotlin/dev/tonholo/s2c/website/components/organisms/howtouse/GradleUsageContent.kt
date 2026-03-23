@@ -3,13 +3,25 @@ package dev.tonholo.s2c.website.components.organisms.howtouse
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.margin
+import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.icons.fa.FaArrowRight
+import com.varabyte.kobweb.silk.components.icons.fa.IconSize
+import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
+import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.UsageCard
+import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
+import org.jetbrains.compose.web.dom.Div
 
 val GradleUsageCardGridStyle = CssStyle {
     base {
@@ -19,11 +31,30 @@ val GradleUsageCardGridStyle = CssStyle {
 }
 
 @Composable
-fun GradleUsageContent() {
-    Column(modifier = GradleUsageCardGridStyle.toModifier()) {
+fun GradleUsageContent(modifier: Modifier = Modifier) {
+    Column(modifier = GradleUsageCardGridStyle.toModifier().then(modifier)) {
         BasicSetupCard()
         MultiSourceCard()
         AdvancedOptionsCard()
+        Div(
+            attrs = Modifier
+                .margin(top = 1.cssRem)
+                .fillMaxWidth()
+                .display(DisplayStyle.Flex)
+                .toAttrs(),
+        ) {
+            Link(
+                path = "/docs/gradle-plugin",
+                modifier = Modifier
+                    .color(SiteTheme.palette.primary)
+                    .gap(0.25.cssRem)
+                    .display(DisplayStyle.Flex),
+                variant = UndecoratedLinkVariant,
+            ) {
+                SpanText("See full Gradle Plugin documentation")
+                FaArrowRight(size = IconSize.XS)
+            }
+        }
     }
 }
 

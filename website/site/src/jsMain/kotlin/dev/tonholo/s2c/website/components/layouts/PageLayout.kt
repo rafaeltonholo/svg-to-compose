@@ -19,7 +19,7 @@ import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.components.icons.fa.FaTriangleExclamation
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.SiteTheme
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Banner
 import dev.tonholo.s2c.website.components.organisms.NavHeader
 import dev.tonholo.s2c.website.components.organisms.footer.Footer
