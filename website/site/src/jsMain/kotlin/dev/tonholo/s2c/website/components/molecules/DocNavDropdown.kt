@@ -188,8 +188,8 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
 private fun DropdownPanel(isOpen: Boolean) {
     Column(
         modifier = DocNavDropdownPanelStyle.toModifier()
-            .opacity(if (isOpen) 1 else 0)
-            .translateY(if (isOpen) 0.px else (-4).px)
+            .opacity(value = if (isOpen) 1 else 0)
+            .translateY(ty = if (isOpen) 0.px else (-4).px)
             .pointerEvents(if (isOpen) PointerEvents.Auto else PointerEvents.None)
             .transition(
                 Transition.of("opacity", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),

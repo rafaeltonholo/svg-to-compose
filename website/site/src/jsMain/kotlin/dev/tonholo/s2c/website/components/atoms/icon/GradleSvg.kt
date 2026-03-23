@@ -11,10 +11,10 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 
 @Composable
 fun GradleSvg(
+    modifier: Modifier = Modifier,
     color: Color = Color.rgb(value = 0x02303A),
     width: Int = 512,
     height: Int = 512,
-    modifier: Modifier = Modifier,
 ) {
     Svg(
         attrs = modifier.toAttrs {
@@ -72,6 +72,6 @@ fun GradleSvg(
 }
 
 @Composable
-fun GradleSvg(color: Color = Color.rgb(value = 0x02303A), size: Int = 512, modifier: Modifier = Modifier) {
+fun GradleSvg(modifier: Modifier = Modifier, color: Color = Color.rgb(value = 0x02303A), size: Int = 512) {
     GradleSvg(color = color, width = size, height = size, modifier = modifier)
 }

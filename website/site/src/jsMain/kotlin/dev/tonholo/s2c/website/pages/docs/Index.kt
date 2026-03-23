@@ -155,12 +155,12 @@ val DocsCardStyle = CssStyle {
     hover {
         Modifier
             .border(1.px, LineStyle.Solid, palette.primary)
-            .translateY((-2).px)
+            .translateY(ty = (-2).px)
     }
     cssRule(":focus-within") {
         Modifier
             .border(1.px, LineStyle.Solid, palette.primary)
-            .translateY((-2).px)
+            .translateY(ty = (-2).px)
     }
 }
 
