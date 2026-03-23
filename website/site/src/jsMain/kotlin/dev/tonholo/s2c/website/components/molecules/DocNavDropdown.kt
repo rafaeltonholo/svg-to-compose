@@ -200,13 +200,14 @@ private fun DropdownPanel(isOpen: Boolean) {
             .role("menu"),
     ) {
         val linkTabIndex = if (isOpen) 0 else -1
+        val docLinkVariant = UndecoratedLinkVariant.then(UncoloredLinkVariant)
         Link(
             path = "/docs/cli",
             text = "CLI",
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
                 .role("menuitem"),
-            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            variant = docLinkVariant,
         )
         Link(
             path = "/docs/gradle-plugin",
@@ -214,7 +215,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
                 .role("menuitem"),
-            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            variant = docLinkVariant,
         )
         Link(
             path = "/api-docs/index.html",
@@ -222,7 +223,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
                 .role("menuitem"),
-            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            variant = docLinkVariant,
         )
     }
 }
