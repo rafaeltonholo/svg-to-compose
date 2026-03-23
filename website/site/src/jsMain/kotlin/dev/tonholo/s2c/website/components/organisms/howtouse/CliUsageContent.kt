@@ -18,7 +18,6 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaPalette
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
@@ -145,11 +144,7 @@ fun CliUsageContent(modifier: Modifier = Modifier) {
         ) {
             Link(
                 path = "/docs/cli",
-                modifier = Modifier
-                    .color(SiteTheme.palette.primary)
-                    .gap(SiteTheme.dimensions.size.Xsm)
-                    .display(DisplayStyle.Flex),
-                variant = UndecoratedLinkVariant,
+                variant = SeeFullDocumentationLinkButton,
             ) {
                 SpanText("See full CLI documentation")
                 FaArrowRight(size = IconSize.XS)

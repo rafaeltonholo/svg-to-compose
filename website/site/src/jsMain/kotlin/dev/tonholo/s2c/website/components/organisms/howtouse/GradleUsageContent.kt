@@ -3,7 +3,6 @@ package dev.tonholo.s2c.website.components.organisms.howtouse
 import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.gap
@@ -12,7 +11,6 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowRight
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
@@ -44,11 +42,7 @@ fun GradleUsageContent(modifier: Modifier = Modifier) {
         ) {
             Link(
                 path = "/docs/gradle-plugin",
-                modifier = Modifier
-                    .color(SiteTheme.palette.primary)
-                    .gap(SiteTheme.dimensions.size.Xsm)
-                    .display(DisplayStyle.Flex),
-                variant = UndecoratedLinkVariant,
+                variant = SeeFullDocumentationLinkButton,
             ) {
                 SpanText("See full Gradle Plugin documentation")
                 FaArrowRight(size = IconSize.XS)
