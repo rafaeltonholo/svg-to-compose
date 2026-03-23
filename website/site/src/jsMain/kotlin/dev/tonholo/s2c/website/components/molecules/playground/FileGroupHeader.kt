@@ -45,12 +45,12 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.SitePalette
-import dev.tonholo.s2c.website.SiteTheme
-import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.state.playground.FileGroup
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
@@ -74,7 +74,7 @@ val FileGroupHeaderStyle = CssStyle {
                 color(palette.outline.toRgb().copyf(alpha = 0.5f))
             }
             .cursor(Cursor.Pointer)
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .position(Position.Sticky)
             .top(0.px)
             .zIndex(FOLDER_HEADER_Z_INDEX)
@@ -233,7 +233,7 @@ private fun FileGroupConvertingTrailing(completedCount: Int, totalCount: Int) {
     val progressPercent = if (totalCount > 0) (completedCount * 100 / totalCount) else 0
 
     Row(
-        modifier = Modifier.gap(0.5.cssRem),
+        modifier = Modifier.gap(SiteTheme.dimensions.size.Sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SpanText(

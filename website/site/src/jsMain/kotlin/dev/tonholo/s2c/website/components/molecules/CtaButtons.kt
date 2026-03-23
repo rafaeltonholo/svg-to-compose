@@ -27,7 +27,8 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexWrap
@@ -40,7 +41,7 @@ val CtaRowStyle = CssStyle.base {
         .display(DisplayStyle.Flex)
         .flexWrap(FlexWrap.Wrap)
         .alignItems(AlignItems.Center)
-        .gap(1.5.cssRem)
+        .gap(SiteTheme.dimensions.size.Xl)
 }
 
 val PrimaryCtaStyle = CssStyle {

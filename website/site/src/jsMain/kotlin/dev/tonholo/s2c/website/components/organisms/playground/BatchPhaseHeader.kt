@@ -52,10 +52,11 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SitePalette
 import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
-import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
@@ -74,7 +75,7 @@ val BatchPhaseHeaderStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .backgroundColor(palette.surfaceVariant)
-        .padding(topBottom = 0.625.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = 0.625.cssRem, leftRight = SiteTheme.dimensions.size.Lg)
         .position(Position.Sticky)
         .top(0.px)
         .zIndex(HEADER_Z_INDEX)
@@ -104,7 +105,7 @@ val BatchPhasePrimaryButtonStyle = CssStyle.base {
         .color(palette.onPrimary)
         .border(0.px, LineStyle.None, palette.primary)
         .borderRadius(0.375.cssRem)
-        .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
         .fontSize(0.75.cssRem)
         .fontWeight(FontWeight.Medium)
         .cursor(Cursor.Pointer)
@@ -120,7 +121,7 @@ val BatchPhaseSecondaryButtonStyle = CssStyle.base {
         .color(palette.onSurface)
         .border(1.px, LineStyle.Solid, palette.outline)
         .borderRadius(0.375.cssRem)
-        .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
         .fontSize(0.75.cssRem)
         .fontWeight(FontWeight.Medium)
         .cursor(Cursor.Pointer)
@@ -151,7 +152,7 @@ internal fun BatchPhaseHeader(
     onClear: () -> Unit = {},
 ) {
     Column(
-        modifier = BatchPhaseHeaderStyle.toModifier().then(modifier).gap(0.5.cssRem),
+        modifier = BatchPhaseHeaderStyle.toModifier().then(modifier).gap(SiteTheme.dimensions.size.Sm),
     ) {
         when (phase) {
             BatchPhase.Select -> SelectPhaseContent(
@@ -259,7 +260,7 @@ private fun ConvertingPhaseContent(phase: BatchPhase.Converting, onCancel: () ->
     val percentage = if (total > 0) (completedCount * 100) / total else 0
     val elapsedText = rememberElapsedTime(phase.startTimeMs)
 
-    Column(modifier = Modifier.fillMaxWidth().gap(0.5.cssRem)) {
+    Column(modifier = Modifier.fillMaxWidth().gap(SiteTheme.dimensions.size.Sm)) {
         Row(
             modifier = Modifier.fillMaxWidth().gap(0.625.cssRem),
             verticalAlignment = Alignment.CenterVertically,
@@ -340,7 +341,7 @@ private fun ResultsPhaseContent(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth().gap(0.5.cssRem),
+        modifier = Modifier.fillMaxWidth().gap(SiteTheme.dimensions.size.Sm),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -370,7 +371,7 @@ private fun ResultsActionButtons(
     onRestart: () -> Unit,
     onClear: () -> Unit,
 ) {
-    Row(modifier = Modifier.gap(0.5.cssRem), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier.gap(SiteTheme.dimensions.size.Sm), verticalAlignment = Alignment.CenterVertically) {
         if (successCount > 0) {
             Button(
                 attrs = BatchPhasePrimaryButtonStyle.toModifier()

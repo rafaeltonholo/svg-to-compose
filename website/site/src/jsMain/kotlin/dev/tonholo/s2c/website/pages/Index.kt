@@ -6,6 +6,7 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
+import dev.tonholo.s2c.website.components.atoms.ScrollReveal
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
 import dev.tonholo.s2c.website.components.organisms.CapabilitiesSection
 import dev.tonholo.s2c.website.components.organisms.HeroSection
@@ -23,8 +24,8 @@ fun initHomePage(ctx: InitRouteContext) {
 @Composable
 fun HomePage() {
     HeroSection()
-    PlaygroundSection()
-    InstallSection()
-    HowToUseSection()
-    CapabilitiesSection()
+    ScrollReveal { PlaygroundSection() }
+    ScrollReveal { InstallSection() }
+    ScrollReveal { HowToUseSection() }
+    ScrollReveal { CapabilitiesSection() }
 }

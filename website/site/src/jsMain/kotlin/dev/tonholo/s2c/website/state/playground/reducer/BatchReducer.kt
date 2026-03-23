@@ -1,137 +1,15 @@
-package dev.tonholo.s2c.website.state.playground
+package dev.tonholo.s2c.website.state.playground.reducer
 
-import dev.tonholo.s2c.website.worker.ConversionOutput
+import dev.tonholo.s2c.website.state.playground.PlaygroundAction
+import dev.tonholo.s2c.website.state.playground.PlaygroundState
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.fileKey
+import dev.tonholo.s2c.website.state.playground.batch.toFileGroups
 import kotlin.js.Date
 
-/**
- * Pure function that computes the next [PlaygroundState] given the current
- * state and an [PlaygroundAction]. Contains no side effects — all state
- * transitions are testable in isolation.
- */
-@Suppress("TooManyFunctions")
-internal object PlaygroundReducer {
-    @Suppress("CyclomaticComplexMethod")
-    fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
-        is PlaygroundAction.SelectSample -> state.copy(
-            selectedSample = action.index,
-            inputCode = "",
-            inputMode = "paste",
-            previewExpanded = true,
-            inputFileName = "input.svg",
-            outputFileName = "MyIcon.kt",
-            viewingBatchResult = false,
-            batchPhase = null,
-            fileGroups = emptyList(),
-            selectedFiles = emptySet(),
-            expandedFolders = emptySet(),
-            uploadedFiles = emptyList(),
-        )
-
-        is PlaygroundAction.SampleLoaded -> state.copy(
-            inputCode = action.svgCode,
-            inputFileName = action.samplePath,
-            outputFileName = "${action.iconName}.kt",
-            previewExpanded = true,
-        )
-
-        is PlaygroundAction.ChangeInputMode -> if (action.mode == "upload") {
-            state.copy(
-                inputMode = action.mode,
-                selectedSample = -1,
-                inputCode = "",
-                convertedKotlinCode = "",
-                iconFileContentsJson = null,
-                conversionError = null,
-                previewExpanded = false,
-                inputFileName = "input.svg",
-                outputFileName = "MyIcon.kt",
-                batchPhase = null,
-                fileGroups = emptyList(),
-                selectedFiles = emptySet(),
-                expandedFolders = emptySet(),
-                uploadedFiles = emptyList(),
-            )
-        } else {
-            state.copy(inputMode = action.mode)
-        }
-
-        is PlaygroundAction.UpdateInputCode -> state.copy(inputCode = action.code)
-
-        is PlaygroundAction.LoadContent -> {
-            val detected = detectExtension(action.content)
-            state.copy(
-                inputCode = action.content,
-                extension = detected ?: state.extension,
-            )
-        }
-
-        is PlaygroundAction.ChangeOptions -> state.copy(options = action.options)
-
-        is PlaygroundAction.SelectMobilePanel -> state.copy(activePanel = action.panel)
-
-        is PlaygroundAction.ChangeZoom -> state.copy(zoomLevel = action.zoom)
-
-        is PlaygroundAction.ChangePreviewExpanded -> state.copy(previewExpanded = action.expanded)
-
-        is PlaygroundAction.SingleFileLoaded -> {
-            val detected = detectExtension(action.content)
-            val iconName = action.fileName.substringBeforeLast(".")
-                .replaceFirstChar { it.uppercase() }
-            state.copy(
-                inputCode = action.content,
-                extension = detected ?: state.extension,
-                inputMode = "paste",
-                selectedSample = -1,
-                previewExpanded = true,
-                inputFileName = action.fileName,
-                outputFileName = "$iconName.kt",
-                viewingBatchResult = false,
-                batchPhase = null,
-                fileGroups = emptyList(),
-                selectedFiles = emptySet(),
-                expandedFolders = emptySet(),
-                uploadedFiles = emptyList(),
-            )
-        }
-
-        is PlaygroundAction.StartConversion -> state.copy(
-            isConverting = true,
-            conversionError = null,
-            conversionProgress = "Starting conversion...",
-            zoomLevel = 1f,
-        )
-
-        is PlaygroundAction.StartBatch,
-        is PlaygroundAction.StartBatchConversion,
-        is PlaygroundAction.BatchFileProgress,
-        is PlaygroundAction.BatchFileCompleted,
-        is PlaygroundAction.BatchCompleted,
-        is PlaygroundAction.CancelBatch,
-        is PlaygroundAction.BatchCancelled,
-        is PlaygroundAction.RestartBatch,
-        is PlaygroundAction.ClearBatchResults,
-        is PlaygroundAction.ToggleFileSelection,
-        is PlaygroundAction.ToggleFolderSelection,
-        is PlaygroundAction.SetFoldersSelection,
-        is PlaygroundAction.ToggleSelectAll,
-        is PlaygroundAction.ToggleFolderExpanded,
-        is PlaygroundAction.InspectBatchResult,
-        is PlaygroundAction.NavigatePrev,
-        is PlaygroundAction.NavigateNext,
-        is PlaygroundAction.BackToBatchList,
-        -> reduceBatch(state, action)
-
-        is PlaygroundAction.ZipUploadError -> state.copy(
-            conversionError = action.message,
-            isConverting = false,
-            batchPhase = null,
-        )
-
-        is PlaygroundAction.ConversionOutputReceived ->
-            reduceConversionOutput(state, action.output)
-    }
-
-    private fun reduceBatch(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
+internal class BatchReducer : Reducer<PlaygroundAction, PlaygroundState> {
+    override fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
         is PlaygroundAction.StartBatch,
         is PlaygroundAction.StartBatchConversion,
         is PlaygroundAction.BatchFileProgress,
@@ -353,6 +231,12 @@ internal object PlaygroundReducer {
                 viewingBatchIndex = -1,
             )
 
+            is PlaygroundAction.ZipUploadError -> state.copy(
+                conversionError = action.message,
+                isConverting = false,
+                batchPhase = null,
+            )
+
             else -> state
         }
 
@@ -374,27 +258,4 @@ internal object PlaygroundReducer {
             viewingBatchIndex = index,
         )
     }
-
-    private fun reduceConversionOutput(state: PlaygroundState, output: ConversionOutput): PlaygroundState =
-        when (output) {
-            is ConversionOutput.Progress -> state.copy(
-                isConverting = true,
-                conversionProgress = output.stage,
-            )
-
-            is ConversionOutput.Success -> state.copy(
-                convertedKotlinCode = output.kotlinCode,
-                iconFileContentsJson = output.iconFileContentsJson,
-                isConverting = false,
-                conversionProgress = "",
-                conversionError = null,
-                previewExpanded = true,
-            )
-
-            is ConversionOutput.Error -> state.copy(
-                isConverting = false,
-                conversionProgress = "",
-                conversionError = output.message,
-            )
-        }
 }

@@ -20,8 +20,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
-import dev.tonholo.s2c.website.SpinKeyframes
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.SpinKeyframes
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AnimationTimingFunction
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -35,7 +36,7 @@ val ConvertButtonStyle = CssStyle {
             .backgroundColor(palette.primary)
             .color(palette.onPrimary)
             .borderRadius(0.5.cssRem)
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
             .fontWeight(FontWeight.SemiBold)
             .fontSize(0.8.cssRem)
             .cursor(Cursor.Pointer)

@@ -8,6 +8,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.fileKey
+import dev.tonholo.s2c.website.state.playground.batch.resultKey
+import dev.tonholo.s2c.website.state.playground.reducer.PlaygroundReducer
+import dev.tonholo.s2c.website.state.playground.reducer.Reducer
 import dev.tonholo.s2c.website.worker.ConversionOutput
 import dev.tonholo.s2c.website.worker.IconConvertWorker
 import kotlinx.browser.window
@@ -22,7 +28,9 @@ import kotlinx.coroutines.await
  * methods beyond dispatch handle side-effect-producing operations
  * (worker I/O, batch pool management) that can't be pure reducers.
  */
-internal class PlaygroundViewModel : ViewModel() {
+internal class PlaygroundViewModel(
+    private val reducer: Reducer<PlaygroundAction, PlaygroundState> = PlaygroundReducer(),
+) : ViewModel() {
     var state by mutableStateOf(PlaygroundState())
         private set
 
@@ -68,7 +76,7 @@ internal class PlaygroundViewModel : ViewModel() {
     }
 
     fun dispatch(action: PlaygroundAction) {
-        state = PlaygroundReducer.reduce(state, action)
+        state = reducer.reduce(state, action)
     }
 
     suspend fun selectSample(index: Int) {
@@ -91,10 +99,6 @@ internal class PlaygroundViewModel : ViewModel() {
         dispatch(PlaygroundAction.StartConversion)
         val input = ConversionInputFactory.fromState(state)
         worker.postInput(input)
-    }
-
-    fun loadFiles(files: List<UploadedFileInfo>) {
-        dispatch(PlaygroundAction.StartBatch(files))
     }
 
     fun startBatchConversion() {

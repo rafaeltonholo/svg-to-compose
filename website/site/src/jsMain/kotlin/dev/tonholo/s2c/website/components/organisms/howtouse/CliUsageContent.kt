@@ -11,24 +11,27 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.icons.fa.FaArrowRight
 import com.varabyte.kobweb.silk.components.icons.fa.FaFile
 import com.varabyte.kobweb.silk.components.icons.fa.FaFolderOpen
 import com.varabyte.kobweb.silk.components.icons.fa.FaPalette
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
+import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
 import dev.tonholo.s2c.website.components.molecules.UsageCard
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.components.organisms.docs.CliOption
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
@@ -66,7 +69,7 @@ val CliUsageCardGridStyle = CssStyle {
     base {
         Modifier
             .display(DisplayStyle.Grid)
-            .gap(1.cssRem)
+            .gap(SiteTheme.dimensions.size.Lg)
             .fillMaxWidth()
             .gridTemplateColumns {
                 size(1.fr)
@@ -98,108 +101,73 @@ val OptionsTableStyle = CssStyle.base {
 
 @Composable
 fun CliUsageContent(modifier: Modifier = Modifier) {
-    Div(attrs = CliUsageCardGridStyle.toModifier().then(modifier).toAttrs()) {
-        UsageCard(
-            title = "Convert a Single File",
-            description = "Convert a single SVG file to a Kotlin ImageVector.",
-            icon = { FaFile(size = IconSize.SM) },
-        ) {
-            CodeBlock(
-                code = S2C_CONVERT_SINGLE_FILE.trimMargin(),
-                language = "shell",
-            )
+    Column(modifier = modifier.fillMaxWidth()) {
+        Div(attrs = CliUsageCardGridStyle.toModifier().toAttrs()) {
+            UsageCard(
+                title = "Convert a Single File",
+                description = "Convert a single SVG file to a Kotlin ImageVector.",
+                icon = { FaFile(size = IconSize.SM) },
+            ) {
+                CodeBlock(
+                    code = S2C_CONVERT_SINGLE_FILE.trimMargin(),
+                    language = "shell",
+                )
+            }
+            UsageCard(
+                title = "Batch Convert a Directory",
+                description = "Recursively convert all SVG files in a directory.",
+                icon = { FaFolderOpen(size = IconSize.SM) },
+            ) {
+                CodeBlock(
+                    code = S2C_CONVERT_DIRECTORY.trimMargin(),
+                    language = "shell",
+                )
+            }
+            UsageCard(
+                title = "Material Icons Receiver",
+                description = "Generate icons with a Material Icons receiver type.",
+                icon = { FaPalette(size = IconSize.SM) },
+            ) {
+                CodeBlock(
+                    code = S2C_CONVERT_MATERIAL_ICON_RECEIVER.trimMargin(),
+                    language = "shell",
+                )
+            }
         }
-        UsageCard(
-            title = "Batch Convert a Directory",
-            description = "Recursively convert all SVG files in a directory.",
-            icon = { FaFolderOpen(size = IconSize.SM) },
-        ) {
-            CodeBlock(
-                code = S2C_CONVERT_DIRECTORY.trimMargin(),
-                language = "shell",
-            )
-        }
-        UsageCard(
-            title = "Material Icons Receiver",
-            description = "Generate icons with a Material Icons receiver type.",
-            icon = { FaPalette(size = IconSize.SM) },
-        ) {
-            CodeBlock(
-                code = S2C_CONVERT_MATERIAL_ICON_RECEIVER.trimMargin(),
-                language = "shell",
-            )
-        }
-    }
 
-    Div(attrs = Modifier.margin(top = 1.5.cssRem).fillMaxWidth().toAttrs()) {
-        CollapsibleSection(
-            title = "All CLI Options Reference",
-            leadingIcon = { FaTerminal(size = IconSize.SM, modifier = Modifier.color(SiteTheme.palette.primary)) },
+        Div(
+            attrs = Modifier
+                .margin(top = SiteTheme.dimensions.size.Lg)
+                .fillMaxWidth()
+                .display(DisplayStyle.Flex)
+                .toAttrs(),
         ) {
-            Column(modifier = OptionsTableStyle.toModifier()) {
-                OptionsHeaderRow()
-                CliOption.options.forEachIndexed { index, option ->
-                    OptionRow(
-                        flag = option.flag,
-                        type = option.type,
-                        description = option.description,
-                        index = index,
-                    )
+            Link(
+                path = "/docs/cli",
+                variant = SeeFullDocumentationLinkButton,
+            ) {
+                SpanText("See full CLI documentation")
+                FaArrowRight(size = IconSize.XS)
+            }
+        }
+
+        Div(attrs = Modifier.margin(top = SiteTheme.dimensions.size.Xl).fillMaxWidth().toAttrs()) {
+            CollapsibleSection(
+                title = "All CLI Options Reference",
+                leadingIcon = { FaTerminal(size = IconSize.SM, modifier = Modifier.color(SiteTheme.palette.primary)) },
+            ) {
+                Column(modifier = OptionsTableStyle.toModifier()) {
+                    OptionsHeaderRow()
+                    CliOption.options.forEachIndexed { index, option ->
+                        OptionRow(
+                            flag = option.flag,
+                            type = option.type,
+                            description = option.description,
+                            index = index,
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-private data class CliOption(val flag: String, val type: String, val description: String) {
-    companion object {
-        val options = setOf(
-            CliOption(flag = "-o, --output", type = "String", description = "Output file or directory path"),
-            CliOption(flag = "-p, --package", type = "String", description = "Kotlin package name for generated code"),
-            CliOption(flag = "-t, --theme", type = "String", description = "Fully-qualified theme class name"),
-            CliOption(
-                flag = "-opt, --optimize",
-                type = "Boolean",
-                description = "Enable SVG/AVG optimization (default: true)",
-            ),
-            CliOption(
-                flag = "-rt, --receiver-type",
-                type = "String",
-                description = "Receiver type (e.g. Icons.Filled)",
-            ),
-            CliOption(flag = "--add-to-material", type = "Boolean", description = "Add as extension to Material Icons"),
-            CliOption(
-                flag = "-np, --no-preview",
-                type = "Boolean",
-                description = "Skip generating @Preview composables",
-            ),
-            CliOption(
-                flag = "--kmp",
-                type = "Boolean",
-                description = "Ensure output is KMP-compatible (default: false)",
-            ),
-            CliOption(flag = "--make-internal", type = "Boolean", description = "Mark generated symbols as internal"),
-            CliOption(
-                flag = "--minified",
-                type = "Boolean",
-                description = "Remove comments and inline method parameters",
-            ),
-            CliOption(flag = "-r, --recursive", type = "Boolean", description = "Recursively process sub-directories"),
-            CliOption(
-                flag = "--recursive-depth, --depth",
-                type = "Int",
-                description = "Depth level for recursive search (default: 10)",
-            ),
-            CliOption(
-                flag = "--exclude",
-                type = "String...",
-                description = "Regex pattern to exclude icons from processing",
-            ),
-            CliOption(
-                flag = "--map-icon-name-from-to",
-                type = "Pair...",
-                description = "Replace icon name pattern (old to new)",
-            ),
-        )
     }
 }

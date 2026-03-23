@@ -32,8 +32,9 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.ToggleSwitch
 import dev.tonholo.s2c.website.state.playground.PlaygroundOptions
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
-import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -50,7 +51,7 @@ import org.jetbrains.compose.web.dom.TextInput
 val OptionsContainerStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .margin(top = 1.cssRem)
+        .margin(top = SiteTheme.dimensions.size.Lg)
         .borderRadius(0.75.cssRem)
         .border(1.px, LineStyle.Solid, colorMode.toSitePalette().outlineVariant)
         .overflow(Overflow.Hidden)
@@ -60,7 +61,7 @@ val OptionsContainerStyle = CssStyle.base {
 val OptionInputStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .padding(topBottom = 0.375.cssRem, leftRight = 0.75.cssRem)
+        .padding(topBottom = 0.375.cssRem, leftRight = SiteTheme.dimensions.size.Md)
         .borderRadius(0.375.cssRem)
         .border(1.px, LineStyle.Solid, colorMode.toSitePalette().outline)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
@@ -78,7 +79,7 @@ val OptionsInputGridStyle = CssStyle {
         Modifier
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(1.cssRem)
+            .gap(SiteTheme.dimensions.size.Lg)
     }
     Breakpoint.MD {
         Modifier.gridTemplateColumns { repeat(OPTIONS_COLUMN_COUNT) { size(1.fr) } }
@@ -97,10 +98,10 @@ fun OptionsContent(
 ) {
     Div(
         attrs = modifier
-            .padding(1.cssRem)
+            .padding(SiteTheme.dimensions.size.Lg)
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
-            .gap(1.cssRem)
+            .gap(SiteTheme.dimensions.size.Lg)
             .toAttrs(),
     ) {
         // Toggle switches row
@@ -108,7 +109,7 @@ fun OptionsContent(
             attrs = Modifier
                 .display(DisplayStyle.Flex)
                 .flexWrap(FlexWrap.Wrap)
-                .gap(1.5.cssRem)
+                .gap(SiteTheme.dimensions.size.Xl)
                 .toAttrs(),
         ) {
             OptionToggle("Optimize", options.optimize) {
@@ -150,7 +151,7 @@ internal fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Boo
         attrs = Modifier
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .minWidth(7.cssRem)
             .toAttrs(),
     ) {
@@ -178,7 +179,7 @@ internal fun OptionInput(label: String, value: String, placeholderText: String, 
                 .display(DisplayStyle.Block)
                 .fontSize(0.75.cssRem)
                 .color(palette.onSurfaceVariant)
-                .margin(bottom = 0.25.cssRem),
+                .margin(bottom = SiteTheme.dimensions.size.Xsm),
         )
         TextInput(
             value = value,

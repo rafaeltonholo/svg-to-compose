@@ -21,7 +21,8 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -36,11 +37,11 @@ val UsageCardStyle = CssStyle.base {
         .backgroundColor(palette.surfaceVariant)
         .border(1.px, LineStyle.Solid, palette.outlineVariant)
         .borderRadius(0.75.cssRem)
-        .padding(1.cssRem)
+        .padding(SiteTheme.dimensions.size.Lg)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
         .minWidth(0.px)
-        .gap(0.75.cssRem)
+        .gap(SiteTheme.dimensions.size.Md)
 }
 
 @Composable
@@ -56,7 +57,7 @@ fun UsageCard(
             attrs = Modifier
                 .display(DisplayStyle.Flex)
                 .alignItems(AlignItems.Center)
-                .gap(0.5.cssRem)
+                .gap(SiteTheme.dimensions.size.Sm)
                 .toAttrs(),
         ) {
             icon?.invoke()

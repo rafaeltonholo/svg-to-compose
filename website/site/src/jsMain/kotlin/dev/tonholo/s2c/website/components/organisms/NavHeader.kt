@@ -12,6 +12,7 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
+import com.varabyte.kobweb.compose.css.autoLength
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
@@ -33,8 +34,13 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.gridColumn
+import com.varabyte.kobweb.compose.ui.modifiers.gridRow
+import com.varabyte.kobweb.compose.ui.modifiers.marginInline
+import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onAnimationEnd
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
@@ -70,7 +76,9 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.components.molecules.DocNavDropdown
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AnimationDirection
@@ -83,31 +91,48 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Nav
 import org.w3c.dom.SMOOTH
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
 
 val NavHeaderStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .padding(leftRight = 1.cssRem, topBottom = 0.75.cssRem)
-        .position(Position.Fixed)
-        .top(0.px)
-        .zIndex(value = 1000)
-        .backgroundColor(colorMode.toSitePalette().background)
-        .borderBottom(
-            width = 1.px,
-            style = LineStyle.Solid,
-            color = palette.outline,
-        )
+        .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
+        .marginInline(autoLength)
+        .padding(topBottom = SiteTheme.dimensions.size.Md)
+}
+
+val NavContainerStyle = CssStyle {
+    val palette = colorMode.toSitePalette()
+    base {
+        Modifier
+            .fillMaxWidth()
+            .position(Position.Fixed)
+            .top(0.px)
+            .zIndex(value = 1000)
+            .backgroundColor(colorMode.toSitePalette().background)
+            .padding(leftRight = SiteTheme.dimensions.size.Lg)
+            .borderBottom(
+                width = 1.px,
+                style = LineStyle.Solid,
+                color = palette.outline,
+            )
+    }
+    Breakpoint.SM {
+        Modifier.padding(leftRight = SiteTheme.dimensions.size.Xl)
+    }
+    Breakpoint.MD {
+        Modifier.padding(leftRight = SiteTheme.dimensions.size.Xxl)
+    }
 }
 
 @Composable
 fun NavHeader(modifier: Modifier = Modifier) {
     Nav(
-        attrs = modifier.fillMaxWidth().toAttrs(),
+        attrs = NavContainerStyle.toModifier().then(modifier).toAttrs(),
     ) {
         Row(NavHeaderStyle.toModifier(), verticalAlignment = Alignment.CenterVertically) {
             S2CLogo()
@@ -115,7 +140,7 @@ fun NavHeader(modifier: Modifier = Modifier) {
             Spacer()
 
             Row(
-                Modifier.gap(1.5.cssRem).displayIfAtLeast(Breakpoint.MD),
+                Modifier.gap(SiteTheme.dimensions.size.Xl).displayIfAtLeast(Breakpoint.MD),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 MenuItems()
@@ -126,7 +151,7 @@ fun NavHeader(modifier: Modifier = Modifier) {
             Row(
                 Modifier
                     .fontSize(1.5.cssRem)
-                    .gap(1.cssRem)
+                    .gap(SiteTheme.dimensions.size.Lg)
                     .displayUntil(Breakpoint.MD),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -147,43 +172,114 @@ fun NavHeader(modifier: Modifier = Modifier) {
     }
 }
 
+private const val LOGO_CROSSFADE_DURATION_MS = 200
+
+/** Compact logo (S2C mark): visible below LG, fades out at LG+. */
+val CompactLogoStyle = CssStyle {
+    base {
+        Modifier
+            .gridRow(1)
+            .gridColumn(1)
+            .opacity(1)
+            .transition(Transition.of("opacity", LOGO_CROSSFADE_DURATION_MS.ms, TransitionTimingFunction.EaseInOut))
+    }
+    Breakpoint.LG {
+        Modifier.opacity(0)
+    }
+}
+
+/** Full logo (icon + text): hidden below LG, fades in at LG+. */
+val FullLogoStyle = CssStyle {
+    base {
+        Modifier
+            .gridRow(1)
+            .gridColumn(1)
+            .opacity(0)
+            .transition(Transition.of("opacity", LOGO_CROSSFADE_DURATION_MS.ms, TransitionTimingFunction.EaseInOut))
+    }
+    Breakpoint.LG {
+        Modifier.opacity(1)
+    }
+}
+
 @Composable
 private fun S2CLogo() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .cursor(Cursor.Pointer)
             .onClick {
-                window.scrollTo(
-                    options = ScrollToOptions(
-                        top = 0.0,
-                        behavior = ScrollBehavior.SMOOTH,
-                    ),
-                )
+                if (window.location.pathname == "/") {
+                    window.scrollTo(
+                        options = ScrollToOptions(
+                            top = 0.0,
+                            behavior = ScrollBehavior.SMOOTH,
+                        ),
+                    )
+                } else {
+                    window.location.href = "/"
+                }
             },
     ) {
-        Image(
-            src = "images/s2c-icon.svg",
-            modifier = Modifier.size(1.25.cssRem),
-        )
-        SpanText(
-            "svg-to-compose",
-            modifier = Modifier
-                .fontWeight(FontWeight.SemiBold)
-                .fontSize(0.9.cssRem)
-                .displayIfAtLeast(Breakpoint.SM),
-        )
+        // Grid overlay: both logos occupy the same cell, crossfade via opacity
+        Div(
+            attrs = Modifier
+                .display(DisplayStyle.Grid)
+                .alignItems(AlignItems.Center)
+                .toAttrs(),
+        ) {
+            Image(
+                src = "/images/s2c-logo.svg",
+                modifier = CompactLogoStyle.toModifier().size(1.75.cssRem),
+            )
+            Row(
+                modifier = FullLogoStyle.toModifier().gap(SiteTheme.dimensions.size.Sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    src = "/images/s2c-icon.svg",
+                    modifier = Modifier.size(1.25.cssRem),
+                )
+                SpanText(
+                    "svg-to-compose",
+                    modifier = Modifier
+                        .fontWeight(FontWeight.SemiBold)
+                        .fontSize(0.9.cssRem),
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun MenuItems() {
-    NavLink("#playground", "Playground")
-    NavLink("#install", "Install")
-    NavLink("#usage", "Usage")
-    NavLink("#capabilities", "Capabilities")
-    NavLink("/docs/index.html", "API Docs")
+    NavLink("/#playground", "Playground")
+    NavLink("/#install", "Install")
+    NavLink("/#usage", "Usage")
+    NavLink("/#capabilities", "Capabilities")
+    DocNavDropdown()
+}
+
+@Composable
+private fun SideMenuItems(onNavigate: () -> Unit) {
+    val palette = ColorMode.current.toSitePalette()
+    val clickModifier = Modifier.onClick { onNavigate() }
+    NavLink("/#playground", "Playground", modifier = clickModifier)
+    NavLink("/#install", "Install", modifier = clickModifier)
+    NavLink("/#usage", "Usage", modifier = clickModifier)
+    NavLink("/#capabilities", "Capabilities", modifier = clickModifier)
+    SpanText(
+        "Docs",
+        modifier = Modifier
+            .fontWeight(FontWeight.SemiBold)
+            .color(palette.onSurfaceVariant)
+            .fontSize(0.75.cssRem)
+            .padding(top = SiteTheme.dimensions.size.Sm),
+    )
+    NavLink("/docs/cli", "CLI", modifier = clickModifier)
+    NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
+    NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
 }
 
 val GitHubButtonStyle = CssStyle {
@@ -194,7 +290,7 @@ val GitHubButtonStyle = CssStyle {
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
             .gap(0.4.cssRem)
-            .padding(leftRight = 0.75.cssRem, topBottom = 0.5.cssRem)
+            .padding(leftRight = SiteTheme.dimensions.size.Md, topBottom = SiteTheme.dimensions.size.Sm)
             .borderRadius(0.5.cssRem)
             .border(1.px, LineStyle.Solid, palette.outline)
             .fontSize(0.8.cssRem)
@@ -283,10 +379,10 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
             Column(
                 Modifier
                     .fillMaxHeight()
-                    .width(clamp(8.cssRem, 33.percent, 10.cssRem))
+                    .width(clamp(12.cssRem, 60.percent, 18.cssRem))
                     .align(Alignment.CenterEnd)
-                    .padding(top = 1.cssRem, leftRight = 1.cssRem)
-                    .gap(1.5.cssRem)
+                    .padding(top = SiteTheme.dimensions.size.Lg, leftRight = SiteTheme.dimensions.size.Lg)
+                    .gap(SiteTheme.dimensions.size.Xl)
                     .backgroundColor(ColorMode.current.toSitePalette().surface)
                     .animation(
                         SideMenuSlideInAnim.toAnimation(
@@ -316,12 +412,12 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                 CloseButton(onClick = { close() })
                 Column(
                     Modifier
-                        .padding(right = 0.75.cssRem)
-                        .gap(1.5.cssRem)
-                        .fontSize(1.4.cssRem),
+                        .padding(right = SiteTheme.dimensions.size.Md)
+                        .gap(SiteTheme.dimensions.size.Xl)
+                        .fontSize(1.2.cssRem),
                     horizontalAlignment = Alignment.End,
                 ) {
-                    MenuItems()
+                    SideMenuItems(onNavigate = { close() })
                     Link(
                         "https://github.com/rafaeltonholo/svg-to-compose",
                         modifier = Modifier

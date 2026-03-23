@@ -6,8 +6,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
-import dev.tonholo.s2c.website.CircleButtonVariant
-import dev.tonholo.s2c.website.UncoloredButtonVariant
+import dev.tonholo.s2c.website.theme.CircleButtonVariant
+import dev.tonholo.s2c.website.theme.UncoloredButtonVariant
 import org.jetbrains.compose.web.css.em
 
 @Composable

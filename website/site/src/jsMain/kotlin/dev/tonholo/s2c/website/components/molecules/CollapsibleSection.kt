@@ -41,7 +41,8 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -59,13 +60,13 @@ val CollapsibleContainerStyle = CssStyle.base {
 val CollapsibleHeaderStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .padding(1.cssRem)
+        .padding(SiteTheme.dimensions.size.Lg)
         .cursor(Cursor.Pointer)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
         .display(DisplayStyle.Flex)
         .alignItems(AlignItems.Center)
         .fontSize(0.875.cssRem)
-        .gap(0.5.cssRem)
+        .gap(SiteTheme.dimensions.size.Sm)
 }
 
 @Composable

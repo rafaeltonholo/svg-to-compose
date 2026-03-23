@@ -29,7 +29,8 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
@@ -55,7 +56,7 @@ val FileDropOverlayInnerStyle = CssStyle.base {
         .backgroundColor(palette.primary.toRgb().copyf(alpha = 0.08f))
         .border(2.px, LineStyle.Dashed, palette.primary)
         .borderRadius(0.75.cssRem)
-        .margin(0.5.cssRem)
+        .margin(SiteTheme.dimensions.size.Sm)
         .position(Position.Absolute)
         .top(0.px)
         .left(0.px)
@@ -85,7 +86,7 @@ fun FileDropOverlay(modifier: Modifier = Modifier) {
                 size = IconSize.X2,
                 modifier = Modifier
                     .color(palette.primary)
-                    .margin(bottom = 0.75.cssRem),
+                    .margin(bottom = SiteTheme.dimensions.size.Md),
             )
             SpanText(
                 "Drop files here",

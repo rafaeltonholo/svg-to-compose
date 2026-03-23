@@ -1,10 +1,12 @@
-package dev.tonholo.s2c.website
+package dev.tonholo.s2c.website.theme
 
 import com.varabyte.kobweb.compose.css.Animation
 import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ScrollBehavior
 import com.varabyte.kobweb.compose.css.TextTransform
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -17,6 +19,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.minSize
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
 import com.varabyte.kobweb.compose.ui.modifiers.padding
@@ -35,6 +38,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.modifyStyleBase
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import org.jetbrains.compose.web.css.CSSMediaQuery
@@ -48,6 +52,14 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
 
+private const val LAYOUT_TRANSITION_DURATION_MS = 300
+
+private val LAYOUT_TRANSITION_PROPERTIES = listOf("padding", "margin", "gap", "max-width")
+
+val LayoutTransitions: List<Transition.Listable> = LAYOUT_TRANSITION_PROPERTIES.map { property ->
+    Transition.of(property, LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut)
+}
+
 // Animation keyframes
 val SpinKeyframes = Keyframes {
     from { Modifier.transform { rotate(0.deg) } }
@@ -56,9 +68,62 @@ val SpinKeyframes = Keyframes {
 
 @InitSilk
 fun initSiteStyles(ctx: InitSilkContext) {
+    ctx.stylesheet.registerStyle(":root") {
+        base {
+            Modifier
+                .setVariable(SiteSizeVar.Xsm, 0.25.cssRem)
+                .setVariable(SiteSizeVar.Sm, 0.5.cssRem)
+                .setVariable(SiteSizeVar.Md, 0.75.cssRem)
+                .setVariable(SiteSizeVar.Lg, 1.cssRem)
+                .setVariable(SiteSizeVar.Xl, 1.5.cssRem)
+                .setVariable(SiteSizeVar.Xxl, 2.cssRem)
+        }
+        Breakpoint.MD {
+            Modifier
+                .setVariable(SiteSizeVar.Xsm, 0.25.cssRem)
+                .setVariable(SiteSizeVar.Sm, 0.5.cssRem)
+                .setVariable(SiteSizeVar.Md, 0.75.cssRem)
+                .setVariable(SiteSizeVar.Lg, 1.cssRem)
+                .setVariable(SiteSizeVar.Xl, 1.5.cssRem)
+                .setVariable(SiteSizeVar.Xxl, 3.cssRem)
+        }
+        Breakpoint.LG {
+            Modifier
+                .setVariable(SiteSizeVar.Xsm, 0.25.cssRem)
+                .setVariable(SiteSizeVar.Sm, 0.5.cssRem)
+                .setVariable(SiteSizeVar.Md, 0.75.cssRem)
+                .setVariable(SiteSizeVar.Lg, 1.cssRem)
+                .setVariable(SiteSizeVar.Xl, 2.cssRem)
+                .setVariable(SiteSizeVar.Xxl, 3.cssRem)
+        }
+        Breakpoint.XL {
+            Modifier
+                .setVariable(SiteSizeVar.Xsm, 0.25.cssRem)
+                .setVariable(SiteSizeVar.Sm, 0.5.cssRem)
+                .setVariable(SiteSizeVar.Md, 0.75.cssRem)
+                .setVariable(SiteSizeVar.Lg, 1.cssRem)
+                .setVariable(SiteSizeVar.Xl, 2.cssRem)
+                .setVariable(SiteSizeVar.Xxl, 4.cssRem)
+        }
+        Breakpoint.XXL {
+            Modifier
+                .setVariable(SiteSizeVar.Xsm, 0.25.cssRem)
+                .setVariable(SiteSizeVar.Sm, 0.5.cssRem)
+                .setVariable(SiteSizeVar.Md, 0.75.cssRem)
+                .setVariable(SiteSizeVar.Lg, 1.cssRem)
+                .setVariable(SiteSizeVar.Xl, 2.cssRem)
+                .setVariable(SiteSizeVar.Xxl, 4.cssRem)
+        }
+    }
     ctx.stylesheet.registerStyle("html") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
             Modifier.scrollBehavior(ScrollBehavior.Smooth)
+        }
+    }
+
+    ctx.stylesheet.registerStyle("main, section, nav, footer") {
+        cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
+            Modifier.transition(LayoutTransitions)
         }
     }
 
@@ -134,7 +199,7 @@ val SubheadlineTextStyle = CssStyle.base {
 val MonospaceTextStyle = CssStyle.base {
     Modifier
         .fontFamily(values = FontFamilies.mono)
-        .fontSize(value = 0.75.cssRem)
+        .fontSize(clamp(0.75.cssRem, 1.5.vw, 0.875.cssRem))
         .lineHeight(value = 1.6)
 }
 
@@ -148,7 +213,7 @@ val LabelTextStyle = CssStyle.base {
 
 // Button variants
 val CircleButtonVariant = ButtonStyle.addVariantBase {
-    Modifier.padding(0.px).borderRadius(50.percent)
+    Modifier.padding(0.px).borderRadius(50.percent).minSize(2.75.cssRem)
 }
 
 val UncoloredButtonVariant = ButtonStyle.addVariantBase {

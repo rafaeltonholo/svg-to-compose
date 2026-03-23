@@ -20,9 +20,10 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.LabelTextStyle
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -38,7 +39,7 @@ val CapabilitiesGridStyle = CssStyle {
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(2.cssRem)
+            .gap(SiteTheme.dimensions.size.Xxl)
     }
     Breakpoint.SM {
         Modifier.gridTemplateColumns { repeat(2) { size(1.fr) } }
@@ -89,7 +90,7 @@ fun CapabilitiesSection(modifier: Modifier = Modifier) {
             "Capabilities",
             modifier = LabelTextStyle.toModifier()
                 .color(palette.onSurfaceVariant)
-                .margin(bottom = 1.cssRem),
+                .margin(bottom = SiteTheme.dimensions.size.Lg),
         )
 
         Div(attrs = CapabilitiesGridStyle.toModifier().toAttrs()) {
@@ -101,8 +102,8 @@ fun CapabilitiesSection(modifier: Modifier = Modifier) {
                             .fontWeight(FontWeight.SemiBold)
                             .fontSize(1.125.cssRem)
                             .display(DisplayStyle.Block)
-                            .padding(bottom = 0.5.cssRem)
-                            .margin(bottom = 0.75.cssRem)
+                            .padding(bottom = SiteTheme.dimensions.size.Sm)
+                            .margin(bottom = SiteTheme.dimensions.size.Md)
                             .borderBottom(
                                 width = 2.px,
                                 style = LineStyle.Solid,

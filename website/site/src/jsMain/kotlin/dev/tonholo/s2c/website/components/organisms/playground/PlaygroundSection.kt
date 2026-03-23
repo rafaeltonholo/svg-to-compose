@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
@@ -20,7 +21,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.minWidth
 import com.varabyte.kobweb.compose.ui.modifiers.overflow
@@ -33,21 +33,21 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.FilePickerInput
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
 import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
 import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.util.handleDrop
 import dev.tonholo.s2c.website.zip.downloadAsZip
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +69,7 @@ import org.w3c.files.File
 // region Styles
 
 val PlaygroundHeadingContainerStyle = CssStyle.base {
-    Modifier.margin(bottom = 1.cssRem)
+    Modifier.margin(bottom = SiteTheme.dimensions.size.Lg)
 }
 
 val EditorPanelStyle = CssStyle.base {
@@ -90,7 +90,7 @@ val DesktopPanelsStyle = CssStyle {
                 size(3.fr)
             }
             .minWidth(0.px)
-            .height(500.px)
+            .height(clamp(24.cssRem, 50.vh, 40.cssRem))
     }
     cssRule(" > *") {
         Modifier
@@ -119,7 +119,7 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
     SectionContainer(
         id = "playground",
         modifier = modifier,
-        contentModifier = Modifier.maxWidth(96.cssRem),
+        contentModifier = Modifier,
     ) {
         val vm = remember { PlaygroundViewModel() }
         val scope = rememberCoroutineScope()

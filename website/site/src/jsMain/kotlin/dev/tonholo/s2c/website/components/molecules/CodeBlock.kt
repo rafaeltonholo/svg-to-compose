@@ -45,8 +45,9 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.shiki.ShikiCodeBlock
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
-import dev.tonholo.s2c.website.toSitePalette
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -77,13 +78,13 @@ val CodeBlockHeaderStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .backgroundColor(palette.surfaceVariant)
-        .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
 }
 
 val CopyButtonStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .padding(topBottom = 0.25.cssRem, leftRight = 0.5.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
         .borderRadius(0.375.cssRem)
         .border(1.px, LineStyle.Solid, palette.outline)
         .backgroundColor(palette.surfaceVariant)
@@ -103,7 +104,7 @@ val LineNumberStyle = CssStyle.base {
         .color(colorMode.toSitePalette().onSurfaceVariant)
         .userSelect(UserSelect.None)
         .textAlign(TextAlign.End)
-        .padding(right = 1.cssRem)
+        .padding(right = SiteTheme.dimensions.size.Lg)
         .minWidth(2.cssRem)
         .display(DisplayStyle.InlineBlock)
 }
@@ -215,7 +216,7 @@ private fun PlainCodeBlock(code: String) {
     Pre(
         attrs = Modifier
             .margin(0.px)
-            .padding(1.cssRem)
+            .padding(SiteTheme.dimensions.size.Lg)
             .overflow { x(Overflow.Auto) }
             .toAttrs(),
     ) {

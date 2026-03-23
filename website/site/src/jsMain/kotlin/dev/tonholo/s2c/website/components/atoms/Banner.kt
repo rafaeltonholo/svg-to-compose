@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.css.TextAlign
+import com.varabyte.kobweb.compose.css.functions.CSSClamp
+import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -23,11 +25,13 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
-import org.jetbrains.compose.web.css.CSSLengthValue
+import dev.tonholo.s2c.website.theme.SiteTheme
+import org.jetbrains.compose.web.css.CSSUnitRel
 import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.vw
 
 sealed interface BannerKind : ComponentKind
 
@@ -35,14 +39,14 @@ object BannerVars {
     val ContentColor by StyleVariable<Color>(prefix = "banner")
     val ContainerColor by StyleVariable<Color>(prefix = "banner")
     val BorderColor by StyleVariable<Color>(prefix = "banner")
-    val FontSize by StyleVariable<CSSLengthValue>(prefix = "banner")
+    val FontSize by StyleVariable<CSSClamp<CSSUnitRel>>(prefix = "banner")
 }
 
 val BannerStyle = CssStyle<BannerKind> {
     base {
         Modifier
             .fillMaxWidth()
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
             .backgroundColor(BannerVars.ContainerColor.value())
             .color(BannerVars.ContentColor.value())
             .borderBottom(
@@ -50,7 +54,7 @@ val BannerStyle = CssStyle<BannerKind> {
                 style = LineStyle.Solid,
                 color = BannerVars.BorderColor.value(),
             )
-            .fontSize(BannerVars.FontSize.value(0.85.cssRem))
+            .fontSize(BannerVars.FontSize.value(clamp(0.75.cssRem, 2.vw, 0.85.cssRem)))
             .fontWeight(FontWeight.Medium)
             .textAlign(TextAlign.Center)
             .justifyContent(JustifyContent.Center)
@@ -76,7 +80,7 @@ fun Banner(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier.gap(0.5.cssRem),
+            modifier = Modifier.gap(SiteTheme.dimensions.size.Sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()

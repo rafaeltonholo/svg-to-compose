@@ -20,12 +20,12 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.SiteTheme
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.config.BuildConfig
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
@@ -38,7 +38,7 @@ val InstallGridStyle = CssStyle {
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(2.cssRem)
+            .gap(SiteTheme.dimensions.size.Xxl)
     }
     cssRule(" > *") {
         Modifier.minWidth(0.px).overflow(Overflow.Hidden)
@@ -56,7 +56,7 @@ fun InstallSection(modifier: Modifier = Modifier) {
             "Install",
             modifier = LabelTextStyle.toModifier()
                 .color(palette.onSurfaceVariant)
-                .margin(bottom = 1.cssRem),
+                .margin(bottom = SiteTheme.dimensions.size.Lg),
         )
 
         Div(attrs = InstallGridStyle.toModifier().toAttrs()) {
@@ -68,7 +68,7 @@ fun InstallSection(modifier: Modifier = Modifier) {
                         .fontWeight(FontWeight.SemiBold)
                         .fontSize(1.125.cssRem)
                         .color(SiteTheme.palette.onSurface)
-                        .margin(bottom = 0.75.cssRem)
+                        .margin(bottom = SiteTheme.dimensions.size.Md)
                         .display(DisplayStyle.Block),
                 )
                 CodeBlock(
@@ -96,7 +96,7 @@ fun InstallSection(modifier: Modifier = Modifier) {
                         .fontWeight(FontWeight.SemiBold)
                         .fontSize(1.125.cssRem)
                         .color(SiteTheme.palette.onSurface)
-                        .margin(bottom = 0.75.cssRem)
+                        .margin(bottom = SiteTheme.dimensions.size.Md)
                         .display(DisplayStyle.Block),
                 )
                 CodeBlock(

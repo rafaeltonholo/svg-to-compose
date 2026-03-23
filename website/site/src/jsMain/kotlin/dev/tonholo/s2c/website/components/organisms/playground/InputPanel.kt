@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.varabyte.kobweb.compose.css.Appearance
 import com.varabyte.kobweb.compose.css.Outline
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.PointerEvents
@@ -19,6 +20,7 @@ import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.appearance
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRight
@@ -63,8 +65,9 @@ import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_DARK_BACKGROUND
 import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_LIGHT_BACKGROUND
 import dev.tonholo.s2c.website.shiki.Shiki
 import dev.tonholo.s2c.website.shiki.codeToHtmlOptions
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.theme.typography.FontFamilies
-import dev.tonholo.s2c.website.toSitePalette
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -118,7 +121,7 @@ val EditorBackdropStyle = CssStyle {
             .fontFamily(values = FontFamilies.mono)
             .fontSize(value = 0.75.cssRem)
             .lineHeight(value = 1.6)
-            .padding(all = 1.cssRem)
+            .padding(all = SiteTheme.dimensions.size.Lg)
             .margin(all = 0.px)
             .overflow(Overflow.Auto)
             .backgroundColor(Colors.Transparent)
@@ -170,16 +173,19 @@ val EditorTextareaStyle = CssStyle {
             .fontFamily(values = FontFamilies.mono)
             .fontSize(0.75.cssRem)
             .lineHeight(value = 1.6)
-            // Extra left padding to align with backdrop text after line numbers
-            // (1rem base + 1rem number width + 1.25rem number margin = 3.25rem)
-            .padding(top = 1.cssRem, right = 1.cssRem, bottom = 1.cssRem, left = 3.25.cssRem)
+            .padding(
+                top = SiteTheme.dimensions.size.Lg,
+                right = SiteTheme.dimensions.size.Lg,
+                bottom = SiteTheme.dimensions.size.Lg,
+                left = 3.25.cssRem,
+            )
             .backgroundColor(Colors.Transparent)
             .color(colorMode.toSitePalette().onSurfaceVariant)
             .border(0.px, LineStyle.None, Colors.Transparent)
             .outline("none".unsafeCast<Outline>())
             // Disable native textarea appearance so browser doesn't
             // draw its own background over the transparent one.
-            .styleModifier { property("appearance", "none") }
+            .appearance(Appearance.None)
             .caretColor(colorMode.toSitePalette().primary)
             .whiteSpace(WhiteSpace.Pre)
             .overflow(Overflow.Auto)

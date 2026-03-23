@@ -32,7 +32,8 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
@@ -48,8 +49,8 @@ val TabBarContainerStyle = CssStyle.base {
 val TabBarStyle = CssStyle.base {
     Modifier
         .display(DisplayStyle.Flex)
-        .gap(0.25.cssRem)
-        .padding(0.25.cssRem)
+        .gap(SiteTheme.dimensions.size.Xsm)
+        .padding(SiteTheme.dimensions.size.Xsm)
         .borderRadius(0.75.cssRem)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
@@ -57,7 +58,7 @@ val TabBarStyle = CssStyle.base {
 val ActiveTabStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
         .borderRadius(0.5.cssRem)
         .cursor(Cursor.Pointer)
         .backgroundColor(palette.primary)
@@ -73,7 +74,7 @@ val ActiveTabStyle = CssStyle.base {
 val InactiveTabStyle = CssStyle {
     base {
         Modifier
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
             .borderRadius(0.5.cssRem)
             .cursor(Cursor.Pointer)
             .backgroundColor(Colors.Transparent)
@@ -119,7 +120,7 @@ fun TabPanel(
         Div(
             attrs = Modifier
                 .fillMaxWidth()
-                .margin(top = 0.75.cssRem)
+                .margin(top = SiteTheme.dimensions.size.Md)
                 .toAttrs {
                     attr("role", "tabpanel")
                 },

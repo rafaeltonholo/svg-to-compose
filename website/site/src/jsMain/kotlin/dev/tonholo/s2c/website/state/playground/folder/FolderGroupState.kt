@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.website.state.playground.folder
 
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.state.playground.FileGroup
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 
 internal data class FolderGroupState(
     val group: FileGroup,

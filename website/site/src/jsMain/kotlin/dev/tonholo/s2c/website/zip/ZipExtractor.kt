@@ -1,7 +1,7 @@
 package dev.tonholo.s2c.website.zip
 
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.detectExtension
 import kotlinx.coroutines.await
 import org.w3c.files.File
