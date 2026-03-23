@@ -94,7 +94,7 @@ val FooterLinkBadgeVariant = SquaredBadge.extendedByBase {
     val (bgColor, borderColor) = color.resolveBadgeColors()
     Modifier
         .setVariable(BadgeVars.ContainerHoverColor, bgColor)
-        .setVariable(BadgeVars.ContainerHoverColor, color)
+        .setVariable(BadgeVars.ContentHoverColor, color)
         .setVariable(BadgeVars.BorderHoverColor, borderColor)
         .transition {
             property("color", "background-color", "border-color")
