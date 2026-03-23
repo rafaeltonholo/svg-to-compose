@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.website.components.atoms
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,10 +45,6 @@ fun ScrollReveal(
                 }
             },
         )
-    }
-
-    DisposableEffect(observer) {
-        onDispose { observer.disconnect() }
     }
 
     Div(
