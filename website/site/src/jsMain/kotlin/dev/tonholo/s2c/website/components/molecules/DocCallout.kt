@@ -15,18 +15,18 @@ import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.role
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCircleExclamation
 import com.varabyte.kobweb.silk.components.icons.fa.FaLightbulb
 import com.varabyte.kobweb.silk.components.icons.fa.FaTriangleExclamation
-import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SitePalette
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
@@ -66,7 +66,7 @@ fun DocCallout(variant: CalloutVariant, modifier: Modifier = Modifier, content: 
             .setVariable(DocCalloutVars.BorderColor, borderColor)
             .setVariable(DocCalloutVars.ContainerColor, containerColor)
             .ariaLabel(variant.accessibleLabel())
-            .attrsModifier { attr("role", "note") }
+            .role("note")
             .then(modifier)
             .toAttrs(),
     ) {
@@ -115,7 +115,7 @@ private fun CalloutVariant.resolveIconColor(palette: SitePalette): Color = when 
     CalloutVariant.IMPORTANT -> palette.error
 }
 
-private fun CalloutVariant.resolveColors(palette: SitePalette): Pair<Color, Color> = when (this) {
+internal fun CalloutVariant.resolveColors(palette: SitePalette): Pair<Color, Color> = when (this) {
     CalloutVariant.TIP -> palette.primary to palette.surfaceVariant
     CalloutVariant.WARNING -> palette.warning to palette.warningContainer
     CalloutVariant.IMPORTANT -> palette.error to palette.surface
