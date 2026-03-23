@@ -197,7 +197,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             )
             .ariaHidden(!isOpen)
             .gap(0.125.cssRem)
-            .attrsModifier { attr("role", "menu") },
+            .role("menu"),
     ) {
         val linkTabIndex = if (isOpen) 0 else -1
         Link(
@@ -205,7 +205,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             text = "CLI",
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
-                .attrsModifier { attr("role", "menuitem") },
+                .role("menuitem"),
             variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
         )
         Link(
@@ -213,7 +213,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             text = "Gradle Plugin",
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
-                .attrsModifier { attr("role", "menuitem") },
+                .role("menuitem"),
             variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
         )
         Link(
@@ -221,7 +221,7 @@ private fun DropdownPanel(isOpen: Boolean) {
             text = "API Reference",
             modifier = DocNavDropdownLinkStyle.toModifier()
                 .tabIndex(linkTabIndex)
-                .attrsModifier { attr("role", "menuitem") },
+                .role("menuitem"),
             variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
         )
     }

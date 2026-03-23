@@ -101,10 +101,10 @@ fun OptionsHeaderRow(modifier: Modifier = Modifier) {
     val headerModifier = Modifier
         .fontWeight(FontWeight.SemiBold)
         .color(palette.onSurface)
-        .attrsModifier { attr("role", "columnheader") }
+        .role("columnheader")
     Div(
         attrs = OptionsHeaderRowStyle.toModifier()
-            .attrsModifier { attr("role", "row") }
+            .role("row")
             .then(modifier)
             .toAttrs(),
     ) {
@@ -120,7 +120,7 @@ fun OptionRow(flag: String, type: String, description: String, index: Int, modif
     val variant = if (index % 2 != 0) OddRowVariant else null
     Div(
         attrs = OptionsRowStyle.toModifier(variant)
-            .attrsModifier { attr("role", "row") }
+            .role("row")
             .then(modifier)
             .toAttrs(),
     ) {

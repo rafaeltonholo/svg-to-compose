@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.varabyte.kobweb.compose.css.Appearance
 import com.varabyte.kobweb.compose.css.Outline
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.PointerEvents
@@ -19,6 +20,7 @@ import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.appearance
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRight
@@ -171,8 +173,6 @@ val EditorTextareaStyle = CssStyle {
             .fontFamily(values = FontFamilies.mono)
             .fontSize(0.75.cssRem)
             .lineHeight(value = 1.6)
-            // Extra left padding to align with backdrop text after line numbers
-            // (1rem base + 1rem number width + 1.25rem number margin = 3.25rem)
             .padding(
                 top = SiteTheme.dimensions.size.Lg,
                 right = SiteTheme.dimensions.size.Lg,
@@ -185,7 +185,7 @@ val EditorTextareaStyle = CssStyle {
             .outline("none".unsafeCast<Outline>())
             // Disable native textarea appearance so browser doesn't
             // draw its own background over the transparent one.
-            .styleModifier { property("appearance", "none") }
+            .appearance(Appearance.None)
             .caretColor(colorMode.toSitePalette().primary)
             .whiteSpace(WhiteSpace.Pre)
             .overflow(Overflow.Auto)
