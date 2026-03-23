@@ -19,6 +19,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.minSize
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
 import com.varabyte.kobweb.compose.ui.modifiers.padding
@@ -198,7 +199,7 @@ val SubheadlineTextStyle = CssStyle.base {
 val MonospaceTextStyle = CssStyle.base {
     Modifier
         .fontFamily(values = FontFamilies.mono)
-        .fontSize(value = 0.75.cssRem)
+        .fontSize(clamp(0.75.cssRem, 1.5.vw, 0.875.cssRem))
         .lineHeight(value = 1.6)
 }
 
@@ -212,7 +213,7 @@ val LabelTextStyle = CssStyle.base {
 
 // Button variants
 val CircleButtonVariant = ButtonStyle.addVariantBase {
-    Modifier.padding(0.px).borderRadius(50.percent)
+    Modifier.padding(0.px).borderRadius(50.percent).minSize(2.75.cssRem)
 }
 
 val UncoloredButtonVariant = ButtonStyle.addVariantBase {

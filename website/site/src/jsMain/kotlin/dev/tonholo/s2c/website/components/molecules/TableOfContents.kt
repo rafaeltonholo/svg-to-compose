@@ -141,7 +141,7 @@ fun TableOfContents(entries: List<TocEntry>, activeId: String?, modifier: Modifi
                             Modifier
                         },
                     )
-                    .padding(topBottom = SiteTheme.dimensions.size.Xsm)
+                    .padding(topBottom = SiteTheme.dimensions.size.Sm)
 
                 Link(
                     path = "#${entry.id}",

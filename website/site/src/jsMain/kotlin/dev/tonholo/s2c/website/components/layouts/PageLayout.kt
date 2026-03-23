@@ -41,7 +41,7 @@ import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.dom.Main
 
-private val NAV_HEADER_HEIGHT = 4.cssRem
+private val NAV_HEADER_HEIGHT = 4.25.cssRem
 private const val BANNER_Z_INDEX = 999
 private const val FADE_IN_DURATION_MS = 300
 private const val FRAME_DELAY_MS = 50L

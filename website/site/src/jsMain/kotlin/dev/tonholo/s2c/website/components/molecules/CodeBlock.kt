@@ -84,7 +84,7 @@ val CodeBlockHeaderStyle = CssStyle.base {
 val CopyButtonStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .padding(topBottom = SiteTheme.dimensions.size.Xsm, leftRight = SiteTheme.dimensions.size.Sm)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
         .borderRadius(0.375.cssRem)
         .border(1.px, LineStyle.Solid, palette.outline)
         .backgroundColor(palette.surfaceVariant)

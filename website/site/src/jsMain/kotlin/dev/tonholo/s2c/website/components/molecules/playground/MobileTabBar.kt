@@ -52,7 +52,7 @@ val MobileTabStyle = CssStyle {
     base {
         val palette = colorMode.toSitePalette()
         Modifier
-            .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
+            .padding(topBottom = SiteTheme.dimensions.size.Lg, leftRight = SiteTheme.dimensions.size.Lg)
             .cursor(Cursor.Pointer)
             .fontWeight(FontWeight.Medium)
             .fontSize(0.8.cssRem)
