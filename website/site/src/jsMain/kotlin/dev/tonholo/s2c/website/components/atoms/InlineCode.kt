@@ -26,10 +26,7 @@ import org.jetbrains.compose.web.dom.Code
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun InlineCode(
-    code: String,
-    modifier: Modifier = Modifier,
-) {
+fun InlineCode(code: String, modifier: Modifier = Modifier) {
     Code(attrs = InlineCodeStyle.toModifier().then(modifier).toAttrs()) {
         Text(code)
     }

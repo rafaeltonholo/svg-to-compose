@@ -14,7 +14,7 @@ fun GradleSvg(
     color: Color = Color.rgb(value = 0x02303A),
     width: Int = 512,
     height: Int = 512,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Svg(
         attrs = modifier.toAttrs {
