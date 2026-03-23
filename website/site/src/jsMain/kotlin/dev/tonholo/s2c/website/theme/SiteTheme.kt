@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website
+package dev.tonholo.s2c.website.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.silk.init.InitSilk
 import com.varabyte.kobweb.silk.init.InitSilkContext
+import com.varabyte.kobweb.silk.style.CssStyleScopeBase
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.color
@@ -19,6 +20,8 @@ object SiteTheme {
         @ReadOnlyComposable
         get() = ColorMode.current.toSitePalette()
 }
+
+val CssStyleScopeBase.palette: SitePalette get() = colorMode.toSitePalette()
 
 data class SitePalette(
     val background: Color,
