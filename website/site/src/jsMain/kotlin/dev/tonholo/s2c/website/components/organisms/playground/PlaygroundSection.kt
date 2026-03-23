@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
@@ -38,12 +39,12 @@ import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
 import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
 import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
-import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.theme.LabelTextStyle
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
@@ -89,7 +90,7 @@ val DesktopPanelsStyle = CssStyle {
                 size(3.fr)
             }
             .minWidth(0.px)
-            .height(500.px)
+            .height(clamp(24.cssRem, 50.vh, 40.cssRem))
     }
     cssRule(" > *") {
         Modifier
