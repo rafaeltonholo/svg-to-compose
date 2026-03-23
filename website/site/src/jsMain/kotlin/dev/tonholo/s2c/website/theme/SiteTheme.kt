@@ -19,6 +19,8 @@ object SiteTheme {
         @Composable
         @ReadOnlyComposable
         get() = ColorMode.current.toSitePalette()
+
+    val dimensions: SiteDimensions = SiteDimensions
 }
 
 val CssStyleScopeBase.palette: SitePalette get() = colorMode.toSitePalette()
