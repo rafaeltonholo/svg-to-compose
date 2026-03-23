@@ -11,33 +11,32 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ListStyleType
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.listStyle
+import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
+import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.TabPanel
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.components.molecules.resolveColors
+import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Ol
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Ul
-
-val GradlePluginOptionNameStyle = CssStyle.base {
-    Modifier
-        .fontWeight(FontWeight.SemiBold)
-        .color(colorMode.toSitePalette().onSurface)
-}
 
 @Composable
 fun GradlePluginDocsContent(modifier: Modifier = Modifier) {
@@ -114,19 +113,27 @@ private fun InstallationSection() {
 private fun PluginsDslTab() {
     Column(modifier = Modifier.gap(0.75.cssRem)) {
         CodeBlock(
-            code = """plugins {
-    id("dev.tonholo.s2c") version "<latest-version>"
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |plugins {
+                |    id("dev.tonholo.s2c") version "<latest-version>"
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            SpanText(
-                text = "Make sure Maven Central is included in your plugin repositories " +
-                    "(settings.gradle.kts).",
-                modifier = DocsBodyTextStyle.toModifier(),
-            )
+            Span(attrs = DocsBodyTextStyle.toAttrs()) {
+                Text("Make sure Maven Central is included in your plugin repositories ")
+                val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
+                InlineCode(
+                    code = "settings.gradle.kts",
+                    modifier = Modifier
+                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                        .setVariable(InlineCodeVars.BorderColor, borderColor),
+                )
+                Text(".")
+            }
         }
     }
 }
@@ -139,15 +146,17 @@ private fun BuildSrcTab() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """// buildSrc/build.gradle.kts
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("dev.tonholo.s2c:svg-to-compose-gradle-plugin:<latest-version>")
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |// buildSrc/build.gradle.kts
+                |repositories {
+                |    mavenCentral()
+                |}
+                |
+                |dependencies {
+                |    implementation("dev.tonholo.s2c:svg-to-compose-gradle-plugin:<latest-version>")
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "buildSrc/build.gradle.kts",
         )
@@ -156,10 +165,12 @@ dependencies {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """plugins {
-    id("dev.tonholo.s2c")
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |plugins {
+                |    id("dev.tonholo.s2c")
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
@@ -177,23 +188,23 @@ private fun HowItWorksSection() {
         Ol(attrs = DocsBulletListStyle.toModifier().listStyle(ListStyleType.Decimal).toAttrs()) {
             Li {
                 SpanText("Configuration Parsing", modifier = Modifier.fontWeight(FontWeight.SemiBold))
-                Text(" \u2014 reads the svgToCompose extension settings from your build script")
+                Text(": reads the svgToCompose extension settings from your build script")
             }
             Li {
                 SpanText("Icon Scanning", modifier = Modifier.fontWeight(FontWeight.SemiBold))
-                Text(" \u2014 finds SVG and AVG files in the specified source directories")
+                Text(": finds SVG and AVG files in the specified source directories")
             }
             Li {
                 SpanText("Icon Processing", modifier = Modifier.fontWeight(FontWeight.SemiBold))
-                Text(" \u2014 applies configured options such as optimization and minification")
+                Text(": applies configured options such as optimization and minification")
             }
             Li {
                 SpanText("Code Generation", modifier = Modifier.fontWeight(FontWeight.SemiBold))
-                Text(" \u2014 generates Kotlin ImageVector code in the specified package")
+                Text(": generates Kotlin ImageVector code in the specified package")
             }
             Li {
                 SpanText("Build Integration", modifier = Modifier.fontWeight(FontWeight.SemiBold))
-                Text(" \u2014 generated code is included in the Kotlin compilation classpath")
+                Text(": generated code is included in the Kotlin compilation classpath")
             }
         }
         DocCallout(variant = CalloutVariant.TIP) {
@@ -214,25 +225,27 @@ private fun BasicConfigurationSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """svgToCompose {
-    processor {
-        val icons by creating {
-            from(layout.projectDirectory.dir("src/main/resources/icons"))
-            destinationPackage("com.example.app.ui.icons")
-            optimize(true)
-            recursive()
-            icons {
-                theme("com.example.app.ui.theme.AppTheme")
-                minify()
-                exclude(".*_exclude\\.svg".toRegex())
-                mapIconNameTo { iconName ->
-                    iconName.replace("_filled", "")
-                }
-            }
-        }
-    }
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        val icons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+                |            destinationPackage("com.example.app.ui.icons")
+                |            optimize(true)
+                |            recursive()
+                |            icons {
+                |                theme("com.example.app.ui.theme.AppTheme")
+                |                minify()
+                |                exclude(".*_exclude\\.svg".toRegex())
+                |                mapIconNameTo { iconName ->
+                |                    iconName.replace("_filled", "")
+                |                }
+                |            }
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
@@ -248,28 +261,30 @@ private fun CommonConfigurationSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """svgToCompose {
-    processor {
-        common {
-            optimize(true)
-            recursive()
-            icons {
-                minify()
-            }
-        }
-
-        val outlinedIcons by creating {
-            from(layout.projectDirectory.dir("src/main/resources/icons/outlined"))
-            destinationPackage("com.example.app.ui.icons.outlined")
-        }
-
-        val filledIcons by creating {
-            from(layout.projectDirectory.dir("src/main/resources/icons/filled"))
-            destinationPackage("com.example.app.ui.icons.filled")
-        }
-    }
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        common {
+                |            optimize(true)
+                |            recursive()
+                |            icons {
+                |                minify()
+                |            }
+                |        }
+                |
+                |        val outlinedIcons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons/outlined"))
+                |            destinationPackage("com.example.app.ui.icons.outlined")
+                |        }
+                |
+                |        val filledIcons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons/filled"))
+                |            destinationPackage("com.example.app.ui.icons.filled")
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
@@ -359,8 +374,8 @@ private fun IconParserConfigurationSubsection() {
 @Composable
 private fun OptionItem(name: String, description: String) {
     Li {
-        SpanText(name, modifier = GradlePluginOptionNameStyle.toModifier())
-        Text(" \u2014 $description")
+        InlineCode(name)
+        Text(": $description")
     }
 }
 
@@ -372,13 +387,15 @@ private fun ParallelProcessingSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """svgToCompose {
-    processor {
-        useParallelism(parallelism = 4)
-        // Processor configurations...
-    }
-}
-            """.trimIndent(),
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        useParallelism(parallelism = 4)
+                |        // Processor configurations...
+                |    }
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
@@ -387,9 +404,12 @@ private fun ParallelProcessingSection() {
                 .toModifier()
                 .toAttrs(),
         ) {
-            Li { Text("Parallelism is bounded by Gradle's --max-workers setting") }
+            Li {
+                Text("Parallelism is bounded by Gradle's ")
+                InlineCode("--max-workers setting")
+            }
             Li { Text("Default value (0 or 1) runs processing sequentially") }
-            Li { Text("Caching is preserved \u2014 unchanged icons are skipped regardless of parallelism") }
+            Li { Text("Caching is preserved: unchanged icons are skipped regardless of parallelism") }
         }
     }
 }
@@ -398,27 +418,38 @@ private fun ParallelProcessingSection() {
 private fun PersistentGenerationSection() {
     DocSection(id = "persistent-generation", title = "Persistent Generation") {
         DocCallout(variant = CalloutVariant.WARNING) {
-            SpanText(
-                text = "The persist() function is a delicate API. When enabled, generated files " +
-                    "are written directly to your source directory instead of the build directory. " +
-                    "Use this only when you need to commit generated code to version control.",
-                modifier = DocsBodyTextStyle.toModifier(),
-            )
-        }
-        CodeBlock(
-            code = """svgToCompose {
-    processor {
-        val persistentIcons by creating {
-            from(layout.projectDirectory.dir("src/main/resources/icons"))
-            destinationPackage("com.example.app.ui.icons")
-            icons {
-                @OptIn(dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi::class)
-                persist()
+            val (borderColor, containerColor) = CalloutVariant.WARNING.resolveInlineCodeColors()
+            Span(attrs = DocsBodyTextStyle.toAttrs()) {
+                Text("The ")
+                InlineCode(
+                    code = "persist()",
+                    modifier = Modifier
+                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                        .setVariable(InlineCodeVars.BorderColor, borderColor),
+                )
+                Text(
+                    " function is a delicate API. When enabled, generated files " +
+                        "are written directly to your source directory instead of the build directory. " +
+                        "Use this only when you need to commit generated code to version control.",
+                )
             }
         }
-    }
-}
-            """.trimIndent(),
+        CodeBlock(
+            // language=kotlin
+            code = """
+                |svgToCompose {
+                |    processor {
+                |        val persistentIcons by creating {
+                |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+                |            destinationPackage("com.example.app.ui.icons")
+                |            icons {
+                |                @OptIn(dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi::class)
+                |                persist()
+                |            }
+                |        }
+                |    }
+                |}
+            """.trimMargin(),
             language = "kotlin",
             filename = "build.gradle.kts",
         )
