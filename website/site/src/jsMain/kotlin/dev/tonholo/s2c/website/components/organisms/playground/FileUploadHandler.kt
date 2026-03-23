@@ -29,7 +29,7 @@ internal fun rememberFileSelectedHandler(
             scope.launch {
                 when (val result = processZipUpload(zipFile)) {
                     is ZipUploadResult.Success ->
-                        vm.loadFiles(result.files)
+                        vm.dispatch(PlaygroundAction.StartBatch(result.files))
 
                     is ZipUploadResult.Error ->
                         vm.dispatch(PlaygroundAction.ZipUploadError(result.message))
@@ -60,7 +60,7 @@ internal fun rememberFileSelectedHandler(
                             relativePath = paths[file.name] ?: "",
                         )
                     }
-                    vm.loadFiles(uploadedInfos)
+                    vm.dispatch(PlaygroundAction.StartBatch(uploadedInfos))
                 }
             }
         }

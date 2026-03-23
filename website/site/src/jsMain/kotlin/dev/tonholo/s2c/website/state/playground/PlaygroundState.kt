@@ -2,7 +2,7 @@ package dev.tonholo.s2c.website.state.playground
 
 /** Holds the full mutable state for the playground section. */
 internal data class PlaygroundState(
-    val selectedSample: Int = 0,
+    val selectedSample: Int = -1,
     val inputCode: String = "",
     val activePanel: Int = 0,
     val inputMode: String = "paste",
