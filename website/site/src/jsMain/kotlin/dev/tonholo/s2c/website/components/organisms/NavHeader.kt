@@ -34,10 +34,13 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.gridColumn
+import com.varabyte.kobweb.compose.ui.modifiers.gridRow
 import com.varabyte.kobweb.compose.ui.modifiers.marginInline
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onAnimationEnd
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
@@ -88,32 +91,42 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Nav
 import org.w3c.dom.SMOOTH
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
 
 val NavHeaderStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
+        .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
         .marginInline(autoLength)
-        .padding(leftRight = SiteTheme.dimensions.size.Xxl, topBottom = SiteTheme.dimensions.size.Md)
+        .padding(topBottom = SiteTheme.dimensions.size.Md)
 }
 
-val NavContainerStyle = CssStyle.base {
+val NavContainerStyle = CssStyle {
     val palette = colorMode.toSitePalette()
-    Modifier
-        .fillMaxWidth()
-        .position(Position.Fixed)
-        .top(0.px)
-        .zIndex(value = 1000)
-        .backgroundColor(colorMode.toSitePalette().background)
-        .borderBottom(
-            width = 1.px,
-            style = LineStyle.Solid,
-            color = palette.outline,
-        )
+    base {
+        Modifier
+            .fillMaxWidth()
+            .position(Position.Fixed)
+            .top(0.px)
+            .zIndex(value = 1000)
+            .backgroundColor(colorMode.toSitePalette().background)
+            .padding(leftRight = SiteTheme.dimensions.size.Lg)
+            .borderBottom(
+                width = 1.px,
+                style = LineStyle.Solid,
+                color = palette.outline,
+            )
+    }
+    Breakpoint.SM {
+        Modifier.padding(leftRight = SiteTheme.dimensions.size.Xl)
+    }
+    Breakpoint.MD {
+        Modifier.padding(leftRight = SiteTheme.dimensions.size.Xxl)
+    }
 }
 
 @Composable
@@ -159,6 +172,36 @@ fun NavHeader(modifier: Modifier = Modifier) {
     }
 }
 
+private const val LOGO_CROSSFADE_DURATION_MS = 200
+
+/** Compact logo (S2C mark): visible below LG, fades out at LG+. */
+val CompactLogoStyle = CssStyle {
+    base {
+        Modifier
+            .gridRow(1)
+            .gridColumn(1)
+            .opacity(1)
+            .transition(Transition.of("opacity", LOGO_CROSSFADE_DURATION_MS.ms, TransitionTimingFunction.EaseInOut))
+    }
+    Breakpoint.LG {
+        Modifier.opacity(0)
+    }
+}
+
+/** Full logo (icon + text): hidden below LG, fades in at LG+. */
+val FullLogoStyle = CssStyle {
+    base {
+        Modifier
+            .gridRow(1)
+            .gridColumn(1)
+            .opacity(0)
+            .transition(Transition.of("opacity", LOGO_CROSSFADE_DURATION_MS.ms, TransitionTimingFunction.EaseInOut))
+    }
+    Breakpoint.LG {
+        Modifier.opacity(1)
+    }
+}
+
 @Composable
 private fun S2CLogo() {
     Row(
@@ -179,17 +222,33 @@ private fun S2CLogo() {
                 }
             },
     ) {
-        Image(
-            src = "/images/s2c-icon.svg",
-            modifier = Modifier.size(1.25.cssRem),
-        )
-        SpanText(
-            "svg-to-compose",
-            modifier = Modifier
-                .fontWeight(FontWeight.SemiBold)
-                .fontSize(0.9.cssRem)
-                .displayIfAtLeast(Breakpoint.SM),
-        )
+        // Grid overlay: both logos occupy the same cell, crossfade via opacity
+        Div(
+            attrs = Modifier
+                .display(DisplayStyle.Grid)
+                .alignItems(AlignItems.Center)
+                .toAttrs(),
+        ) {
+            Image(
+                src = "/images/s2c-logo.svg",
+                modifier = CompactLogoStyle.toModifier().size(1.75.cssRem),
+            )
+            Row(
+                modifier = FullLogoStyle.toModifier().gap(SiteTheme.dimensions.size.Sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    src = "/images/s2c-icon.svg",
+                    modifier = Modifier.size(1.25.cssRem),
+                )
+                SpanText(
+                    "svg-to-compose",
+                    modifier = Modifier
+                        .fontWeight(FontWeight.SemiBold)
+                        .fontSize(0.9.cssRem),
+                )
+            }
+        }
     }
 }
 
@@ -319,7 +378,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
             Column(
                 Modifier
                     .fillMaxHeight()
-                    .width(clamp(8.cssRem, 33.percent, 10.cssRem))
+                    .width(clamp(12.cssRem, 60.percent, 18.cssRem))
                     .align(Alignment.CenterEnd)
                     .padding(top = SiteTheme.dimensions.size.Lg, leftRight = SiteTheme.dimensions.size.Lg)
                     .gap(SiteTheme.dimensions.size.Xl)
@@ -354,7 +413,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                     Modifier
                         .padding(right = SiteTheme.dimensions.size.Md)
                         .gap(SiteTheme.dimensions.size.Xl)
-                        .fontSize(1.4.cssRem),
+                        .fontSize(1.2.cssRem),
                     horizontalAlignment = Alignment.End,
                 ) {
                     SideMenuItems()
