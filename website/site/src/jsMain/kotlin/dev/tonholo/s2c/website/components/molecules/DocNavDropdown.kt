@@ -37,6 +37,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.pointerEvents
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.translateY
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
@@ -184,13 +185,16 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
                     Transition.of("opacity", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
                     Transition.of("transform", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
                 )
+                .ariaHidden(!isOpen)
                 .gap(0.125.cssRem)
                 .attrsModifier { attr("role", "menu") },
         ) {
+            val linkTabIndex = if (isOpen) 0 else -1
             Link(
                 path = "/docs/cli",
                 text = "CLI",
                 modifier = DocNavDropdownLinkStyle.toModifier()
+                    .tabIndex(linkTabIndex)
                     .attrsModifier { attr("role", "menuitem") },
                 variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
             )
@@ -198,6 +202,7 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
                 path = "/docs/gradle-plugin",
                 text = "Gradle Plugin",
                 modifier = DocNavDropdownLinkStyle.toModifier()
+                    .tabIndex(linkTabIndex)
                     .attrsModifier { attr("role", "menuitem") },
                 variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
             )
@@ -205,6 +210,7 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
                 path = "/api-docs/index.html",
                 text = "API Reference",
                 modifier = DocNavDropdownLinkStyle.toModifier()
+                    .tabIndex(linkTabIndex)
                     .attrsModifier { attr("role", "menuitem") },
                 variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
             )
