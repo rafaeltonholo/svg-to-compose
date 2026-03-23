@@ -5,6 +5,8 @@ import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ScrollBehavior
 import com.varabyte.kobweb.compose.css.TextTransform
+import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.TransitionTimingFunction
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -48,6 +50,8 @@ import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
+
+private const val LAYOUT_TRANSITION_DURATION_MS = 300
 
 // Animation keyframes
 val SpinKeyframes = Keyframes {
@@ -107,6 +111,17 @@ fun initSiteStyles(ctx: InitSilkContext) {
     ctx.stylesheet.registerStyle("html") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
             Modifier.scrollBehavior(ScrollBehavior.Smooth)
+        }
+    }
+
+    ctx.stylesheet.registerStyle("main, section, nav, footer, div") {
+        cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
+            Modifier.transition(
+                Transition.of("padding", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
+                Transition.of("margin", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
+                Transition.of("gap", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
+                Transition.of("max-width", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
+            )
         }
     }
 
