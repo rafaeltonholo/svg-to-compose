@@ -24,16 +24,15 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
 import dev.tonholo.s2c.website.components.molecules.UsageCard
 import dev.tonholo.s2c.website.components.organisms.docs.CliOption
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
@@ -71,7 +70,7 @@ val CliUsageCardGridStyle = CssStyle {
     base {
         Modifier
             .display(DisplayStyle.Grid)
-            .gap(1.cssRem)
+            .gap(SiteTheme.dimensions.size.Lg)
             .fillMaxWidth()
             .gridTemplateColumns {
                 size(1.fr)
@@ -139,7 +138,7 @@ fun CliUsageContent(modifier: Modifier = Modifier) {
 
         Div(
             attrs = Modifier
-                .margin(top = 1.cssRem)
+                .margin(top = SiteTheme.dimensions.size.Lg)
                 .fillMaxWidth()
                 .display(DisplayStyle.Flex)
                 .toAttrs(),
@@ -148,7 +147,7 @@ fun CliUsageContent(modifier: Modifier = Modifier) {
                 path = "/docs/cli",
                 modifier = Modifier
                     .color(SiteTheme.palette.primary)
-                    .gap(0.25.cssRem)
+                    .gap(SiteTheme.dimensions.size.Xsm)
                     .display(DisplayStyle.Flex),
                 variant = UndecoratedLinkVariant,
             ) {
@@ -157,7 +156,7 @@ fun CliUsageContent(modifier: Modifier = Modifier) {
             }
         }
 
-        Div(attrs = Modifier.margin(top = 1.5.cssRem).fillMaxWidth().toAttrs()) {
+        Div(attrs = Modifier.margin(top = SiteTheme.dimensions.size.Xl).fillMaxWidth().toAttrs()) {
             CollapsibleSection(
                 title = "All CLI Options Reference",
                 leadingIcon = { FaTerminal(size = IconSize.SM, modifier = Modifier.color(SiteTheme.palette.primary)) },

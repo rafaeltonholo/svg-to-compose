@@ -11,8 +11,6 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ListStyleType
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
@@ -29,9 +27,7 @@ import dev.tonholo.s2c.website.components.molecules.CalloutVariant
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.TabPanel
-import dev.tonholo.s2c.website.components.molecules.resolveColors
 import dev.tonholo.s2c.website.theme.SiteTheme
-import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Ol
 import org.jetbrains.compose.web.dom.Span
@@ -40,7 +36,7 @@ import org.jetbrains.compose.web.dom.Ul
 
 @Composable
 fun GradlePluginDocsContent(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.fillMaxWidth().gap(2.cssRem).then(modifier)) {
+    Column(modifier = Modifier.fillMaxWidth().gap(SiteTheme.dimensions.size.Xxl).then(modifier)) {
         OverviewSection()
         PlatformSupportSection()
         InstallationSection()
@@ -111,7 +107,7 @@ private fun InstallationSection() {
 
 @Composable
 private fun PluginsDslTab() {
-    Column(modifier = Modifier.gap(0.75.cssRem)) {
+    Column(modifier = Modifier.gap(SiteTheme.dimensions.size.Md)) {
         CodeBlock(
             // language=kotlin
             code = """
@@ -140,7 +136,7 @@ private fun PluginsDslTab() {
 
 @Composable
 private fun BuildSrcTab() {
-    Column(modifier = Modifier.gap(0.75.cssRem)) {
+    Column(modifier = Modifier.gap(SiteTheme.dimensions.size.Md)) {
         SpanText(
             text = "Add the plugin dependency to your buildSrc project:",
             modifier = DocsBodyTextStyle.toModifier(),
@@ -309,7 +305,7 @@ private fun ProcessorConfigurationSubsection() {
         Ul(
             attrs = DocsBulletListStyle
                 .toModifier()
-                .gap(0.5.cssRem)
+                .gap(SiteTheme.dimensions.size.Sm)
                 .toAttrs(),
         ) {
             OptionItem(name = "from(Directory)", description = "Source directory containing SVG/AVG icon files")
@@ -337,7 +333,7 @@ private fun IconParserConfigurationSubsection() {
         Ul(
             attrs = DocsBulletListStyle
                 .toModifier()
-                .gap(0.5.cssRem)
+                .gap(SiteTheme.dimensions.size.Sm)
                 .toAttrs(),
         ) {
             OptionItem(

@@ -45,6 +45,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.molecules.playground.ConvertButtonStyle
 import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -62,8 +63,8 @@ val ToolbarStyle = CssStyle.base {
         .display(DisplayStyle.Flex)
         .alignItems(AlignItems.Center)
         .flexWrap(FlexWrap.Wrap)
-        .gap(0.75.cssRem)
-        .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+        .gap(SiteTheme.dimensions.size.Md)
+        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
@@ -106,7 +107,7 @@ val SampleButtonStyle = CssStyle {
         Modifier
             .border(1.px, LineStyle.Solid, palette.outline)
             .borderRadius(0.5.cssRem)
-            .padding(topBottom = 0.75.cssRem, leftRight = 0.875.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = 0.875.cssRem)
             .fontSize(0.8.cssRem)
             .fontWeight(FontWeight.Medium)
             .color(palette.onSurfaceVariant)
@@ -143,7 +144,7 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
         val sitePalette = colorMode.toSitePalette()
         Modifier
             .backgroundColor(sitePalette.surface)
-            .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
             .fontSize(0.75.cssRem)
             .cursor(Cursor.Pointer)
             .color(sitePalette.surface.inverted())

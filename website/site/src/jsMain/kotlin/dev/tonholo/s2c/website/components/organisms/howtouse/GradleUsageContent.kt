@@ -16,17 +16,16 @@ import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.UsageCard
+import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
 
 val GradleUsageCardGridStyle = CssStyle {
     base {
         Modifier
-            .gap(1.cssRem)
+            .gap(SiteTheme.dimensions.size.Lg)
     }
 }
 
@@ -38,7 +37,7 @@ fun GradleUsageContent(modifier: Modifier = Modifier) {
         AdvancedOptionsCard()
         Div(
             attrs = Modifier
-                .margin(top = 1.cssRem)
+                .margin(top = SiteTheme.dimensions.size.Lg)
                 .fillMaxWidth()
                 .display(DisplayStyle.Flex)
                 .toAttrs(),
@@ -47,7 +46,7 @@ fun GradleUsageContent(modifier: Modifier = Modifier) {
                 path = "/docs/gradle-plugin",
                 modifier = Modifier
                     .color(SiteTheme.palette.primary)
-                    .gap(0.25.cssRem)
+                    .gap(SiteTheme.dimensions.size.Xsm)
                     .display(DisplayStyle.Flex),
                 variant = UndecoratedLinkVariant,
             ) {

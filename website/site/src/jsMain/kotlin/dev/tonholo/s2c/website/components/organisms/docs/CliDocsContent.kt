@@ -26,7 +26,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
@@ -42,6 +41,7 @@ import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
 import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -153,7 +153,7 @@ val PlatformTableStyle = CssStyle.base {
 val PlatformTableHeaderStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
         .fontWeight(FontWeight.SemiBold)
         .backgroundColor(palette.surface)
         .borderBottom(
@@ -166,7 +166,7 @@ val PlatformTableHeaderStyle = CssStyle.base {
 val PlatformTableCellStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
-        .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
         .borderBottom(
             width = 1.px,
             style = LineStyle.Solid,
@@ -182,7 +182,7 @@ val CliDocsOptionsTableStyle = CssStyle.base {
 
 @Composable
 fun CliDocsContent(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.fillMaxWidth().gap(2.cssRem).then(modifier)) {
+    Column(modifier = Modifier.fillMaxWidth().gap(SiteTheme.dimensions.size.Xxl).then(modifier)) {
         OverviewSection()
         PlatformSupportSection()
         InstallationSection()
@@ -460,7 +460,7 @@ private fun OutputExamplesSection() {
         DocCallout(variant = CalloutVariant.TIP) {
             val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
             Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text(                    "The generated code uses the same ")
+                Text("The generated code uses the same ")
                 InlineCode(
                     code = "ImageVector.Builder",
                     modifier = Modifier

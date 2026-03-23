@@ -31,8 +31,8 @@ val DocsBodyTextStyle = CssStyle.base {
 
 val DocsBulletListStyle = CssStyle.base {
     Modifier
-        .padding(left = 1.5.cssRem)
-        .margin(top = 0.5.cssRem, bottom = 0.5.cssRem)
+        .padding(left = SiteTheme.dimensions.size.Xl)
+        .margin(top = SiteTheme.dimensions.size.Sm, bottom = SiteTheme.dimensions.size.Sm)
         .listStyle(ListStyleType.Disc)
         .fontSize(DOCS_BODY_FONT_SIZE_REM.cssRem)
         .lineHeight(DOCS_BODY_LINE_HEIGHT)

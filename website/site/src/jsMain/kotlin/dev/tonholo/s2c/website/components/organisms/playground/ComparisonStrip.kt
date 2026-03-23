@@ -38,13 +38,13 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.theme.SitePalette
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.CheckerboardPreview
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.molecules.playground.ZoomControls
 import dev.tonholo.s2c.website.state.playground.preview.SourcePreviewContent
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.util.rememberElementSize
 import org.jetbrains.compose.web.css.AlignItems
@@ -67,7 +67,7 @@ val ComparisonStripStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
         .backgroundColor(palette.surfaceVariant)
 }
 
@@ -80,7 +80,7 @@ val ComparisonRowStyle = CssStyle {
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
             .justifyContent(JustifyContent.Center)
-            .gap(1.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Xl)
     }
     Breakpoint.MD {
         Modifier.flexDirection(FlexDirection.Row)
@@ -163,7 +163,7 @@ fun ComparisonStrip(
             zoomLevel = zoomLevel,
             onZoomChange = onZoomChange,
             nativeScale = nativeScale,
-            modifier = Modifier.padding(top = 0.75.cssRem),
+            modifier = Modifier.padding(top = SiteTheme.dimensions.size.Md),
         )
     }
 }
@@ -182,7 +182,7 @@ private fun SourcePreviewColumn(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = PreviewColumnStyle.toModifier().gap(0.5.cssRem),
+        modifier = PreviewColumnStyle.toModifier().gap(SiteTheme.dimensions.size.Sm),
     ) {
         CheckerboardPreview(onElementRef = onElementRef) {
             SourcePreviewContent(
@@ -206,7 +206,7 @@ private fun SourceLabel(extension: String, palette: SitePalette) {
         attrs = Modifier
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .toAttrs(),
     ) {
         SpanText(
@@ -228,7 +228,7 @@ private fun ConvertedPreviewColumn(iconFileContentsJson: String?, zoomLevel: Flo
     val palette = ColorMode.current.toSitePalette()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = PreviewColumnStyle.toModifier().gap(0.5.cssRem),
+        modifier = PreviewColumnStyle.toModifier().gap(SiteTheme.dimensions.size.Sm),
     ) {
         CheckerboardPreview {
             ComparisonIframe(
@@ -248,7 +248,7 @@ private fun ConvertedLabel(iconFileContentsJson: String?, palette: SitePalette) 
         attrs = Modifier
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .toAttrs(),
     ) {
         SpanText(

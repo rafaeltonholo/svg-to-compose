@@ -37,6 +37,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -50,7 +51,7 @@ val UploadPanelStyle = CssStyle.base {
         .flex(1)
         .minHeight(0.px)
         .backgroundColor(palette.surfaceVariant)
-        .padding(2.cssRem)
+        .padding(SiteTheme.dimensions.size.Xxl)
 }
 
 val UploadDropZoneStyle = CssStyle.base(
@@ -65,7 +66,7 @@ val UploadDropZoneStyle = CssStyle.base(
         .flex(1)
         .border(2.px, LineStyle.Dashed, palette.outline)
         .borderRadius(0.75.cssRem)
-        .padding(2.cssRem)
+        .padding(SiteTheme.dimensions.size.Xxl)
         .cursor(Cursor.Pointer)
 }
 
@@ -75,7 +76,7 @@ val UploadButtonStyle = CssStyle.base {
         .backgroundColor(palette.surface)
         .border(1.px, LineStyle.Solid, palette.outline)
         .borderRadius(0.5.cssRem)
-        .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
         .fontSize(0.8.cssRem)
         .fontWeight(FontWeight.Medium)
         .cursor(Cursor.Pointer)
@@ -123,7 +124,7 @@ private fun UploadDropZone(onFilePickerClick: () -> Unit, onFolderPickerClick: (
             size = IconSize.X2,
             modifier = Modifier
                 .color(palette.onSurfaceVariant)
-                .margin(bottom = 1.cssRem),
+                .margin(bottom = SiteTheme.dimensions.size.Lg),
         )
         SpanText(
             "Drop SVG/AVG files, a folder, or a zip file here",
@@ -137,7 +138,7 @@ private fun UploadDropZone(onFilePickerClick: () -> Unit, onFolderPickerClick: (
             modifier = Modifier
                 .fontSize(0.75.cssRem)
                 .color(palette.onSurfaceVariant)
-                .margin(top = 0.25.cssRem),
+                .margin(top = SiteTheme.dimensions.size.Xsm),
         )
         UploadActionButtons(onFilePickerClick, onFolderPickerClick)
         Row(
@@ -165,8 +166,8 @@ private fun UploadDropZone(onFilePickerClick: () -> Unit, onFolderPickerClick: (
 private fun UploadActionButtons(onFilePickerClick: () -> Unit, onFolderPickerClick: () -> Unit) {
     Row(
         modifier = Modifier
-            .margin(top = 1.cssRem)
-            .gap(0.75.cssRem),
+            .margin(top = SiteTheme.dimensions.size.Lg)
+            .gap(SiteTheme.dimensions.size.Md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Button(

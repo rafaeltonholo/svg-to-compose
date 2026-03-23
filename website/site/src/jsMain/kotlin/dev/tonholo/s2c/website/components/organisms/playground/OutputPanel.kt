@@ -48,12 +48,13 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.components.molecules.PanelHeaderStyle
 import dev.tonholo.s2c.website.components.molecules.playground.SpinnerIconStyle
 import dev.tonholo.s2c.website.shiki.ShikiCodeBlock
-import dev.tonholo.s2c.website.theme.typography.FontFamilies
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.AlignItems
@@ -204,7 +205,7 @@ private fun OutputPanelContent(
 @Composable
 private fun OutputConvertingState(progress: String, palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(2.cssRem),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaSpinner(
@@ -217,7 +218,7 @@ private fun OutputConvertingState(progress: String, palette: SitePalette) {
             modifier = Modifier
                 .fontSize(0.75.cssRem)
                 .color(palette.onSurfaceVariant)
-                .padding(top = 0.5.cssRem)
+                .padding(top = SiteTheme.dimensions.size.Sm)
                 .transition(
                     Transition.of("opacity", duration = 200.ms, timingFunction = TransitionTimingFunction.Ease),
                 ),
@@ -228,7 +229,7 @@ private fun OutputConvertingState(progress: String, palette: SitePalette) {
 @Composable
 private fun OutputErrorState(error: String, palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(2.cssRem),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaCircleExclamation(
@@ -239,7 +240,7 @@ private fun OutputErrorState(error: String, palette: SitePalette) {
             modifier = Modifier
                 .fontSize(0.75.cssRem)
                 .color(palette.error)
-                .padding(top = 0.5.cssRem),
+                .padding(top = SiteTheme.dimensions.size.Sm),
         )
     }
 }
@@ -247,7 +248,7 @@ private fun OutputErrorState(error: String, palette: SitePalette) {
 @Composable
 private fun OutputEmptyState(palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(2.cssRem),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaCode(
@@ -258,7 +259,7 @@ private fun OutputEmptyState(palette: SitePalette) {
             modifier = Modifier
                 .fontSize(0.75.cssRem)
                 .color(palette.onSurfaceVariant)
-                .padding(top = 0.5.cssRem),
+                .padding(top = SiteTheme.dimensions.size.Sm),
         )
     }
 }

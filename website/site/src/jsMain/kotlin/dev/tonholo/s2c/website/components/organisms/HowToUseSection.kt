@@ -16,20 +16,19 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.TabPanel
 import dev.tonholo.s2c.website.components.organisms.howtouse.CliUsageContent
 import dev.tonholo.s2c.website.components.organisms.howtouse.GradleUsageContent
-import org.jetbrains.compose.web.css.cssRem
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.dom.Div
 
 val UsageTabContentStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .margin(top = 1.5.cssRem)
+        .margin(top = SiteTheme.dimensions.size.Xl)
 }
 
 @Composable
@@ -39,7 +38,7 @@ fun HowToUseSection(modifier: Modifier = Modifier) {
             "Usage",
             modifier = LabelTextStyle.toModifier()
                 .color(SiteTheme.palette.onSurfaceVariant)
-                .margin(bottom = 1.cssRem),
+                .margin(bottom = SiteTheme.dimensions.size.Lg),
         )
 
         var selectedTab by remember { mutableIntStateOf(0) }
