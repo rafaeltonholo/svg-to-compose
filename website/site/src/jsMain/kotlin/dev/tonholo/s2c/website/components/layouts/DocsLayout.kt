@@ -11,9 +11,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.leftRight
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.marginInline
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
@@ -35,6 +35,7 @@ import dev.tonholo.s2c.website.components.molecules.TableOfContents
 import dev.tonholo.s2c.website.components.molecules.TocEntry
 import dev.tonholo.s2c.website.components.molecules.TocLinkStyle
 import dev.tonholo.s2c.website.components.molecules.rememberActiveTocSection
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -50,15 +51,15 @@ val DocsLayoutStyle = CssStyle {
         Modifier
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(2.cssRem)
+            .gap(SiteTheme.dimensions.size.Xxl)
             .fillMaxWidth()
             .maxWidth(72.cssRem)
             .marginInline(autoLength)
-            .padding(top = 10.cssRem, leftRight = 1.cssRem)
+            .padding(top = SiteTheme.dimensions.padding.docsLayoutTop, leftRight = SiteTheme.dimensions.size.Lg)
     }
     Breakpoint.SM {
         Modifier.padding {
-            leftRight(1.5.cssRem)
+            leftRight(SiteTheme.dimensions.size.Xl)
         }
     }
     Breakpoint.MD {
@@ -68,7 +69,7 @@ val DocsLayoutStyle = CssStyle {
                 size(1.fr)
             }
             .padding {
-                leftRight(2.cssRem)
+                leftRight(SiteTheme.dimensions.size.Xxl)
             }
     }
 }
@@ -86,7 +87,7 @@ val DocsTitleStyle = CssStyle.base {
         .fontSize(clamp(1.5.cssRem, 4.vw, 2.5.cssRem))
         .fontWeight(FontWeight.Bold)
         .lineHeight(DOCS_TITLE_LINE_HEIGHT)
-        .margin(top = 0.px, bottom = 2.cssRem)
+        .margin(top = 0.px, bottom = SiteTheme.dimensions.size.Xxl)
 }
 
 @Composable
@@ -124,13 +125,13 @@ fun DocsLayout(
             Div(
                 attrs = Modifier
                     .displayUntil(Breakpoint.MD)
-                    .padding(bottom = 1.cssRem)
+                    .padding(bottom = SiteTheme.dimensions.size.Lg)
                     .toAttrs(),
             ) {
                 CollapsibleSection(title = "Table of Contents") {
                     tocEntries.forEach { entry ->
                         val linkPadding = if (entry.level >= MOBILE_TOC_INDENT_LEVEL) {
-                            Modifier.padding(left = 1.cssRem)
+                            Modifier.padding(left = SiteTheme.dimensions.size.Lg)
                         } else {
                             Modifier
                         }
@@ -139,7 +140,7 @@ fun DocsLayout(
                             text = entry.label,
                             modifier = TocLinkStyle.toModifier()
                                 .then(linkPadding)
-                                .padding(topBottom = 0.25.cssRem),
+                                .padding(topBottom = SiteTheme.dimensions.size.Xsm),
                             variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
                         )
                     }

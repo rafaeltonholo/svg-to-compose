@@ -50,11 +50,11 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.DisplayTextStyle
-import dev.tonholo.s2c.website.SubheadlineTextStyle
 import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
+import dev.tonholo.s2c.website.theme.DisplayTextStyle
 import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.SubheadlineTextStyle
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -79,13 +79,25 @@ val DocsContainerStyle = CssStyle {
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
-            .padding(top = 4.cssRem, bottom = 3.cssRem, leftRight = 1.cssRem)
+            .padding(
+                top = SiteTheme.dimensions.padding.pageTop,
+                bottom = SiteTheme.dimensions.padding.section,
+                leftRight = SiteTheme.dimensions.size.Lg,
+            )
     }
     Breakpoint.SM {
-        Modifier.padding(top = 4.cssRem, bottom = 3.cssRem, leftRight = 1.5.cssRem)
+        Modifier.padding(
+            top = SiteTheme.dimensions.padding.pageTop,
+            bottom = SiteTheme.dimensions.padding.section,
+            leftRight = SiteTheme.dimensions.size.Xl,
+        )
     }
     Breakpoint.MD {
-        Modifier.padding(top = 5.cssRem, bottom = 4.cssRem, leftRight = 2.cssRem)
+        Modifier.padding(
+            top = SiteTheme.dimensions.padding.pageTop,
+            bottom = SiteTheme.dimensions.padding.section,
+            leftRight = SiteTheme.dimensions.size.Xxl,
+        )
     }
 }
 
@@ -95,7 +107,7 @@ val DocsHeaderStyle = CssStyle {
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
-            .gap(0.75.cssRem)
+            .gap(SiteTheme.dimensions.size.Md)
     }
 }
 
@@ -105,8 +117,8 @@ val DocsGridStyle = CssStyle {
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { repeat(1) { size(1.fr) } }
-            .gap(1.5.cssRem)
-            .padding(top = 3.cssRem)
+            .gap(SiteTheme.dimensions.size.Xl)
+            .padding(top = SiteTheme.dimensions.padding.section)
     }
     Breakpoint.MD {
         Modifier.gridTemplateColumns { repeat(DOCS_GRID_COLUMNS) { size(1.fr) } }
@@ -120,10 +132,10 @@ val DocsCardStyle = CssStyle {
             .backgroundColor(palette.surfaceVariant)
             .border(1.px, LineStyle.Solid, palette.outline)
             .borderRadius(0.75.cssRem)
-            .padding(1.5.cssRem)
+            .padding(SiteTheme.dimensions.size.Xl)
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
-            .gap(0.75.cssRem)
+            .gap(SiteTheme.dimensions.size.Md)
             .cursor(Cursor.Pointer)
             .transition {
                 property("border-color", "transform")
@@ -222,7 +234,7 @@ private fun DocsCard(title: String, description: String, href: String, icon: @Co
     ) {
         Div(attrs = DocsCardStyle.toModifier().toAttrs()) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(.5.cssRem),
+                horizontalArrangement = Arrangement.spacedBy(SiteTheme.dimensions.size.Sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 icon()

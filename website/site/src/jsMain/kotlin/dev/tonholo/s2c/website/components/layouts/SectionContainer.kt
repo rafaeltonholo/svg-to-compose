@@ -17,6 +17,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -28,16 +29,16 @@ val SectionContainerStyle = CssStyle {
     base {
         Modifier
             .fillMaxWidth()
-            .padding(topBottom = 3.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Lg)
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
     }
     Breakpoint.SM {
-        Modifier.padding(topBottom = 3.cssRem, leftRight = 1.5.cssRem)
+        Modifier.padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Xl)
     }
     Breakpoint.MD {
-        Modifier.padding(topBottom = 4.cssRem, leftRight = 2.cssRem)
+        Modifier.padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Xxl)
     }
 }
 
