@@ -30,6 +30,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.Banner
 import dev.tonholo.s2c.website.components.organisms.NavHeader
 import dev.tonholo.s2c.website.components.organisms.footer.Footer
+import dev.tonholo.s2c.website.theme.LayoutTransitions
 import dev.tonholo.s2c.website.theme.SiteTheme
 import kotlinx.browser.document
 import kotlinx.coroutines.delay
@@ -42,8 +43,11 @@ import org.jetbrains.compose.web.dom.Main
 
 private val NAV_HEADER_HEIGHT = 4.cssRem
 private const val BANNER_Z_INDEX = 999
-private const val PAGE_FADE_IN_DURATION_MS = 300
+private const val FADE_IN_DURATION_MS = 300
 private const val FRAME_DELAY_MS = 50L
+
+private val FadeInTransition = Transition.of("opacity", FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut)
+private val MainTransitions: List<Transition.Listable> = listOf(FadeInTransition) + LayoutTransitions
 
 val RootStyle = CssStyle {
     base {
@@ -93,13 +97,7 @@ fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
             attrs = Modifier
                 .fillMaxWidth()
                 .opacity(if (contentVisible) 1 else 0)
-                .transition(
-                    Transition.of("opacity", PAGE_FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                    Transition.of("padding", PAGE_FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                    Transition.of("margin", PAGE_FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                    Transition.of("gap", PAGE_FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                    Transition.of("max-width", PAGE_FADE_IN_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                )
+                .transition(MainTransitions)
                 .toAttrs(),
         ) {
             content()

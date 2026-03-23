@@ -53,6 +53,12 @@ import org.jetbrains.compose.web.css.vw
 
 private const val LAYOUT_TRANSITION_DURATION_MS = 300
 
+private val LAYOUT_TRANSITION_PROPERTIES = listOf("padding", "margin", "gap", "max-width")
+
+val LayoutTransitions: List<Transition.Listable> = LAYOUT_TRANSITION_PROPERTIES.map { property ->
+    Transition.of(property, LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut)
+}
+
 // Animation keyframes
 val SpinKeyframes = Keyframes {
     from { Modifier.transform { rotate(0.deg) } }
@@ -116,12 +122,7 @@ fun initSiteStyles(ctx: InitSilkContext) {
 
     ctx.stylesheet.registerStyle("main, section, nav, footer, div") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
-            Modifier.transition(
-                Transition.of("padding", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                Transition.of("margin", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                Transition.of("gap", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-                Transition.of("max-width", LAYOUT_TRANSITION_DURATION_MS.ms, TransitionTimingFunction.EaseOut),
-            )
+            Modifier.transition(LayoutTransitions)
         }
     }
 
