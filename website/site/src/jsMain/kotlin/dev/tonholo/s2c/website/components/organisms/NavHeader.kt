@@ -262,12 +262,13 @@ private fun MenuItems() {
 }
 
 @Composable
-private fun SideMenuItems() {
+private fun SideMenuItems(onNavigate: () -> Unit) {
     val palette = ColorMode.current.toSitePalette()
-    NavLink("/#playground", "Playground")
-    NavLink("/#install", "Install")
-    NavLink("/#usage", "Usage")
-    NavLink("/#capabilities", "Capabilities")
+    val clickModifier = Modifier.onClick { onNavigate() }
+    NavLink("/#playground", "Playground", modifier = clickModifier)
+    NavLink("/#install", "Install", modifier = clickModifier)
+    NavLink("/#usage", "Usage", modifier = clickModifier)
+    NavLink("/#capabilities", "Capabilities", modifier = clickModifier)
     SpanText(
         "Docs",
         modifier = Modifier
@@ -276,9 +277,9 @@ private fun SideMenuItems() {
             .fontSize(0.75.cssRem)
             .padding(top = SiteTheme.dimensions.size.Sm),
     )
-    NavLink("/docs/cli", "CLI")
-    NavLink("/docs/gradle-plugin", "Gradle Plugin")
-    NavLink("/api-docs/index.html", "API Reference")
+    NavLink("/docs/cli", "CLI", modifier = clickModifier)
+    NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
+    NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
 }
 
 val GitHubButtonStyle = CssStyle {
@@ -416,7 +417,7 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                         .fontSize(1.2.cssRem),
                     horizontalAlignment = Alignment.End,
                 ) {
-                    SideMenuItems()
+                    SideMenuItems(onNavigate = { close() })
                     Link(
                         "https://github.com/rafaeltonholo/svg-to-compose",
                         modifier = Modifier
