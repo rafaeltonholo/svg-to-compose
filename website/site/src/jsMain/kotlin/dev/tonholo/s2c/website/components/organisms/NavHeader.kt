@@ -12,6 +12,7 @@ import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.TransitionTimingFunction
+import com.varabyte.kobweb.compose.css.autoLength
 import com.varabyte.kobweb.compose.css.functions.clamp
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.marginInline
+import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onAnimationEnd
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
@@ -71,6 +74,7 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
 import dev.tonholo.s2c.website.components.molecules.DocNavDropdown
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.AlignItems
@@ -93,7 +97,15 @@ val NavHeaderStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .padding(leftRight = 1.cssRem, topBottom = 0.75.cssRem)
+        .maxWidth(72.cssRem)
+        .marginInline(autoLength)
+        .padding(leftRight = SiteTheme.dimensions.size.Lg, topBottom = SiteTheme.dimensions.size.Md)
+}
+
+val NavContainerStyle = CssStyle.base {
+    val palette = colorMode.toSitePalette()
+    Modifier
+        .fillMaxWidth()
         .position(Position.Fixed)
         .top(0.px)
         .zIndex(value = 1000)
@@ -108,7 +120,7 @@ val NavHeaderStyle = CssStyle.base {
 @Composable
 fun NavHeader(modifier: Modifier = Modifier) {
     Nav(
-        attrs = modifier.fillMaxWidth().toAttrs(),
+        attrs = NavContainerStyle.toModifier().then(modifier).toAttrs(),
     ) {
         Row(NavHeaderStyle.toModifier(), verticalAlignment = Alignment.CenterVertically) {
             S2CLogo()
@@ -116,7 +128,7 @@ fun NavHeader(modifier: Modifier = Modifier) {
             Spacer()
 
             Row(
-                Modifier.gap(1.5.cssRem).displayIfAtLeast(Breakpoint.MD),
+                Modifier.gap(SiteTheme.dimensions.size.Xl).displayIfAtLeast(Breakpoint.MD),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 MenuItems()
@@ -127,7 +139,7 @@ fun NavHeader(modifier: Modifier = Modifier) {
             Row(
                 Modifier
                     .fontSize(1.5.cssRem)
-                    .gap(1.cssRem)
+                    .gap(SiteTheme.dimensions.size.Lg)
                     .displayUntil(Breakpoint.MD),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -153,7 +165,7 @@ private fun S2CLogo() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .cursor(Cursor.Pointer)
             .onClick {
                 if (window.location.pathname == "/") {
@@ -204,7 +216,7 @@ private fun SideMenuItems() {
             .fontWeight(FontWeight.SemiBold)
             .color(palette.onSurfaceVariant)
             .fontSize(0.75.cssRem)
-            .padding(top = 0.5.cssRem),
+            .padding(top = SiteTheme.dimensions.size.Sm),
     )
     NavLink("/docs/cli", "CLI")
     NavLink("/docs/gradle-plugin", "Gradle Plugin")
@@ -219,7 +231,7 @@ val GitHubButtonStyle = CssStyle {
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
             .gap(0.4.cssRem)
-            .padding(leftRight = 0.75.cssRem, topBottom = 0.5.cssRem)
+            .padding(leftRight = SiteTheme.dimensions.size.Md, topBottom = SiteTheme.dimensions.size.Sm)
             .borderRadius(0.5.cssRem)
             .border(1.px, LineStyle.Solid, palette.outline)
             .fontSize(0.8.cssRem)
@@ -310,8 +322,8 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                     .fillMaxHeight()
                     .width(clamp(8.cssRem, 33.percent, 10.cssRem))
                     .align(Alignment.CenterEnd)
-                    .padding(top = 1.cssRem, leftRight = 1.cssRem)
-                    .gap(1.5.cssRem)
+                    .padding(top = SiteTheme.dimensions.size.Lg, leftRight = SiteTheme.dimensions.size.Lg)
+                    .gap(SiteTheme.dimensions.size.Xl)
                     .backgroundColor(ColorMode.current.toSitePalette().surface)
                     .animation(
                         SideMenuSlideInAnim.toAnimation(
@@ -341,8 +353,8 @@ private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd
                 CloseButton(onClick = { close() })
                 Column(
                     Modifier
-                        .padding(right = 0.75.cssRem)
-                        .gap(1.5.cssRem)
+                        .padding(right = SiteTheme.dimensions.size.Md)
+                        .gap(SiteTheme.dimensions.size.Xl)
                         .fontSize(1.4.cssRem),
                     horizontalAlignment = Alignment.End,
                 ) {

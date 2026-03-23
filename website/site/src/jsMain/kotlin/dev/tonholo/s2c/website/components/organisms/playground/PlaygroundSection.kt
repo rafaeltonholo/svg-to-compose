@@ -33,8 +33,6 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.FilePickerInput
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
@@ -47,6 +45,8 @@ import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
 import dev.tonholo.s2c.website.state.playground.PlaygroundViewModel
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import dev.tonholo.s2c.website.util.handleDrop
 import dev.tonholo.s2c.website.zip.downloadAsZip
@@ -69,7 +69,7 @@ import org.w3c.files.File
 // region Styles
 
 val PlaygroundHeadingContainerStyle = CssStyle.base {
-    Modifier.margin(bottom = 1.cssRem)
+    Modifier.margin(bottom = SiteTheme.dimensions.size.Lg)
 }
 
 val EditorPanelStyle = CssStyle.base {
@@ -119,7 +119,7 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
     SectionContainer(
         id = "playground",
         modifier = modifier,
-        contentModifier = Modifier.maxWidth(96.cssRem),
+        contentModifier = Modifier,
     ) {
         val vm = remember { PlaygroundViewModel() }
         val scope = rememberCoroutineScope()
