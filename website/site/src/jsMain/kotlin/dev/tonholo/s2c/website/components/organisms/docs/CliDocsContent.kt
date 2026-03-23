@@ -1,10 +1,15 @@
 package dev.tonholo.s2c.website.components.organisms.docs
 
 import androidx.compose.runtime.Composable
+import com.varabyte.kobweb.compose.css.BorderCollapse
 import com.varabyte.kobweb.compose.css.FontWeight
+import com.varabyte.kobweb.compose.css.TableLayout
+import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
 import com.varabyte.kobweb.compose.ui.modifiers.borderCollapse
@@ -15,29 +20,34 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.tableLayout
-import com.varabyte.kobweb.compose.css.BorderCollapse
-import com.varabyte.kobweb.compose.css.TableLayout
+import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.SitePalette
 import dev.tonholo.s2c.website.components.atoms.DocSection
+import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.Tbody
 import org.jetbrains.compose.web.dom.Td
@@ -223,7 +233,9 @@ private fun PlatformSupportSection() {
             Thead {
                 Tr {
                     Th(
-                        attrs = PlatformTableHeaderStyle.toModifier()
+                        attrs = PlatformTableHeaderStyle
+                            .toModifier()
+                            .textAlign(TextAlign.Start)
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
                             .toAttrs(),
@@ -269,7 +281,8 @@ private fun PlatformRow(platform: String, index: Int) {
     }
     Tr(attrs = backgroundModifier.toAttrs()) {
         Td(
-            attrs = PlatformTableCellStyle.toModifier()
+            attrs = PlatformTableCellStyle
+                .toModifier()
                 .fontWeight(FontWeight.Medium)
                 .color(palette.onSurface)
                 .toAttrs(),
@@ -285,14 +298,14 @@ private fun PlatformRow(platform: String, index: Int) {
 private fun SupportedCell(palette: SitePalette) {
     Td(
         attrs = PlatformTableCellStyle.toModifier()
-            .attrsModifier { attr("aria-label", "Supported") }
+            .ariaLabel("Supported")
+            .textAlign(TextAlign.Center)
             .toAttrs(),
     ) {
         FaCheck(
-            size = IconSize.SM,
             modifier = Modifier
                 .color(palette.primary)
-                .attrsModifier { attr("aria-hidden", "true") },
+                .ariaHidden(),
         )
     }
 }
@@ -300,11 +313,14 @@ private fun SupportedCell(palette: SitePalette) {
 @Composable
 private fun InstallationSection() {
     DocSection(id = "installation", title = "Installation") {
-        SpanText(
-            text = "1. Download the latest release binary for your platform from the GitHub releases page, " +
-                "then give it execution permission:",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("1. Download the latest release binary for your platform from the ")
+            Link(
+                path = "https://github.com/rafaeltonholo/svg-to-compose/releases",
+                text = "GitHub releases page",
+            )
+            Text(", then give it execution permission:")
+        }
         CodeBlock(
             code = "chmod +xw s2c",
             language = "console",
@@ -329,11 +345,20 @@ private fun ExternalDependenciesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
-            SpanText(
-                text = "If you do not have Node.js installed or do not need optimization, " +
-                    "you can disable it with the -opt false flag.",
-                modifier = DocsBodyTextStyle.toModifier(),
-            )
+            val (borderColor, containerColor) = CalloutVariant.IMPORTANT.resolveInlineCodeColors()
+            Span(attrs = DocsBodyTextStyle.toAttrs()) {
+                Text(
+                    "If you do not have Node.js installed or do not need optimization, " +
+                        "you can disable it with the ",
+                )
+                InlineCode(
+                    code = "-opt false",
+                    modifier = Modifier
+                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                        .setVariable(InlineCodeVars.BorderColor, borderColor),
+                )
+                Text(" flag.")
+            }
         }
         SpanText(
             text = "Install the optimization tools globally:",
@@ -433,11 +458,17 @@ private fun OutputExamplesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            SpanText(
-                text = "The generated code uses the same ImageVector.Builder API that " +
-                    "Jetpack Compose uses internally, ensuring full compatibility.",
-                modifier = DocsBodyTextStyle.toModifier(),
-            )
+            val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
+            Span(attrs = DocsBodyTextStyle.toAttrs()) {
+                Text(                    "The generated code uses the same ")
+                InlineCode(
+                    code = "ImageVector.Builder",
+                    modifier = Modifier
+                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                        .setVariable(InlineCodeVars.BorderColor, borderColor),
+                )
+                Text(" API that Jetpack Compose uses internally, ensuring full compatibility.")
+            }
         }
         CodeBlock(
             code = OUTPUT_EXAMPLE.trimMargin(),
