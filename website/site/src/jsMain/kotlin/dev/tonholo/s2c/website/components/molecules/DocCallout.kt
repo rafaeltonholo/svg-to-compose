@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
 import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.borderLeft
@@ -88,7 +89,7 @@ private fun CalloutIcon(variant: CalloutVariant, palette: SitePalette) {
     val iconModifier = Modifier
         .padding(top = 0.35.cssRem)
         .color(variant.resolveIconColor(palette))
-        .attrsModifier { attr("aria-hidden", "true") }
+        .ariaHidden()
     when (variant) {
         CalloutVariant.TIP -> FaLightbulb(
             modifier = iconModifier,
