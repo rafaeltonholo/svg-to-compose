@@ -97,9 +97,8 @@ val NavHeaderStyle = CssStyle.base {
     val palette = colorMode.toSitePalette()
     Modifier
         .fillMaxWidth()
-        .maxWidth(72.cssRem)
         .marginInline(autoLength)
-        .padding(leftRight = SiteTheme.dimensions.size.Lg, topBottom = SiteTheme.dimensions.size.Md)
+        .padding(leftRight = SiteTheme.dimensions.size.Xxl, topBottom = SiteTheme.dimensions.size.Md)
 }
 
 val NavContainerStyle = CssStyle.base {

@@ -59,7 +59,6 @@ val FooterStyle = CssStyle {
 val FooterContentStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
-        .maxWidth(72.cssRem)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
         .gap(SiteTheme.dimensions.padding.section)

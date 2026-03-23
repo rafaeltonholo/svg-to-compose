@@ -53,7 +53,6 @@ val DocsLayoutStyle = CssStyle {
             .gridTemplateColumns { size(1.fr) }
             .gap(SiteTheme.dimensions.size.Xxl)
             .fillMaxWidth()
-            .maxWidth(72.cssRem)
             .marginInline(autoLength)
             .padding(top = SiteTheme.dimensions.padding.docsLayoutTop, leftRight = SiteTheme.dimensions.size.Lg)
     }

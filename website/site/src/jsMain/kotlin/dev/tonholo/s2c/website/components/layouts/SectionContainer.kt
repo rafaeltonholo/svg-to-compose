@@ -44,9 +44,7 @@ val SectionContainerStyle = CssStyle {
 
 val SectionContentStyle = CssStyle {
     base {
-        Modifier
-            .fillMaxWidth()
-            .maxWidth(72.cssRem)
+        Modifier.fillMaxWidth()
     }
 }
 

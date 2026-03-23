@@ -74,7 +74,6 @@ val DocsContainerStyle = CssStyle {
     base {
         Modifier
             .fillMaxWidth()
-            .maxWidth(72.cssRem)
             .marginInline(autoLength)
             .display(DisplayStyle.Flex)
             .flexDirection(FlexDirection.Column)
