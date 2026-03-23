@@ -1,9 +1,9 @@
 package dev.tonholo.s2c.website.state.playground.reducer
 
-import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.batch.fileKey
 import dev.tonholo.s2c.website.state.playground.batch.toFileGroups
 import kotlin.js.Date

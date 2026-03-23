@@ -27,12 +27,12 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IntersectionObserverTrigger
 import dev.tonholo.s2c.website.components.molecules.playground.FileGroupHeader
 import dev.tonholo.s2c.website.components.molecules.playground.FileRow
-import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
-import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.batch.BatchFileListState
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 import dev.tonholo.s2c.website.state.playground.batch.fileKey
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
 import dev.tonholo.s2c.website.state.playground.folder.FolderGroupState
