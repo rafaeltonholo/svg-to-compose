@@ -51,7 +51,7 @@ val UploadPanelStyle = CssStyle.base {
         .flex(1)
         .minHeight(0.px)
         .backgroundColor(palette.surfaceVariant)
-        .padding(SiteTheme.dimensions.size.Xxl)
+        .padding(SiteTheme.dimensions.size.Lg)
 }
 
 val UploadDropZoneStyle = CssStyle.base(
@@ -66,7 +66,7 @@ val UploadDropZoneStyle = CssStyle.base(
         .flex(1)
         .border(2.px, LineStyle.Dashed, palette.outline)
         .borderRadius(0.75.cssRem)
-        .padding(SiteTheme.dimensions.size.Xxl)
+        .padding(SiteTheme.dimensions.size.Xl)
         .cursor(Cursor.Pointer)
 }
 

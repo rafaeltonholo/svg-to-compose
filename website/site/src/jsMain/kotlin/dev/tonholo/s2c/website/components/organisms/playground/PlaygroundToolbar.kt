@@ -107,7 +107,7 @@ val SampleButtonStyle = CssStyle {
         Modifier
             .border(1.px, LineStyle.Solid, palette.outline)
             .borderRadius(0.5.cssRem)
-            .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = 0.875.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = 0.875.cssRem)
             .fontSize(0.8.cssRem)
             .fontWeight(FontWeight.Medium)
             .color(palette.onSurfaceVariant)
@@ -144,8 +144,8 @@ val ToolbarButtonStyle = CssStyle<ToolbarButtonKind> {
         val sitePalette = colorMode.toSitePalette()
         Modifier
             .backgroundColor(sitePalette.surface)
-            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
-            .fontSize(0.75.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
+            .fontSize(0.8.cssRem)
             .cursor(Cursor.Pointer)
             .color(sitePalette.surface.inverted())
             .fontWeight(FontWeight.Medium)

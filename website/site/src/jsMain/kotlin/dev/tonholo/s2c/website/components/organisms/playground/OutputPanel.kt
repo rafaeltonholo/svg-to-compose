@@ -205,7 +205,7 @@ private fun OutputPanelContent(
 @Composable
 private fun OutputConvertingState(progress: String, palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaSpinner(
@@ -229,7 +229,7 @@ private fun OutputConvertingState(progress: String, palette: SitePalette) {
 @Composable
 private fun OutputErrorState(error: String, palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaCircleExclamation(
@@ -248,7 +248,7 @@ private fun OutputErrorState(error: String, palette: SitePalette) {
 @Composable
 private fun OutputEmptyState(palette: SitePalette) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xxl),
+        modifier = Modifier.fillMaxSize().padding(SiteTheme.dimensions.size.Xl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FaCode(
