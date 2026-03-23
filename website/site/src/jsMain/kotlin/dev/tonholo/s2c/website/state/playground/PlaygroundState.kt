@@ -41,4 +41,14 @@ internal data class PlaygroundState(
 
         // endregion
     }
+
+    val selectedSampleName: String
+        get() = if (selectedSample >= 0) {
+            samples.getOrNull(selectedSample)?.name ?: "Unknown (#$selectedSample)"
+        } else {
+            "None"
+        }
+
+    val isBatchMode: Boolean
+        get() = uploadedFiles.isNotEmpty() || fileGroups.isNotEmpty()
 }
