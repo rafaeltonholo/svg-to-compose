@@ -81,7 +81,7 @@ val copyEditorWasm by tasks.registering(Copy::class) {
 val dokkaOutputDir = rootProject.layout.projectDirectory.dir("../build/dokka")
 val copyDokkaHtml by tasks.registering(Sync::class) {
     from(dokkaOutputDir)
-    into(layout.projectDirectory.dir("src/jsMain/resources/public/docs"))
+    into(layout.projectDirectory.dir("src/jsMain/resources/public/api-docs"))
 }
 
 tasks.configureEach {
