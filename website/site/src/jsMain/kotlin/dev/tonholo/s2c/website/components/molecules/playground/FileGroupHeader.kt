@@ -45,8 +45,8 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.state.playground.BatchPhase
-import dev.tonholo.s2c.website.state.playground.FileGroup
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 import dev.tonholo.s2c.website.state.playground.folder.FileGroupHeaderState
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme

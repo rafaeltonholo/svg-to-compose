@@ -8,6 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.fileKey
+import dev.tonholo.s2c.website.state.playground.batch.resultKey
 import dev.tonholo.s2c.website.state.playground.reducer.PlaygroundReducer
 import dev.tonholo.s2c.website.state.playground.reducer.Reducer
 import dev.tonholo.s2c.website.worker.ConversionOutput

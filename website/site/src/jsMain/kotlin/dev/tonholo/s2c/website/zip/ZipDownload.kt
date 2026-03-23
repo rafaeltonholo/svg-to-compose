@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.website.zip
 
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
 import kotlinx.browser.document
 import kotlinx.coroutines.await
 import org.w3c.dom.HTMLAnchorElement

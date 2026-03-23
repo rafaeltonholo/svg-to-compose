@@ -1,4 +1,4 @@
-package dev.tonholo.s2c.website.state.playground
+package dev.tonholo.s2c.website.state.playground.batch
 
 /**
  * Result of converting a single file during batch conversion.

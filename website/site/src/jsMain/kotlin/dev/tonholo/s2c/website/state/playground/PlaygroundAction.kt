@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.website.state.playground
 
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.reducer.PlaygroundReducer
 import dev.tonholo.s2c.website.worker.ConversionOutput
 

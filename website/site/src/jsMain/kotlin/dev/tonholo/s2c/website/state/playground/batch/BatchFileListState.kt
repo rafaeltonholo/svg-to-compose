@@ -1,7 +1,5 @@
 package dev.tonholo.s2c.website.state.playground.batch
 
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 
 internal data class BatchFileListState(

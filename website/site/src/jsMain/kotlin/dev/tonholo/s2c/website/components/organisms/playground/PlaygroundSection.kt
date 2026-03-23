@@ -38,8 +38,8 @@ import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
 import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
 import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
 import dev.tonholo.s2c.website.state.playground.PlaygroundState
 import dev.tonholo.s2c.website.state.playground.PlaygroundState.Companion.samples

@@ -38,8 +38,8 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selectors.hover
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.state.playground.BatchConversionResult
-import dev.tonholo.s2c.website.state.playground.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.UploadedFileInfo
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.toSitePalette

@@ -1,5 +1,8 @@
 package dev.tonholo.s2c.website.state.playground
 
+import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
+import dev.tonholo.s2c.website.state.playground.batch.FileGroup
+
 /** Holds the full mutable state for the playground section. */
 internal data class PlaygroundState(
     val selectedSample: Int = -1,
