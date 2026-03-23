@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.leftRight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
@@ -22,7 +23,6 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
-import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
@@ -35,13 +35,15 @@ import dev.tonholo.s2c.website.components.molecules.TableOfContents
 import dev.tonholo.s2c.website.components.molecules.TocEntry
 import dev.tonholo.s2c.website.components.molecules.TocLinkStyle
 import dev.tonholo.s2c.website.components.molecules.rememberActiveTocSection
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H1
+import org.jetbrains.compose.web.dom.Text
 
 val DocsLayoutStyle = CssStyle {
     base {
@@ -77,11 +79,14 @@ val DocsContentStyle = CssStyle.base {
         .maxWidth(48.cssRem)
 }
 
+private const val DOCS_TITLE_LINE_HEIGHT = 1.2
+
 val DocsTitleStyle = CssStyle.base {
     Modifier
         .fontSize(clamp(1.5.cssRem, 4.vw, 2.5.cssRem))
         .fontWeight(FontWeight.Bold)
-        .margin(bottom = 2.cssRem)
+        .lineHeight(DOCS_TITLE_LINE_HEIGHT)
+        .margin(top = 0.px, bottom = 2.cssRem)
 }
 
 @Composable
@@ -141,11 +146,13 @@ fun DocsLayout(
                 }
             }
 
-            SpanText(
-                title,
-                modifier = DocsTitleStyle.toModifier()
-                    .color(palette.onBackground),
-            )
+            H1(
+                attrs = DocsTitleStyle.toModifier()
+                    .color(palette.onBackground)
+                    .toAttrs(),
+            ) {
+                Text(title)
+            }
             content()
         }
     }
