@@ -8,8 +8,8 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
+import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.id
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.margin
@@ -20,7 +20,8 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.HeadlineTextStyle
+import dev.tonholo.s2c.website.theme.HeadlineTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
@@ -36,7 +37,7 @@ val DocSectionStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .scrollMargin(top = 5.cssRem)
-        .padding(bottom = 1.cssRem)
+        .padding(bottom = SiteTheme.dimensions.size.Lg)
 }
 
 val DocSectionLevel3HeadingStyle = CssStyle.base {
@@ -66,7 +67,7 @@ fun DocSection(
                 attrs = HeadlineTextStyle.toModifier()
                     .margin(0.px)
                     .color(palette.onBackground)
-                    .padding(bottom = 0.75.cssRem)
+                    .padding(bottom = SiteTheme.dimensions.size.Md)
                     .toAttrs(),
             ) {
                 Text(title)
@@ -76,13 +77,13 @@ fun DocSection(
                 attrs = DocSectionLevel3HeadingStyle.toModifier()
                     .margin(0.px)
                     .color(palette.onBackground)
-                    .padding(bottom = 0.75.cssRem)
+                    .padding(bottom = SiteTheme.dimensions.size.Md)
                     .toAttrs(),
             ) {
                 Text(title)
             }
         }
-        Column(modifier = Modifier.fillMaxWidth().gap(0.75.cssRem)) {
+        Column(modifier = Modifier.fillMaxWidth().gap(SiteTheme.dimensions.size.Md)) {
             content()
         }
     }

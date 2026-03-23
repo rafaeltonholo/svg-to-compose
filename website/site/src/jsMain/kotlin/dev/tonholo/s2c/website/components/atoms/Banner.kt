@@ -23,6 +23,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
+import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.css.CSSLengthValue
 import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
@@ -42,7 +43,7 @@ val BannerStyle = CssStyle<BannerKind> {
     base {
         Modifier
             .fillMaxWidth()
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
             .backgroundColor(BannerVars.ContainerColor.value())
             .color(BannerVars.ContentColor.value())
             .borderBottom(
@@ -76,7 +77,7 @@ fun Banner(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier.gap(0.5.cssRem),
+            modifier = Modifier.gap(SiteTheme.dimensions.size.Sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
