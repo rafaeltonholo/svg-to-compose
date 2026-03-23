@@ -125,7 +125,6 @@ val SquaredBadge = BadgeStyle.addVariant {
     }
 }
 
-
 fun Color.resolveBadgeColors(): Pair<Color, Color> {
     val rgb = toRgb()
     val bgColor = rgb.copyf(alpha = 0.1f)

@@ -26,10 +26,7 @@ private val RevealTransitions = listOf(
 )
 
 @Composable
-fun ScrollReveal(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
+fun ScrollReveal(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var isVisible by remember { mutableStateOf(false) }
     val observer = remember {
         IntersectionObserver(

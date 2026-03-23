@@ -20,7 +20,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.minHeight
 import com.varabyte.kobweb.compose.ui.modifiers.minWidth
 import com.varabyte.kobweb.compose.ui.modifiers.overflow

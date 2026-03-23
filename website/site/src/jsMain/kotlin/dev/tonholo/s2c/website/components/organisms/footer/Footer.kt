@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.website.components.organisms.footer
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.autoLength
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.borderTop
@@ -10,7 +9,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
-import com.varabyte.kobweb.compose.ui.modifiers.marginInline
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -51,7 +49,10 @@ val FooterStyle = CssStyle {
         Modifier.padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Xl)
     }
     Breakpoint.MD {
-        Modifier.padding(topBottom = SiteTheme.dimensions.padding.footerVertical, leftRight = SiteTheme.dimensions.size.Xxl)
+        Modifier.padding(
+            topBottom = SiteTheme.dimensions.padding.footerVertical,
+            leftRight = SiteTheme.dimensions.size.Xxl,
+        )
     }
 }
 
