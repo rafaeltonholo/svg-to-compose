@@ -53,6 +53,7 @@ val DocsLayoutStyle = CssStyle {
             .gridTemplateColumns { size(1.fr) }
             .gap(SiteTheme.dimensions.size.Xxl)
             .fillMaxWidth()
+            .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
             .marginInline(autoLength)
             .padding(top = SiteTheme.dimensions.padding.docsLayoutTop, leftRight = SiteTheme.dimensions.size.Lg)
     }
@@ -70,6 +71,12 @@ val DocsLayoutStyle = CssStyle {
             .padding {
                 leftRight(SiteTheme.dimensions.size.Xxl)
             }
+    }
+    Breakpoint.XL {
+        Modifier.gridTemplateColumns {
+            size(18.cssRem)
+            size(1.fr)
+        }
     }
 }
 
@@ -139,7 +146,7 @@ fun DocsLayout(
                             text = entry.label,
                             modifier = TocLinkStyle.toModifier()
                                 .then(linkPadding)
-                                .padding(topBottom = SiteTheme.dimensions.size.Xsm),
+                                .padding(topBottom = SiteTheme.dimensions.size.Sm),
                             variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
                         )
                     }

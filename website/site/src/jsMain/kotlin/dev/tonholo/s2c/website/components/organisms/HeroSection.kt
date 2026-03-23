@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.flexDirection
+import com.varabyte.kobweb.compose.ui.modifiers.flexWrap
 import com.varabyte.kobweb.compose.ui.modifiers.fontFamily
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.id
@@ -28,6 +29,7 @@ import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.FlexWrap
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Section
@@ -61,6 +63,7 @@ val CompactIntroStyle = CssStyle {
 val IntroContentStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
+        .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
         .gap(SiteTheme.dimensions.size.Md)
@@ -80,6 +83,7 @@ fun HeroSection(modifier: Modifier = Modifier) {
                 attrs = DisplayTextStyle
                     .toModifier()
                     .display(DisplayStyle.Flex)
+                    .flexWrap(FlexWrap.Wrap)
                     .alignItems(AlignItems.Center)
                     .gap(SiteTheme.dimensions.size.Md)
                     .toAttrs(),

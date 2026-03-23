@@ -24,7 +24,6 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -59,8 +58,10 @@ val FooterStyle = CssStyle {
 val FooterContentStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
+        .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
         .display(DisplayStyle.Flex)
         .flexDirection(FlexDirection.Column)
+        .alignItems(AlignItems.Center)
         .gap(SiteTheme.dimensions.padding.section)
 }
 
@@ -68,6 +69,7 @@ val FooterContentMdStyle = CssStyle {
     Breakpoint.MD {
         Modifier
             .flexDirection(FlexDirection.Row)
+            .alignItems(AlignItems.Stretch)
             .justifyContent(JustifyContent.SpaceBetween)
     }
 }
