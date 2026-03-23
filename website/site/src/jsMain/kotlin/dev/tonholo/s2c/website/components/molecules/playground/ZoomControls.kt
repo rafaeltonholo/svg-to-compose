@@ -25,6 +25,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -38,7 +39,7 @@ val ZoomButtonStyle = CssStyle.base {
         .color(palette.onSurfaceVariant)
         .border(1.px, LineStyle.Solid, palette.outlineVariant)
         .borderRadius(0.25.cssRem)
-        .padding(topBottom = 0.25.cssRem, leftRight = 0.5.cssRem)
+        .padding(topBottom = SiteTheme.dimensions.size.Xsm, leftRight = SiteTheme.dimensions.size.Sm)
         .fontSize(0.75.cssRem)
         .fontWeight(FontWeight.Medium)
         .cursor(Cursor.Pointer)
@@ -71,7 +72,7 @@ fun ZoomControls(
     val palette = ColorMode.current.toSitePalette()
 
     Row(
-        modifier = modifier.gap(0.5.cssRem)
+        modifier = modifier.gap(SiteTheme.dimensions.size.Sm)
             .tabIndex(0)
             .attrsModifier {
                 onKeyDown { event ->

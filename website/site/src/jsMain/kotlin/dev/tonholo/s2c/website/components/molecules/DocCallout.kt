@@ -26,6 +26,7 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.theme.SitePalette
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -47,7 +48,7 @@ val DocCalloutStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .borderRadius(0.5.cssRem)
-        .padding(1.cssRem)
+        .padding(SiteTheme.dimensions.size.Lg)
         .borderLeft(
             width = 3.px,
             style = LineStyle.Solid,
@@ -71,7 +72,7 @@ fun DocCallout(variant: CalloutVariant, modifier: Modifier = Modifier, content: 
             .toAttrs(),
     ) {
         Row(
-            modifier = Modifier.gap(0.75.cssRem).fillMaxWidth(),
+            modifier = Modifier.gap(SiteTheme.dimensions.size.Md).fillMaxWidth(),
             verticalAlignment = Alignment.Top,
         ) {
             CalloutIcon(variant = variant, palette = palette)

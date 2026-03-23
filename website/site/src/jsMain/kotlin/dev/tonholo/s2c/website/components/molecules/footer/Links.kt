@@ -16,21 +16,20 @@ import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.components.atoms.Badge
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexWrap
-import org.jetbrains.compose.web.css.cssRem
 
 @Composable
 fun Links(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .flexWrap(FlexWrap.Wrap),
         verticalAlignment = Alignment.CenterVertically,
     ) {

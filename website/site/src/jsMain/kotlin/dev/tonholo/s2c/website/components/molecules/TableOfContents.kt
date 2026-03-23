@@ -32,7 +32,8 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
-import dev.tonholo.s2c.website.LabelTextStyle
+import dev.tonholo.s2c.website.theme.LabelTextStyle
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.Position
@@ -53,7 +54,7 @@ val TocContainerStyle = CssStyle.base {
         .top(6.5.cssRem)
         .maxHeight(100.vh - 7.5.cssRem)
         .overflow { y(Overflow.Auto) }
-        .padding(top = 1.cssRem, right = 1.cssRem)
+        .padding(top = SiteTheme.dimensions.size.Lg, right = SiteTheme.dimensions.size.Lg)
 }
 
 val TocLinkStyle = CssStyle {
@@ -121,7 +122,7 @@ fun TableOfContents(entries: List<TocEntry>, activeId: String?, modifier: Modifi
             SpanText(
                 "Table of Contents",
                 modifier = LabelTextStyle.toModifier()
-                    .padding(bottom = 0.75.cssRem),
+                    .padding(bottom = SiteTheme.dimensions.size.Md),
             )
             entries.forEach { entry ->
                 val isActive = entry.id == activeId
@@ -135,12 +136,12 @@ fun TableOfContents(entries: List<TocEntry>, activeId: String?, modifier: Modifi
                     )
                     .then(
                         if (entry.level >= TOC_LEVEL_INDENT) {
-                            Modifier.padding(left = 1.cssRem)
+                            Modifier.padding(left = SiteTheme.dimensions.size.Lg)
                         } else {
                             Modifier
                         },
                     )
-                    .padding(topBottom = 0.25.cssRem)
+                    .padding(topBottom = SiteTheme.dimensions.size.Xsm)
 
                 Link(
                     path = "#${entry.id}",

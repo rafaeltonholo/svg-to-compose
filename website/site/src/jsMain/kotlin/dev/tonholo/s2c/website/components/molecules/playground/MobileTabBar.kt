@@ -30,6 +30,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
@@ -42,8 +43,8 @@ import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 val MobileTabBarStyle = CssStyle.base {
     Modifier
         .display(DisplayStyle.Flex)
-        .gap(0.25.cssRem)
-        .padding(0.5.cssRem)
+        .gap(SiteTheme.dimensions.size.Xsm)
+        .padding(SiteTheme.dimensions.size.Sm)
         .backgroundColor(colorMode.toSitePalette().surfaceVariant)
 }
 
@@ -51,7 +52,7 @@ val MobileTabStyle = CssStyle {
     base {
         val palette = colorMode.toSitePalette()
         Modifier
-            .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
             .cursor(Cursor.Pointer)
             .fontWeight(FontWeight.Medium)
             .fontSize(0.8.cssRem)

@@ -27,8 +27,9 @@ import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import dev.tonholo.s2c.website.theme.typography.FontFamilies
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
+import dev.tonholo.s2c.website.theme.typography.FontFamilies
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
@@ -45,8 +46,8 @@ val OptionsHeaderRowStyle = CssStyle {
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(0.5.cssRem)
-            .padding(topBottom = 0.75.cssRem, leftRight = 1.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
+            .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
             .fontSize(0.75.cssRem)
             .lineHeight(OPTIONS_LINE_HEIGHT)
             .backgroundColor(palette.surface)
@@ -73,8 +74,8 @@ val OptionsRowStyle = CssStyle<OptionsRowKind> {
             .fillMaxWidth()
             .display(DisplayStyle.Grid)
             .gridTemplateColumns { size(1.fr) }
-            .gap(0.5.cssRem)
-            .padding(topBottom = 0.625.cssRem, leftRight = 1.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
+            .padding(topBottom = 0.625.cssRem, leftRight = SiteTheme.dimensions.size.Lg)
             .fontFamily(values = FontFamilies.mono)
             .fontWeight(FontWeight.Medium)
             .whiteSpace(WhiteSpace.NoWrap)
@@ -128,19 +129,19 @@ fun OptionRow(flag: String, type: String, description: String, index: Int, modif
             modifier = Modifier
                 .fontWeight(FontWeight.Medium)
                 .color(palette.primary)
-                .role("cell")
+                .role("cell"),
         )
         SpanText(
             type,
             modifier = Modifier
                 .color(palette.primary)
-                .role("cell")
+                .role("cell"),
         )
         SpanText(
             description,
             modifier = Modifier
                 .color(palette.onSurfaceVariant)
-                .role("cell")
+                .role("cell"),
         )
     }
 }

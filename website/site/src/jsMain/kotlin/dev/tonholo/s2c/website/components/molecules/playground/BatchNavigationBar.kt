@@ -47,11 +47,11 @@ internal fun BatchNavigationBar(
     Div(
         attrs = Modifier
             .fillMaxWidth()
-            .padding(topBottom = 0.5.cssRem, leftRight = 1.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Lg)
             .backgroundColor(SiteTheme.palette.surfaceVariant)
             .display(DisplayStyle.Flex)
             .alignItems(AlignItems.Center)
-            .gap(0.5.cssRem)
+            .gap(SiteTheme.dimensions.size.Sm)
             .toAttrs(),
     ) {
         BatchNavButton(

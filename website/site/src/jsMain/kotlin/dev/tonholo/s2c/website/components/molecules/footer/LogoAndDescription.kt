@@ -24,11 +24,11 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun LogoAndDescription(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.gap(0.5.cssRem),
+        modifier = modifier.gap(SiteTheme.dimensions.size.Sm),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.gap(0.5.cssRem),
+            modifier = Modifier.gap(SiteTheme.dimensions.size.Sm),
         ) {
             Image(
                 src = "/images/s2c-icon.svg",

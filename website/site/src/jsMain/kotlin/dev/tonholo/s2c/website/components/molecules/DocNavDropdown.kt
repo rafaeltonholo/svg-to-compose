@@ -45,6 +45,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
@@ -81,7 +82,7 @@ val DocNavDropdownPanelStyle = CssStyle {
             .top(100.percent)
             .left(0.px)
             .minWidth(12.cssRem)
-            .padding(0.5.cssRem)
+            .padding(SiteTheme.dimensions.size.Sm)
             .backgroundColor(palette.surfaceVariant)
             .border(1.px, LineStyle.Solid, palette.outline)
             .borderRadius(0.5.cssRem)
@@ -100,7 +101,7 @@ val DocNavDropdownLinkStyle = CssStyle {
         val palette = colorMode.toSitePalette()
         Modifier
             .display(DisplayStyle.Block)
-            .padding(topBottom = 0.5.cssRem, leftRight = 0.75.cssRem)
+            .padding(topBottom = SiteTheme.dimensions.size.Sm, leftRight = SiteTheme.dimensions.size.Md)
             .fontSize(0.8.cssRem)
             .borderRadius(0.25.cssRem)
             .color(palette.onSurfaceVariant)
@@ -139,7 +140,7 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
     ) {
         Row(
             modifier = DocNavDropdownTriggerStyle.toModifier()
-                .gap(0.25.cssRem)
+                .gap(SiteTheme.dimensions.size.Xsm)
                 .onClick { isOpen = !isOpen }
                 .tabIndex(0)
                 .attrsModifier {
