@@ -36,6 +36,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.pointerEvents
 import com.varabyte.kobweb.compose.ui.modifiers.position
+import com.varabyte.kobweb.compose.ui.modifiers.role
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.transition
@@ -62,7 +63,11 @@ import org.jetbrains.compose.web.css.px
 
 private const val DROPDOWN_Z_INDEX = 100
 
-val DocNavDropdownTriggerStyle = CssStyle {
+val DocNavDropdownTriggerStyle = CssStyle(
+    extraModifier = Modifier
+        .tabIndex(0)
+        .role("button"),
+) {
     base {
         val palette = colorMode.toSitePalette()
         Modifier
@@ -73,6 +78,7 @@ val DocNavDropdownTriggerStyle = CssStyle {
             .transition(
                 Transition.of("color", duration = 150.ms, timingFunction = TransitionTimingFunction.Ease),
             )
+            .gap(SiteTheme.dimensions.size.Xsm)
     }
     cssRule(":hover") {
         Modifier.color(colorMode.toSitePalette().primary)
@@ -144,14 +150,12 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
             },
     ) {
         Row(
-            modifier = DocNavDropdownTriggerStyle.toModifier()
-                .gap(SiteTheme.dimensions.size.Xsm)
+            modifier = DocNavDropdownTriggerStyle
+                .toModifier()
                 .onClick { isOpen = !isOpen }
-                .tabIndex(0)
                 .attrsModifier {
                     attr("aria-expanded", isOpen.toString())
                     attr("aria-haspopup", "true")
-                    attr("role", "button")
                     onKeyDown { event ->
                         when (event.key) {
                             " ", "Enter" -> {
@@ -176,44 +180,49 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
             )
         }
 
-        Column(
-            modifier = DocNavDropdownPanelStyle.toModifier()
-                .opacity(if (isOpen) 1 else 0)
-                .translateY(if (isOpen) 0.px else (-4).px)
-                .pointerEvents(if (isOpen) PointerEvents.Auto else PointerEvents.None)
-                .transition(
-                    Transition.of("opacity", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
-                    Transition.of("transform", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
-                )
-                .ariaHidden(!isOpen)
-                .gap(0.125.cssRem)
-                .attrsModifier { attr("role", "menu") },
-        ) {
-            val linkTabIndex = if (isOpen) 0 else -1
-            Link(
-                path = "/docs/cli",
-                text = "CLI",
-                modifier = DocNavDropdownLinkStyle.toModifier()
-                    .tabIndex(linkTabIndex)
-                    .attrsModifier { attr("role", "menuitem") },
-                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+        DropdownPanel(isOpen)
+    }
+}
+
+@Composable
+private fun DropdownPanel(isOpen: Boolean) {
+    Column(
+        modifier = DocNavDropdownPanelStyle.toModifier()
+            .opacity(if (isOpen) 1 else 0)
+            .translateY(if (isOpen) 0.px else (-4).px)
+            .pointerEvents(if (isOpen) PointerEvents.Auto else PointerEvents.None)
+            .transition(
+                Transition.of("opacity", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
+                Transition.of("transform", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
             )
-            Link(
-                path = "/docs/gradle-plugin",
-                text = "Gradle Plugin",
-                modifier = DocNavDropdownLinkStyle.toModifier()
-                    .tabIndex(linkTabIndex)
-                    .attrsModifier { attr("role", "menuitem") },
-                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-            )
-            Link(
-                path = "/api-docs/index.html",
-                text = "API Reference",
-                modifier = DocNavDropdownLinkStyle.toModifier()
-                    .tabIndex(linkTabIndex)
-                    .attrsModifier { attr("role", "menuitem") },
-                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-            )
-        }
+            .ariaHidden(!isOpen)
+            .gap(0.125.cssRem)
+            .attrsModifier { attr("role", "menu") },
+    ) {
+        val linkTabIndex = if (isOpen) 0 else -1
+        Link(
+            path = "/docs/cli",
+            text = "CLI",
+            modifier = DocNavDropdownLinkStyle.toModifier()
+                .tabIndex(linkTabIndex)
+                .attrsModifier { attr("role", "menuitem") },
+            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+        )
+        Link(
+            path = "/docs/gradle-plugin",
+            text = "Gradle Plugin",
+            modifier = DocNavDropdownLinkStyle.toModifier()
+                .tabIndex(linkTabIndex)
+                .attrsModifier { attr("role", "menuitem") },
+            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+        )
+        Link(
+            path = "/api-docs/index.html",
+            text = "API Reference",
+            modifier = DocNavDropdownLinkStyle.toModifier()
+                .tabIndex(linkTabIndex)
+                .attrsModifier { attr("role", "menuitem") },
+            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+        )
     }
 }
