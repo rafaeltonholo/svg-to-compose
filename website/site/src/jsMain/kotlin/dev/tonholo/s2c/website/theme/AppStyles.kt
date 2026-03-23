@@ -120,7 +120,7 @@ fun initSiteStyles(ctx: InitSilkContext) {
         }
     }
 
-    ctx.stylesheet.registerStyle("main, section, nav, footer, div") {
+    ctx.stylesheet.registerStyle("main, section, nav, footer") {
         cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
             Modifier.transition(LayoutTransitions)
         }
