@@ -41,21 +41,18 @@ val CompactIntroStyle = CssStyle {
             .alignItems(AlignItems.Center)
             .padding(
                 top = SiteTheme.dimensions.padding.heroTop,
-                bottom = SiteTheme.dimensions.size.Xxl,
                 leftRight = SiteTheme.dimensions.size.Lg,
             )
     }
     Breakpoint.SM {
         Modifier.padding(
             top = SiteTheme.dimensions.padding.heroTop,
-            bottom = SiteTheme.dimensions.size.Xxl,
             leftRight = SiteTheme.dimensions.size.Xl,
         )
     }
     Breakpoint.MD {
         Modifier.padding(
             top = SiteTheme.dimensions.padding.heroTop,
-            bottom = SiteTheme.dimensions.size.Xxl,
             leftRight = SiteTheme.dimensions.size.Xxl,
         )
     }

@@ -67,7 +67,7 @@ object PaddingTokens {
     val pageTop get() = calc { SiteSizeVar.Xxl.value() + 2.cssRem }
 
     /** Hero section top padding (6rem base -> 7rem MD+) */
-    val heroTop get() = calc { SiteSizeVar.Xxl.value() + 4.cssRem }
+    val heroTop get() = calc { SiteSizeVar.Xxl.value() + 5.cssRem }
 
     /** Footer vertical padding (5rem at MD+) */
     val footerVertical get() = calc { SiteSizeVar.Xxl.value() + 2.cssRem }
