@@ -196,20 +196,20 @@ private fun S2CLogo() {
 
 @Composable
 private fun MenuItems() {
-    NavLink("#playground", "Playground")
-    NavLink("#install", "Install")
-    NavLink("#usage", "Usage")
-    NavLink("#capabilities", "Capabilities")
+    NavLink("/#playground", "Playground")
+    NavLink("/#install", "Install")
+    NavLink("/#usage", "Usage")
+    NavLink("/#capabilities", "Capabilities")
     DocNavDropdown()
 }
 
 @Composable
 private fun SideMenuItems() {
     val palette = ColorMode.current.toSitePalette()
-    NavLink("#playground", "Playground")
-    NavLink("#install", "Install")
-    NavLink("#usage", "Usage")
-    NavLink("#capabilities", "Capabilities")
+    NavLink("/#playground", "Playground")
+    NavLink("/#install", "Install")
+    NavLink("/#usage", "Usage")
+    NavLink("/#capabilities", "Capabilities")
     SpanText(
         "Docs",
         modifier = Modifier
