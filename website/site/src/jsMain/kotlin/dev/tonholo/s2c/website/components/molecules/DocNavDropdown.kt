@@ -15,6 +15,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.css.PointerEvents
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -30,11 +31,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.minWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.onMouseEnter
 import com.varabyte.kobweb.compose.ui.modifiers.onMouseLeave
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.pointerEvents
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.modifiers.translateY
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
 import com.varabyte.kobweb.silk.components.icons.fa.FaChevronDown
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
@@ -171,34 +175,39 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
             )
         }
 
-        if (isOpen) {
-            Column(
-                modifier = DocNavDropdownPanelStyle.toModifier()
-                    .gap(0.125.cssRem)
-                    .attrsModifier { attr("role", "menu") },
-            ) {
-                Link(
-                    path = "/docs/cli",
-                    text = "CLI",
-                    modifier = DocNavDropdownLinkStyle.toModifier()
-                        .attrsModifier { attr("role", "menuitem") },
-                    variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+        Column(
+            modifier = DocNavDropdownPanelStyle.toModifier()
+                .opacity(if (isOpen) 1 else 0)
+                .translateY(if (isOpen) 0.px else (-4).px)
+                .pointerEvents(if (isOpen) PointerEvents.Auto else PointerEvents.None)
+                .transition(
+                    Transition.of("opacity", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
+                    Transition.of("transform", duration = 150.ms, timingFunction = TransitionTimingFunction.EaseOut),
                 )
-                Link(
-                    path = "/docs/gradle-plugin",
-                    text = "Gradle Plugin",
-                    modifier = DocNavDropdownLinkStyle.toModifier()
-                        .attrsModifier { attr("role", "menuitem") },
-                    variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-                )
-                Link(
-                    path = "/api-docs/index.html",
-                    text = "API Reference",
-                    modifier = DocNavDropdownLinkStyle.toModifier()
-                        .attrsModifier { attr("role", "menuitem") },
-                    variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-                )
-            }
+                .gap(0.125.cssRem)
+                .attrsModifier { attr("role", "menu") },
+        ) {
+            Link(
+                path = "/docs/cli",
+                text = "CLI",
+                modifier = DocNavDropdownLinkStyle.toModifier()
+                    .attrsModifier { attr("role", "menuitem") },
+                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            )
+            Link(
+                path = "/docs/gradle-plugin",
+                text = "Gradle Plugin",
+                modifier = DocNavDropdownLinkStyle.toModifier()
+                    .attrsModifier { attr("role", "menuitem") },
+                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            )
+            Link(
+                path = "/api-docs/index.html",
+                text = "API Reference",
+                modifier = DocNavDropdownLinkStyle.toModifier()
+                    .attrsModifier { attr("role", "menuitem") },
+                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+            )
         }
     }
 }
