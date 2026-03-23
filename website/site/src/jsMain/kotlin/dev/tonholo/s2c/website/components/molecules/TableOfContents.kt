@@ -33,7 +33,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.LabelTextStyle
-import dev.tonholo.s2c.website.toSitePalette
+import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
