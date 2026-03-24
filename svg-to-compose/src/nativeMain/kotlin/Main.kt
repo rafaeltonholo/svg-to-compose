@@ -190,7 +190,7 @@ class Client : CliktCommand(name = "s2c") {
     override fun run() {
         logger.verbose("Args:")
         logger.verbose("   path = $path")
-        logger.verbose("   pacakge = $pkg")
+        logger.verbose("   package = $pkg")
         logger.verbose("   theme = $theme")
         logger.verbose("   output = $output")
         logger.verbose("   optimize = $optimize")
