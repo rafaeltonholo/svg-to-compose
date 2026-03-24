@@ -5,7 +5,6 @@ import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
 import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel

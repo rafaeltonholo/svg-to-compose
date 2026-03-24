@@ -37,6 +37,7 @@ import dev.tonholo.s2c.website.components.atoms.FilePickerInput
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CollapsibleSection
 import dev.tonholo.s2c.website.components.molecules.playground.BatchNavigationBar
+import dev.tonholo.s2c.website.components.molecules.playground.FeedbackButtonRow
 import dev.tonholo.s2c.website.components.molecules.playground.FileDropOverlay
 import dev.tonholo.s2c.website.components.molecules.playground.MobileTabBar
 import dev.tonholo.s2c.website.state.playground.PlaygroundAction
@@ -165,6 +166,7 @@ fun PlaygroundSection(modifier: Modifier = Modifier) {
             onDragOverChange = { isDragOver = it },
             onSelectFiles = onSelectFiles,
         )
+        FeedbackButtonRow(state = vm.state)
     }
 }
 
