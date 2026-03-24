@@ -170,7 +170,14 @@ val DocsCardLinkVariant = LinkStyle.addVariant {
 
 @InitRoute
 fun initDocsPage(ctx: InitRouteContext) {
-    ctx.data.add(PageLayoutData("Documentation"))
+    ctx.data.add(
+        PageLayoutData(
+            title = "Documentation",
+            description = "Documentation for SVG to Compose CLI tool and Gradle plugin. " +
+                "Installation guides, configuration, and API reference.",
+            canonicalPath = "/docs",
+        ),
+    )
 }
 
 @Page

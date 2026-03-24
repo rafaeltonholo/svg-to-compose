@@ -23,7 +23,14 @@ private val cliTocEntries = listOf(
 
 @InitRoute
 fun initCliDocsPage(ctx: InitRouteContext) {
-    ctx.data.add(PageLayoutData("CLI Documentation"))
+    ctx.data.add(
+        PageLayoutData(
+            title = "CLI Documentation",
+            description = "SVG to Compose CLI tool documentation. " +
+                "Installation, usage examples, platform support, and all options reference.",
+            canonicalPath = "/docs/cli",
+        ),
+    )
 }
 
 @Page
