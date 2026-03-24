@@ -28,11 +28,12 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaTriangleExclamation
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.Banner
+import dev.tonholo.s2c.website.components.atoms.SeoHead
+import dev.tonholo.s2c.website.components.atoms.StructuredDataType
 import dev.tonholo.s2c.website.components.organisms.NavHeader
 import dev.tonholo.s2c.website.components.organisms.footer.Footer
 import dev.tonholo.s2c.website.theme.LayoutTransitions
 import dev.tonholo.s2c.website.theme.SiteTheme
-import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.cssRem
@@ -66,9 +67,7 @@ val RootStyle = CssStyle {
 @Suppress("ModifierMissing")
 fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
     val data = ctx.data.getValue<PageLayoutData>()
-    LaunchedEffect(data.title) {
-        document.title = "SVG to Compose — ${data.title}"
-    }
+    SeoHead(data = data, path = ctx.route.path)
 
     var contentVisible by remember(ctx.route.path) { mutableStateOf(false) }
     LaunchedEffect(ctx.route.path) {
@@ -106,4 +105,11 @@ fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
     }
 }
 
-data class PageLayoutData(val title: String)
+data class PageLayoutData(
+    val title: String,
+    val description: String = "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.",
+    val canonicalPath: String = "/",
+    val ogType: String = "website",
+    val ogImage: String = "/images/og-image.png",
+    val structuredData: List<StructuredDataType> = emptyList(),
+)
