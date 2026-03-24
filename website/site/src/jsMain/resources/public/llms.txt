@@ -1,0 +1,258 @@
+# SVG to Compose
+
+> Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.
+
+SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android Vector Drawable (AVD/XML) files into Jetpack Compose ImageVector code. Available as a CLI tool, a Gradle plugin, and a library.
+
+## Documentation
+
+- [CLI Tool](https://svgtocompose.tonholo.dev/docs/cli): Command-line tool for converting SVG/AVD files
+- [Gradle Plugin](https://svgtocompose.tonholo.dev/docs/gradle-plugin): Automate conversion in your build pipeline
+- [API Reference](https://svgtocompose.tonholo.dev/api-docs/index.html): Generated API documentation
+
+## Key Features
+
+- Custom parsing algorithm for complex vector graphics
+- Kotlin Multiplatform: JVM, JS, WASM/JS, macOS (arm64/x64), Linux x64, Windows
+- SVG optimization via SVGO integration
+- Android Vector Drawable optimization via Avocado
+- Gradle plugin with incremental build support and smart caching
+- Batch conversion of entire directories
+- Usable as a library in JVM, JS, and WASM targets
+
+## CLI Tool
+
+### Installation
+
+```sh
+curl -o s2c https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
+chmod +x s2c
+./s2c --help
+```
+
+### Optional Dependencies (for optimization)
+
+```sh
+npm -g install svgo    # SVG optimization
+npm -g install avocado # Android Vector Drawable optimization
+```
+
+### Platform Support
+
+macOS Arm64, macOS x64, Linux x64, Windows (mingwX64), Windows WSL
+
+### Usage Examples
+
+Single file conversion:
+
+```sh
+s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.svg
+```
+
+Batch directory conversion (recursive):
+
+```sh
+s2c -o ./output -p com.app.icons -t com.app.theme.AppTheme -r ./icons/
+```
+
+With Material Icons receiver:
+
+```sh
+s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme -rt "Icons.Filled" icon.svg
+```
+
+Android Vector Drawable:
+
+```sh
+s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.xml
+```
+
+### CLI Arguments
+
+- `<path>` (required): Input file (*.svg, *.xml) or directory to process
+
+### CLI Options
+
+Required:
+- `-o, --output`: Output file (.kt) or directory. If input is a directory, output must also be a directory
+- `-p, --package`: Package name for generated Kotlin files
+- `-t, --theme`: Fully-qualified theme class name, used in @Preview and ImageVector.Builder names
+
+Optimization:
+- `-opt, --optimize` (default: true): Enable SVG/AVG optimization via svgo and avocado
+
+Code generation:
+- `-rt, --receiver-type`: Generate icon as extension property on the given type (e.g., `Icons.Filled`)
+- `--add-to-material`: Add the icon to the Material Icons context provider
+- `-np, --no-preview`: Omit the @Preview composable from output
+- `--kmp` (default: false): Ensure output is KMP-compatible
+- `--make-internal`: Mark generated icon with `internal` visibility
+- `--minified`: Remove comments and inline method parameters
+
+Directory processing:
+- `-r, --recursive`: Process all files in input directory including subdirectories (max depth 10)
+- `--recursive-depth, --depth` (default: 10): Max depth for recursive file search
+
+Formatting:
+- `--indent-size`: Number of indent characters per level. Overrides .editorconfig if specified
+- `--indent-style` (space|tab): Indentation style. Overrides .editorconfig if specified
+- `--no-editorconfig`: Disable .editorconfig resolution, use defaults unless --indent-size/--indent-style set
+
+Filtering and renaming:
+- `--exclude`: Regex to exclude icons by filename
+- `--map-icon-name-from-to, --from-to, --rename`: Replace part of the icon name. E.g., `--rename "_filled" ""` turns `bright_sun_filled.svg` into `BrightSun`
+
+Logging:
+- `--debug`: Enable debug log output
+- `--verbose`: Enable verbose log output
+- `--silent`: Suppress all output logs
+- `--stacktrace`: Print stacktrace on errors
+
+Other:
+- `-v, --version`: Show CLI version and exit
+- `-h, --help`: Show help and exit
+
+## Gradle Plugin
+
+### Installation
+
+```kotlin
+plugins {
+    id("dev.tonholo.s2c") version "2.1.3"
+}
+```
+
+Ensure Maven Central is in settings.gradle.kts:
+
+```kotlin
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+```
+
+### Basic Configuration
+
+```kotlin
+svgToCompose {
+    processor {
+        val icons by creating {
+            from(layout.projectDirectory.dir("src/main/resources/icons"))
+            destinationPackage("com.example.app.ui.icons")
+            optimize(true)
+            recursive()
+            icons {
+                theme("com.example.app.ui.theme.AppTheme")
+                minify()
+            }
+        }
+    }
+}
+```
+
+### Common Configuration (shared defaults)
+
+```kotlin
+svgToCompose {
+    processor {
+        common {
+            optimize(true)
+            recursive()
+            icons { minify() }
+        }
+        val outlined by creating {
+            from(layout.projectDirectory.dir("src/main/resources/icons/outlined"))
+            destinationPackage("com.example.app.ui.icons.outlined")
+        }
+        val filled by creating {
+            from(layout.projectDirectory.dir("src/main/resources/icons/filled"))
+            destinationPackage("com.example.app.ui.icons.filled")
+        }
+    }
+}
+```
+
+### Parallel Processing
+
+```kotlin
+svgToCompose {
+    processor {
+        useParallelism(parallelism = 4)
+    }
+}
+```
+
+### Processor Options
+
+- `from(Directory)`: Source directory containing SVG/AVG files
+- `destinationPackage(String)`: Target package for generated code
+- `optimize(Boolean)`: Enable SVG optimization
+- `recursive()`: Recursively search subdirectories
+- `maxDepth(Int)`: Maximum recursion depth
+
+### Icon Parser Options (inside `icons {}` block)
+
+- `theme(String)`: Fully-qualified theme class for previews
+- `minify()`: Remove comments and extra whitespace
+- `noPreview()`: Disable @Preview function generation
+- `makeInternal()`: Add internal visibility modifier
+- `receiverType(String)`: Receiver type for extension property
+- `addToMaterialIcons()`: Use Material Icons as receiver
+- `mapIconNameTo((String) -> String)`: Custom icon name transformation
+- `exclude(vararg Regex)`: Exclude icons by filename pattern
+- `persist()`: Write generated files to source directory (delicate API)
+
+Note: Formatting options (`indent-size`, `indent-style`, `no-editorconfig`) are CLI-only. The Gradle plugin resolves `.editorconfig` automatically if present.
+
+## Library
+
+The `svg-to-compose` module can be used as a standalone Kotlin library.
+
+### Maven Coordinates
+
+- Group: `dev.tonholo.s2c`
+- Artifact: `svg-to-compose`
+- Version: `2.1.3`
+
+### Supported KMP Targets
+
+- JVM
+- JavaScript (JS)
+- WebAssembly/JS (WASM)
+- macOS Arm64, macOS x64
+- Linux x64
+- Windows (mingwX64)
+
+### Dependency (Gradle)
+
+```kotlin
+dependencies {
+    implementation("dev.tonholo.s2c:svg-to-compose:2.1.3")
+}
+```
+
+### Key API Entry Points
+
+- `Processor`: Main processing class for converting SVG/AVD to ImageVector code
+- `SvgContentParser`: Parses SVG files
+- `AvgContentParser`: Parses Android Vector Drawable XML
+- `ImageVectorEmitter`: Generates Compose ImageVector Kotlin code
+- `ParserConfig`: Configuration for parsing behavior
+- `FileManager`: File I/O abstraction (uses Okio)
+
+## Output Format
+
+All modes generate Kotlin source files containing:
+
+- `ImageVector` properties using `ImageVector.Builder` API
+- Lazy-initialized with backing field for caching
+- Optional `@Preview` composable functions
+- Compatible with `androidx.compose.ui.graphics.vector.ImageVector`
+
+## Links
+
+- Website: https://svgtocompose.tonholo.dev
+- GitHub: https://github.com/rafaeltonholo/svg-to-compose
+- Maven Central: https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose
