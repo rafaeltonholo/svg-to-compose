@@ -13,7 +13,7 @@ private const val JSON_LD_SCRIPT_ID = "seo-json-ld"
 
 @Composable
 fun SeoHead(data: PageLayoutData, path: String) {
-    val fullTitle = "$SITE_NAME \u2014 ${data.title}"
+    val fullTitle = "$SITE_NAME - ${data.title}"
     val canonicalPath = data.canonicalPath ?: path
     val canonicalUrl = "$BASE_URL$canonicalPath"
     val ogImageUrl = "$BASE_URL${data.ogImage}"
