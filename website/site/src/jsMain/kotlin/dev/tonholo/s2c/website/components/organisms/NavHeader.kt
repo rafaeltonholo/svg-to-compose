@@ -265,21 +265,26 @@ private fun MenuItems() {
 private fun SideMenuItems(onNavigate: () -> Unit) {
     val palette = ColorMode.current.toSitePalette()
     val clickModifier = Modifier.onClick { onNavigate() }
-    NavLink("/#playground", "Playground", modifier = clickModifier)
-    NavLink("/#install", "Install", modifier = clickModifier)
-    NavLink("/#usage", "Usage", modifier = clickModifier)
-    NavLink("/#capabilities", "Capabilities", modifier = clickModifier)
-    SpanText(
-        "Docs",
-        modifier = Modifier
-            .fontWeight(FontWeight.SemiBold)
-            .color(palette.onSurfaceVariant)
-            .fontSize(0.75.cssRem)
-            .padding(top = SiteTheme.dimensions.size.Sm),
-    )
-    NavLink("/docs/cli", "CLI", modifier = clickModifier)
-    NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
-    NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
+    Column(
+        Modifier.gap(SiteTheme.dimensions.size.Xl),
+        horizontalAlignment = Alignment.End,
+    ) {
+        NavLink("/#playground", "Playground", modifier = clickModifier)
+        NavLink("/#install", "Install", modifier = clickModifier)
+        NavLink("/#usage", "Usage", modifier = clickModifier)
+        NavLink("/#capabilities", "Capabilities", modifier = clickModifier)
+        SpanText(
+            "Docs",
+            modifier = Modifier
+                .fontWeight(FontWeight.SemiBold)
+                .color(palette.onSurfaceVariant)
+                .fontSize(0.75.cssRem)
+                .padding(top = SiteTheme.dimensions.size.Sm),
+        )
+        NavLink("/docs/cli", "CLI", modifier = clickModifier)
+        NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
+        NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
+    }
 }
 
 val GitHubButtonStyle = CssStyle {
