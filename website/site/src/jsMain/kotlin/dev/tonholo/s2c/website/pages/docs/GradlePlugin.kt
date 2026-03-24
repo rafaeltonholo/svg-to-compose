@@ -27,7 +27,14 @@ private val gradlePluginTocEntries = listOf(
 
 @InitRoute
 fun initGradlePluginDocsPage(ctx: InitRouteContext) {
-    ctx.data.add(PageLayoutData("Gradle Plugin Documentation"))
+    ctx.data.add(
+        PageLayoutData(
+            title = "Gradle Plugin Documentation",
+            description = "SVG to Compose Gradle plugin documentation. " +
+                "Setup, configuration DSL, incremental builds, and processor options.",
+            canonicalPath = "/docs/gradle-plugin",
+        ),
+    )
 }
 
 @Page

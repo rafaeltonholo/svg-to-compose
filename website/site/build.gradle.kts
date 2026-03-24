@@ -72,6 +72,20 @@ kobweb {
     }
 }
 
+val generateLlmsTxt by tasks.registering {
+    val templateFile = layout.projectDirectory.file("src/jsMain/resources/llms.txt.template")
+    val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/llms.txt")
+    val appVersion = appProperties["VERSION"].toString()
+    inputs.file(templateFile)
+    inputs.property("version", appVersion)
+    outputs.file(outputFile)
+    doLast {
+        outputFile.asFile.writeText(
+            templateFile.asFile.readText().replace("\${VERSION}", appVersion),
+        )
+    }
+}
+
 val copyEditorWasm by tasks.registering(Copy::class) {
     dependsOn(":editor-wasm:wasmJsBrowserDistribution")
     from(project(":editor-wasm").layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
@@ -86,6 +100,7 @@ val copyDokkaHtml by tasks.registering(Sync::class) {
 
 tasks.configureEach {
     if (name == "jsProcessResources") {
+        dependsOn(generateLlmsTxt)
         dependsOn(copyEditorWasm)
         dependsOn(copyDokkaHtml)
     }
