@@ -20,7 +20,7 @@ import dev.tonholo.s2c.website.components.organisms.playground.PlaygroundSection
 fun initHomePage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Home",
+            title = "Convert SVG and AVD to Compose ImageVector",
             description = "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code. " +
                 "CLI tool and Gradle plugin for Kotlin Multiplatform.",
             canonicalPath = "/",
