@@ -9,8 +9,6 @@ sealed interface StructuredDataType {
     fun toJsonLd(): String
 }
 
-private const val BASE_URL = "https://svgtocompose.tonholo.dev"
-
 data object WebSiteStructuredData : StructuredDataType {
     // language=json
     override fun toJsonLd(): String = """

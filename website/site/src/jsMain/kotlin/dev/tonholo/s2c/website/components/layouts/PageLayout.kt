@@ -108,7 +108,7 @@ fun PageLayout(ctx: PageContext, content: @Composable () -> Unit) {
 data class PageLayoutData(
     val title: String,
     val description: String = "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.",
-    val canonicalPath: String = "/",
+    val canonicalPath: String? = null,
     val ogType: String = "website",
     val ogImage: String = "/images/og-image.png",
     val structuredData: List<StructuredDataType> = emptyList(),

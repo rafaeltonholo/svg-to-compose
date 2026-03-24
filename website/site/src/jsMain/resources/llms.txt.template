@@ -118,7 +118,7 @@ Other:
 
 ```kotlin
 plugins {
-    id("dev.tonholo.s2c") version "2.1.3"
+    id("dev.tonholo.s2c") version "${VERSION}"
 }
 ```
 
@@ -214,7 +214,7 @@ The `svg-to-compose` module can be used as a standalone Kotlin library.
 
 - Group: `dev.tonholo.s2c`
 - Artifact: `svg-to-compose`
-- Version: `2.1.3`
+- Version: `${VERSION}`
 
 ### Supported KMP Targets
 
@@ -229,7 +229,7 @@ The `svg-to-compose` module can be used as a standalone Kotlin library.
 
 ```kotlin
 dependencies {
-    implementation("dev.tonholo.s2c:svg-to-compose:2.1.3")
+    implementation("dev.tonholo.s2c:svg-to-compose:${VERSION}")
 }
 ```
 

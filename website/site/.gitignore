@@ -3,3 +3,4 @@
 !.kobweb/conf.yaml
 src/jsMain/resources/public/editor
 src/jsMain/resources/public/api-docs
+src/jsMain/resources/public/llms.txt

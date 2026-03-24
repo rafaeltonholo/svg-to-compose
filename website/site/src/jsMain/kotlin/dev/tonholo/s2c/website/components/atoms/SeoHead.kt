@@ -4,9 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
 import kotlinx.browser.document
-import org.w3c.dom.Element
 
-private const val BASE_URL = "https://svgtocompose.tonholo.dev"
+internal const val BASE_URL = "https://svgtocompose.tonholo.dev"
 private const val SITE_NAME = "SVG to Compose"
 private const val OG_IMAGE_WIDTH = "1200"
 private const val OG_IMAGE_HEIGHT = "630"
@@ -15,7 +14,8 @@ private const val JSON_LD_SCRIPT_ID = "seo-json-ld"
 @Composable
 fun SeoHead(data: PageLayoutData, path: String) {
     val fullTitle = "$SITE_NAME \u2014 ${data.title}"
-    val canonicalUrl = "$BASE_URL${data.canonicalPath}"
+    val canonicalPath = data.canonicalPath ?: path
+    val canonicalUrl = "$BASE_URL$canonicalPath"
     val ogImageUrl = "$BASE_URL${data.ogImage}"
 
     LaunchedEffect(data, path) {
@@ -108,7 +108,3 @@ private fun buildJsonLdArray(items: List<StructuredDataType>): String = buildStr
     }
     append("]")
 }
-
-private var Element.id: String
-    get() = getAttribute("id").orEmpty()
-    set(value) = setAttribute("id", value)
