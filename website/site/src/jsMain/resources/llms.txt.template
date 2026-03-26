@@ -6,9 +6,9 @@ SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android Vect
 
 ## Documentation
 
-- [CLI Tool](https://svgtocompose.tonholo.dev/docs/cli): Command-line tool for converting SVG/AVD files
-- [Gradle Plugin](https://svgtocompose.tonholo.dev/docs/gradle-plugin): Automate conversion in your build pipeline
-- [API Reference](https://svgtocompose.tonholo.dev/api-docs/index.html): Generated API documentation
+- [CLI Tool](https://www.svgtocompose.com/docs/cli): Command-line tool for converting SVG/AVD files
+- [Gradle Plugin](https://www.svgtocompose.com/docs/gradle-plugin): Automate conversion in your build pipeline
+- [API Reference](https://www.svgtocompose.com/api-docs/index.html): Generated API documentation
 
 ## Key Features
 
@@ -253,6 +253,6 @@ All modes generate Kotlin source files containing:
 
 ## Links
 
-- Website: https://svgtocompose.tonholo.dev
+- Website: https://www.svgtocompose.com
 - GitHub: https://github.com/rafaeltonholo/svg-to-compose
 - Maven Central: https://central.sonatype.com/artifact/dev.tonholo.s2c/svg-to-compose
