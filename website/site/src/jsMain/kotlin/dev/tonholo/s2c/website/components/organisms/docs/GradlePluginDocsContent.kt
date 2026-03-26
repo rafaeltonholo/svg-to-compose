@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.listStyle
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
@@ -362,6 +363,47 @@ private fun IconParserConfigurationSubsection() {
                 name = "persist()",
                 description = "Persist generated files to the source directory (delicate API)",
             )
+            OptionItem(
+                name = "templateFile(RegularFileProperty)",
+                description = "Path to an s2c.template.toml file for customizing generated code",
+            )
+        }
+        TemplateFileExample()
+    }
+}
+
+@Composable
+private fun TemplateFileExample() {
+    SpanText(
+        text = "Example usage with a template file:",
+        modifier = DocsBodyTextStyle.toModifier()
+            .fontWeight(FontWeight.SemiBold),
+    )
+    CodeBlock(
+        // language=kotlin
+        code = """
+            |svgToCompose {
+            |    processor {
+            |        val icons by creating {
+            |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+            |            destinationPackage("com.example.app.ui.icons")
+            |            icons {
+            |                theme("com.example.app.ui.theme.AppTheme")
+            |                // TIP: You can choose whatever name for the template, as soon as it is a toml file.
+            |                templateFile(layout.projectDirectory.file("s2c.template.toml"))
+            |            }
+            |        }
+            |    }
+            |}
+        """.trimMargin(),
+        language = "kotlin",
+        filename = "build.gradle.kts",
+    )
+    DocCallout(variant = CalloutVariant.TIP) {
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("See the ")
+            Link(path = "/docs/templates", text = "Template System documentation")
+            Text(" for the full schema reference and placeholder grammar.")
         }
     }
 }

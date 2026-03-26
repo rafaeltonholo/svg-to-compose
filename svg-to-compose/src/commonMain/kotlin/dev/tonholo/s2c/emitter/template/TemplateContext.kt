@@ -33,7 +33,7 @@ internal class TemplateContext(
     private val _collectedImports: MutableSet<String> = initialImports.toMutableSet()
 
     /** Immutable snapshot of the accumulated imports. */
-    val collectedImports: Set<String> get() = _collectedImports
+    val collectedImports: Set<String> get() = _collectedImports.toSet()
 
     /** Registers a single import path. */
     fun addImport(importPath: String) {
@@ -69,7 +69,7 @@ internal class TemplateContext(
         fun forIcon(contents: IconFileContents, config: TemplateEmitterConfig, iconBody: String): TemplateContext {
             val receiverName = config.definitions.receiver?.name
             val iconPropertyName = when {
-                contents.receiverType?.isNotEmpty() == true -> {
+                !contents.receiverType.isNullOrEmpty() -> {
                     val receiverType = contents.receiverType.removeSuffix(".")
                     "$receiverType.${contents.iconName.pascalCase()}"
                 }

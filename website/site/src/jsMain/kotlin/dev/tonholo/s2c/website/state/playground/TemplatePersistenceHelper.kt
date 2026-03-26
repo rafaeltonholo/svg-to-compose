@@ -47,11 +47,8 @@ internal class TemplatePersistenceHelper(
     }
 
     private fun validateTemplate() {
-        val toml = readState().templateToml.trim()
-        val isStructuralOnly = toml.isEmpty() || toml.lines().all {
-            it.isBlank() || it.startsWith("#") || it.startsWith("[")
-        }
-        if (isStructuralOnly) {
+        val toml = readState().templateToml
+        if (toml.isTemplateStructuralOnly()) {
             dispatch(PlaygroundAction.TemplateValidated(errors = emptyList()))
             return
         }

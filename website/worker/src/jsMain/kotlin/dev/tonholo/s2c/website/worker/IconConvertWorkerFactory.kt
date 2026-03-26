@@ -5,12 +5,8 @@ import com.varabyte.kobweb.worker.OutputDispatcher
 import com.varabyte.kobweb.worker.WorkerFactory
 import com.varabyte.kobweb.worker.WorkerStrategy
 import dev.tonholo.s2c.ConversionStep
-import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.emitter.template.config.TemplateConfigParser
-import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
-import dev.tonholo.s2c.optimizer.ContentOptimizer
-import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.website.worker.inject.WorkerGraph
 import dev.zacsweers.metro.createGraph
 import kotlinx.coroutines.CoroutineScope
@@ -55,71 +51,18 @@ internal class IconConvertWorkerFactory : WorkerFactory<ConversionInput, Convers
                 }
 
             coroutineScope.launch {
-                if (templateConfig != null) {
-                    convertWithTemplate(input, config, fileType, optimizer, templateConfig, postOutput)
-                } else {
-                    graph.converter.convert(
-                        content = input.svgContent,
-                        iconName = input.iconName,
-                        config = config,
-                        fileType = fileType,
-                        optimizer = optimizer,
-                    ).collect { step ->
-                        postOutput(step.toConversionOutput(graph.json))
-                    }
+                graph.converter.convert(
+                    content = input.svgContent,
+                    iconName = input.iconName,
+                    config = config,
+                    fileType = fileType,
+                    optimizer = optimizer,
+                    templateEmitterConfig = templateConfig,
+                ).collect { step ->
+                    postOutput(step.toConversionOutput(graph.json))
                 }
             }
         }
-
-    private suspend fun convertWithTemplate(
-        input: ConversionInput,
-        config: ParserConfig,
-        fileType: FileType,
-        optimizer: ContentOptimizer?,
-        templateConfig: TemplateEmitterConfig,
-        postOutput: OutputDispatcher<ConversionOutput>,
-    ) {
-        runCatching {
-            convertWithTemplateInternal(input, config, fileType, optimizer, templateConfig, postOutput)
-        }.onFailure { e ->
-            postOutput(ConversionOutput.Error(e.message ?: "Unknown error"))
-        }
-    }
-
-    private suspend fun convertWithTemplateInternal(
-        input: ConversionInput,
-        config: ParserConfig,
-        fileType: FileType,
-        optimizer: ContentOptimizer?,
-        templateConfig: TemplateEmitterConfig,
-        postOutput: OutputDispatcher<ConversionOutput>,
-    ) {
-        val optimizedContent = if (optimizer != null) {
-            postOutput(ConversionOutput.Progress("Optimizing...", percent = PROGRESS_OPTIMIZING))
-            optimizer.optimize(input.svgContent, fileType)
-        } else {
-            input.svgContent
-        }
-
-        postOutput(ConversionOutput.Progress("Parsing...", percent = PROGRESS_PARSING))
-        val parser = graph.contentParsers[fileType]
-            ?: error("No content parser registered for file type: ${fileType.extension}")
-        val iconContents = parser.parse(optimizedContent, input.iconName, config)
-
-        postOutput(ConversionOutput.Progress("Generating...", percent = PROGRESS_GENERATING))
-        val emitter = graph.codeEmitterFactory.create(templateEmitterConfig = templateConfig)
-        val kotlinCode = emitter.emit(iconContents)
-
-        postOutput(
-            ConversionOutput.Success(
-                kotlinCode = kotlinCode,
-                iconFileContentsJson = graph.json.encodeToString(
-                    IconFileContents.serializer(),
-                    iconContents,
-                ),
-            ),
-        )
-    }
 
     override fun createIOSerializer() = Json.createIOSerializer<ConversionInput, ConversionOutput>()
 }

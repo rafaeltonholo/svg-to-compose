@@ -125,19 +125,7 @@ internal class TemplateEmitter(
     }
 
     private companion object {
-        // These mirror the imports that ImageVectorEmitter adds for its preview
-        // snippet. If the default preview format changes, this set must be updated.
-        val PREVIEW_IMPORTS = setOf(
-            "androidx.compose.foundation.Image",
-            "androidx.compose.foundation.layout.Arrangement",
-            "androidx.compose.foundation.layout.Column",
-            "androidx.compose.foundation.layout.width",
-            "androidx.compose.foundation.layout.height",
-            "androidx.compose.ui.Alignment",
-            "androidx.compose.ui.Modifier",
-            "androidx.compose.ui.tooling.preview.Preview",
-            "androidx.compose.runtime.Composable",
-        )
+        val PREVIEW_IMPORTS: Set<String> = ImageVectorEmitter.PREVIEW_IMPORTS
     }
 
     private fun buildChunkFunctionsContent(chunkFunctions: List<ImageVectorNode.ChunkFunction>?): String {

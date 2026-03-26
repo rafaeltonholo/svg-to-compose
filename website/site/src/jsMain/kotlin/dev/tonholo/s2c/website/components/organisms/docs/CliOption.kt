@@ -49,6 +49,18 @@ internal data class CliOption(val flag: String, val type: String, val descriptio
                 type = "Pair...",
                 description = "Replace icon name pattern (old to new)",
             ),
+            CliOption(
+                flag = "--template",
+                type = "String",
+                description = "Path to s2c.template.toml configuration file. When provided, the template " +
+                    "is used to customize the generated Kotlin code.",
+            ),
+            CliOption(
+                flag = "--no-template",
+                type = "Boolean",
+                description = "Disable template auto-discovery. By default, s2c walks up from the output " +
+                    "directory looking for s2c.template.toml.",
+            ),
         )
     }
 }

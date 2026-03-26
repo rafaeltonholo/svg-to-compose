@@ -79,7 +79,8 @@ class TemplateEmitterConfigParserTest {
         val error = assertFailsWith<IllegalArgumentException> {
             TemplateConfigParser.parse(toml)
         }
-        assertTrue(error.message!!.contains("undefined_key"))
+        val message = requireNotNull(error.message) { "Expected error message to be non-null" }
+        assertTrue(message.contains("undefined_key"))
     }
 
     @Test
@@ -150,10 +151,10 @@ class TemplateEmitterConfigParserTest {
         """.trimIndent()
 
         val config = TemplateConfigParser.parse(toml)
-        assertNotNull(config.templates.fileHeader)
-        assertNotNull(config.templates.iconTemplate)
-        assertTrue(config.templates.fileHeader!!.contains("icon:package"))
-        assertTrue(config.templates.iconTemplate!!.contains("icon:body"))
+        val fileHeader = requireNotNull(config.templates.fileHeader)
+        val iconTemplate = requireNotNull(config.templates.iconTemplate)
+        assertTrue(fileHeader.contains("icon:package"))
+        assertTrue(iconTemplate.contains("icon:body"))
     }
 
     @Test

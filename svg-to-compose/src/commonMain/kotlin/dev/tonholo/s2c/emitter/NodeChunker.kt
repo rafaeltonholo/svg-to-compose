@@ -15,7 +15,10 @@ import kotlin.math.roundToInt
  * @property chunkFunctions The chunk function nodes extracted from [nodes],
  *   or `null` when no chunking was needed.
  */
-data class ChunkResult(val nodes: List<ImageVectorNode>, val chunkFunctions: List<ImageVectorNode.ChunkFunction>?)
+internal data class ChunkResult(
+    val nodes: List<ImageVectorNode>,
+    val chunkFunctions: List<ImageVectorNode.ChunkFunction>?,
+)
 
 /**
  * Splits an icon's nodes into [ImageVectorNode.ChunkFunction]s when the

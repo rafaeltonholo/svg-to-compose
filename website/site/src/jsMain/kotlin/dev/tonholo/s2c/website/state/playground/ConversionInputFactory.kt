@@ -14,7 +14,7 @@ internal object ConversionInputFactory {
             iconName = iconName,
             fileType = state.extension,
             options = state.options,
-            templateToml = state.templateToml.takeIfUsable(),
+            templateToml = state.templateToml.takeIfUsableTemplate(),
         )
     }
 
@@ -43,20 +43,6 @@ internal object ConversionInputFactory {
             .replace("-", "_")
             .lowercase()
         return "$basePackage.$subPkg"
-    }
-
-    /**
-     * Returns the TOML string only when it contains real configuration
-     * beyond section headers and comments (the default placeholder).
-     */
-    fun String.takeIfUsable(): String? {
-        val trimmed = trim()
-        if (trimmed.isEmpty()) return null
-        val hasContent = trimmed.lines().any { line ->
-            val l = line.trim()
-            l.isNotEmpty() && !l.startsWith("#") && !l.startsWith("[")
-        }
-        return if (hasContent) this else null
     }
 
     private fun create(

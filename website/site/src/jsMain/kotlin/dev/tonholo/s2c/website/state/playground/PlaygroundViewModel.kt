@@ -137,7 +137,7 @@ internal class PlaygroundViewModel(
         _completedResultsByKey.clear()
         dispatch(PlaygroundAction.StartBatchConversion)
 
-        val templateToml = with(ConversionInputFactory) { state.templateToml.takeIfUsable() }
+        val templateToml = state.templateToml.takeIfUsableTemplate()
         val inputs = filesToConvert.mapIndexed { index, file ->
             index to ConversionInputFactory.fromUploadedFile(
                 file,

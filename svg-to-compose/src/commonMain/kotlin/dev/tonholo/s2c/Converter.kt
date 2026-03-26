@@ -8,6 +8,7 @@ import dev.tonholo.s2c.ConversionStep.Parsing
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
 import dev.tonholo.s2c.optimizer.ContentOptimizer
 import dev.tonholo.s2c.parser.ContentParser
 import dev.tonholo.s2c.parser.ParserConfig
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.flow
  * allowing consumers to track progress and handle intermediate states such as optimization,
  * parsing, code generation, completion, or errors.
  */
-fun interface Converter {
+interface Converter {
     /**
      * Converts vector icon content into Kotlin Compose code by processing it through optimization,
      * parsing, and code generation stages.
@@ -51,6 +52,7 @@ fun interface Converter {
      * @param config the parser configuration containing package name, theme, and other generation options
      * @param fileType the type of vector file being converted (defaults to SVG)
      * @param optimizer optional optimizer to preprocess the content before parsing
+     * @param templateEmitterConfig optional template configuration for custom code generation output
      * @return a Flow of ConversionStep instances representing the progress and result of the conversion
      */
     fun convert(
@@ -59,6 +61,7 @@ fun interface Converter {
         config: ParserConfig,
         fileType: FileType,
         optimizer: ContentOptimizer?,
+        templateEmitterConfig: TemplateEmitterConfig? = null,
     ): Flow<ConversionStep>
 }
 
@@ -73,6 +76,7 @@ class DefaultConverter(
         config: ParserConfig,
         fileType: FileType,
         optimizer: ContentOptimizer?,
+        templateEmitterConfig: TemplateEmitterConfig?,
     ): Flow<ConversionStep> = flow {
         try {
             val optimizedContent = if (optimizer != null) {
@@ -88,7 +92,7 @@ class DefaultConverter(
             val iconContents = parser.parse(optimizedContent, iconName, config)
 
             emit(Generating("Generating Kotlin code..."))
-            val emitter = codeEmitterFactory.create()
+            val emitter = codeEmitterFactory.create(templateEmitterConfig = templateEmitterConfig)
             val kotlinCode = emitter.emit(iconContents)
 
             emit(

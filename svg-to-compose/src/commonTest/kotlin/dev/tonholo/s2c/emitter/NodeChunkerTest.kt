@@ -61,7 +61,8 @@ class NodeChunkerTest {
         val icon = createIcon(nodeCount = NODE_COUNT_ABOVE_THRESHOLD)
         val result = chunker.chunkIfNeeded(icon, defaultNameResolver)
 
-        val allChunkedNodes = result.chunkFunctions!!.flatMap { it.nodes }
+        val chunkFunctions = requireNotNull(result.chunkFunctions) { "chunkFunctions should be present" }
+        val allChunkedNodes = chunkFunctions.flatMap { it.nodes }
         assertEquals(icon.nodes.size, allChunkedNodes.size)
     }
 
@@ -74,7 +75,8 @@ class NodeChunkerTest {
 
         val result = chunker.chunkIfNeeded(icon, nameResolver)
 
-        val names = result.chunkFunctions!!.map { it.functionName }
+        val chunkFunctions = requireNotNull(result.chunkFunctions) { "chunkFunctions should be present" }
+        val names = chunkFunctions.map { it.functionName }
         names.forEachIndexed { idx, name ->
             assertEquals("customChunk${idx + 1}", name)
         }

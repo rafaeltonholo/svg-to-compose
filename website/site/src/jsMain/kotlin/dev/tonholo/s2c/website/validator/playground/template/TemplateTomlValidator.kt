@@ -175,7 +175,7 @@ object TemplateTomlValidator {
         val first = key[0]
         if (first != '_' && !first.isLetter()) return false
         for (c in key) {
-            if (c != '_' && !c.isLetterOrDigit()) return false
+            if (c != '_' && c != '-' && !c.isLetterOrDigit()) return false
         }
         return true
     }

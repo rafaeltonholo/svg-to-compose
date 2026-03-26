@@ -143,6 +143,7 @@ fun CliDocsContent(modifier: Modifier = Modifier) {
         ExternalDependenciesSection()
         UsageSection()
         OptionsReferenceSection()
+        TemplateSystemCallout()
         OutputExamplesSection()
     }
 }
@@ -399,6 +400,32 @@ private fun OptionsReferenceSection() {
                     index = index,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun TemplateSystemCallout() {
+    DocCallout(variant = CalloutVariant.TIP) {
+        val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("You can customize the generated code using the template system. Use ")
+            InlineCode(
+                code = "--template=<path>",
+                modifier = Modifier
+                    .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                    .setVariable(InlineCodeVars.BorderColor, borderColor),
+            )
+            Text(" to specify a template file, or let the CLI auto-discover ")
+            InlineCode(
+                code = "s2c.template.toml",
+                modifier = Modifier
+                    .setVariable(InlineCodeVars.ContainerColor, containerColor)
+                    .setVariable(InlineCodeVars.BorderColor, borderColor),
+            )
+            Text(" from your project. See the ")
+            Link(path = "/docs/templates", text = "Template System documentation")
+            Text(" for the full schema reference.")
         }
     }
 }

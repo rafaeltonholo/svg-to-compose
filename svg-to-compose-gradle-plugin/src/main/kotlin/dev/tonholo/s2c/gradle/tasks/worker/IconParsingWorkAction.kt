@@ -5,6 +5,7 @@ import dev.tonholo.s2c.error.ParserException
 import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.config.TemplateConfig
+import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.gradle.workers.WorkAction
 import java.util.UUID
@@ -80,8 +81,8 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         silent = true,
         keepTempFolder = true,
         template = TemplateConfig(
-            configPath = templateFilePath.orNull?.toPath(),
-            noDiscovery = templateFilePath.orNull == null,
+            configPath = templateFilePath.orNull?.asFile?.toOkioPath(),
+            noDiscovery = !templateFilePath.isPresent,
         ),
     )
 }

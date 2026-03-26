@@ -100,7 +100,7 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
     }
 
     private fun buildIconPropertyName(contents: IconFileContents): String = when {
-        contents.receiverType?.isNotEmpty() == true -> {
+        !contents.receiverType.isNullOrEmpty() -> {
             val receiverType = contents.receiverType.removeSuffix(".")
             "$receiverType.${contents.iconName.pascalCase()}"
         }
@@ -172,5 +172,20 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
         if (preview.isNotEmpty()) {
             appendLine(preview.trimMargin())
         }
+    }
+
+    internal companion object {
+        /** Imports required by the default preview snippet. */
+        val PREVIEW_IMPORTS: Set<String> = setOf(
+            "androidx.compose.foundation.Image",
+            "androidx.compose.foundation.layout.Arrangement",
+            "androidx.compose.foundation.layout.Column",
+            "androidx.compose.foundation.layout.width",
+            "androidx.compose.foundation.layout.height",
+            "androidx.compose.ui.Alignment",
+            "androidx.compose.ui.Modifier",
+            "androidx.compose.ui.tooling.preview.Preview",
+            "androidx.compose.runtime.Composable",
+        )
     }
 }

@@ -286,10 +286,10 @@ class TemplateEmitterTest {
             definitions = config.definitions.imports,
             fragments = config.fragments,
         )
-        val result = PlaceholderResolver.resolve(
-            config.fragments["chunk_function_name"]!!,
-            context,
-        )
+        val fragment = requireNotNull(config.fragments["chunk_function_name"]) {
+            "chunk_function_name fragment must be present in config"
+        }
+        val result = PlaceholderResolver.resolve(fragment, context)
         assertEquals("testIconPart3", result)
     }
 

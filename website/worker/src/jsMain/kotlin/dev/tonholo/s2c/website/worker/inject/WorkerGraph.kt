@@ -3,7 +3,6 @@ package dev.tonholo.s2c.website.worker.inject
 import dev.tonholo.s2c.Converter
 import dev.tonholo.s2c.DefaultConverter
 import dev.tonholo.s2c.domain.FileType
-import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.AvgContentParser
 import dev.tonholo.s2c.parser.ContentParser
@@ -18,8 +17,6 @@ import kotlinx.serialization.json.Json
 @DependencyGraph
 internal interface WorkerGraph {
     val converter: Converter
-    val codeEmitterFactory: CodeEmitterFactory
-    val contentParsers: Map<FileType, ContentParser>
     val json: Json
 
     @Binds

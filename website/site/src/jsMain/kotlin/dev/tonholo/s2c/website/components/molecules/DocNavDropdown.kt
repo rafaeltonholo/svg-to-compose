@@ -75,6 +75,7 @@ data class DocLinkEntry(val path: String, val label: String)
 val docLinkEntries = listOf(
     DocLinkEntry(path = "/docs/cli", label = "CLI"),
     DocLinkEntry(path = "/docs/gradle-plugin", label = "Gradle Plugin"),
+    DocLinkEntry(path = "/docs/templates", label = "Template System"),
     DocLinkEntry(path = "/api-docs/index.html", label = "API Reference"),
     DocLinkEntry(path = "/docs/faq", label = "FAQ"),
     DocLinkEntry(path = "/docs/alternatives", label = "Alternatives"),
