@@ -27,6 +27,6 @@ dokka {
             rootProject.layout.projectDirectory.file("s2c-logo.svg"),
         )
         footerMessage.set("(c) Rafael Tonholo")
-        homepageLink.set("https://svgtocompose.tonholo.dev")
+        homepageLink.set("https://www.svgtocompose.com")
     }
 }

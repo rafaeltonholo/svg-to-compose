@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
 import kotlinx.browser.document
 
-internal const val BASE_URL = "https://svgtocompose.tonholo.dev"
+internal const val BASE_URL = "https://www.svgtocompose.com"
 private const val SITE_NAME = "SVG to Compose"
 private const val OG_IMAGE_WIDTH = "1200"
 private const val OG_IMAGE_HEIGHT = "630"

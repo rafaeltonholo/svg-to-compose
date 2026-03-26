@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://svgtocompose.tonholo.dev/sitemap.xml
+Sitemap: https://www.svgtocompose.com/sitemap.xml
