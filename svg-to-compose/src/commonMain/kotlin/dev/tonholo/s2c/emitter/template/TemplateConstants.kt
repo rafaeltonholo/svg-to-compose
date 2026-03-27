@@ -57,6 +57,7 @@ object TemplateConstants {
 
     /** Variable keys in the `${group:*}` namespace. */
     object GroupVar {
+        const val CLIP_PATH_DATA = "clip_path_data"
         const val ROTATE = "rotate"
         const val PIVOT_X = "pivot_x"
         const val PIVOT_Y = "pivot_y"

@@ -4,8 +4,11 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter
 import dev.tonholo.s2c.emitter.template.TemplateConstants.Fragment
+import dev.tonholo.s2c.emitter.template.TemplateConstants.GroupVar
 import dev.tonholo.s2c.emitter.template.TemplateConstants.Namespace
 import dev.tonholo.s2c.emitter.template.resolver.PlaceholderResolver
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ParserException
 
 private const val FRAGMENT_LEVEL_RESOLUTION_DEPTH = 1
 
@@ -71,9 +74,22 @@ internal class TemplateNodeEmitter(
         } else {
             val fragment = context.fragments.getValue(Fragment.GROUP_BUILDER)
 
+            val hasClipPath = group.params.clipPath != null
+            val fragmentReferencesClipPath = "\${${Namespace.GROUP}:${GroupVar.CLIP_PATH_DATA}}" in fragment
+            if (hasClipPath && !fragmentReferencesClipPath) {
+                throw ParserException(
+                    errorCode = ErrorCode.TemplateEmissionError,
+                    message = "Icon group has clipPathData but the '${Fragment.GROUP_BUILDER}' " +
+                        "fragment does not reference \${${Namespace.GROUP}:${GroupVar.CLIP_PATH_DATA}}. " +
+                        "Add it to the fragment to avoid silently dropping the clip path.",
+                )
+            }
+
+            val clipPathData = fallbackEmitter.emitClipPathData(group.params.clipPath)
             val groupVars = TemplateContext
                 .groupVariables(group.params)
-                .mapValues { (_, v) -> context.applyColorMappings(v) }
+                .plus(GroupVar.CLIP_PATH_DATA to clipPathData)
+                .mapValues { (_, v) -> v?.let { context.applyColorMappings(it) } }
 
             val resolved = PlaceholderResolver.resolve(
                 template = fragment.trim(),
@@ -137,18 +153,19 @@ internal class TemplateNodeEmitter(
 }
 
 /**
- * Tracks nesting depth for parentheses, angle brackets, braces, brackets,
- * and string literals. Shared by [findMatchingCloseParen] and [splitTopLevelParams].
+ * Tracks nesting depth for paired delimiters and string literals.
+ *
+ * Callers advance through a character sequence, calling [process] for each
+ * character. The tracker updates its internal state and reports whether the
+ * current position is inside a string or at the top-level (no unclosed
+ * delimiters).
  */
 private class NestingTracker {
     var parenDepth = 0
         private set
-    var angleDepth = 0
-        private set
-    var braceDepth = 0
-        private set
-    var bracketDepth = 0
-        private set
+    private var angleDepth = 0
+    private var braceDepth = 0
+    private var bracketDepth = 0
     var inString = false
         private set
 
@@ -156,12 +173,15 @@ private class NestingTracker {
         get() = parenDepth == 0 && angleDepth == 0 && braceDepth == 0 && bracketDepth == 0
 
     /**
-     * Processes a character and updates nesting state.
+     * Processes [ch] and updates nesting state.
      *
-     * @return `true` if the caller should skip (advance index by 2 for escape), `false` otherwise.
+     * @param hasNext whether there is a character after [ch] (for escape detection).
+     * @return `true` when an escape was consumed and the caller must skip the next char.
      */
     fun process(ch: Char, hasNext: Boolean): Boolean = when {
-        inString && ch == '\\' && hasNext -> true // skip escape
+        inString && ch == '\\' && hasNext -> true
+
+        // skip escape
         inString -> {
             if (ch == '"') inString = false
             false
@@ -193,18 +213,21 @@ private class NestingTracker {
  * tracking nesting depth and skipping string literals so inner parens are
  * handled correctly.
  *
+ * The [NestingTracker] starts at `parenDepth = 0`, but we begin scanning
+ * **inside** the already-opened parenthesis, so the matching `)` brings
+ * `parenDepth` to `-1`.
+ *
  * @return The index of the matching `)`, or `-1` if unbalanced.
  */
 private fun findMatchingCloseParen(text: String, openIndex: Int): Int {
     val tracker = NestingTracker()
     var i = openIndex + 1
     while (i < text.length) {
-        val ch = text[i]
-        if (tracker.process(ch, i + 1 < text.length)) {
+        if (tracker.process(text[i], i + 1 < text.length)) {
             i += 2
             continue
         }
-        if (!tracker.inString && ch == ')' && tracker.parenDepth == 0) return i
+        if (!tracker.inString && text[i] == ')' && tracker.parenDepth < 0) return i
         i++
     }
     return -1

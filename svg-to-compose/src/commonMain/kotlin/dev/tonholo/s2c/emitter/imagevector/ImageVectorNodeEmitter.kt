@@ -43,6 +43,28 @@ internal class ImageVectorNodeEmitter(
     }
 
     /**
+     * Emits a `PathData { ... }` block for a clip path.
+     *
+     * @param clipPath The clip path wrapper containing the path nodes.
+     * @return The emitted `PathData { ... }` string, or `null` if [clipPath] is `null`.
+     */
+    fun emitClipPathData(clipPath: ImageVectorNode.NodeWrapper?): String? {
+        if (clipPath == null) return null
+        val doubleIndent = indent.repeat(2)
+        val clipPathData = clipPath.nodes
+            .joinToString("\n$doubleIndent") { node ->
+                pathNodeEmitter.emit(node)
+                    .replace("\n", "\n$doubleIndent")
+                    .trimEnd()
+            }
+        return """
+            |PathData {
+            |$indent$indent$clipPathData
+            |$indent}"""
+            .trimMargin()
+    }
+
+    /**
      * Emits a chunk function definition (the private extension function body).
      *
      * @param chunk The chunk function to emit.
@@ -122,7 +144,8 @@ internal class ImageVectorNodeEmitter(
             }
             """(
             |$params
-            |)"""
+            |)
+            """.trimMargin()
         } else {
             ""
         }
@@ -169,22 +192,8 @@ internal class ImageVectorNodeEmitter(
 
     @Suppress("CyclomaticComplexMethod")
     private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
-        val doubleIndent = indent.repeat(2)
         buildSet {
-            clipPath?.let {
-                val clipPathData = clipPath.nodes
-                    .joinToString("\n$doubleIndent") { node ->
-                        pathNodeEmitter.emit(node)
-                            .replace("\n", "\n$doubleIndent")
-                            .trimEnd()
-                    }
-                val value = """
-                    |PathData {
-                    |$indent$indent$clipPathData
-                    |$indent}"""
-                    .trimMargin()
-                add(CLIP_PATH_PARAM_NAME to value)
-            }
+            emitClipPathData(clipPath)?.let { add(CLIP_PATH_PARAM_NAME to it) }
             rotate?.let { add(ROTATE_PARAM_NAME to "${rotate.toStringConsistent()}f") }
             pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX.toStringConsistent()}f") }
             pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY.toStringConsistent()}f") }

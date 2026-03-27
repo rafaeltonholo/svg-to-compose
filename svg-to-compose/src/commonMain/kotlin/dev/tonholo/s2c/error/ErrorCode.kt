@@ -9,5 +9,6 @@ enum class ErrorCode(val code: Int) {
     ParseSvgError(code = 10),
     MissingCoreDependency(code = 1000),
     FailedToParseIconError(code = 2000),
+    TemplateEmissionError(code = 2100),
     GradlePluginError(code = 3000),
 }
