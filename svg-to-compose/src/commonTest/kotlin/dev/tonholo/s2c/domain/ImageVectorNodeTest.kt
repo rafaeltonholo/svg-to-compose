@@ -64,6 +64,10 @@ class ImageVectorNodeTest {
         assertIs<PathNodes.CurveTo>(nodes[6])
     }
 
+    /**
+     * Verifies that uppercase 'E' in scientific notation (e.g., 1.5E-3) is not
+     * mistakenly treated as a path command separator during path normalization.
+     */
     @Test
     fun `ensure uppercase E in scientific notation is not treated as a path command`() {
         // Arrange
