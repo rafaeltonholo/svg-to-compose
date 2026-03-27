@@ -20,6 +20,10 @@ class ImageVectorNodeTest {
         attributes = mutableMapOf(),
     )
 
+    /**
+     * Verifies that subsequent coordinate pairs after a MoveTo command are
+     * implicitly parsed as LineTo commands per the SVG path spec.
+     */
     @Test
     fun `ensure for any subsequent coordinate pair after MoveTo is parsed to LineTo`() {
         // Arrange
@@ -39,6 +43,10 @@ class ImageVectorNodeTest {
         assertIs<PathNodes.LineTo>(nodes[1])
     }
 
+    /**
+     * Verifies that when consecutive coordinates appear without an explicit
+     * command letter, the parser repeats the last active command.
+     */
     @Test
     fun `ensure repeat last command when no command letter was found`() {
         // Arrange
@@ -87,6 +95,10 @@ class ImageVectorNodeTest {
         assertIs<PathNodes.LineTo>(nodes[1])
     }
 
+    /**
+     * Verifies that an unsupported path command letter causes the parser to
+     * throw an [ExitProgramException] with a descriptive error message.
+     */
     @Test
     fun `should throw ExitProgramException when a not supported command is found on SVG path`() {
         // Arrange
