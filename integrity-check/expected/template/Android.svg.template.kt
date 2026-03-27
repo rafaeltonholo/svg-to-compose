@@ -12,12 +12,225 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
 import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconGroup
 import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
 import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.Android: ImageVector by lazy {
     icon(name = "Android", viewportWidth = 95.0f, viewportHeight = 95.0f) {
-        group() {
+        iconGroup(
+            clipPathData = PathData {
+                // M 85.12 64.8
+                moveTo(x = 85.12f, y = 64.8f)
+                // a 39 39 0 0 0 -3.26 -8.65
+                arcToRelative(
+                    a = 39.0f,
+                    b = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -3.26f,
+                    dy1 = -8.65f,
+                )
+                // A 39 39 0 0 0 72.8 44.7
+                arcTo(
+                    horizontalEllipseRadius = 39.0f,
+                    verticalEllipseRadius = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    x1 = 72.8f,
+                    y1 = 44.7f,
+                )
+                // a 39 39 0 0 0 -4.82 -3.54
+                arcToRelative(
+                    a = 39.0f,
+                    b = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -4.82f,
+                    dy1 = -3.54f,
+                )
+                // l 0.05 -0.08
+                lineToRelative(dx = 0.05f, dy = -0.08f)
+                // l 2.33 -4.02
+                lineToRelative(dx = 2.33f, dy = -4.02f)
+                // l 2.28 -3.93
+                lineToRelative(dx = 2.28f, dy = -3.93f)
+                // l 1.64 -2.82
+                lineToRelative(dx = 1.64f, dy = -2.82f)
+                // A 3.54 3.54 0 0 0 73 25.5
+                arcTo(
+                    horizontalEllipseRadius = 3.54f,
+                    verticalEllipseRadius = 3.54f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    x1 = 73.0f,
+                    y1 = 25.5f,
+                )
+                // a 3.6 3.6 0 0 0 -2.17 -0.48
+                arcToRelative(
+                    a = 3.6f,
+                    b = 3.6f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -2.17f,
+                    dy1 = -0.48f,
+                )
+                // a 3.5 3.5 0 0 0 -2.7 1.74
+                arcToRelative(
+                    a = 3.5f,
+                    b = 3.5f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -2.7f,
+                    dy1 = 1.74f,
+                )
+                // l -1.63 2.82
+                lineToRelative(dx = -1.63f, dy = 2.82f)
+                // l -2.28 3.93
+                lineToRelative(dx = -2.28f, dy = 3.93f)
+                // l -2.33 4.02
+                lineToRelative(dx = -2.33f, dy = 4.02f)
+                // l -0.26 0.44
+                lineToRelative(dx = -0.26f, dy = 0.44f)
+                // l -0.35 -0.13
+                lineToRelative(dx = -0.35f, dy = -0.13f)
+                // A 39 39 0 0 0 47.5 35.3
+                arcTo(
+                    horizontalEllipseRadius = 39.0f,
+                    verticalEllipseRadius = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    x1 = 47.5f,
+                    y1 = 35.3f,
+                )
+                // h -0.4
+                horizontalLineToRelative(dx = -0.4f)
+                // a 39 39 0 0 0 -12.33 2.14
+                arcToRelative(
+                    a = 39.0f,
+                    b = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -12.33f,
+                    dy1 = 2.14f,
+                )
+                // l -1.33 0.5
+                lineToRelative(dx = -1.33f, dy = 0.5f)
+                // l -0.24 -0.41
+                lineToRelative(dx = -0.24f, dy = -0.41f)
+                // l -2.33 -4.03
+                lineToRelative(dx = -2.33f, dy = -4.03f)
+                // l -3.92 -6.75
+                lineToRelative(dx = -3.92f, dy = -6.75f)
+                // a 3.5 3.5 0 0 0 -3.36 -1.74
+                arcToRelative(
+                    a = 3.5f,
+                    b = 3.5f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -3.36f,
+                    dy1 = -1.74f,
+                )
+                // a 3.5 3.5 0 0 0 -1.5 0.48
+                arcToRelative(
+                    a = 3.5f,
+                    b = 3.5f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -1.5f,
+                    dy1 = 0.48f,
+                )
+                // a 3.5 3.5 0 0 0 -1.62 2.13
+                arcToRelative(
+                    a = 3.5f,
+                    b = 3.5f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -1.62f,
+                    dy1 = 2.13f,
+                )
+                // a 3.5 3.5 0 0 0 0.36 2.68
+                arcToRelative(
+                    a = 3.5f,
+                    b = 3.5f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = 0.36f,
+                    dy1 = 2.68f,
+                )
+                // l 1.64 2.83
+                lineToRelative(dx = 1.64f, dy = 2.83f)
+                // l 2.28 3.92
+                lineToRelative(dx = 2.28f, dy = 3.92f)
+                // l 2.33 4.03
+                lineToRelative(dx = 2.33f, dy = 4.03f)
+                // l 0.02 0.03
+                lineToRelative(dx = 0.02f, dy = 0.03f)
+                // a 39 39 0 0 0 -11.15 10.45
+                arcToRelative(
+                    a = 39.0f,
+                    b = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -11.15f,
+                    dy1 = 10.45f,
+                )
+                // a 38 38 0 0 0 -2.8 4.58
+                arcToRelative(
+                    a = 38.0f,
+                    b = 38.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -2.8f,
+                    dy1 = 4.58f,
+                )
+                // a 39 39 0 0 0 -3.27 8.65
+                arcToRelative(
+                    a = 39.0f,
+                    b = 39.0f,
+                    theta = 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -3.27f,
+                    dy1 = 8.65f,
+                )
+                // c -0.65 2.65 1.5 5.02 4.23 5.02
+                curveToRelative(
+                    dx1 = -0.65f,
+                    dy1 = 2.65f,
+                    dx2 = 1.5f,
+                    dy2 = 5.02f,
+                    dx3 = 4.23f,
+                    dy3 = 5.02f,
+                )
+                // h 66.78
+                horizontalLineToRelative(dx = 66.78f)
+                // c 2.73 0 4.88 -2.38 4.23 -5.03z
+                curveToRelative(
+                    dx1 = 2.73f,
+                    dy1 = 0.0f,
+                    dx2 = 4.88f,
+                    dy2 = -2.38f,
+                    dx3 = 4.23f,
+                    dy3 = -5.03f,
+                )
+                close()
+            },
+        ) {
             iconPath(
                 fill = Brush.radialGradient(
                     0.307f to Color(0xFF4FAF53),

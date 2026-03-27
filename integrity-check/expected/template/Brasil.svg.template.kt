@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
 import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconGroup
+import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
 import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
 
 val Icons.Brasil: ImageVector by lazy {
@@ -20,10 +22,7 @@ val Icons.Brasil: ImageVector by lazy {
 }
 
 private fun ImageVector.Builder.brasilPart1() {
-    // <rect width="4200" height="2940" x="-2100.0" y="-1470.0" fill="#009b3a" />
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 0 0
         moveTo(x = 0.0f, y = 0.0f)
         // l 4200 0
@@ -34,10 +33,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -4200.0f, dy = 0.0f)
         close()
     }
-    // M-1743 0 0 1113 1743 0 0 -1113z
-    path(
-        fill = SolidColor(Color(0xFFFEDF00)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFEDF00))) {
         // M 357 1470
         moveTo(x = 357.0f, y = 1470.0f)
         // L 2100 2583
@@ -48,10 +44,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineTo(x = 2100.0f, y = 357.0f)
         close()
     }
-    // <circle cx="0.0" cy="0.0" radius="735.0" fill="#002776" />
-    path(
-        fill = SolidColor(Color(0xFF002776)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF002776))) {
         // M 2100 1470
         moveTo(x = 2100.0f, y = 1470.0f)
         // m -735 0
@@ -78,8 +71,7 @@ private fun ImageVector.Builder.brasilPart1() {
         )
         close()
     }
-    group(
-        // M 0 0 m -735 0 a 735 735 0 1 1 1470 0 a 735 735 0 1 1 -1470 0z
+    iconGroup(
         clipPathData = PathData {
             // M 2100 1470
             moveTo(x = 2100.0f, y = 1470.0f)
@@ -108,10 +100,7 @@ private fun ImageVector.Builder.brasilPart1() {
             close()
         },
     ) {
-        // M-2205 1470 a1785 1785 0 0 1 3570 0 h-105 a1680 1680 0 1 0 -3360 0z
-        path(
-            fill = SolidColor(Color(0xFFFFFFFF)),
-        ) {
+        iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
             // M -105 2940
             moveTo(x = -105.0f, y = 2940.0f)
             // a 1785 1785 0 0 1 3570 0
@@ -139,11 +128,7 @@ private fun ImageVector.Builder.brasilPart1() {
             close()
         }
     }
-    // M0 0 a31.5 35 0 0 0 0 -70 A31.5 35 0 0 0 0 0 m0 -13 a18.5 22 0 0 0 0 -44 18.5 22 0 0 0 0 44
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 1473.1268 1255.153
         moveTo(x = 1473.1268f, y = 1255.153f)
         // a 31.5 35 -7 0 0 -8.530854 -69.47823
@@ -189,11 +174,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy1 = 43.67203f,
         )
     }
-    // M-31.5 0 h13 v-26 h28 a22 22 0 0 0 0 -44 h-40z m13 -39 h27 a9 9 0 0 0 0 -18 h-27z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 1530.1652 1248.8324
         moveTo(x = 1530.1652f, y = 1248.8324f)
         // l 12.968332 -0.9068342
@@ -233,10 +214,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -26.934229f, dy = 1.8834248f)
         close()
     }
-    // M28 0 c0 -10 0 -32 -15 -32 H-6 c22 0 22 22 22 32
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 1589.5201 1244.6819
         moveTo(x = 1589.5201f, y = 1244.6819f)
         // c -0.6975647 -9.97564 -2.232207 -31.92205 -17.195667 -30.875702
@@ -260,11 +238,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy3 = 30.387407f,
         )
     }
-    // M-31.5 0 h33 a30 30 0 0 0 30 -30 v-10 a30 30 0 0 0 -30 -30 h-33z m13 -13 h19 a19 19 0 0 0 19 -19 v-6 a19 19 0 0 0 -19 -19 h-19z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 1618.8794 1243.3082
         moveTo(x = 1618.8794f, y = 1243.3082f)
         // l 32.994972 -0.5759294
@@ -324,10 +298,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -18.997107f, dy = 0.33159572f)
         close()
     }
-    // M0 0 h63 v-13 H12 v-18 h40 v-12 H12 v-14 h48 v-13 H0z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 1707.7611 1242.4347
         moveTo(x = 1707.7611f, y = 1242.4347f)
         // l 62.96162 2.1986682
@@ -354,10 +325,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineTo(x = 1710.2041f, y = 1172.4774f)
         close()
     }
-    // M-31.5 0 h12 v-48 l14 48 h11 l14 -48 V0 h12 v-70 H14 L0 -22 l-14 -48 h-17.5z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 1796.5668 1246.2141
         moveTo(x = 1796.5668f, y = 1246.2141f)
         // l 11.954336 1.0458689
@@ -386,10 +354,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -17.433407f, dy = -1.5252255f)
         close()
     }
-    // M-26.25 0 h52.5 v-12 h-40.5 v-16 h33 v-12 h-33 v-11 H25 v-12 h-51.25z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 1941.6 1262.5731
         moveTo(x = 1941.6f, y = 1262.5731f)
         // l 51.74169 8.890849
@@ -416,11 +381,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -50.509747f, dy = -8.679162f)
         close()
     }
-    // M-31.5 0 h13 v-26 h28 a22 22 0 0 0 0 -44 h-40z m13 -39 h27 a9 9 0 0 0 0 -18 h-27z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 2074.5234 1288.6824
         moveTo(x = 2074.5234f, y = 1288.6824f)
         // l 12.585919 3.25494
@@ -460,11 +421,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -26.139986f, dy = -6.76026f)
         close()
     }
-    // M-31.5 0 h13 v-26 h28 a22 22 0 0 0 0 -44 h-40z m13 -39 h27 a9 9 0 0 0 0 -18 h-27z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 2160.406 1311.5933
         moveTo(x = 2160.406f, y = 1311.5933f)
         // l 12.39832 3.9091754
@@ -504,10 +461,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -25.750359f, dy = -8.119057f)
         close()
     }
-    // M28 0 c0 -10 0 -32 -15 -32 H-6 c22 0 22 22 22 32
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 2217.152 1329.4852
         moveTo(x = 2217.152f, y = 1329.4852f)
         // c 3.007058 -9.537169 9.622585 -30.518942 -4.683169 -35.02953
@@ -531,11 +485,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy3 = 37.13447f,
         )
     }
-    // M0 0 a31.5 35 0 0 0 0 -70 A31.5 35 0 0 0 0 0 m0 -13 a18.5 22 0 0 0 0 -44 18.5 22 0 0 0 0 44
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 2274.477 1349.9989
         moveTo(x = 2274.477f, y = 1349.9989f)
         // a 31.5 35 20.5 0 0 24.514517 -65.567055
@@ -581,8 +531,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy1 = 41.213577f,
         )
     }
-    group(
-        // 
+    iconGroup(
         clipPathData = PathData {
             moveTo(x = 2327.9893f, y = 1370.73f)
             lineToRelative(dx = 27.912436f, dy = -64.19421f)
@@ -596,8 +545,7 @@ private fun ImageVector.Builder.brasilPart1() {
             close()
         },
     ) {
-        group(
-            // M -31.5 0 v -70 h 63 V 0z M 0 -47 v 12 h 31.5 v -12z
+        iconGroup(
             clipPathData = PathData {
                 // M 2327.9893 1370.73
                 moveTo(x = 2327.9893f, y = 1370.73f)
@@ -619,11 +567,7 @@ private fun ImageVector.Builder.brasilPart1() {
                 close()
             },
         ) {
-            // M0 0 a31.5 35 0 0 0 0 -70 A31.5 35 0 0 0 0 0 m0 -13 a18.5 22 0 0 0 0 -44 18.5 22 0 0 0 0 44
-            path(
-                fill = SolidColor(Color(0xFF009B3A)),
-                pathFillType = PathFillType.EvenOdd,
-            ) {
+            iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
                 // M 2356.8765 1383.2905
                 moveTo(x = 2356.8765f, y = 1383.2905f)
                 // a 31.5 35 23.5 0 0 27.912436 -64.19421
@@ -670,10 +614,7 @@ private fun ImageVector.Builder.brasilPart1() {
                 )
             }
         }
-        // M5 -35 h26.5 v10 H5z
-        path(
-            fill = SolidColor(Color(0xFF009B3A)),
-        ) {
+        iconPath(fill = SolidColor(Color(0xFF009B3A))) {
             // M 2375.418 1353.1871
             moveTo(x = 2375.418f, y = 1353.1871f)
             // l 24.302092 10.566851
@@ -684,10 +625,7 @@ private fun ImageVector.Builder.brasilPart1() {
             lineTo(x = 2371.4307f, y = 1362.3578f)
             close()
         }
-        // M21.5 -35 h10 V0 h-10z
-        path(
-            fill = SolidColor(Color(0xFF009B3A)),
-        ) {
+        iconPath(fill = SolidColor(Color(0xFF009B3A))) {
             // M 2390.5496 1359.7665
             moveTo(x = 2390.5496f, y = 1359.7665f)
             // l 9.170601 3.9874907
@@ -699,11 +637,7 @@ private fun ImageVector.Builder.brasilPart1() {
             close()
         }
     }
-    // M-31.5 0 h13 v-26 h28 a22 22 0 0 0 0 -44 h-40z m13 -39 h27 a9 9 0 0 0 0 -18 h-27z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 2409.2305 1406.7937
         moveTo(x = 2409.2305f, y = 1406.7937f)
         // l 11.634147 5.8005714
@@ -743,10 +677,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineToRelative(dx = -24.163227f, dy = -12.047341f)
         close()
     }
-    // M28 0 c0 -10 0 -32 -15 -32 H-6 c22 0 22 22 22 32
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 2462.479 1433.3424
         moveTo(x = 2462.479f, y = 1433.3424f)
         // c 4.461978 -8.949344 14.27833 -28.6379 0.8543146 -35.330868
@@ -770,10 +701,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy3 = 38.45425f,
         )
     }
-    // M0 0 h63 v-13 H12 v-18 h40 v-12 H12 v-14 h48 v-13 H0z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 2488.473 1447.0598
         moveTo(x = 2488.473f, y = 1447.0598f)
         // l 54.83241 31.022684
@@ -800,10 +728,7 @@ private fun ImageVector.Builder.brasilPart1() {
         lineTo(x = 2522.9424f, y = 1386.135f)
         close()
     }
-    // M-15.75 -22 C-15.75 -15 -9 -11.5 1 -11.5 s14.74 -3.25 14.75 -7.75 c0 -14.25 -46.75 -5.25 -46.5 -30.25 C-30.5 -71 -6 -70 3 -70 s26 4 25.75 21.25 H13.5 c0 -7.5 -7 -10.25 -15 -10.25 -7.75 0 -13.25 1.25 -13.25 8.5 -.25 11.75 46.25 4 46.25 28.75 C31.5 -3.5 13.5 0 0 0 c-11.5 0 -31.55 -4.5 -31.5 -22z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 2590.6033 1481.3259
         moveTo(x = 2590.6033f, y = 1481.3259f)
         // C 2586.8423 1487.2297 2590.6545 1493.8083 2599.0884 1499.1813
@@ -896,10 +821,7 @@ private fun ImageVector.Builder.brasilPart1() {
         )
         close()
     }
-    // M-15.75 -22 C-15.75 -15 -9 -11.5 1 -11.5 s14.74 -3.25 14.75 -7.75 c0 -14.25 -46.75 -5.25 -46.5 -30.25 C-30.5 -71 -6 -70 3 -70 s26 4 25.75 21.25 H13.5 c0 -7.5 -7 -10.25 -15 -10.25 -7.75 0 -13.25 1.25 -13.25 8.5 -.25 11.75 46.25 4 46.25 28.75 C31.5 -3.5 13.5 0 0 0 c-11.5 0 -31.55 -4.5 -31.5 -22z
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A))) {
         // M 2665.6965 1530.9823
         moveTo(x = 2665.6965f, y = 1530.9823f)
         // C 2661.6316 1536.6812 2665.0942 1543.4502 2673.2354 1549.2573
@@ -992,11 +914,7 @@ private fun ImageVector.Builder.brasilPart1() {
         )
         close()
     }
-    // M0 0 a31.5 35 0 0 0 0 -70 A31.5 35 0 0 0 0 0 m0 -13 a18.5 22 0 0 0 0 -44 18.5 22 0 0 0 0 44
-    path(
-        fill = SolidColor(Color(0xFF009B3A)),
-        pathFillType = PathFillType.EvenOdd,
-    ) {
+    iconPath(fill = SolidColor(Color(0xFF009B3A)), pathFillType = PathFillType.EvenOdd) {
         // M 2736.7185 1611.5227
         moveTo(x = 2736.7185f, y = 1611.5227f)
         // a 31.5 35 38.5 0 0 43.576023 -54.78257
@@ -1042,10 +960,7 @@ private fun ImageVector.Builder.brasilPart1() {
             dy1 = 34.434757f,
         )
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1500 1306.5
         moveTo(x = 1500.0f, y = 1306.5f)
         // l -9.7340355 29.95828
@@ -1053,10 +968,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1500 1306.5
         moveTo(x = 1500.0f, y = 1306.5f)
         // l 9.7340355 29.95828
@@ -1064,10 +976,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1529.9583 1328.266
         moveTo(x = 1529.9583f, y = 1328.266f)
         // l -31.5 1.7763568E-15
@@ -1075,10 +984,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1529.9583 1328.266
         moveTo(x = 1529.9583f, y = 1328.266f)
         // l -25.484035 18.515236
@@ -1086,10 +992,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1470.0417 1328.266
         moveTo(x = 1470.0417f, y = 1328.266f)
         // l 25.484035 18.515236
@@ -1097,10 +1000,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1470.0417 1328.266
         moveTo(x = 1470.0417f, y = 1328.266f)
         // l 31.5 1.7763568E-15
@@ -1108,10 +1008,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1518.5153 1363.484
         moveTo(x = 1518.5153f, y = 1363.484f)
         // l -9.7340355 -29.95828
@@ -1119,10 +1016,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1518.5153 1363.484
         moveTo(x = 1518.5153f, y = 1363.484f)
         // l -25.484035 -18.515236
@@ -1130,10 +1024,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1481.4847 1363.484
         moveTo(x = 1481.4847f, y = 1363.484f)
         // l 25.484035 -18.515236
@@ -1141,10 +1032,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1481.4847 1363.484
         moveTo(x = 1481.4847f, y = 1363.484f)
         // l 9.7340355 -29.95828
@@ -1152,10 +1040,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1565 1615.5
         moveTo(x = 1565.0f, y = 1615.5f)
         // l -9.7340355 29.95828
@@ -1163,10 +1048,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1565 1615.5
         moveTo(x = 1565.0f, y = 1615.5f)
         // l 9.7340355 29.95828
@@ -1174,10 +1056,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1594.9583 1637.266
         moveTo(x = 1594.9583f, y = 1637.266f)
         // l -31.5 1.7763568E-15
@@ -1185,10 +1064,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1594.9583 1637.266
         moveTo(x = 1594.9583f, y = 1637.266f)
         // l -25.484035 18.515236
@@ -1196,10 +1072,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1535.0417 1637.266
         moveTo(x = 1535.0417f, y = 1637.266f)
         // l 25.484035 18.515236
@@ -1207,10 +1080,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1535.0417 1637.266
         moveTo(x = 1535.0417f, y = 1637.266f)
         // l 31.5 1.7763568E-15
@@ -1218,10 +1088,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1583.5153 1672.484
         moveTo(x = 1583.5153f, y = 1672.484f)
         // l -9.7340355 -29.95828
@@ -1229,10 +1096,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1583.5153 1672.484
         moveTo(x = 1583.5153f, y = 1672.484f)
         // l -25.484035 -18.515236
@@ -1240,10 +1104,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1546.4847 1672.484
         moveTo(x = 1546.4847f, y = 1672.484f)
         // l 25.484035 -18.515236
@@ -1251,10 +1112,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1546.4847 1672.484
         moveTo(x = 1546.4847f, y = 1672.484f)
         // l 9.7340355 -29.95828
@@ -1262,10 +1120,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1475 1686.75
         moveTo(x = 1475.0f, y = 1686.75f)
         // l -8.111696 24.965233
@@ -1273,10 +1128,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1475 1686.75
         moveTo(x = 1475.0f, y = 1686.75f)
         // l 8.111696 24.965233
@@ -1284,10 +1136,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1499.9652 1704.8883
         moveTo(x = 1499.9652f, y = 1704.8883f)
         // l -26.25 1.7763568E-15
@@ -1295,10 +1144,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1499.9652 1704.8883
         moveTo(x = 1499.9652f, y = 1704.8883f)
         // l -21.236696 15.429363
@@ -1306,10 +1152,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1450.0348 1704.8883
         moveTo(x = 1450.0348f, y = 1704.8883f)
         // l 21.236696 15.429363
@@ -1317,10 +1160,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1450.0348 1704.8883
         moveTo(x = 1450.0348f, y = 1704.8883f)
         // l 26.25 1.7763568E-15
@@ -1328,10 +1168,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1490.4293 1734.2367
         moveTo(x = 1490.4293f, y = 1734.2367f)
         // l -8.111696 -24.965233
@@ -1339,10 +1176,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1490.4293 1734.2367
         moveTo(x = 1490.4293f, y = 1734.2367f)
         // l -21.236696 -15.429363
@@ -1350,10 +1184,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1459.5707 1734.2367
         moveTo(x = 1459.5707f, y = 1734.2367f)
         // l 21.236696 -15.429363
@@ -1361,10 +1192,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1459.5707 1734.2367
         moveTo(x = 1459.5707f, y = 1734.2367f)
         // l 8.111696 -24.965233
@@ -1372,10 +1200,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1637 1587
         moveTo(x = 1637.0f, y = 1587.0f)
         // l -4.635255 14.265848
@@ -1383,10 +1208,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.132924 2.3176274
         lineToRelative(dx = 7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1637 1587
         moveTo(x = 1637.0f, y = 1587.0f)
         // l 4.635255 14.265848
@@ -1394,10 +1216,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.132924 2.3176274
         lineToRelative(dx = -7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1651.2659 1597.3647
         moveTo(x = 1651.2659f, y = 1597.3647f)
         // l -15 8.881784E-16
@@ -1405,10 +1224,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 4.440892E-16 7.5
         lineToRelative(dx = 4.440892E-16f, dy = 7.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1651.2659 1597.3647
         moveTo(x = 1651.2659f, y = 1597.3647f)
         // l -12.135255 8.816779
@@ -1416,10 +1232,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -4.4083896 -6.0676274
         lineToRelative(dx = -4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1622.7341 1597.3647
         moveTo(x = 1622.7341f, y = 1597.3647f)
         // l 12.135255 8.816779
@@ -1427,10 +1240,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 4.4083896 -6.0676274
         lineToRelative(dx = 4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1622.7341 1597.3647
         moveTo(x = 1622.7341f, y = 1597.3647f)
         // l 15 8.881784E-16
@@ -1438,10 +1248,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -4.440892E-16 7.5
         lineToRelative(dx = -4.440892E-16f, dy = 7.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1645.8168 1614.1353
         moveTo(x = 1645.8168f, y = 1614.1353f)
         // l -4.635255 -14.265848
@@ -1449,10 +1256,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.132924 2.3176274
         lineToRelative(dx = -7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1645.8168 1614.1353
         moveTo(x = 1645.8168f, y = 1614.1353f)
         // l -12.135255 -8.816779
@@ -1460,10 +1264,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 4.4083896 -6.0676274
         lineToRelative(dx = 4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1628.1832 1614.1353
         moveTo(x = 1628.1832f, y = 1614.1353f)
         // l 12.135255 -8.816779
@@ -1471,10 +1272,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -4.4083896 -6.0676274
         lineToRelative(dx = -4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1628.1832 1614.1353
         moveTo(x = 1628.1832f, y = 1614.1353f)
         // l 4.635255 -14.265848
@@ -1482,10 +1280,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.132924 2.3176274
         lineToRelative(dx = 7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1718 1693.75
         moveTo(x = 1718.0f, y = 1693.75f)
         // l -8.111696 24.965233
@@ -1493,10 +1288,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1718 1693.75
         moveTo(x = 1718.0f, y = 1693.75f)
         // l 8.111696 24.965233
@@ -1504,10 +1296,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1742.9652 1711.8883
         moveTo(x = 1742.9652f, y = 1711.8883f)
         // l -26.25 1.7763568E-15
@@ -1515,10 +1304,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1742.9652 1711.8883
         moveTo(x = 1742.9652f, y = 1711.8883f)
         // l -21.236696 15.429363
@@ -1526,10 +1312,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1693.0348 1711.8883
         moveTo(x = 1693.0348f, y = 1711.8883f)
         // l 21.236696 15.429363
@@ -1537,10 +1320,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1693.0348 1711.8883
         moveTo(x = 1693.0348f, y = 1711.8883f)
         // l 26.25 1.7763568E-15
@@ -1548,10 +1328,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1733.4293 1741.2367
         moveTo(x = 1733.4293f, y = 1741.2367f)
         // l -8.111696 -24.965233
@@ -1559,10 +1336,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1733.4293 1741.2367
         moveTo(x = 1733.4293f, y = 1741.2367f)
         // l -21.236696 -15.429363
@@ -1570,10 +1344,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1702.5707 1741.2367
         moveTo(x = 1702.5707f, y = 1741.2367f)
         // l 21.236696 -15.429363
@@ -1581,10 +1352,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1702.5707 1741.2367
         moveTo(x = 1702.5707f, y = 1741.2367f)
         // l 8.111696 -24.965233
@@ -1592,10 +1360,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1696 1772
         moveTo(x = 1696.0f, y = 1772.0f)
         // l -6.489357 19.972187
@@ -1603,10 +1368,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1696 1772
         moveTo(x = 1696.0f, y = 1772.0f)
         // l 6.489357 19.972187
@@ -1614,10 +1376,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1715.9722 1786.5106
         moveTo(x = 1715.9722f, y = 1786.5106f)
         // l -21 1.7763568E-15
@@ -1625,10 +1384,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1715.9722 1786.5106
         moveTo(x = 1715.9722f, y = 1786.5106f)
         // l -16.989357 12.343491
@@ -1636,10 +1392,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1676.0278 1786.5106
         moveTo(x = 1676.0278f, y = 1786.5106f)
         // l 16.989357 12.343491
@@ -1647,10 +1400,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1676.0278 1786.5106
         moveTo(x = 1676.0278f, y = 1786.5106f)
         // l 21 1.7763568E-15
@@ -1658,10 +1408,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1708.3435 1809.9894
         moveTo(x = 1708.3435f, y = 1809.9894f)
         // l -6.489357 -19.972187
@@ -1669,10 +1416,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1708.3435 1809.9894
         moveTo(x = 1708.3435f, y = 1809.9894f)
         // l -16.989357 -12.343491
@@ -1680,10 +1424,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1683.6565 1809.9894
         moveTo(x = 1683.6565f, y = 1809.9894f)
         // l 16.989357 -12.343491
@@ -1691,10 +1432,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1683.6565 1809.9894
         moveTo(x = 1683.6565f, y = 1809.9894f)
         // l 6.489357 -19.972187
@@ -1702,10 +1440,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2328 1210.5
         moveTo(x = 2328.0f, y = 1210.5f)
         // l -9.7340355 29.95828
@@ -1713,10 +1448,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2328 1210.5
         moveTo(x = 2328.0f, y = 1210.5f)
         // l 9.7340355 29.95828
@@ -1724,10 +1456,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2357.9583 1232.266
         moveTo(x = 2357.9583f, y = 1232.266f)
         // l -31.5 1.7763568E-15
@@ -1735,10 +1464,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2357.9583 1232.266
         moveTo(x = 2357.9583f, y = 1232.266f)
         // l -25.484035 18.515236
@@ -1746,10 +1472,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2298.0417 1232.266
         moveTo(x = 2298.0417f, y = 1232.266f)
         // l 25.484035 18.515236
@@ -1757,10 +1480,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2298.0417 1232.266
         moveTo(x = 2298.0417f, y = 1232.266f)
         // l 31.5 1.7763568E-15
@@ -1768,10 +1488,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2346.5151 1267.484
         moveTo(x = 2346.5151f, y = 1267.484f)
         // l -9.7340355 -29.95828
@@ -1779,10 +1496,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2346.5151 1267.484
         moveTo(x = 2346.5151f, y = 1267.484f)
         // l -25.484035 -18.515236
@@ -1790,10 +1504,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2309.4849 1267.484
         moveTo(x = 2309.4849f, y = 1267.484f)
         // l 25.484035 -18.515236
@@ -1801,10 +1512,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2309.4849 1267.484
         moveTo(x = 2309.4849f, y = 1267.484f)
         // l 9.7340355 -29.95828
@@ -1812,10 +1520,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2615 1696.5
         moveTo(x = 2615.0f, y = 1696.5f)
         // l -9.7340355 29.95828
@@ -1823,10 +1528,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2615 1696.5
         moveTo(x = 2615.0f, y = 1696.5f)
         // l 9.7340355 29.95828
@@ -1834,10 +1536,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2644.9583 1718.266
         moveTo(x = 2644.9583f, y = 1718.266f)
         // l -31.5 1.7763568E-15
@@ -1845,10 +1544,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2644.9583 1718.266
         moveTo(x = 2644.9583f, y = 1718.266f)
         // l -25.484035 18.515236
@@ -1856,10 +1552,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2585.0417 1718.266
         moveTo(x = 2585.0417f, y = 1718.266f)
         // l 25.484035 18.515236
@@ -1867,10 +1560,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2585.0417 1718.266
         moveTo(x = 2585.0417f, y = 1718.266f)
         // l 31.5 1.7763568E-15
@@ -1878,10 +1568,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2633.5151 1753.484
         moveTo(x = 2633.5151f, y = 1753.484f)
         // l -9.7340355 -29.95828
@@ -1889,10 +1576,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2633.5151 1753.484
         moveTo(x = 2633.5151f, y = 1753.484f)
         // l -25.484035 -18.515236
@@ -1900,10 +1584,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2596.4849 1753.484
         moveTo(x = 2596.4849f, y = 1753.484f)
         // l 25.484035 -18.515236
@@ -1911,10 +1592,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2596.4849 1753.484
         moveTo(x = 2596.4849f, y = 1753.484f)
         // l 9.7340355 -29.95828
@@ -1922,10 +1600,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2717 1714
         moveTo(x = 2717.0f, y = 1714.0f)
         // l -6.489357 19.972187
@@ -1933,10 +1608,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2717 1714
         moveTo(x = 2717.0f, y = 1714.0f)
         // l 6.489357 19.972187
@@ -1944,10 +1616,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2736.9722 1728.5106
         moveTo(x = 2736.9722f, y = 1728.5106f)
         // l -21 1.7763568E-15
@@ -1955,10 +1624,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2736.9722 1728.5106
         moveTo(x = 2736.9722f, y = 1728.5106f)
         // l -16.989357 12.343491
@@ -1966,10 +1632,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2697.0278 1728.5106
         moveTo(x = 2697.0278f, y = 1728.5106f)
         // l 16.989357 12.343491
@@ -1977,10 +1640,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2697.0278 1728.5106
         moveTo(x = 2697.0278f, y = 1728.5106f)
         // l 21 1.7763568E-15
@@ -1988,10 +1648,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2729.3435 1751.9894
         moveTo(x = 2729.3435f, y = 1751.9894f)
         // l -6.489357 -19.972187
@@ -1999,10 +1656,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2729.3435 1751.9894
         moveTo(x = 2729.3435f, y = 1751.9894f)
         // l -16.989357 -12.343491
@@ -2010,10 +1664,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2704.6565 1751.9894
         moveTo(x = 2704.6565f, y = 1751.9894f)
         // l 16.989357 -12.343491
@@ -2021,10 +1672,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2704.6565 1751.9894
         moveTo(x = 2704.6565f, y = 1751.9894f)
         // l 6.489357 -19.972187
@@ -2032,10 +1680,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2645 1766.75
         moveTo(x = 2645.0f, y = 1766.75f)
         // l -8.111696 24.965233
@@ -2043,10 +1688,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2645 1766.75
         moveTo(x = 2645.0f, y = 1766.75f)
         // l 8.111696 24.965233
@@ -2054,10 +1696,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2669.9653 1784.8883
         moveTo(x = 2669.9653f, y = 1784.8883f)
         // l -26.25 1.7763568E-15
@@ -2065,10 +1704,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2669.9653 1784.8883
         moveTo(x = 2669.9653f, y = 1784.8883f)
         // l -21.236696 15.429363
@@ -2076,10 +1712,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2620.0347 1784.8883
         moveTo(x = 2620.0347f, y = 1784.8883f)
         // l 21.236696 15.429363
@@ -2087,10 +1720,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2620.0347 1784.8883
         moveTo(x = 2620.0347f, y = 1784.8883f)
         // l 26.25 1.7763568E-15
@@ -2098,10 +1728,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2660.4294 1814.2367
         moveTo(x = 2660.4294f, y = 1814.2367f)
         // l -8.111696 -24.965233
@@ -2109,10 +1736,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2660.4294 1814.2367
         moveTo(x = 2660.4294f, y = 1814.2367f)
         // l -21.236696 -15.429363
@@ -2120,10 +1744,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2629.5706 1814.2367
         moveTo(x = 2629.5706f, y = 1814.2367f)
         // l 21.236696 -15.429363
@@ -2131,10 +1752,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2629.5706 1814.2367
         moveTo(x = 2629.5706f, y = 1814.2367f)
         // l 8.111696 -24.965233
@@ -2142,10 +1760,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2468 1920.75
         moveTo(x = 2468.0f, y = 1920.75f)
         // l -8.111696 24.965233
@@ -2153,10 +1768,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2468 1920.75
         moveTo(x = 2468.0f, y = 1920.75f)
         // l 8.111696 24.965233
@@ -2164,10 +1776,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2492.9653 1938.8883
         moveTo(x = 2492.9653f, y = 1938.8883f)
         // l -26.25 1.7763568E-15
@@ -2175,10 +1784,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2492.9653 1938.8883
         moveTo(x = 2492.9653f, y = 1938.8883f)
         // l -21.236696 15.429363
@@ -2186,10 +1792,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2443.0347 1938.8883
         moveTo(x = 2443.0347f, y = 1938.8883f)
         // l 21.236696 15.429363
@@ -2197,10 +1800,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2443.0347 1938.8883
         moveTo(x = 2443.0347f, y = 1938.8883f)
         // l 26.25 1.7763568E-15
@@ -2208,10 +1808,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2483.4294 1968.2367
         moveTo(x = 2483.4294f, y = 1968.2367f)
         // l -8.111696 -24.965233
@@ -2219,10 +1816,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2483.4294 1968.2367
         moveTo(x = 2483.4294f, y = 1968.2367f)
         // l -21.236696 -15.429363
@@ -2230,10 +1824,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2452.5706 1968.2367
         moveTo(x = 2452.5706f, y = 1968.2367f)
         // l 21.236696 -15.429363
@@ -2241,10 +1832,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2452.5706 1968.2367
         moveTo(x = 2452.5706f, y = 1968.2367f)
         // l 8.111696 -24.965233
@@ -2252,10 +1840,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2467 2000
         moveTo(x = 2467.0f, y = 2000.0f)
         // l -6.489357 19.972187
@@ -2263,10 +1848,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2467 2000
         moveTo(x = 2467.0f, y = 2000.0f)
         // l 6.489357 19.972187
@@ -2274,10 +1856,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2486.9722 2014.5106
         moveTo(x = 2486.9722f, y = 2014.5106f)
         // l -21 1.7763568E-15
@@ -2285,10 +1864,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2486.9722 2014.5106
         moveTo(x = 2486.9722f, y = 2014.5106f)
         // l -16.989357 12.343491
@@ -2296,10 +1872,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2447.0278 2014.5106
         moveTo(x = 2447.0278f, y = 2014.5106f)
         // l 16.989357 12.343491
@@ -2307,10 +1880,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2447.0278 2014.5106
         moveTo(x = 2447.0278f, y = 2014.5106f)
         // l 21 1.7763568E-15
@@ -2318,10 +1888,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2479.3435 2037.9894
         moveTo(x = 2479.3435f, y = 2037.9894f)
         // l -6.489357 -19.972187
@@ -2329,10 +1896,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2479.3435 2037.9894
         moveTo(x = 2479.3435f, y = 2037.9894f)
         // l -16.989357 -12.343491
@@ -2340,10 +1904,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2454.6565 2037.9894
         moveTo(x = 2454.6565f, y = 2037.9894f)
         // l 16.989357 -12.343491
@@ -2351,10 +1912,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2454.6565 2037.9894
         moveTo(x = 2454.6565f, y = 2037.9894f)
         // l 6.489357 -19.972187
@@ -2362,10 +1920,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2541 1868
         moveTo(x = 2541.0f, y = 1868.0f)
         // l -6.489357 19.972187
@@ -2373,10 +1928,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2541 1868
         moveTo(x = 2541.0f, y = 1868.0f)
         // l 6.489357 19.972187
@@ -2384,10 +1936,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2560.9722 1882.5106
         moveTo(x = 2560.9722f, y = 1882.5106f)
         // l -21 1.7763568E-15
@@ -2395,10 +1944,7 @@ private fun ImageVector.Builder.brasilPart1() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2560.9722 1882.5106
         moveTo(x = 2560.9722f, y = 1882.5106f)
         // l -16.989357 12.343491
@@ -2409,10 +1955,7 @@ private fun ImageVector.Builder.brasilPart1() {
 }
 
 private fun ImageVector.Builder.brasilPart2() {
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2521.0278 1882.5106
         moveTo(x = 2521.0278f, y = 1882.5106f)
         // l 16.989357 12.343491
@@ -2420,10 +1963,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2521.0278 1882.5106
         moveTo(x = 2521.0278f, y = 1882.5106f)
         // l 21 1.7763568E-15
@@ -2431,10 +1971,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2553.3435 1905.9894
         moveTo(x = 2553.3435f, y = 1905.9894f)
         // l -6.489357 -19.972187
@@ -2442,10 +1979,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2553.3435 1905.9894
         moveTo(x = 2553.3435f, y = 1905.9894f)
         // l -16.989357 -12.343491
@@ -2453,10 +1987,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2528.6565 1905.9894
         moveTo(x = 2528.6565f, y = 1905.9894f)
         // l 16.989357 -12.343491
@@ -2464,10 +1995,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2528.6565 1905.9894
         moveTo(x = 2528.6565f, y = 1905.9894f)
         // l 6.489357 -19.972187
@@ -2475,10 +2003,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2600 1825.75
         moveTo(x = 2600.0f, y = 1825.75f)
         // l -8.111696 24.965233
@@ -2486,10 +2011,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2600 1825.75
         moveTo(x = 2600.0f, y = 1825.75f)
         // l 8.111696 24.965233
@@ -2497,10 +2019,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2624.9653 1843.8883
         moveTo(x = 2624.9653f, y = 1843.8883f)
         // l -26.25 1.7763568E-15
@@ -2508,10 +2027,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2624.9653 1843.8883
         moveTo(x = 2624.9653f, y = 1843.8883f)
         // l -21.236696 15.429363
@@ -2519,10 +2035,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2575.0347 1843.8883
         moveTo(x = 2575.0347f, y = 1843.8883f)
         // l 21.236696 15.429363
@@ -2530,10 +2043,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2575.0347 1843.8883
         moveTo(x = 2575.0347f, y = 1843.8883f)
         // l 26.25 1.7763568E-15
@@ -2541,10 +2051,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2615.4294 1873.2367
         moveTo(x = 2615.4294f, y = 1873.2367f)
         // l -8.111696 -24.965233
@@ -2552,10 +2059,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2615.4294 1873.2367
         moveTo(x = 2615.4294f, y = 1873.2367f)
         // l -21.236696 -15.429363
@@ -2563,10 +2067,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2584.5706 1873.2367
         moveTo(x = 2584.5706f, y = 1873.2367f)
         // l 21.236696 -15.429363
@@ -2574,10 +2075,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2584.5706 1873.2367
         moveTo(x = 2584.5706f, y = 1873.2367f)
         // l 8.111696 -24.965233
@@ -2585,10 +2083,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2465 1854
         moveTo(x = 2465.0f, y = 1854.0f)
         // l -6.489357 19.972187
@@ -2596,10 +2091,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2465 1854
         moveTo(x = 2465.0f, y = 1854.0f)
         // l 6.489357 19.972187
@@ -2607,10 +2099,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2484.9722 1868.5106
         moveTo(x = 2484.9722f, y = 1868.5106f)
         // l -21 1.7763568E-15
@@ -2618,10 +2107,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2484.9722 1868.5106
         moveTo(x = 2484.9722f, y = 1868.5106f)
         // l -16.989357 12.343491
@@ -2629,10 +2115,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2445.0278 1868.5106
         moveTo(x = 2445.0278f, y = 1868.5106f)
         // l 16.989357 12.343491
@@ -2640,10 +2123,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2445.0278 1868.5106
         moveTo(x = 2445.0278f, y = 1868.5106f)
         // l 21 1.7763568E-15
@@ -2651,10 +2131,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2477.3435 1891.9894
         moveTo(x = 2477.3435f, y = 1891.9894f)
         // l -6.489357 -19.972187
@@ -2662,10 +2139,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2477.3435 1891.9894
         moveTo(x = 2477.3435f, y = 1891.9894f)
         // l -16.989357 -12.343491
@@ -2673,10 +2147,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2452.6565 1891.9894
         moveTo(x = 2452.6565f, y = 1891.9894f)
         // l 16.989357 -12.343491
@@ -2684,10 +2155,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2452.6565 1891.9894
         moveTo(x = 2452.6565f, y = 1891.9894f)
         // l 6.489357 -19.972187
@@ -2695,10 +2163,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1820 1473.75
         moveTo(x = 1820.0f, y = 1473.75f)
         // l -8.111696 24.965233
@@ -2706,10 +2171,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1820 1473.75
         moveTo(x = 1820.0f, y = 1473.75f)
         // l 8.111696 24.965233
@@ -2717,10 +2179,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1844.9652 1491.8883
         moveTo(x = 1844.9652f, y = 1491.8883f)
         // l -26.25 1.7763568E-15
@@ -2728,10 +2187,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1844.9652 1491.8883
         moveTo(x = 1844.9652f, y = 1491.8883f)
         // l -21.236696 15.429363
@@ -2739,10 +2195,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1795.0348 1491.8883
         moveTo(x = 1795.0348f, y = 1491.8883f)
         // l 21.236696 15.429363
@@ -2750,10 +2203,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1795.0348 1491.8883
         moveTo(x = 1795.0348f, y = 1491.8883f)
         // l 26.25 1.7763568E-15
@@ -2761,10 +2211,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1835.4293 1521.2367
         moveTo(x = 1835.4293f, y = 1521.2367f)
         // l -8.111696 -24.965233
@@ -2772,10 +2219,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1835.4293 1521.2367
         moveTo(x = 1835.4293f, y = 1521.2367f)
         // l -21.236696 -15.429363
@@ -2783,10 +2227,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1804.5707 1521.2367
         moveTo(x = 1804.5707f, y = 1521.2367f)
         // l 21.236696 -15.429363
@@ -2794,10 +2235,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1804.5707 1521.2367
         moveTo(x = 1804.5707f, y = 1521.2367f)
         // l 8.111696 -24.965233
@@ -2805,10 +2243,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2300 1412
         moveTo(x = 2300.0f, y = 1412.0f)
         // l -6.489357 19.972187
@@ -2816,10 +2251,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2300 1412
         moveTo(x = 2300.0f, y = 1412.0f)
         // l 6.489357 19.972187
@@ -2827,10 +2259,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2319.9722 1426.5106
         moveTo(x = 2319.9722f, y = 1426.5106f)
         // l -21 1.7763568E-15
@@ -2838,10 +2267,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2319.9722 1426.5106
         moveTo(x = 2319.9722f, y = 1426.5106f)
         // l -16.989357 12.343491
@@ -2849,10 +2275,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2280.0278 1426.5106
         moveTo(x = 2280.0278f, y = 1426.5106f)
         // l 16.989357 12.343491
@@ -2860,10 +2283,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2280.0278 1426.5106
         moveTo(x = 2280.0278f, y = 1426.5106f)
         // l 21 1.7763568E-15
@@ -2871,10 +2291,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2312.3435 1449.9894
         moveTo(x = 2312.3435f, y = 1449.9894f)
         // l -6.489357 -19.972187
@@ -2882,10 +2299,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2312.3435 1449.9894
         moveTo(x = 2312.3435f, y = 1449.9894f)
         // l -16.989357 -12.343491
@@ -2893,10 +2307,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2287.6565 1449.9894
         moveTo(x = 2287.6565f, y = 1449.9894f)
         // l 16.989357 -12.343491
@@ -2904,10 +2315,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2287.6565 1449.9894
         moveTo(x = 2287.6565f, y = 1449.9894f)
         // l 6.489357 -19.972187
@@ -2915,10 +2323,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 1768.5
         moveTo(x = 2100.0f, y = 1768.5f)
         // l -9.7340355 29.95828
@@ -2926,10 +2331,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 1768.5
         moveTo(x = 2100.0f, y = 1768.5f)
         // l 9.7340355 29.95828
@@ -2937,10 +2339,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2129.9583 1790.266
         moveTo(x = 2129.9583f, y = 1790.266f)
         // l -31.5 1.7763568E-15
@@ -2948,10 +2347,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2129.9583 1790.266
         moveTo(x = 2129.9583f, y = 1790.266f)
         // l -25.484035 18.515236
@@ -2959,10 +2355,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2070.0417 1790.266
         moveTo(x = 2070.0417f, y = 1790.266f)
         // l 25.484035 18.515236
@@ -2970,10 +2363,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2070.0417 1790.266
         moveTo(x = 2070.0417f, y = 1790.266f)
         // l 31.5 1.7763568E-15
@@ -2981,10 +2371,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2118.5151 1825.484
         moveTo(x = 2118.5151f, y = 1825.484f)
         // l -9.7340355 -29.95828
@@ -2992,10 +2379,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2118.5151 1825.484
         moveTo(x = 2118.5151f, y = 1825.484f)
         // l -25.484035 -18.515236
@@ -3003,10 +2387,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2081.4849 1825.484
         moveTo(x = 2081.4849f, y = 1825.484f)
         // l 25.484035 -18.515236
@@ -3014,10 +2395,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2081.4849 1825.484
         moveTo(x = 2081.4849f, y = 1825.484f)
         // l 9.7340355 -29.95828
@@ -3025,10 +2403,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2185 1627.75
         moveTo(x = 2185.0f, y = 1627.75f)
         // l -8.111696 24.965233
@@ -3036,10 +2411,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2185 1627.75
         moveTo(x = 2185.0f, y = 1627.75f)
         // l 8.111696 24.965233
@@ -3047,10 +2419,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2209.9653 1645.8883
         moveTo(x = 2209.9653f, y = 1645.8883f)
         // l -26.25 1.7763568E-15
@@ -3058,10 +2427,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2209.9653 1645.8883
         moveTo(x = 2209.9653f, y = 1645.8883f)
         // l -21.236696 15.429363
@@ -3069,10 +2435,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2160.0347 1645.8883
         moveTo(x = 2160.0347f, y = 1645.8883f)
         // l 21.236696 15.429363
@@ -3080,10 +2443,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2160.0347 1645.8883
         moveTo(x = 2160.0347f, y = 1645.8883f)
         // l 26.25 1.7763568E-15
@@ -3091,10 +2451,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2200.4294 1675.2367
         moveTo(x = 2200.4294f, y = 1675.2367f)
         // l -8.111696 -24.965233
@@ -3102,10 +2459,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2200.4294 1675.2367
         moveTo(x = 2200.4294f, y = 1675.2367f)
         // l -21.236696 -15.429363
@@ -3113,10 +2467,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2169.5706 1675.2367
         moveTo(x = 2169.5706f, y = 1675.2367f)
         // l 21.236696 -15.429363
@@ -3124,10 +2475,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2169.5706 1675.2367
         moveTo(x = 2169.5706f, y = 1675.2367f)
         // l 8.111696 -24.965233
@@ -3135,10 +2483,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 1561.75
         moveTo(x = 2100.0f, y = 1561.75f)
         // l -8.111696 24.965233
@@ -3146,10 +2491,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 1561.75
         moveTo(x = 2100.0f, y = 1561.75f)
         // l 8.111696 24.965233
@@ -3157,10 +2499,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2124.9653 1579.8883
         moveTo(x = 2124.9653f, y = 1579.8883f)
         // l -26.25 1.7763568E-15
@@ -3168,10 +2507,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2124.9653 1579.8883
         moveTo(x = 2124.9653f, y = 1579.8883f)
         // l -21.236696 15.429363
@@ -3179,10 +2515,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2075.0347 1579.8883
         moveTo(x = 2075.0347f, y = 1579.8883f)
         // l 21.236696 15.429363
@@ -3190,10 +2523,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2075.0347 1579.8883
         moveTo(x = 2075.0347f, y = 1579.8883f)
         // l 26.25 1.7763568E-15
@@ -3201,10 +2531,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2115.4294 1609.2367
         moveTo(x = 2115.4294f, y = 1609.2367f)
         // l -8.111696 -24.965233
@@ -3212,10 +2539,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2115.4294 1609.2367
         moveTo(x = 2115.4294f, y = 1609.2367f)
         // l -21.236696 -15.429363
@@ -3223,10 +2547,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2084.5706 1609.2367
         moveTo(x = 2084.5706f, y = 1609.2367f)
         // l 21.236696 -15.429363
@@ -3234,10 +2555,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2084.5706 1609.2367
         moveTo(x = 2084.5706f, y = 1609.2367f)
         // l 8.111696 -24.965233
@@ -3245,10 +2563,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2026 1633
         moveTo(x = 2026.0f, y = 1633.0f)
         // l -6.489357 19.972187
@@ -3256,10 +2571,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2026 1633
         moveTo(x = 2026.0f, y = 1633.0f)
         // l 6.489357 19.972187
@@ -3267,10 +2579,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2045.9722 1647.5106
         moveTo(x = 2045.9722f, y = 1647.5106f)
         // l -21 1.7763568E-15
@@ -3278,10 +2587,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2045.9722 1647.5106
         moveTo(x = 2045.9722f, y = 1647.5106f)
         // l -16.989357 12.343491
@@ -3289,10 +2595,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2006.0278 1647.5106
         moveTo(x = 2006.0278f, y = 1647.5106f)
         // l 16.989357 12.343491
@@ -3300,10 +2603,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2006.0278 1647.5106
         moveTo(x = 2006.0278f, y = 1647.5106f)
         // l 21 1.7763568E-15
@@ -3311,10 +2611,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2038.3435 1670.9894
         moveTo(x = 2038.3435f, y = 1670.9894f)
         // l -6.489357 -19.972187
@@ -3322,10 +2619,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2038.3435 1670.9894
         moveTo(x = 2038.3435f, y = 1670.9894f)
         // l -16.989357 -12.343491
@@ -3333,10 +2627,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2013.6565 1670.9894
         moveTo(x = 2013.6565f, y = 1670.9894f)
         // l 16.989357 -12.343491
@@ -3344,10 +2635,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2013.6565 1670.9894
         moveTo(x = 2013.6565f, y = 1670.9894f)
         // l 6.489357 -19.972187
@@ -3355,10 +2643,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2063 1690
         moveTo(x = 2063.0f, y = 1690.0f)
         // l -4.635255 14.265848
@@ -3366,10 +2651,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.132924 2.3176274
         lineToRelative(dx = 7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2063 1690
         moveTo(x = 2063.0f, y = 1690.0f)
         // l 4.635255 14.265848
@@ -3377,10 +2659,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.132924 2.3176274
         lineToRelative(dx = -7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2077.2659 1700.3647
         moveTo(x = 2077.2659f, y = 1700.3647f)
         // l -15 8.881784E-16
@@ -3388,10 +2667,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 4.440892E-16 7.5
         lineToRelative(dx = 4.440892E-16f, dy = 7.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2077.2659 1700.3647
         moveTo(x = 2077.2659f, y = 1700.3647f)
         // l -12.135255 8.816779
@@ -3399,10 +2675,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.4083896 -6.0676274
         lineToRelative(dx = -4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2048.7341 1700.3647
         moveTo(x = 2048.7341f, y = 1700.3647f)
         // l 12.135255 8.816779
@@ -3410,10 +2683,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 4.4083896 -6.0676274
         lineToRelative(dx = 4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2048.7341 1700.3647
         moveTo(x = 2048.7341f, y = 1700.3647f)
         // l 15 8.881784E-16
@@ -3421,10 +2691,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.440892E-16 7.5
         lineToRelative(dx = -4.440892E-16f, dy = 7.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2071.817 1717.1353
         moveTo(x = 2071.817f, y = 1717.1353f)
         // l -4.635255 -14.265848
@@ -3432,10 +2699,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.132924 2.3176274
         lineToRelative(dx = -7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2071.817 1717.1353
         moveTo(x = 2071.817f, y = 1717.1353f)
         // l -12.135255 -8.816779
@@ -3443,10 +2707,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 4.4083896 -6.0676274
         lineToRelative(dx = 4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2054.183 1717.1353
         moveTo(x = 2054.183f, y = 1717.1353f)
         // l 12.135255 -8.816779
@@ -3454,10 +2715,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.4083896 -6.0676274
         lineToRelative(dx = -4.4083896f, dy = -6.0676274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2054.183 1717.1353
         moveTo(x = 2054.183f, y = 1717.1353f)
         // l 4.635255 -14.265848
@@ -3465,10 +2723,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.132924 2.3176274
         lineToRelative(dx = 7.132924f, dy = 2.3176274f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2320 1938.75
         moveTo(x = 2320.0f, y = 1938.75f)
         // l -8.111696 24.965233
@@ -3476,10 +2731,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2320 1938.75
         moveTo(x = 2320.0f, y = 1938.75f)
         // l 8.111696 24.965233
@@ -3487,10 +2739,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2344.9653 1956.8883
         moveTo(x = 2344.9653f, y = 1956.8883f)
         // l -26.25 1.7763568E-15
@@ -3498,10 +2747,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 13.125
         lineToRelative(dx = 8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2344.9653 1956.8883
         moveTo(x = 2344.9653f, y = 1956.8883f)
         // l -21.236696 15.429363
@@ -3509,10 +2755,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2295.0347 1956.8883
         moveTo(x = 2295.0347f, y = 1956.8883f)
         // l 21.236696 15.429363
@@ -3520,10 +2763,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2295.0347 1956.8883
         moveTo(x = 2295.0347f, y = 1956.8883f)
         // l 26.25 1.7763568E-15
@@ -3531,10 +2771,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 13.125
         lineToRelative(dx = -8.881784E-16f, dy = 13.125f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2335.4294 1986.2367
         moveTo(x = 2335.4294f, y = 1986.2367f)
         // l -8.111696 -24.965233
@@ -3542,10 +2779,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -12.482616 4.055848
         lineToRelative(dx = -12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2335.4294 1986.2367
         moveTo(x = 2335.4294f, y = 1986.2367f)
         // l -21.236696 -15.429363
@@ -3553,10 +2787,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 7.7146816 -10.618348
         lineToRelative(dx = 7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2304.5706 1986.2367
         moveTo(x = 2304.5706f, y = 1986.2367f)
         // l 21.236696 -15.429363
@@ -3564,10 +2795,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -7.7146816 -10.618348
         lineToRelative(dx = -7.7146816f, dy = -10.618348f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2304.5706 1986.2367
         moveTo(x = 2304.5706f, y = 1986.2367f)
         // l 8.111696 -24.965233
@@ -3575,10 +2803,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 12.482616 4.055848
         lineToRelative(dx = 12.482616f, dy = 4.055848f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2383 1879
         moveTo(x = 2383.0f, y = 1879.0f)
         // l -6.489357 19.972187
@@ -3586,10 +2811,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2383 1879
         moveTo(x = 2383.0f, y = 1879.0f)
         // l 6.489357 19.972187
@@ -3597,10 +2819,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2402.9722 1893.5106
         moveTo(x = 2402.9722f, y = 1893.5106f)
         // l -21 1.7763568E-15
@@ -3608,10 +2827,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2402.9722 1893.5106
         moveTo(x = 2402.9722f, y = 1893.5106f)
         // l -16.989357 12.343491
@@ -3619,10 +2835,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2363.0278 1893.5106
         moveTo(x = 2363.0278f, y = 1893.5106f)
         // l 16.989357 12.343491
@@ -3630,10 +2843,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2363.0278 1893.5106
         moveTo(x = 2363.0278f, y = 1893.5106f)
         // l 21 1.7763568E-15
@@ -3641,10 +2851,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2395.3435 1916.9894
         moveTo(x = 2395.3435f, y = 1916.9894f)
         // l -6.489357 -19.972187
@@ -3652,10 +2859,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2395.3435 1916.9894
         moveTo(x = 2395.3435f, y = 1916.9894f)
         // l -16.989357 -12.343491
@@ -3663,10 +2867,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2370.6565 1916.9894
         moveTo(x = 2370.6565f, y = 1916.9894f)
         // l 16.989357 -12.343491
@@ -3674,10 +2875,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2370.6565 1916.9894
         moveTo(x = 2370.6565f, y = 1916.9894f)
         // l 6.489357 -19.972187
@@ -3685,10 +2883,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2262 1861
         moveTo(x = 2262.0f, y = 1861.0f)
         // l -6.489357 19.972187
@@ -3696,10 +2891,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2262 1861
         moveTo(x = 2262.0f, y = 1861.0f)
         // l 6.489357 19.972187
@@ -3707,10 +2899,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2281.9722 1875.5106
         moveTo(x = 2281.9722f, y = 1875.5106f)
         // l -21 1.7763568E-15
@@ -3718,10 +2907,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 10.5
         lineToRelative(dx = 8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2281.9722 1875.5106
         moveTo(x = 2281.9722f, y = 1875.5106f)
         // l -16.989357 12.343491
@@ -3729,10 +2915,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2242.0278 1875.5106
         moveTo(x = 2242.0278f, y = 1875.5106f)
         // l 16.989357 12.343491
@@ -3740,10 +2923,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2242.0278 1875.5106
         moveTo(x = 2242.0278f, y = 1875.5106f)
         // l 21 1.7763568E-15
@@ -3751,10 +2931,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 10.5
         lineToRelative(dx = -8.881784E-16f, dy = 10.5f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2274.3435 1898.9894
         moveTo(x = 2274.3435f, y = 1898.9894f)
         // l -6.489357 -19.972187
@@ -3762,10 +2939,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.9860935 3.2446785
         lineToRelative(dx = -9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2274.3435 1898.9894
         moveTo(x = 2274.3435f, y = 1898.9894f)
         // l -16.989357 -12.343491
@@ -3773,10 +2947,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 6.1717453 -8.4946785
         lineToRelative(dx = 6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2249.6565 1898.9894
         moveTo(x = 2249.6565f, y = 1898.9894f)
         // l 16.989357 -12.343491
@@ -3784,10 +2955,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -6.1717453 -8.4946785
         lineToRelative(dx = -6.1717453f, dy = -8.4946785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2249.6565 1898.9894
         moveTo(x = 2249.6565f, y = 1898.9894f)
         // l 6.489357 -19.972187
@@ -3795,10 +2963,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.9860935 3.2446785
         lineToRelative(dx = 9.9860935f, dy = 3.2446785f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1805 1828.5
         moveTo(x = 1805.0f, y = 1828.5f)
         // l -9.7340355 29.95828
@@ -3806,10 +2971,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1805 1828.5
         moveTo(x = 1805.0f, y = 1828.5f)
         // l 9.7340355 29.95828
@@ -3817,10 +2979,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1834.9583 1850.266
         moveTo(x = 1834.9583f, y = 1850.266f)
         // l -31.5 1.7763568E-15
@@ -3828,10 +2987,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 8.881784E-16 15.75
         lineToRelative(dx = 8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1834.9583 1850.266
         moveTo(x = 1834.9583f, y = 1850.266f)
         // l -25.484035 18.515236
@@ -3839,10 +2995,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1775.0417 1850.266
         moveTo(x = 1775.0417f, y = 1850.266f)
         // l 25.484035 18.515236
@@ -3850,10 +3003,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1775.0417 1850.266
         moveTo(x = 1775.0417f, y = 1850.266f)
         // l 31.5 1.7763568E-15
@@ -3861,10 +3011,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -8.881784E-16 15.75
         lineToRelative(dx = -8.881784E-16f, dy = 15.75f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1823.5153 1885.484
         moveTo(x = 1823.5153f, y = 1885.484f)
         // l -9.7340355 -29.95828
@@ -3872,10 +3019,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -14.97914 4.8670177
         lineToRelative(dx = -14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1823.5153 1885.484
         moveTo(x = 1823.5153f, y = 1885.484f)
         // l -25.484035 -18.515236
@@ -3883,10 +3027,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 9.257618 -12.742018
         lineToRelative(dx = 9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1786.4847 1885.484
         moveTo(x = 1786.4847f, y = 1885.484f)
         // l 25.484035 -18.515236
@@ -3894,10 +3035,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -9.257618 -12.742018
         lineToRelative(dx = -9.257618f, dy = -12.742018f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 1786.4847 1885.484
         moveTo(x = 1786.4847f, y = 1885.484f)
         // l 9.7340355 -29.95828
@@ -3905,10 +3043,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 14.97914 4.8670177
         lineToRelative(dx = 14.97914f, dy = 4.8670177f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 2034.5
         moveTo(x = 2100.0f, y = 2034.5f)
         // l -3.2446785 9.9860935
@@ -3916,10 +3051,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 4.9930468 1.6223392
         lineToRelative(dx = 4.9930468f, dy = 1.6223392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2100 2034.5
         moveTo(x = 2100.0f, y = 2034.5f)
         // l 3.2446785 9.9860935
@@ -3927,10 +3059,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.9930468 1.6223392
         lineToRelative(dx = -4.9930468f, dy = 1.6223392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2109.986 2041.7554
         moveTo(x = 2109.986f, y = 2041.7554f)
         // l -10.5 8.881784E-16
@@ -3938,10 +3067,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 4.440892E-16 5.25
         lineToRelative(dx = 4.440892E-16f, dy = 5.25f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2109.986 2041.7554
         moveTo(x = 2109.986f, y = 2041.7554f)
         // l -8.4946785 6.1717453
@@ -3949,10 +3075,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -3.0858727 -4.2473392
         lineToRelative(dx = -3.0858727f, dy = -4.2473392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2090.014 2041.7554
         moveTo(x = 2090.014f, y = 2041.7554f)
         // l 8.4946785 6.1717453
@@ -3960,10 +3083,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 3.0858727 -4.2473392
         lineToRelative(dx = 3.0858727f, dy = -4.2473392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2090.014 2041.7554
         moveTo(x = 2090.014f, y = 2041.7554f)
         // l 10.5 8.881784E-16
@@ -3971,10 +3091,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.440892E-16 5.25
         lineToRelative(dx = -4.440892E-16f, dy = 5.25f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2106.1716 2053.4946
         moveTo(x = 2106.1716f, y = 2053.4946f)
         // l -3.2446785 -9.9860935
@@ -3982,10 +3099,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -4.9930468 1.6223392
         lineToRelative(dx = -4.9930468f, dy = 1.6223392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2106.1716 2053.4946
         moveTo(x = 2106.1716f, y = 2053.4946f)
         // l -8.4946785 -6.1717453
@@ -3993,10 +3107,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l 3.0858727 -4.2473392
         lineToRelative(dx = 3.0858727f, dy = -4.2473392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2093.8284 2053.4946
         moveTo(x = 2093.8284f, y = 2053.4946f)
         // l 8.4946785 -6.1717453
@@ -4004,10 +3115,7 @@ private fun ImageVector.Builder.brasilPart2() {
         // l -3.0858727 -4.2473392
         lineToRelative(dx = -3.0858727f, dy = -4.2473392f)
     }
-    // M0 -1 v1 h.5
-    path(
-        fill = SolidColor(Color(0xFFFFFFFF)),
-    ) {
+    iconPath(fill = SolidColor(Color(0xFFFFFFFF))) {
         // M 2093.8284 2053.4946
         moveTo(x = 2093.8284f, y = 2053.4946f)
         // l 3.2446785 -9.9860935
