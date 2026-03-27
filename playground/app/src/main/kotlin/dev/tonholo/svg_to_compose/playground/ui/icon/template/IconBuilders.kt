@@ -2,8 +2,19 @@ package dev.tonholo.svg_to_compose.playground.ui.icon.template
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.vector.DefaultGroupName
+import androidx.compose.ui.graphics.vector.DefaultPivotX
+import androidx.compose.ui.graphics.vector.DefaultPivotY
+import androidx.compose.ui.graphics.vector.DefaultRotation
+import androidx.compose.ui.graphics.vector.DefaultScaleX
+import androidx.compose.ui.graphics.vector.DefaultScaleY
+import androidx.compose.ui.graphics.vector.DefaultTranslationX
+import androidx.compose.ui.graphics.vector.DefaultTranslationY
+import androidx.compose.ui.graphics.vector.EmptyPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathBuilder
+import androidx.compose.ui.graphics.vector.PathNode
+import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
@@ -48,3 +59,25 @@ fun ImageVector.Builder.iconPath(
         pathBuilder = block,
     )
 }
+
+fun ImageVector.Builder.iconGroup(
+    rotate: Float = DefaultRotation,
+    pivotX: Float = DefaultPivotX,
+    pivotY: Float = DefaultPivotY,
+    scaleX: Float = DefaultScaleX,
+    scaleY: Float = DefaultScaleY,
+    translationX: Float = DefaultTranslationX,
+    translationY: Float = DefaultTranslationY,
+    clipPathData: List<PathNode> = EmptyPath,
+    block: ImageVector.Builder.() -> Unit,
+) = group(
+    rotate = rotate,
+    pivotX = pivotX,
+    pivotY = pivotY,
+    scaleX = scaleX,
+    scaleY = scaleY,
+    translationX = translationX,
+    translationY = translationY,
+    clipPathData = clipPathData,
+    block = block,
+)

@@ -12,6 +12,7 @@ package = "dev.tonholo.svg_to_compose.playground.ui.icon.template"
 [definitions.imports]
 icon_builder = "dev.tonholo.svg_to_compose.playground.ui.icon.template.icon"
 icon_path = "dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath"
+icon_group = "dev.tonholo.svg_to_compose.playground.ui.icon.template.iconGroup"
 theme = "dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme"
 
 # Color mappings: replace Color(<value>) with <name> and auto-import <import>.<name>.
@@ -54,7 +55,13 @@ private fun ${icon:name}Preview() {
 [fragments]
 icon_builder = "${def:icon_builder}(name = \"${icon:name}\", viewportWidth = ${icon:viewport_width}, viewportHeight = ${icon:viewport_height})"
 path_builder = "${def:icon_path}(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, strokeAlpha = ${path:stroke_alpha}, pathFillType = ${path:fill_type})"
-group_builder = "group(rotate = ${group:rotate}, pivotX = ${group:pivot_x}, pivotY = ${group:pivot_y})"
+group_builder = """
+${def:icon_group}(
+    rotate = ${group:rotate},
+    pivotX = ${group:pivot_x},
+    pivotY = ${group:pivot_y},
+    clipPathData = ${group:clip_path_data},
+)"""
 # chunk_function_name / chunk_function_definition: customize how large icons
 # are split into helper functions. ${icon:name} is camelCase, ${chunk:index}
 # is the 1-based chunk number, ${chunk:name} is the resolved function name,
