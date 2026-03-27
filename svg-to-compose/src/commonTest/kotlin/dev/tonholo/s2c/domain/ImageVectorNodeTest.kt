@@ -65,6 +65,25 @@ class ImageVectorNodeTest {
     }
 
     @Test
+    fun `ensure uppercase E in scientific notation is not treated as a path command`() {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M0 0 L1.5E-3 2.5E-3",
+            ),
+        )
+        // Act
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
+        val nodes = node.wrapper.nodes
+
+        // Assert
+        assertEquals(expected = 2, actual = nodes.size)
+        assertIs<PathNodes.MoveTo>(nodes[0])
+        assertIs<PathNodes.LineTo>(nodes[1])
+    }
+
+    @Test
     fun `should throw ExitProgramException when a not supported command is found on SVG path`() {
         // Arrange
         val command = "X"

@@ -399,7 +399,7 @@ private fun normalizePath(path: String): String {
             continue
         }
 
-        val isNotENotation = char != 'e'
+        val isNotENotation = char.lowercaseChar() != 'e'
         val isNotClosingCommand = (char.isLetter() && char.lowercaseChar() != PathCommand.Close.value)
         val isNegativeSignSeparator = (lastChar.isDigit() && char == '-')
         val reachMaximumDotNumbers = dotCount == 2
