@@ -96,6 +96,20 @@ internal class ImageVectorNodeEmitter(
                 emit(it).trimEnd()
             }.prependIndent(indent)
 
+        val header = emitGroupHeader(group)
+        return """
+            |$header {
+            |$groupPaths
+            |}
+        """.trimMargin()
+    }
+
+    /**
+     * Emits only the `group(...)` call signature without the body or braces.
+     * Used by [TemplateNodeEmitter] when no group fragment is configured but
+     * template-aware recursion of children is still needed.
+     */
+    fun emitGroupHeader(group: ImageVectorNode.Group): String {
         val groupParams = buildGroupParameters(group)
 
         val groupParamsString = if (groupParams.isNotEmpty()) {
@@ -112,12 +126,7 @@ internal class ImageVectorNodeEmitter(
         } else {
             ""
         }
-
-        return """
-            |group$groupParamsString {
-            |$groupPaths
-            |}
-        """.trimMargin()
+        return "group$groupParamsString"
     }
 
     private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String = "${chunk.functionName}()"
