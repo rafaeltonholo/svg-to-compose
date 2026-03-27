@@ -364,7 +364,7 @@ private fun IconParserConfigurationSubsection() {
                 description = "Persist generated files to the source directory (delicate API)",
             )
             OptionItem(
-                name = "templateFile(RegularFileProperty)",
+                name = "templateFile(path: RegularFile)",
                 description = "Path to an s2c.template.toml file for customizing generated code",
             )
         }

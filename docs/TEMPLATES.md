@@ -342,8 +342,10 @@ When no explicit template path is given, the tool walks up from the output
 directory looking for `s2c.template.toml`. This matches the behavior of
 `.editorconfig` discovery.
 
-Disable auto-discovery with `--no-template` (CLI) or by omitting
-`templateFile()` from the Gradle DSL.
+Disable auto-discovery with `--no-template` (CLI). In the Gradle DSL,
+omitting `templateFile()` disables auto-discovery for that configuration;
+set `templateFile()` in `common` to share a template across all
+configurations via inheritance.
 
 ## Gradle Plugin: Per-Configuration Templates
 
@@ -375,7 +377,7 @@ svgToCompose {
             destinationPackage("com.example.icons.filled")
             icons {
                 theme("com.example.theme.AppTheme")
-                // No templateFile() → inherits from common or auto-discovery
+                // No templateFile() -> inherits from common config
             }
         }
     }

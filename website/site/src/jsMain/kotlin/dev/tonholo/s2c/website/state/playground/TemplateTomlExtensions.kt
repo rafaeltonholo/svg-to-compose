@@ -18,5 +18,4 @@ internal fun String.isTemplateStructuralOnly(): Boolean {
  * Returns the TOML string only when it contains real configuration
  * beyond section headers and comments (the default placeholder).
  */
-internal fun String.takeIfUsableTemplate(): String? =
-    if (isTemplateStructuralOnly()) null else this
+internal fun String.takeIfUsableTemplate(): String? = if (isTemplateStructuralOnly()) null else this

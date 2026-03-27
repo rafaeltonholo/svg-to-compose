@@ -202,7 +202,7 @@ private val gradlePerConfigExample = """
 |            destinationPackage("com.example.icons.filled")
 |            icons {
 |                theme("com.example.theme.AppTheme")
-|                // No templateFile() -> inherits from common or auto-discovery
+|                // No templateFile() -> inherits from common config
 |            }
 |        }
 |    }
