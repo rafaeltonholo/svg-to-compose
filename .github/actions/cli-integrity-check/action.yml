@@ -11,8 +11,8 @@ runs:
     - name: Verify ${{ inputs.type }} conversion without optimization
       shell: bash
       run: |
-        ./.github/actions/cli-integrity-check/script.sh . ${{ inputs.type }}
+        ./.github/actions/cli-integrity-check/script.sh . --extension ${{ inputs.type }}
     - name: Verify ${{ inputs.type }} conversion with optimization
       shell: bash
       run: |
-        ./.github/actions/cli-integrity-check/script.sh . ${{ inputs.type }} optimize
+        ./.github/actions/cli-integrity-check/script.sh . --extension ${{ inputs.type }} --optimize

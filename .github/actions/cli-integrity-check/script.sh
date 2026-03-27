@@ -46,7 +46,7 @@ fi
 
 differ="diff --strip-trailing-cr"
 if [ "$use_default_differ" == "false" ] && command -v delta &> /dev/null; then
-  differ="delta --paging=never"
+  differ="delta -s --paging=never"
 fi
 
 # Package must match exactly what the Gradle plugin functional tests use so

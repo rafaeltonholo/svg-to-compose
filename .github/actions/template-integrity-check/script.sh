@@ -28,7 +28,7 @@ done
 
 differ="diff --strip-trailing-cr"
 if [ "$use_default_differ" == "false" ] && command -v delta &> /dev/null; then
-  differ="delta --paging=never"
+  differ="delta -s --paging=never"
 fi
 rebuild_applied="false"
 
