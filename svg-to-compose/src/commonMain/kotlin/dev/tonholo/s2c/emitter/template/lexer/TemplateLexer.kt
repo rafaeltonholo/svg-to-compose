@@ -31,19 +31,8 @@ internal object TemplateLexer {
         var cursor = 0
 
         while (cursor < input.length) {
-            if (input[cursor] == '$' && cursor + 1 < input.length && input[cursor + 1] == '{') {
-                val result = tryParsePlaceholder(input, cursor + 2)
-                if (result != null) {
-                    if (literal.isNotEmpty()) {
-                        tokens.add(TemplateToken.Literal(literal.toString()))
-                        literal.clear()
-                    }
-                    tokens.add(result.token)
-                    cursor = result.endIndex
-                } else {
-                    literal.append(input[cursor])
-                    cursor++
-                }
+            if (isPlaceholderStart(input, cursor)) {
+                cursor = consumePlaceholder(input, cursor, tokens, literal)
             } else {
                 literal.append(input[cursor])
                 cursor++
@@ -55,6 +44,39 @@ internal object TemplateLexer {
         }
 
         return tokens
+    }
+
+    private fun isPlaceholderStart(input: String, cursor: Int): Boolean =
+        input[cursor] == '$' && cursor + 1 < input.length && input[cursor + 1] == '{'
+
+    /**
+     * Attempts to parse a `${...}` placeholder at [cursor]. On success, flushes
+     * the accumulated [literal] and appends the placeholder token to [tokens].
+     * On failure, appends the entire malformed `${...}` span as literal text.
+     *
+     * @return The updated cursor position.
+     */
+    private fun consumePlaceholder(
+        input: String,
+        cursor: Int,
+        tokens: MutableList<TemplateToken>,
+        literal: StringBuilder,
+    ): Int {
+        val result = tryParsePlaceholder(input, cursor + 2)
+        if (result != null) {
+            if (literal.isNotEmpty()) {
+                tokens.add(TemplateToken.Literal(literal.toString()))
+                literal.clear()
+            }
+            tokens.add(result.token)
+            return result.endIndex
+        }
+        // Consume the entire malformed `${...}` span as literal text
+        // so the inner content isn't re-interpreted as nested placeholders.
+        val closeBrace = input.indexOf('}', cursor + 2)
+        val endIndex = if (closeBrace >= 0) closeBrace + 1 else input.length
+        literal.append(input, cursor, endIndex)
+        return endIndex
     }
 
     /**
