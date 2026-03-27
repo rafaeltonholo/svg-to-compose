@@ -84,7 +84,6 @@ jobs:
           uses: ./.github/actions/setup
 
         - name: Prepare nodeJS environment for integrity check
-          if: startsWith(matrix.check, 'cli-')
           uses: ./.github/actions/setup-nodejs
           with:
             os: ${{ matrix.os }}
