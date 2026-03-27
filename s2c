@@ -151,7 +151,7 @@ fn_main() {
     fn_print_info "✅ Binaries download completed."
   elif [[ $must_build == true ]]; then
     fn_print_info "Found project structure, but not binaries. Build required."
-    if [[ $DEBUG == true ]] | [[ $VERBOSE == true ]]; then
+    if [[ $DEBUG == true ]] || [[ $VERBOSE == true ]]; then
       build_type=Debug
     else
       build_type=Release
