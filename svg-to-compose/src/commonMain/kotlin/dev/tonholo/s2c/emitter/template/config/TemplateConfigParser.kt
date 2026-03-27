@@ -94,6 +94,7 @@ object TemplateConfigParser {
         val defPattern = Regex("""\$\{${Namespace.DEFINITIONS}:([a-z][a-z0-9_.]*)\}""")
 
         val allTemplateTexts = buildList {
+            config.templates.fileHeader?.let(::add)
             config.templates.iconTemplate?.let(::add)
             config.templates.preview?.template?.let(::add)
             config.fragments.values.forEach(::add)
