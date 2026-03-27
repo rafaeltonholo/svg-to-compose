@@ -3,18 +3,38 @@
 root_directory="${1:?Error: Root directory must be the first parameter}"
 ext="${2:?Error: File extension must be the second parameter}"
 
-# Parse optimization and rebuild flags (rebuild can be $3 or $4)
+# Parse optional flags
 optimize="false"
 suffix="nonoptimized"
 rebuild=""
+use_default_differ="false"
+rebuild_applied="false"
 
-if [ "$3" == "optimize" ]; then
-  optimize="true"
-  suffix="optimized"
-  [ "$4" == "--rebuild" ] && rebuild="--upgrade"
-elif [ "$3" == "--rebuild" ]; then
-  rebuild="--upgrade"
-fi
+shift # consume root_directory ($1), leaving only flags
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --extension)
+      ext="${2:?Error: --extension flag requires a value}"
+      shift 2
+      ;;
+    --optimize)
+      optimize="true"
+      shift
+      ;;
+    --rebuild)
+      rebuild="--upgrade"
+      shift
+      ;;
+    --default-differ)
+      use_default_differ="true"
+      shift
+      ;;
+    *)
+      echo "Warning: unknown flag '$1'" >&2
+      shift
+      ;;
+  esac
+done
 
 # Determine file type based on extension
 if [ "$ext" == "xml" ]; then
@@ -24,7 +44,10 @@ else
   ext="svg"
 fi
 
-rebuild_applied="false"
+differ="diff --strip-trailing-cr"
+if [ "$use_default_differ" == "false" ] && command -v delta &> /dev/null; then
+  differ="delta --paging=never"
+fi
 
 # Package must match exactly what the Gradle plugin functional tests use so
 # both tools validate against the same expected .kt files.
@@ -96,7 +119,7 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
   fi
 
   echo "Verifying $stem against expected file."
-  if ! diff --strip-trailing-cr "$tmp_output" "$expected_file"; then
+  if ! $differ "$tmp_output" "$expected_file"; then
     errors+=("$stem.$ext")
   else
     echo "✅ $stem.$ext pass"

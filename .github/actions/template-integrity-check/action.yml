@@ -6,4 +6,4 @@ runs:
     - name: Verify template conversion
       shell: bash
       run: |
-        bash ./.github/actions/cli-integrity-check/template-script.sh .
+        bash ./.github/actions/template-integrity-check/script.sh .

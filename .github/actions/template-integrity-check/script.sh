@@ -5,11 +5,30 @@ if [ "$root_directory" == "" ]; then
   exit 1
 fi
 
-rebuild="$2"
-if [ "$rebuild" == "--rebuild" ]; then
-  rebuild="--upgrade"
-else
-  rebuild=""
+use_default_differ="false"
+rebuild=""
+
+shift # consume root_directory ($1), leaving only flags
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --rebuild)
+      rebuild="--upgrade"
+      shift
+      ;;
+    --default-differ)
+      use_default_differ="true"
+      shift
+      ;;
+    *)
+      echo "Warning: unknown flag '$1'" >&2
+      shift
+      ;;
+  esac
+done
+
+differ="diff --strip-trailing-cr"
+if [ "$use_default_differ" == "false" ] && command -v delta &> /dev/null; then
+  differ="delta --paging=never"
 fi
 rebuild_applied="false"
 
@@ -86,7 +105,7 @@ process_file() {
   fi
 
   echo "Verifying $stem (template) against expected file."
-  if ! diff --strip-trailing-cr "$tmp_output" "$expected_file"; then
+  if ! $differ "$tmp_output" "$expected_file"; then
     errors+=("$stem.$ext")
   else
     echo "✅ $stem.$ext (template) pass"
