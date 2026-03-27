@@ -56,7 +56,7 @@ internal class TemplateEmitter(
             context.addImports(nodeContext.collectedImports)
             val resolvedTemplate = PlaceholderResolver.resolve(iconTemplate.trim(), context).trimStart()
             val preview = buildPreview(contents, context)
-            val chunkContent = buildChunkFunctionsContent(chunkFunctions)
+            val chunkContent = buildChunkFunctionsContent(chunkFunctions, context)
 
             buildString {
                 val fileHeader = buildFileHeader(context)
@@ -87,27 +87,38 @@ internal class TemplateEmitter(
         }
     }
 
-    private fun buildNodeContext(contents: IconFileContents): TemplateContext {
+    private fun buildNodeContext(contents: IconFileContents): TemplateContext =
+        buildNodeContext(initialImports = contents.imports.toSet())
+
+    private fun buildNodeContext(
+        parentContext: TemplateContext? = null,
+        initialImports: Set<String> = parentContext?.collectedImports.orEmpty(),
+    ): TemplateContext {
         val defs = templateEmitterConfig.definitions.imports
         val frags = templateEmitterConfig.fragments
         return TemplateContext(
             iconVariables = emptyMap(),
             definitions = defs,
             fragments = frags,
-            initialImports = contents.imports.toSet(),
+            initialImports = initialImports,
             colorMappings = templateEmitterConfig.definitions.colorMapping,
         )
     }
 
     private fun buildPreview(contents: IconFileContents, context: TemplateContext): String {
-        val previewConfig = templateEmitterConfig.templates.preview
-        if (previewConfig != null) {
-            val previewTemplate = previewConfig.template ?: return ""
-            if (previewTemplate.isBlank()) return ""
-            return PlaceholderResolver.resolve(previewTemplate.trim(), context)
+        val template = templateEmitterConfig.templates.preview?.template
+        return when {
+            // Explicitly blank template suppresses preview generation
+            template != null && template.isBlank() -> ""
+
+            // Non-blank template — resolve placeholders
+            template != null -> PlaceholderResolver.resolve(template.trim(), context)
+
+            // null/missing template — fall back to CLI/Gradle defaults via noPreview flag
+            contents.noPreview -> ""
+
+            else -> buildDefaultPreview(contents, context)
         }
-        // No template preview config — use CLI/Gradle defaults via noPreview flag
-        return if (contents.noPreview) "" else buildDefaultPreview(contents, context)
     }
 
     private fun buildDefaultPreview(contents: IconFileContents, context: TemplateContext): String {
@@ -128,7 +139,10 @@ internal class TemplateEmitter(
         val PREVIEW_IMPORTS: Set<String> = ImageVectorEmitter.PREVIEW_IMPORTS
     }
 
-    private fun buildChunkFunctionsContent(chunkFunctions: List<ImageVectorNode.ChunkFunction>?): String {
+    private fun buildChunkFunctionsContent(
+        chunkFunctions: List<ImageVectorNode.ChunkFunction>?,
+        parentContext: TemplateContext,
+    ): String {
         if (chunkFunctions.isNullOrEmpty()) return ""
 
         val defFragment = templateEmitterConfig.fragments[Fragment.CHUNK_FUNCTION_DEFINITION]
@@ -137,9 +151,13 @@ internal class TemplateEmitter(
             }
 
         return chunkFunctions.joinToString("\n\n") { chunk ->
+            val chunkNodeContext = buildNodeContext(parentContext)
             val body = chunk.nodes.joinToString("\n") {
-                nodeEmitter.emit(it).trimEnd()
+                templateNodeEmitter.emit(it, chunkNodeContext).trimEnd()
             }.prependIndent(formatConfig.indentUnit)
+
+            // Merge imports collected during template-aware chunk emission
+            parentContext.addImports(chunkNodeContext.collectedImports)
 
             val context = TemplateContext(
                 iconVariables = emptyMap(),
@@ -149,6 +167,7 @@ internal class TemplateEmitter(
                 ),
                 definitions = templateEmitterConfig.definitions.imports,
                 fragments = templateEmitterConfig.fragments,
+                colorMappings = templateEmitterConfig.definitions.colorMapping,
             )
             PlaceholderResolver.resolve(defFragment.trim(), context)
         }
