@@ -104,7 +104,7 @@ done
 
 echo
 echo
-if [ "${#errors[@]}" == 0 ]; then
+if [ "${#errors[@]}" -eq 0 ]; then
   echo "✅ Template integrity check pass"
   exit 0
 else
