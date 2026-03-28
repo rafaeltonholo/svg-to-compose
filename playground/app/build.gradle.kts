@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.tonholo.svg_to_compose.playground"
+    namespace = "dev.tonholo.svgtocompose.playground"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.tonholo.svg_to_compose.playground"
+        applicationId = "dev.tonholo.svgtocompose.playground"
         minSdk = 28
         targetSdk = 35
         versionCode = 1
@@ -53,10 +53,10 @@ svgToCompose {
             recursive()
             optimize(enabled = false)
             icons {
-                theme("dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme")
+                theme("dev.tonholo.svgtocompose.playground.ui.theme.SampleAppTheme")
             }
         }
-        val basePackage = "dev.tonholo.svg_to_compose.playground.ui.icon"
+        val basePackage = "dev.tonholo.svgtocompose.playground.ui.icon"
         create("svg") {
             from(layout.projectDirectory.dir("../../samples/svg"))
             destinationPackage("$basePackage.svg")
