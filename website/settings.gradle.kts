@@ -12,10 +12,15 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
     }
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+        create("websiteLibs") {
+            from(files("../gradle/libs.website.versions.toml"))
+        }
+    }
 }
 
-// The following block registers dependencies to enable Kobweb snapshot support. It is safe to delete or comment out
-// this block if you never plan to use them.
+// Kobweb snapshot support
 gradle.settingsEvaluated {
     fun RepositoryHandler.kobwebSnapshots() {
         maven("https://central.sonatype.com/repository/maven-snapshots/") {

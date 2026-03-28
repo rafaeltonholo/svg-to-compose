@@ -5,7 +5,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kobweb.application)
+    alias(websiteLibs.plugins.kobweb.application)
     alias(libs.plugins.buildconfig)
 }
 
@@ -111,15 +111,15 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.html.core)
-            implementation(libs.compose.viewmodel)
-            implementation(libs.kobweb.core)
-            implementation(libs.kobweb.silk)
-            implementation(libs.silk.icons.fa)
-            implementation(libs.dev.tonholo.s2c)
+            implementation(websiteLibs.compose.runtime)
+            implementation(websiteLibs.compose.html.core)
+            implementation(websiteLibs.compose.viewmodel)
+            implementation(websiteLibs.kobweb.core)
+            implementation(websiteLibs.kobweb.silk)
+            implementation(websiteLibs.silk.icons.fa)
+            implementation(websiteLibs.dev.tonholo.s2c)
             implementation(project(":worker"))
-            implementation(npm("jszip", libs.versions.jszip.get()))
+            implementation(npm("jszip", websiteLibs.versions.jszip.get()))
         }
     }
 }
