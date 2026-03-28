@@ -1,25 +1,30 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.dev.tonholo.s2c)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(playgroundKmpLibs.plugins.androidMultiplatformLibrary)
+    alias(playgroundKmpLibs.plugins.composeMultiplatform)
+    alias(libs.plugins.compose.compiler)
+    alias(playgroundKmpLibs.plugins.composeHotReload)
+    alias(playgroundKmpLibs.plugins.dev.tonholo.s2c)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    android {
+        namespace = "dev.tonholo.svgtocompose.playground.kmp"
+        compileSdk = playgroundKmpLibs.versions.android.compileSdk.get().toInt()
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+        androidResources {
+            enable = true
+        }
     }
-
+    
     listOf(
         iosX64(),
         iosArm64(),
@@ -30,95 +35,53 @@ kotlin {
             isStatic = true
         }
     }
-
-    jvm("desktop")
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        moduleName = "composeApp"
-        browser {
-            val rootDirPath = project.rootDir.path
-            val projectDirPath = project.projectDir.path
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
-                }
-            }
-        }
+    
+    jvm()
+    
+    js {
+        browser()
         binaries.executable()
     }
-
+    
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+    
     sourceSets {
-        val desktopMain by getting
-
         androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
+            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
+            implementation(playgroundKmpLibs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(playgroundKmpLibs.compose.runtime)
+            implementation(playgroundKmpLibs.compose.foundation)
+            implementation(playgroundKmpLibs.compose.material3)
+            implementation(playgroundKmpLibs.compose.ui)
+            implementation(playgroundKmpLibs.compose.components.resources)
+            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
+            implementation(playgroundKmpLibs.androidx.lifecycle.viewmodelCompose)
+            implementation(playgroundKmpLibs.androidx.lifecycle.runtime.compose)
         }
-        desktopMain.dependencies {
+        jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
+            implementation(playgroundKmpLibs.kotlinx.coroutinesSwing)
         }
-        wasmJsMain.dependencies {
-            implementation(devNpm("webpack", "^5.94.0"))
-            implementation(devNpm("path-to-regexp", "^0.1.12"))
-        }
-    }
-}
-
-android {
-    namespace = "dev.tonholo.svg_to_compose.playground.kmp"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "dev.tonholo.svg_to_compose.playground.kmp"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    androidRuntimeClasspath(playgroundKmpLibs.compose.ui.tooling)
 }
 
 compose.desktop {
     application {
-        mainClass = "dev.tonholo.svg_to_compose.playground.kmp.MainKt"
+        mainClass = "dev.tonholo.svgtocompose.playground.kmp.app.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "dev.tonholo.svg_to_compose.playground.kmp"
+            packageName = "dev.tonholo.svgtocompose.playground.kmp.app"
             packageVersion = "1.0.0"
         }
     }
@@ -130,7 +93,8 @@ svgToCompose {
             optimize(enabled = false)
             recursive()
             icons {
-                theme("dev.tonholo.svg_to_compose.playground.kmp.ui.Theme")
+                noPreview()
+                theme("dev.tonholo.svgtocompose.playground.kmp.ui.Theme")
                 minify()
                 mapIconNameTo { iconName -> iconName.replace("-filled", "") }
             }
@@ -138,12 +102,12 @@ svgToCompose {
 
         create("composeResource") {
             from(layout.projectDirectory.dir("src/commonMain/composeResources/drawable").also { println(it) })
-            destinationPackage("dev.tonholo.svg_to_compose.playground.kmp.ui.icons.compose_resources")
+            destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.compose_resources")
         }
 
         create("svg") {
             from(rootProject.layout.projectDirectory.dir("../samples/svg").also { println(it) })
-            destinationPackage("dev.tonholo.svg_to_compose.playground.kmp.ui.icons.samples")
+            destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.samples")
         }
     }
 }

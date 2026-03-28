@@ -3,11 +3,11 @@ import dev.detekt.gradle.Detekt
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.compose.compiler) apply false
-    alias(libs.plugins.compose.multiplatform) apply false
-    alias(libs.plugins.kobweb.application) apply false
-    alias(libs.plugins.kobweb.worker) apply false
+    alias(websiteLibs.plugins.compose.multiplatform) apply false
+    alias(websiteLibs.plugins.kobweb.application) apply false
+    alias(websiteLibs.plugins.kobweb.worker) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.metro) apply false
+    alias(libs.plugins.dev.zacsweers.metro) apply false
     alias(libs.plugins.buildconfig) apply false
     alias(libs.plugins.detekt) apply false
 }

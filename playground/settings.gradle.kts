@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        maven { url = uri("../build/localMaven") }
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -8,7 +9,6 @@ pluginManagement {
             }
         }
         mavenCentral()
-        maven { url = uri("../build/localMaven") }
         gradlePluginPortal()
     }
 }
@@ -19,8 +19,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+        create("playgroundLibs") {
+            from(files("../gradle/libs.playground.versions.toml"))
+        }
+    }
 }
 
 rootProject.name = "SVG-to-Compose-playground"
-includeBuild("../")
 include(":app")
