@@ -26,3 +26,4 @@ include(
 
 includeBuild("website")
 includeBuild("playground")
+includeBuild("playground-kmp")

@@ -1,20 +1,21 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(playgroundKmpLibs.plugins.androidApplication)
+    alias(playgroundKmpLibs.plugins.androidMultiplatformLibrary)
     alias(playgroundKmpLibs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(playgroundKmpLibs.plugins.dev.tonholo.s2c)
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    androidLibrary {
+        namespace = "dev.tonholo.svg_to_compose.playground.kmp"
+        compileSdk = playgroundKmpLibs.versions.android.compileSdk.get().toInt()
+        minSdk = playgroundKmpLibs.versions.android.minSdk.get().toInt()
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -53,10 +54,6 @@ kotlin {
     sourceSets {
         val desktopMain by getting
 
-        androidMain.dependencies {
-            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
-            implementation(playgroundKmpLibs.androidx.activity.compose)
-        }
         commonMain.dependencies {
             implementation(playgroundKmpLibs.compose.runtime)
             implementation(playgroundKmpLibs.compose.foundation)
@@ -77,37 +74,6 @@ kotlin {
             implementation(devNpm("path-to-regexp", "^0.1.12"))
         }
     }
-}
-
-android {
-    namespace = "dev.tonholo.svg_to_compose.playground.kmp"
-    compileSdk = playgroundKmpLibs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "dev.tonholo.svg_to_compose.playground.kmp"
-        minSdk = playgroundKmpLibs.versions.android.minSdk.get().toInt()
-        targetSdk = playgroundKmpLibs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
-dependencies {
-    debugImplementation(playgroundKmpLibs.compose.ui.tooling)
 }
 
 compose.desktop {

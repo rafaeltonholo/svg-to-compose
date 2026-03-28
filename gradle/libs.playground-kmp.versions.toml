@@ -1,6 +1,6 @@
 [versions]
-agp = "8.13.2"
-android-compileSdk = "34"
+agp = "9.1.0"
+android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.12.2"
@@ -23,6 +23,6 @@ compose-components-ui-tooling-preview = { module = "org.jetbrains.compose.compon
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 dev-tonholo-s2c = { id = "dev.tonholo.s2c", version.ref = "s2c" }
