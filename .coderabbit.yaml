@@ -18,6 +18,9 @@ reviews:
     - "!*.svg"
     - "!**/config/detekt.yml"
     - "!**/.run/**"
+    - "!**/gradlew"
+    - "!**/gradlew.bat"
+    - "!**/gradle/wrapper/**"
   auto_review:
     enabled: true
     ignore_title_keywords:
