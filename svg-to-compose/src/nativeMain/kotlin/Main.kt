@@ -151,7 +151,7 @@ class Client : CliktCommand(name = "s2c") {
     ).validate { pattern ->
         try {
             Regex(pattern)
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
             fail("Invalid regex pattern: \"$pattern\". ${e.message}")
         }
     }
