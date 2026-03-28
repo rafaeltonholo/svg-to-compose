@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.tonholo.svg_to_compose.playground.kmp.app"
+    namespace = "dev.tonholo.svgtocompose.playground.kmp.app"
     compileSdk = playgroundKmpLibs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "dev.tonholo.svg_to_compose.playground.kmp"
+        applicationId = "dev.tonholo.svgtocompose.playground.kmp"
         minSdk = playgroundKmpLibs.versions.android.minSdk.get().toInt()
         targetSdk = playgroundKmpLibs.versions.android.targetSdk.get().toInt()
         versionCode = 1

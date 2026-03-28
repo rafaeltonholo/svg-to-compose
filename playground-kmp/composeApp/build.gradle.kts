@@ -8,19 +8,23 @@ plugins {
     alias(playgroundKmpLibs.plugins.androidMultiplatformLibrary)
     alias(playgroundKmpLibs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(playgroundKmpLibs.plugins.composeHotReload)
     alias(playgroundKmpLibs.plugins.dev.tonholo.s2c)
 }
 
 kotlin {
-    androidLibrary {
-        namespace = "dev.tonholo.svg_to_compose.playground.kmp"
+    android {
+        namespace = "dev.tonholo.svgtocompose.playground.kmp"
         compileSdk = playgroundKmpLibs.versions.android.compileSdk.get().toInt()
-        minSdk = playgroundKmpLibs.versions.android.minSdk.get().toInt()
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+        androidResources {
+            enable = true
+        }
     }
-
+    
     listOf(
         iosX64(),
         iosArm64(),
@@ -31,58 +35,53 @@ kotlin {
             isStatic = true
         }
     }
-
-    jvm("desktop")
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        outputModuleName.set("composeApp")
-        browser {
-            val rootDirPath = project.rootDir.path
-            val projectDirPath = project.projectDir.path
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static(rootDirPath)
-                    static(projectDirPath)
-                }
-            }
-        }
+    
+    jvm()
+    
+    js {
+        browser()
         binaries.executable()
     }
-
+    
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+    
     sourceSets {
-        val desktopMain by getting
-
+        androidMain.dependencies {
+            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
+            implementation(playgroundKmpLibs.androidx.activity.compose)
+        }
         commonMain.dependencies {
             implementation(playgroundKmpLibs.compose.runtime)
             implementation(playgroundKmpLibs.compose.foundation)
-            implementation(playgroundKmpLibs.compose.material)
+            implementation(playgroundKmpLibs.compose.material3)
             implementation(playgroundKmpLibs.compose.ui)
             implementation(playgroundKmpLibs.compose.components.resources)
-            implementation(playgroundKmpLibs.compose.components.ui.tooling.preview)
-            implementation(playgroundKmpLibs.androidx.lifecycle.viewmodel)
+            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
+            implementation(playgroundKmpLibs.androidx.lifecycle.viewmodelCompose)
             implementation(playgroundKmpLibs.androidx.lifecycle.runtime.compose)
         }
-        desktopMain.dependencies {
-            @Suppress("DEPRECATION")
+        jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.org.jetbrains.kotlinx.coroutines.swing)
-        }
-        wasmJsMain.dependencies {
-            implementation(devNpm("webpack", "^5.94.0"))
-            implementation(devNpm("path-to-regexp", "^0.1.12"))
+            implementation(playgroundKmpLibs.kotlinx.coroutinesSwing)
         }
     }
 }
 
+dependencies {
+//    debugImplementation(playgroundKmpLibs.compose.ui.tooling)
+}
+
 compose.desktop {
     application {
-        mainClass = "dev.tonholo.svg_to_compose.playground.kmp.MainKt"
+        mainClass = "dev.tonholo.svgtocompose.playground.kmp.app.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "dev.tonholo.svg_to_compose.playground.kmp"
+            packageName = "dev.tonholo.svgtocompose.playground.kmp.app"
             packageVersion = "1.0.0"
         }
     }
@@ -94,7 +93,8 @@ svgToCompose {
             optimize(enabled = false)
             recursive()
             icons {
-                theme("dev.tonholo.svg_to_compose.playground.kmp.ui.Theme")
+                noPreview()
+                theme("dev.tonholo.svgtocompose.playground.kmp.ui.Theme")
                 minify()
                 mapIconNameTo { iconName -> iconName.replace("-filled", "") }
             }
@@ -102,12 +102,12 @@ svgToCompose {
 
         create("composeResource") {
             from(layout.projectDirectory.dir("src/commonMain/composeResources/drawable").also { println(it) })
-            destinationPackage("dev.tonholo.svg_to_compose.playground.kmp.ui.icons.compose_resources")
+            destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.compose_resources")
         }
 
         create("svg") {
             from(rootProject.layout.projectDirectory.dir("../samples/svg").also { println(it) })
-            destinationPackage("dev.tonholo.svg_to_compose.playground.kmp.ui.icons.samples")
+            destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.samples")
         }
     }
 }

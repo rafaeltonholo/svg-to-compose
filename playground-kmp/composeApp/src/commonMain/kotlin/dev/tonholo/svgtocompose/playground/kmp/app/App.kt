@@ -1,8 +1,10 @@
 package dev.tonholo.svgtocompose.playground.kmp.app
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +22,13 @@ import playground_kmp.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     MaterialTheme {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .safeContentPadding()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text("From Resources:")
             Image(
                 painter = painterResource(resource = Res.drawable.compose_multiplatform),
