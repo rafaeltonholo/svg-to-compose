@@ -91,8 +91,18 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         description = "Parse svg or avg to compose icons"
     }
 
-    @get:Nested
+    @get:Internal
     internal lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
+
+    /**
+     * Exposes only user-defined (non-common) configurations for Gradle's
+     * [Nested] input tracking. The "common" entry is a merge template whose
+     * properties are intentionally left unset, so it must not be validated
+     * by Gradle's task-input checks.
+     */
+    @get:Nested
+    internal val activeConfigurations: List<ProcessorConfiguration>
+        get() = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
 
     @get:Input
     internal val configurationNames: List<String>
@@ -227,13 +237,23 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             logger = logger,
         )
 
-        // Handle removed files — non-persistent outputs are in @OutputDirectory, Gradle handles cleanup
-        if (isPersistent) {
-            filesToRemove.forEach { removedPath ->
+        // Handle removed files — delete corresponding outputs for both persistent and non-persistent modes.
+        // Gradle's @OutputDirectory only handles full directory cleanup on non-incremental builds;
+        // individual stale outputs must be removed explicitly during incremental builds.
+        filesToRemove.forEach { removedPath ->
+            if (isPersistent) {
                 val outputPath = registry.getOutput(removedPath.toString()) ?: return@forEach
                 logger.output("Deleted origin file detected. Deleting generated file $outputPath.")
                 fileManager.delete(outputPath.toPath())
                 registry.remove(removedPath.toString())
+            } else {
+                val outputDir = requireNotNull(outputDirectories[configuration.name]).toOkioPath()
+                val baseName = removedPath.name.substringBeforeLast('.')
+                val outputFile = outputDir / "${baseName.pascalCase()}.kt"
+                if (fileManager.exists(outputFile)) {
+                    logger.output("Deleted origin file detected. Deleting generated file $outputFile.")
+                    fileManager.delete(outputFile)
+                }
             }
         }
 
