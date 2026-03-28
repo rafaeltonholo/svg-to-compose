@@ -25,5 +25,8 @@ include(
 )
 
 includeBuild("website")
-includeBuild("playground")
-includeBuild("playground-kmp")
+
+if (System.getenv("CI") == null) {
+    includeBuild("playground")
+    includeBuild("playground-kmp")
+}
