@@ -31,8 +31,10 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
@@ -53,6 +55,7 @@ internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
 internal const val COMMON_CONFIGURATION_NAME = "common"
 
+@CacheableTask
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(private val projectLayout: ProjectLayout) :
     DefaultTask() {
     /**
@@ -76,24 +79,26 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
 
-    @get:Input
+    @get:Internal
     internal abstract val logLevel: Property<LogLevel>
 
     init {
         group = "svg-to-compose"
         description = "Parse svg or avg to compose icons"
-        // Keep Gradle task cache conservative; internal CacheManager ensures correctness.
-        outputs.upToDateWhen { false }
     }
 
-    @get:Internal
+    @get:Nested
     internal lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
 
-    @get:Internal
-    internal var maxParallelExecutions: Int = 0
+    @get:Input
+    internal val configurationNames: List<String>
+        get() = configurations.map { it.name }.sorted()
 
-    @get:Internal
-    internal var isKmp: Boolean = false
+    @get:Input
+    internal abstract val maxParallelExecutions: Property<Int>
+
+    @get:Input
+    internal abstract val kmp: Property<Boolean>
 
     @get:Internal
     @set:org.gradle.api.tasks.options.Option(option = "silent", description = "Run icon parsing without outputs.")
@@ -109,7 +114,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
                         projectLayout.projectDirectory.dir(
                             buildString {
                                 append(
-                                    if (isKmp) {
+                                    if (kmp.get()) {
                                         "src/commonMain/kotlin"
                                     } else {
                                         "src/main/kotlin"
@@ -231,7 +236,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         if (!resultsDir.exists()) resultsDir.mkdirs()
 
         // Concurrency is controlled by chunking based on maxParallelExecutions and Gradle's max workers.
-        val chunkSize = if (maxParallelExecutions > 1) maxParallelExecutions else 1
+        val chunkSize = if (maxParallelExecutions.get() > 1) maxParallelExecutions.get() else 1
         filesToProcess
             .chunked(chunkSize)
             .forEachIndexed { chunkIndex, chunk ->
@@ -315,7 +320,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             noPreview.set(iconConfiguration.noPreview.get())
             makeInternal.set(iconConfiguration.iconVisibility.get() == IconVisibility.Internal)
             excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
-            kmpPreview.set(isKmp)
+            kmpPreview.set(kmp.get())
             resultFilePath.set(resultFile.absolutePath)
             this.bridgeToken.set(bridgeToken)
             tempDirPath.set(temporaryDir.resolve("worker-${path.name.hashCode()}").absolutePath)
@@ -407,9 +412,9 @@ internal fun Project.registerParseSvgToComposeIconTask(extension: SvgToComposeEx
             }
         }
 
-        isKmp = kmpExtension != null
+        kmp.set(kmpExtension != null)
         configurations = extension.configurations
-        maxParallelExecutions = extension.maxParallelExecutions.convention(0).get()
+        maxParallelExecutions.set(extension.maxParallelExecutions.convention(0))
         logLevel.set(project.gradle.startParameter.logLevel)
         sourceDirectory.set(outputSourceDir)
     }

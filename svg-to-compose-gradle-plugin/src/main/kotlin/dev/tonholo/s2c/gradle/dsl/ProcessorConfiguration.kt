@@ -13,19 +13,55 @@ import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.kotlin.dsl.property
 import javax.inject.Inject
 
 abstract class ProcessorConfiguration @Inject constructor(private val objectFactory: ObjectFactory) :
     SourceConfiguration,
     Cacheable {
+    // Gradle does not inherit annotations from interfaces. These overrides exist solely
+    // to attach @Internal so Gradle doesn't treat Named/Configuration properties as task inputs.
+    @get:Internal
+    abstract override val name: String
+
+    @get:Internal
     override val parentName: String = "svgToCompose.processor"
+
+    @get:Internal
+    override val fullName: String
+        get() = super.fullName
+
+    @get:Internal
+    override val visibleName: String
+        get() = super.visibleName
+
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:SkipWhenEmpty
     internal val origin: DirectoryProperty = objectFactory.directoryProperty()
+
+    @get:Input
     internal val destinationPackage: Property<String> = objectFactory.property()
+
+    @get:Input
     internal val recursive: Property<Boolean> = objectFactory.property<Boolean>()
+
+    @get:Input
     internal val maxDepth: Property<Int> = objectFactory.property<Int>()
+
+    @get:Input
     internal val optimize: Property<Boolean> = objectFactory.property<Boolean>()
 
+    // Gradle's @Nested traverses into the Property value to visit its @Input annotations.
+    // The convention is set at declaration time, so the value is always present when Gradle inspects it.
+    @get:Nested
     internal val iconConfiguration: Property<IconParserConfigurationImpl> = objectFactory
         .property<IconParserConfigurationImpl>()
         .convention(
