@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
@@ -147,7 +148,13 @@ class Client : CliktCommand(name = "s2c") {
     private val exclude by option(
         names = arrayOf("--exclude"),
         help = "A regex used to exclude some icons from the parsing.",
-    )
+    ).validate { pattern ->
+        try {
+            Regex(pattern)
+        } catch (e: IllegalArgumentException) {
+            fail("Invalid regex pattern: \"$pattern\". ${e.message}")
+        }
+    }
 
     private val indentSize by option(
         names = arrayOf("--indent-size"),
