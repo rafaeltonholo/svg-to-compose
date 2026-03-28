@@ -35,18 +35,15 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName.set("composeApp")
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
+                    static(rootDirPath)
+                    static(projectDirPath)
                 }
             }
         }
@@ -57,20 +54,21 @@ kotlin {
         val desktopMain by getting
 
         androidMain.dependencies {
-            implementation(compose.preview)
+            implementation(playgroundKmpLibs.compose.ui.tooling.preview)
             implementation(playgroundKmpLibs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(playgroundKmpLibs.compose.runtime)
+            implementation(playgroundKmpLibs.compose.foundation)
+            implementation(playgroundKmpLibs.compose.material)
+            implementation(playgroundKmpLibs.compose.ui)
+            implementation(playgroundKmpLibs.compose.components.resources)
+            implementation(playgroundKmpLibs.compose.components.ui.tooling.preview)
             implementation(playgroundKmpLibs.androidx.lifecycle.viewmodel)
             implementation(playgroundKmpLibs.androidx.lifecycle.runtime.compose)
         }
         desktopMain.dependencies {
+            @Suppress("DEPRECATION")
             implementation(compose.desktop.currentOs)
             implementation(libs.org.jetbrains.kotlinx.coroutines.swing)
         }
@@ -109,7 +107,7 @@ android {
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    debugImplementation(playgroundKmpLibs.compose.ui.tooling)
 }
 
 compose.desktop {
