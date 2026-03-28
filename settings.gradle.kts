@@ -25,3 +25,4 @@ include(
 )
 
 includeBuild("website")
+includeBuild("playground")
