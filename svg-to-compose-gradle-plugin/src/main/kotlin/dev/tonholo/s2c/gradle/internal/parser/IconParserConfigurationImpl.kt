@@ -5,9 +5,6 @@ import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
-import dev.tonholo.s2c.gradle.internal.cache.Cacheable
-import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
-import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -22,8 +19,7 @@ internal class IconParserConfigurationImpl(
     objectFactory: ObjectFactory,
     @get:Internal override val parentName: String,
 ) : IconParserConfiguration,
-    Configuration,
-    Cacheable {
+    Configuration {
     // Gradle does not inherit annotations from interfaces. These overrides exist solely
     // to attach @Internal so Gradle doesn't treat Named/Configuration properties as task inputs.
     @get:Internal
@@ -135,27 +131,6 @@ internal class IconParserConfigurationImpl(
         }
 
         return errors
-    }
-
-    override fun calculateHash(): Sha256Hash {
-        val raw = buildString {
-            append(receiverType.orNull)
-            append("|")
-            append(addToMaterialIcons.orNull)
-            append("|")
-            append(noPreview.orNull)
-            append("|")
-            append(iconVisibility.orNull)
-            append("|")
-            append(minified.orNull)
-            append("|")
-            append(exclude.orNull)
-            append("|")
-            append(mapIconNameTo.orNull?.let { "fn()" })
-            append("|")
-            append(isCodeGenerationPersistent.orNull)
-        }
-        return raw.sha256()
     }
 
     internal fun merge(common: IconParserConfigurationImpl) {
