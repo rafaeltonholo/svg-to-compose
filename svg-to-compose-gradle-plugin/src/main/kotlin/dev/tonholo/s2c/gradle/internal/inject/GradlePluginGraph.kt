@@ -3,6 +3,7 @@ package dev.tonholo.s2c.gradle.internal.inject
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
 import dev.tonholo.s2c.gradle.tasks.PERSISTENT_REGISTRY_PATH
+import dev.tonholo.s2c.gradle.tasks.ParseSvgToComposeIconTask
 import dev.tonholo.s2c.inject.SvgToComposeGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
@@ -47,4 +48,6 @@ internal interface GradlePluginGraph {
             @Provides @BuildDirectory buildDirectory: DirectoryProperty,
         ): GradlePluginGraph
     }
+
+    fun inject(task: ParseSvgToComposeIconTask)
 }

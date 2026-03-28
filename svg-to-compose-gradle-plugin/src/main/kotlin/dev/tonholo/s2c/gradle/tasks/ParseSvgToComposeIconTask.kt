@@ -18,6 +18,7 @@ import dev.tonholo.s2c.gradle.tasks.worker.toResult
 import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
+import dev.zacsweers.metro.HasMemberInjections
 import dev.zacsweers.metro.createGraphFactory
 import okio.FileSystem
 import okio.Path
@@ -39,6 +40,7 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.work.ChangeType
@@ -53,6 +55,7 @@ import java.util.Properties
 import java.util.UUID
 import javax.inject.Inject
 import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
+import dev.zacsweers.metro.Inject as MetroInject
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
@@ -60,26 +63,9 @@ internal const val PERSISTENT_REGISTRY_PATH = "$GENERATED_FOLDER/persistent-outp
 internal const val COMMON_CONFIGURATION_NAME = "common"
 
 @CacheableTask
+@HasMemberInjections
 internal abstract class ParseSvgToComposeIconTask @Inject constructor(private val projectLayout: ProjectLayout) :
     DefaultTask() {
-    /**
-     * Creates and configures the GradlePluginGraph used by the task.
-     *
-     * The returned graph is initialized with the plugin's S2C graph and the project's build directory.
-     *
-     * @return The configured GradlePluginGraph instance.
-     */
-    private fun createGraph(): GradlePluginGraph {
-        val s2cGraph = createS2cGraph(
-            logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
-            fileSystem = FileSystem.SYSTEM,
-        )
-        return createGraphFactory<GradlePluginGraph.Factory>().create(
-            svgToComposeGraph = s2cGraph,
-            buildDirectory = projectLayout.buildDirectory,
-        )
-    }
-
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
 
@@ -91,8 +77,18 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         description = "Parse svg or avg to compose icons"
     }
 
-    @get:Nested
+    @get:Internal
     internal lateinit var configurations: NamedDomainObjectContainer<ProcessorConfiguration>
+
+    /**
+     * Exposes only user-defined (non-common) configurations for Gradle's
+     * [Nested] input tracking. The "common" entry is a merge template whose
+     * properties are intentionally left unset, so it must not be validated
+     * by Gradle's task-input checks.
+     */
+    @get:Nested
+    internal val activeConfigurations: List<ProcessorConfiguration>
+        get() = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
 
     @get:Input
     internal val configurationNames: List<String>
@@ -105,7 +101,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
     internal abstract val kmp: Property<Boolean>
 
     @get:Internal
-    @set:org.gradle.api.tasks.options.Option(option = "silent", description = "Run icon parsing without outputs.")
+    @set:Option(option = "silent", description = "Run icon parsing without outputs.")
     internal var silent: Boolean = false
 
     private val outputDirectories: Map<String, File>
@@ -144,6 +140,15 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             .get()
             .asFile
 
+    @MetroInject
+    private lateinit var logger: Logger
+
+    @MetroInject
+    private lateinit var fileManager: FileManager
+
+    @MetroInject
+    private lateinit var registry: PersistentOutputRegistry
+
     /**
      * Executes the task: parses configured SVG/AVG files into Compose icons using
      * Gradle's [InputChanges] API for incremental processing.
@@ -158,10 +163,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
      */
     @TaskAction
     fun run(inputChanges: InputChanges) {
-        val graph = createGraph()
-        val logger = graph.logger
-        val fileManager = graph.fileManager
-        val registry = graph.persistentOutputRegistry
+        val graph = createGraph(projectLayout)
+        graph.inject(this)
         val bridgeToken = UUID.randomUUID().toString()
         // Processor is created to manage task-level temp directory lifecycle.
         // Workers create their own isolated processors via S2cWorkerBridge.
@@ -169,7 +172,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
-            val activeConfigurations = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
 
@@ -177,12 +179,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
                 processConfiguration(
                     configuration = configuration,
                     inputChanges = inputChanges,
-                    registry = registry,
-                    fileManager = fileManager,
                     errors = errors,
                     outputFiles = outputFiles,
                     bridgeToken = bridgeToken,
-                    logger = logger,
                 )
             }
 
@@ -206,12 +205,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
     private fun processConfiguration(
         configuration: ProcessorConfiguration,
         inputChanges: InputChanges,
-        registry: PersistentOutputRegistry,
-        fileManager: FileManager,
         errors: MutableMap<Path, Throwable>,
         outputFiles: MutableMap<Path, Path>,
         bridgeToken: String,
-        logger: Logger,
     ) {
         val iconConfiguration = configuration.iconConfiguration.get()
         val isPersistent = iconConfiguration.isCodeGenerationPersistent.orNull == true
@@ -222,18 +218,25 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             configuration = configuration,
             inputChanges = inputChanges,
             isPersistent = isPersistent,
-            registry = registry,
-            fileManager = fileManager,
-            logger = logger,
         )
 
-        // Handle removed files — non-persistent outputs are in @OutputDirectory, Gradle handles cleanup
-        if (isPersistent) {
-            filesToRemove.forEach { removedPath ->
+        // Handle removed files. Delete corresponding outputs for both persistent and non-persistent modes.
+        // Gradle's @OutputDirectory only handles full directory cleanup on non-incremental builds;
+        // individual stale outputs must be removed explicitly during incremental builds.
+        filesToRemove.forEach { removedPath ->
+            if (isPersistent) {
                 val outputPath = registry.getOutput(removedPath.toString()) ?: return@forEach
                 logger.output("Deleted origin file detected. Deleting generated file $outputPath.")
                 fileManager.delete(outputPath.toPath())
                 registry.remove(removedPath.toString())
+            } else {
+                val outputDir = requireNotNull(outputDirectories[configuration.name]).toOkioPath()
+                val baseName = removedPath.name.substringBeforeLast('.')
+                val outputFile = outputDir / "${baseName.pascalCase()}.kt"
+                if (fileManager.exists(outputFile)) {
+                    logger.output("Deleted origin file detected. Deleting generated file $outputFile.")
+                    fileManager.delete(outputFile)
+                }
             }
         }
 
@@ -253,7 +256,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             errors,
             outputFiles,
             bridgeToken,
-            logger,
         )
         logger.debug("End processing ${filesToProcess.size} files.")
     }
@@ -262,9 +264,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         configuration: ProcessorConfiguration,
         inputChanges: InputChanges,
         isPersistent: Boolean,
-        registry: PersistentOutputRegistry,
-        fileManager: FileManager,
-        logger: Logger,
     ): Pair<List<Path>, List<Path>> {
         if (!inputChanges.isIncremental) {
             logger.info("Non-incremental build for configuration '${configuration.name}'")
@@ -297,7 +296,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         outputFiles.forEach { (origin, output) ->
             val configForOrigin = activeConfigurations.firstOrNull { config ->
                 val configOrigin = config.origin.get().asFile.toOkioPath()
-                origin.toString().startsWith(configOrigin.toString() + "/") ||
+                origin.toString().startsWith("$configOrigin/") ||
                     origin == configOrigin
             }
             val isPersistent = configForOrigin?.iconConfiguration?.orNull
@@ -317,7 +316,6 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         errors: MutableMap<Path, Throwable>,
         outputFiles: MutableMap<Path, Path>,
         bridgeToken: String,
-        logger: Logger,
     ) {
         // Prepare worker queue
         var queue: WorkQueue
@@ -464,7 +462,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         val configOrigin = configuration.origin.get().asFile.toOkioPath()
         return registry.allEntries()
             .filter { (origin, output) ->
-                origin.startsWith(configOrigin.toString() + "/") &&
+                origin.startsWith("$configOrigin/") &&
                     fileManager.exists(origin.toPath()) &&
                     !fileManager.exists(output.toPath())
             }
@@ -557,4 +555,22 @@ private fun Project.addToAndroidSourceSet(task: TaskProvider<ParseSvgToComposeIc
             ParseSvgToComposeIconTask::sourceDirectory,
         )
     }
+}
+
+/**
+ * Creates and configures the GradlePluginGraph used by the task.
+ *
+ * The returned graph is initialized with the plugin's S2C graph and the project's build directory.
+ *
+ * @return The configured GradlePluginGraph instance.
+ */
+private fun createGraph(projectLayout: ProjectLayout): GradlePluginGraph {
+    val s2cGraph = createS2cGraph(
+        logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
+        fileSystem = FileSystem.SYSTEM,
+    )
+    return createGraphFactory<GradlePluginGraph.Factory>().create(
+        svgToComposeGraph = s2cGraph,
+        buildDirectory = projectLayout.buildDirectory,
+    )
 }
