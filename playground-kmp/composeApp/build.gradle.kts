@@ -72,7 +72,7 @@ kotlin {
 }
 
 dependencies {
-//    debugImplementation(playgroundKmpLibs.compose.ui.tooling)
+    androidRuntimeClasspath(playgroundKmpLibs.compose.ui.tooling)
 }
 
 compose.desktop {
