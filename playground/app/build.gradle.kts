@@ -2,9 +2,9 @@ import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
 import dev.tonholo.s2c.annotations.ExperimentalParallelProcessing
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(playgroundLibs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.dev.tonholo.s2c)
+    alias(playgroundLibs.plugins.dev.tonholo.s2c)
 }
 
 android {
@@ -78,15 +78,15 @@ svgToCompose {
 
 dependencies {
 
-    implementation(libs.core.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.activity.compose)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
-    implementation(libs.google.material)
+    implementation(playgroundLibs.core.ktx)
+    implementation(playgroundLibs.lifecycle.runtime.ktx)
+    implementation(playgroundLibs.activity.compose)
+    implementation(platform(playgroundLibs.compose.bom))
+    implementation(playgroundLibs.ui)
+    implementation(playgroundLibs.ui.graphics)
+    implementation(playgroundLibs.ui.tooling.preview)
+    implementation(playgroundLibs.material3)
+    implementation(playgroundLibs.google.material)
 
-    debugImplementation(libs.bundles.androidx.compose.ui.debug)
+    debugImplementation(playgroundLibs.bundles.androidx.compose.ui.debug)
 }
