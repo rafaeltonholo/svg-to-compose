@@ -3,6 +3,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
+        maven { url = uri("../build/localMaven") }
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -25,6 +26,12 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+    }
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+        create("playgroundKmpLibs") {
+            from(files("../gradle/libs.playground-kmp.versions.toml"))
+        }
     }
 }
 
