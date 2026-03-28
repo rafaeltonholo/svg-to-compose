@@ -7,7 +7,7 @@ import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
-import dev.tonholo.s2c.gradle.internal.cache.CacheManager
+import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
 import dev.tonholo.s2c.gradle.internal.inject.GradlePluginGraph
 import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
@@ -34,12 +34,15 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
+import org.gradle.work.ChangeType
+import org.gradle.work.InputChanges
 import org.gradle.workers.WorkQueue
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -53,6 +56,7 @@ import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
 
 internal const val GENERATED_FOLDER = "generated/svgToCompose"
 internal const val WORKER_RESULTS_FOLDER = "$GENERATED_FOLDER/worker-results"
+internal const val PERSISTENT_REGISTRY_PATH = "$GENERATED_FOLDER/persistent-output-registry.properties"
 internal const val COMMON_CONFIGURATION_NAME = "common"
 
 @CacheableTask
@@ -133,73 +137,59 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
     @get:OutputDirectory
     abstract val sourceDirectory: DirectoryProperty
 
+    @get:LocalState
+    val persistentOutputRegistryFile: File
+        get() = projectLayout.buildDirectory
+            .file(PERSISTENT_REGISTRY_PATH)
+            .get()
+            .asFile
+
     /**
-     * Executes the task: parses configured SVG/AVG files into Compose icons, runs
-     * worker actions, and updates the task cache.
+     * Executes the task: parses configured SVG/AVG files into Compose icons using
+     * Gradle's [InputChanges] API for incremental processing.
      *
-     * This method initializes the processing graph and related resources, registers
-     * the worker bridge, processes all active configurations (excluding the "common"
-     * configuration), aggregates results, removes temporary worker results, saves the
-     * updated cache, and ensures cleanup of the worker bridge and processor.
+     * For non-incremental builds, all matching source files are processed. For incremental
+     * builds, only added, modified, or removed files are handled. Persistent-mode outputs
+     * that were manually deleted are detected and re-generated.
      *
+     * @param inputChanges Gradle-provided change information for incremental builds.
      * @throws ExitProgramException if one or more icons fail to parse; the exception
      * contains the underlying causes.
      */
     @TaskAction
-    fun run() {
+    fun run(inputChanges: InputChanges) {
         val graph = createGraph()
         val logger = graph.logger
         val fileManager = graph.fileManager
-        val cacheManager = graph.cacheManager
+        val registry = graph.persistentOutputRegistry
         val bridgeToken = UUID.randomUUID().toString()
+        // Processor is created to manage task-level temp directory lifecycle.
+        // Workers create their own isolated processors via S2cWorkerBridge.
         val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
             val activeConfigurations = configurations.filter { it.name != COMMON_CONFIGURATION_NAME }
-            val activeConfigMap = activeConfigurations.associateBy { it.name }
-            cacheManager.initialize(activeConfigMap)
             val errors = mutableMapOf<Path, Throwable>()
             val outputFiles = mutableMapOf<Path, Path>()
+
             activeConfigurations.forEach { configuration ->
-                val filesToProcess = findFilesToProcess(configuration, fileManager, cacheManager)
-
-                if (filesToProcess.isEmpty()) {
-                    logger.info("No files to process for configuration '${configuration.name}'")
-                    return@forEach
-                } else {
-                    logger.info("Files eligible for processing: ${filesToProcess.map { it.name }}")
-                }
-
-                val iconConfiguration = configuration.iconConfiguration.get()
-                val parent = configuration.origin.get().asFile.toOkioPath()
-                val recursive = configuration.recursive.get()
-                logger.debug("Processing ${filesToProcess.size} files")
-                processFiles(
-                    filesToProcess,
-                    configuration,
-                    recursive,
-                    parent,
-                    iconConfiguration,
-                    errors,
-                    outputFiles,
-                    bridgeToken,
-                    logger,
+                processConfiguration(
+                    configuration = configuration,
+                    inputChanges = inputChanges,
+                    registry = registry,
+                    fileManager = fileManager,
+                    errors = errors,
+                    outputFiles = outputFiles,
+                    bridgeToken = bridgeToken,
+                    logger = logger,
                 )
-                logger.debug("End processing ${filesToProcess.size} files.")
             }
 
             projectLayout.buildDirectory.dir(WORKER_RESULTS_FOLDER).get().asFile.deleteRecursively()
+            updatePersistentOutputRegistry(activeConfigurations, outputFiles, registry)
+            registry.save()
 
-            if (errors.isNotEmpty()) {
-                errors.forEach { (path, _) ->
-                    logger.debug("Removing $path from cache")
-                    cacheManager.removeFromCache(path)
-                }
-            }
-            logger.debug("Finished processing files. Creating cache...")
-            cacheManager.saveCache(outputFiles)
-            logger.debug("Cache created.")
             if (errors.isNotEmpty()) {
                 throw ExitProgramException(
                     errorCode = ErrorCode.GradlePluginError,
@@ -210,6 +200,111 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         } finally {
             S2cWorkerBridge.unregister(bridgeToken)
             processor.dispose()
+        }
+    }
+
+    private fun processConfiguration(
+        configuration: ProcessorConfiguration,
+        inputChanges: InputChanges,
+        registry: PersistentOutputRegistry,
+        fileManager: FileManager,
+        errors: MutableMap<Path, Throwable>,
+        outputFiles: MutableMap<Path, Path>,
+        bridgeToken: String,
+        logger: Logger,
+    ) {
+        val iconConfiguration = configuration.iconConfiguration.get()
+        val isPersistent = iconConfiguration.isCodeGenerationPersistent.orNull == true
+        val parent = configuration.origin.get().asFile.toOkioPath()
+        val recursive = configuration.recursive.get()
+
+        val (filesToProcess, filesToRemove) = resolveFileChanges(
+            configuration = configuration,
+            inputChanges = inputChanges,
+            isPersistent = isPersistent,
+            registry = registry,
+            fileManager = fileManager,
+            logger = logger,
+        )
+
+        // Handle removed files — non-persistent outputs are in @OutputDirectory, Gradle handles cleanup
+        if (isPersistent) {
+            filesToRemove.forEach { removedPath ->
+                val outputPath = registry.getOutput(removedPath.toString()) ?: return@forEach
+                logger.output("Deleted origin file detected. Deleting generated file $outputPath.")
+                fileManager.delete(outputPath.toPath())
+                registry.remove(removedPath.toString())
+            }
+        }
+
+        if (filesToProcess.isEmpty()) {
+            logger.info("No files to process for configuration '${configuration.name}'")
+            return
+        }
+
+        logger.info("Files eligible for processing: ${filesToProcess.map { it.name }}")
+        logger.debug("Processing ${filesToProcess.size} files")
+        processFiles(
+            filesToProcess,
+            configuration,
+            recursive,
+            parent,
+            iconConfiguration,
+            errors,
+            outputFiles,
+            bridgeToken,
+            logger,
+        )
+        logger.debug("End processing ${filesToProcess.size} files.")
+    }
+
+    private fun resolveFileChanges(
+        configuration: ProcessorConfiguration,
+        inputChanges: InputChanges,
+        isPersistent: Boolean,
+        registry: PersistentOutputRegistry,
+        fileManager: FileManager,
+        logger: Logger,
+    ): Pair<List<Path>, List<Path>> {
+        if (!inputChanges.isIncremental) {
+            logger.info("Non-incremental build for configuration '${configuration.name}'")
+            return findAllFiles(configuration, fileManager) to emptyList()
+        }
+
+        val added = mutableListOf<Path>()
+        val removed = mutableListOf<Path>()
+        inputChanges.getFileChanges(configuration.origin).forEach { change ->
+            val ext = change.file.extension.lowercase()
+            if (ext != "svg" && ext != "xml") return@forEach
+            val path = change.file.toOkioPath()
+            when (change.changeType) {
+                ChangeType.ADDED, ChangeType.MODIFIED -> added.add(path)
+                ChangeType.REMOVED -> removed.add(path)
+            }
+        }
+        // Check for persistent outputs that were manually deleted
+        if (isPersistent) {
+            added.addAll(findMissingPersistentOutputs(configuration, registry, fileManager))
+        }
+        return added.distinct() to removed
+    }
+
+    private fun updatePersistentOutputRegistry(
+        activeConfigurations: List<ProcessorConfiguration>,
+        outputFiles: Map<Path, Path>,
+        registry: PersistentOutputRegistry,
+    ) {
+        outputFiles.forEach { (origin, output) ->
+            val configForOrigin = activeConfigurations.firstOrNull { config ->
+                val configOrigin = config.origin.get().asFile.toOkioPath()
+                origin.toString().startsWith(configOrigin.toString() + "/") ||
+                    origin == configOrigin
+            }
+            val isPersistent = configForOrigin?.iconConfiguration?.orNull
+                ?.isCodeGenerationPersistent?.orNull == true
+            if (isPersistent) {
+                registry.register(origin.toString(), output.toString())
+            }
         }
     }
 
@@ -351,23 +446,29 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         }
     }
 
-    private fun findFilesToProcess(
-        configuration: ProcessorConfiguration,
-        fileManager: FileManager,
-        cacheManager: CacheManager,
-    ): List<Path> {
+    private fun findAllFiles(configuration: ProcessorConfiguration, fileManager: FileManager): List<Path> {
         val iconConfiguration = configuration.iconConfiguration.get()
-
-        val files = fileManager.findFilesToProcess(
+        return fileManager.findFilesToProcess(
             from = configuration.origin.get().asFile.toOkioPath(),
             recursive = configuration.recursive.get(),
             maxDepth = configuration.maxDepth.orNull,
             exclude = iconConfiguration.exclude.orNull,
         )
+    }
 
-        val filesToProcess = files.filter(cacheManager::hasCacheChanged)
-        cacheManager.removeDeletedFilesFromCache()
-        return filesToProcess
+    private fun findMissingPersistentOutputs(
+        configuration: ProcessorConfiguration,
+        registry: PersistentOutputRegistry,
+        fileManager: FileManager,
+    ): List<Path> {
+        val configOrigin = configuration.origin.get().asFile.toOkioPath()
+        return registry.allEntries()
+            .filter { (origin, output) ->
+                origin.startsWith(configOrigin.toString() + "/") &&
+                    fileManager.exists(origin.toPath()) &&
+                    !fileManager.exists(output.toPath())
+            }
+            .map { (origin, _) -> origin.toPath() }
     }
 }
 
