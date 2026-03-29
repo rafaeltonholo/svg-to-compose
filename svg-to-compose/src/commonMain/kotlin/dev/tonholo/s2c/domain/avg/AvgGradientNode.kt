@@ -111,6 +111,8 @@ fun AvgGradientNode.buildSweepGradient(): ComposeBrush.Gradient.Sweep {
     )
 }
 
+private const val CENTER_COLOR_STOP_OFFSET = 0.5f
+
 private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
     val gradientItems = children
         .asSequence()
@@ -122,7 +124,8 @@ private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
         val shorthandColors = listOf(startColor, centerColor, endColor).mapNotNull { it }
         colors = shorthandColors
         stops = when {
-            centerColor != null && startColor != null && endColor != null -> listOf(0f, 0.5f, 1f)
+            centerColor != null && startColor != null && endColor != null ->
+                listOf(0f, CENTER_COLOR_STOP_OFFSET, 1f)
             shorthandColors.size == 2 -> listOf(0f, 1f)
             else -> emptyList()
         }
