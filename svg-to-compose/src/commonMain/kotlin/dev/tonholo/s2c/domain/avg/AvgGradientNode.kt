@@ -38,7 +38,9 @@ class AvgGradientNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attr
     override val centerColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
         it?.let(::AvgColor)
     }
-    override val endColor: AvgColor? by attribute(namespace = AvgNode.NAMESPACE)
+    override val endColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
+        it?.let(::AvgColor)
+    }
 
     // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val type: AvgGradientType? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
@@ -111,20 +113,26 @@ fun AvgGradientNode.buildSweepGradient(): ComposeBrush.Gradient.Sweep {
     )
 }
 
-private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
-    val gradientItems = children
-        .asSequence()
-        .filterIsInstance<AvgGradientItemNode>()
+private const val CENTER_COLOR_STOP_OFFSET = 0.5f
 
-    val colors = if (children.isEmpty()) {
-        listOf(startColor, endColor).mapNotNull { it }
+private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
+    val gradientItems = children.filterIsInstance<AvgGradientItemNode>()
+
+    val colors: List<AvgColor>
+    val stops: List<Float>
+    if (gradientItems.isEmpty()) {
+        val shorthandColors = listOf(startColor, centerColor, endColor).mapNotNull { it }
+        colors = shorthandColors
+        stops = when {
+            centerColor != null && startColor != null && endColor != null ->
+                listOf(0f, CENTER_COLOR_STOP_OFFSET, 1f)
+            shorthandColors.size == 2 -> listOf(0f, 1f)
+            else -> emptyList()
+        }
     } else {
-        gradientItems
-            .mapNotNull { it.color }
-            .toList()
+        val validItems = gradientItems.filter { it.color != null && it.offset != null }
+        colors = validItems.mapNotNull { it.color }
+        stops = validItems.mapNotNull { it.offset }
     }
-    val stops = gradientItems
-        .mapNotNull { it.offset }
-        .toList()
-    return Pair(colors, stops)
+    return colors to stops
 }
