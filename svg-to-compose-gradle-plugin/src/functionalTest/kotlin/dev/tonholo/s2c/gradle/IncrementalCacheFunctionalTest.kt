@@ -188,6 +188,13 @@ class IncrementalCacheFunctionalTest {
         .forwardOutput()
         .build()
 
+    private fun runGradleWithInfo(projectDir: File, vararg args: String): BuildResult = GradleRunner.create()
+        .withProjectDir(projectDir)
+        .withPluginClasspath()
+        .withArguments(*args, "--stacktrace", "--info")
+        .forwardOutput()
+        .build()
+
     private fun assertTaskOutcome(result: BuildResult, expected: TaskOutcome) {
         val task = result.task(TASK_PATH)
         assertNotNull(task, "Task $TASK_PATH was not found in the build")
@@ -362,6 +369,121 @@ class IncrementalCacheFunctionalTest {
     }
 
     // endregion [ Single Configuration Tests ]
+
+    // region [ Incrementality Verification Tests ]
+
+    @Test
+    fun `given first run, when task executes, then build is non-incremental`() {
+        val pkg = "dev.tonholo.s2c.test.verify.first.run"
+        val projectDir = createTempProject()
+        try {
+            // Arrange
+            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
+            writeSvg(projectDir, "icons", "icon-a.svg", SIMPLE_SVG_A)
+
+            // Act
+            val result = runGradleWithInfo(projectDir, TASK_NAME)
+
+            // Assert
+            assertTaskOutcome(result, TaskOutcome.SUCCESS)
+            assertTrue(
+                result.output.contains("Non-incremental build for configuration"),
+                "First run should be non-incremental",
+            )
+        } finally {
+            projectDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `given file added, when task runs incrementally, then only new file is processed`() {
+        val pkg = "dev.tonholo.s2c.test.verify.incr.add"
+        val projectDir = createTempProject()
+        try {
+            // Arrange
+            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
+            writeSvg(projectDir, "icons", "icon-a.svg", SIMPLE_SVG_A)
+            runGradle(projectDir, TASK_NAME)
+
+            // Act
+            writeSvg(projectDir, "icons", "icon-b.svg", SIMPLE_SVG_B)
+            val result = runGradleWithInfo(projectDir, TASK_NAME)
+
+            // Assert
+            assertTaskOutcome(result, TaskOutcome.SUCCESS)
+            assertFalse(
+                result.output.contains("Non-incremental build for configuration"),
+                "Second run should be incremental, not non-incremental",
+            )
+            assertTrue(
+                result.output.contains("Files eligible for processing: [icon-b.svg]"),
+                "Only the newly added file should be processed, but output was:\n${
+                    result.output.lines().filter { it.contains("eligible") }.joinToString("\n")
+                }",
+            )
+        } finally {
+            projectDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `given file modified, when task runs incrementally, then only modified file is processed`() {
+        val pkg = "dev.tonholo.s2c.test.verify.incr.modify"
+        val projectDir = createTempProject()
+        try {
+            // Arrange
+            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
+            writeSvg(projectDir, "icons", "icon-a.svg", SIMPLE_SVG_A)
+            writeSvg(projectDir, "icons", "icon-b.svg", SIMPLE_SVG_B)
+            runGradle(projectDir, TASK_NAME)
+
+            // Act
+            writeSvg(projectDir, "icons", "icon-a.svg", SIMPLE_SVG_A_MODIFIED)
+            val result = runGradleWithInfo(projectDir, TASK_NAME)
+
+            // Assert
+            assertTaskOutcome(result, TaskOutcome.SUCCESS)
+            assertFalse(
+                result.output.contains("Non-incremental build for configuration"),
+                "Second run should be incremental",
+            )
+            assertTrue(
+                result.output.contains("Files eligible for processing: [icon-a.svg]"),
+                "Only the modified file should be processed, but output was:\n${
+                    result.output.lines().filter { it.contains("eligible") }.joinToString("\n")
+                }",
+            )
+        } finally {
+            projectDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `given config changed, when task runs, then build is non-incremental`() {
+        val pkg = "dev.tonholo.s2c.test.verify.noninc.config"
+        val projectDir = createTempProject()
+        try {
+            // Arrange
+            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg, optimize = false))
+            writeSvg(projectDir, "icons", "icon-a.svg", SIMPLE_SVG_A)
+            runGradle(projectDir, TASK_NAME)
+
+            // Act
+            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg, optimize = true))
+            val result = runGradleWithInfo(projectDir, TASK_NAME)
+
+            // Assert
+            assertTaskOutcome(result, TaskOutcome.SUCCESS)
+            assertTrue(
+                result.output.contains("Non-incremental build for configuration"),
+                "Config change should trigger non-incremental build",
+            )
+        } finally {
+            projectDir.deleteRecursively()
+        }
+    }
+
+    // endregion [ Incrementality Verification Tests ]
 
     // region [ Persistent Mode Tests ]
 
