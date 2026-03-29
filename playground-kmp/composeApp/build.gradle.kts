@@ -1,7 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -24,31 +23,31 @@ kotlin {
             enable = true
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     js {
         browser()
         binaries.executable()
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
         binaries.executable()
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(playgroundKmpLibs.compose.ui.tooling.preview)
@@ -101,13 +100,18 @@ svgToCompose {
         }
 
         create("composeResource") {
-            from(layout.projectDirectory.dir("src/commonMain/composeResources/drawable").also { println(it) })
+            from(layout.projectDirectory.dir("src/commonMain/composeResources/drawable"))
             destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.compose_resources")
         }
 
         create("svg") {
-            from(rootProject.layout.projectDirectory.dir("../samples/svg").also { println(it) })
+            from(rootProject.layout.projectDirectory.dir("../samples/svg"))
             destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.samples")
+        }
+
+        create("avg") {
+            from(rootProject.layout.projectDirectory.dir("../samples/avg"))
+            destinationPackage("dev.tonholo.svgtocompose.playground.kmp.ui.icons.samples.avg")
         }
     }
 }
