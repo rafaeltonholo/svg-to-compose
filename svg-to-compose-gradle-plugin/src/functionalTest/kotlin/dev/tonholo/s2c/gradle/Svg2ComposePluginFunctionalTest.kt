@@ -44,33 +44,6 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
     }
 
     // language=kotlin
-    private fun buildGradleContent(optimize: Boolean, pkg: String) =
-        """
-        plugins {
-            kotlin("multiplatform")
-            id("dev.tonholo.s2c")
-        }
-        repositories {
-            mavenCentral()
-        }
-        kotlin {
-            jvm()
-        }
-        svgToCompose {
-            processor {
-                common {
-                    optimize($optimize)
-                    icons { noPreview() }
-                }
-                val icons by creating {
-                    from(layout.projectDirectory.dir("icons"))
-                    destinationPackage("$pkg")
-                }
-            }
-        }
-        """.trimIndent()
-
-    // language=kotlin
     private fun buildTemplateGradleContent(pkg: String) =
         """
         plugins {
@@ -99,19 +72,6 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         }
         """.trimIndent()
 
-    private fun copyIconsToProject(projectDir: File, type: String) {
-        val iconsDir = projectDir.resolve("icons")
-        iconsDir.mkdirs()
-        val resourceDir = File(
-            requireNotNull(javaClass.classLoader.getResource(type)) {
-                "Test resource directory not found: $type"
-            }.toURI(),
-        )
-        resourceDir.listFiles().orEmpty().forEach { file ->
-            file.copyTo(iconsDir.resolve(file.name))
-        }
-    }
-
     private val templateSvgFiles = listOf(
         "samples/svg/attention-filled.svg",
         "samples/svg/android.svg",
@@ -126,27 +86,21 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         "samples/avg/gradient/stroke_gradient.xml",
     )
 
-    private fun copyTemplateIconsToProject(projectDir: File, type: String) {
+    private fun copyTemplateIconsToProject(type: String) {
         val iconsDir = projectDir.resolve("icons")
         iconsDir.mkdirs()
         val files = if (type == "svg") templateSvgFiles else templateAvgFiles
         for (relativePath in files) {
-            val source = projectRoot.resolve(relativePath)
+            val source = repoRoot.resolve(relativePath)
             source.copyTo(iconsDir.resolve(source.name))
         }
     }
 
-    private fun copyTemplateConfigToProject(projectDir: File) {
-        val templateSource = projectRoot.resolve("playground/s2c.template.toml")
+    private fun copyTemplateConfigToProject() {
+        val templateSource = repoRoot.resolve("playground/s2c.template.toml")
         templateSource.copyTo(projectDir.resolve("s2c.template.toml"))
     }
 
-    private fun runGradle(projectDir: File, vararg args: String): BuildResult = GradleRunner.create()
-        .withProjectDir(projectDir)
-        .withPluginClasspath()
-        .withArguments(*args, "--stacktrace")
-        .forwardOutput()
-        .build()
     /**
      * Asserts all generated .kt files match their corresponding expected files.
      *
@@ -188,7 +142,7 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         }
     }
 
-    private fun assertTemplateOutputMatchesExpected(projectDir: File, pkg: String, fileType: String) {
+    private fun assertTemplateOutputMatchesExpected(pkg: String, fileType: String) {
         val templateExpectedDir = expectedDir.resolve("template")
         val pkgPath = pkg.replace('.', '/')
         val generatedDir = projectDir.resolve("build/generated/svgToCompose/commonMain/kotlin/$pkgPath")
@@ -276,35 +230,25 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
     @Test
     fun `svg with template matches expected output`() {
         val pkg = "dev.tonholo.s2c.integrity.icon.svg"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildTemplateGradleContent(pkg))
-            copyTemplateIconsToProject(projectDir, "svg")
-            copyTemplateConfigToProject(projectDir)
+        projectDir.resolve("build.gradle.kts").writeText(buildTemplateGradleContent(pkg))
+        copyTemplateIconsToProject("svg")
+        copyTemplateConfigToProject()
 
-            val result = runGradle(projectDir, "parseSvgToComposeIcon")
-            assertTaskSuccess(result, "parseSvgToComposeIcon")
-            assertTemplateOutputMatchesExpected(projectDir, pkg, fileType = "svg")
-        } finally {
-            projectDir.deleteRecursively()
-        }
+        val result = runGradle("parseSvgToComposeIcon")
+        assertTaskSuccess(result, "parseSvgToComposeIcon")
+        assertTemplateOutputMatchesExpected(pkg, fileType = "svg")
     }
 
     @Test
     fun `avg with template matches expected output`() {
         val pkg = "dev.tonholo.s2c.integrity.icon.avg"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildTemplateGradleContent(pkg))
-            copyTemplateIconsToProject(projectDir, "avg")
-            copyTemplateConfigToProject(projectDir)
+        projectDir.resolve("build.gradle.kts").writeText(buildTemplateGradleContent(pkg))
+        copyTemplateIconsToProject("avg")
+        copyTemplateConfigToProject()
 
-            val result = runGradle(projectDir, "parseSvgToComposeIcon")
-            assertTaskSuccess(result, "parseSvgToComposeIcon")
-            assertTemplateOutputMatchesExpected(projectDir, pkg, fileType = "xml")
-        } finally {
-            projectDir.deleteRecursively()
-        }
+        val result = runGradle("parseSvgToComposeIcon")
+        assertTaskSuccess(result, "parseSvgToComposeIcon")
+        assertTemplateOutputMatchesExpected(pkg, fileType = "xml")
     }
 
     // --- Configuration cache tests ---
