@@ -131,8 +131,8 @@ private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
         }
     } else {
         val validItems = gradientItems.filter { it.color != null && it.offset != null }
-        colors = validItems.map { it.color!! }
-        stops = validItems.map { it.offset!! }
+        colors = validItems.mapNotNull { it.color }
+        stops = validItems.mapNotNull { it.offset }
     }
     return colors to stops
 }
