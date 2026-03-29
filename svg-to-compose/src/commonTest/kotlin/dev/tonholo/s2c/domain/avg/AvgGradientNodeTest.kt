@@ -89,4 +89,24 @@ class AvgGradientNodeTest {
         assertEquals(expected = 3, actual = brush.colors.size)
         assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
     }
+
+    @Test
+    fun `given sweep gradient with centerColor - when toBrush - then produces 3 color stops`() {
+        val gradient = createGradient(
+            mutableMapOf(
+                "android:type" to "sweep",
+                "android:startColor" to "#FF0000",
+                "android:centerColor" to "#00FF00",
+                "android:endColor" to "#0000FF",
+                "android:centerX" to "12",
+                "android:centerY" to "12",
+            ),
+        )
+
+        val brush = gradient.toBrush()
+
+        assertIs<ComposeBrush.Gradient.Sweep>(brush)
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+    }
 }
