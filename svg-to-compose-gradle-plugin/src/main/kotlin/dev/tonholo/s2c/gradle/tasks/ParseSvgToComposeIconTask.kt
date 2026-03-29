@@ -550,6 +550,15 @@ internal fun Project.registerParseSvgToComposeIconTask(extension: SvgToComposeEx
         maxParallelExecutions.set(extension.maxParallelExecutions.convention(0))
         logLevel.set(project.gradle.startParameter.logLevel)
         sourceDirectory.set(outputSourceDir)
+
+        // Disable build cache when any configuration uses persistent mode.
+        // Persistent outputs live in src/ (outside @OutputDirectory), so restoring
+        // from cache would skip the task action and leave persistent outputs stale.
+        outputs.cacheIf {
+            extension.configurations
+                .filter { it.name != COMMON_CONFIGURATION_NAME }
+                .none { it.iconConfiguration.orNull?.isCodeGenerationPersistent?.orNull == true }
+        }
     }
 
     // Register this task as a dependency of all Kotlin compile tasks (JVM, JS, Native)
