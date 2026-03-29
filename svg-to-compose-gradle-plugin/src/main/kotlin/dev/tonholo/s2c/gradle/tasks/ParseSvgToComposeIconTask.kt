@@ -47,7 +47,7 @@ import org.gradle.workers.WorkQueue
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 import java.io.File
 import java.util.Properties
 import java.util.UUID
@@ -540,8 +540,8 @@ internal fun Project.registerParseSvgToComposeIconTask(extension: SvgToComposeEx
         sourceDirectory.set(outputSourceDir)
     }
 
-    // Register this task as a dependency of KotlinCompile
-    tasks.withType<KotlinCompile> {
+    // Register this task as a dependency of all Kotlin compile tasks (JVM, JS, Native)
+    tasks.withType<AbstractKotlinCompileTool<*>> {
         dependsOn(task)
     }
 
