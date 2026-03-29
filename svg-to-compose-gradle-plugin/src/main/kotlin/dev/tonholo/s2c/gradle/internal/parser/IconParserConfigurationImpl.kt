@@ -5,40 +5,80 @@ import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
-import dev.tonholo.s2c.gradle.internal.cache.Cacheable
-import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
-import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.kotlin.dsl.property
 
 private typealias IconMapper = (String) -> String
 
-internal class IconParserConfigurationImpl(objectFactory: ObjectFactory, override val parentName: String) :
-    IconParserConfiguration,
-    Configuration,
-    Cacheable {
+internal class IconParserConfigurationImpl(
+    objectFactory: ObjectFactory,
+    @get:Internal override val parentName: String,
+) : IconParserConfiguration,
+    Configuration {
+    // Gradle does not inherit annotations from interfaces. These overrides exist solely
+    // to attach @Internal so Gradle doesn't treat Named/Configuration properties as task inputs.
+    @get:Internal
     override val name: String = "icons"
+
+    @get:Internal
+    override val visibleName: String
+        get() = super.visibleName
+
+    @get:Internal
+    override val fullName: String
+        get() = super.fullName
+
+    @get:Input
     override val iconVisibility: Property<IconVisibility> = objectFactory.property<IconVisibility>()
 
+    @get:Input
+    @get:Optional
     internal val receiverType: Property<String> = objectFactory.property<String>()
 
+    @get:Input
+    @get:Optional
     internal val addToMaterialIcons: Property<Boolean> = objectFactory.property<Boolean>()
 
+    @get:Input
     internal val minified: Property<Boolean> = objectFactory.property<Boolean>()
 
+    @get:Input
+    @get:Optional
     internal val noPreview: Property<Boolean> = objectFactory.property<Boolean>()
 
+    @get:Input
     internal val theme: Property<String> = objectFactory.property<String>()
 
+    @get:Internal
     @Suppress("UNCHECKED_CAST")
     internal val mapIconNameTo: Property<IconMapper> =
         objectFactory.property(IconMapper::class.java) as Property<IconMapper>
 
+    @get:Internal
     internal val exclude: Property<Regex> = objectFactory.property<Regex>()
 
+    @get:Input
+    @get:Optional
+    val excludePattern: String?
+        get() = exclude.orNull?.pattern
+
     internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
+
+    @get:Input
+    @get:Optional
+    val codeGenerationPersistent: Boolean?
+        get() = isCodeGenerationPersistent.orNull
+
+    // Tracks presence only. Two different mapper lambdas will fingerprint identically.
+    // This is an inherent limitation of non-serializable lambda properties.
+    @get:Input
+    val hasIconNameMapper: Boolean
+        get() = mapIconNameTo.isPresent
 
     override fun makeInternal() {
         iconVisibility.set(IconVisibility.Internal)
@@ -91,27 +131,6 @@ internal class IconParserConfigurationImpl(objectFactory: ObjectFactory, overrid
         }
 
         return errors
-    }
-
-    override fun calculateHash(): Sha256Hash {
-        val raw = buildString {
-            append(receiverType.orNull)
-            append("|")
-            append(addToMaterialIcons.orNull)
-            append("|")
-            append(noPreview.orNull)
-            append("|")
-            append(iconVisibility.orNull)
-            append("|")
-            append(minified.orNull)
-            append("|")
-            append(exclude.orNull)
-            append("|")
-            append(mapIconNameTo.orNull?.let { "fn()" })
-            append("|")
-            append(isCodeGenerationPersistent.orNull)
-        }
-        return raw.sha256()
     }
 
     internal fun merge(common: IconParserConfigurationImpl) {

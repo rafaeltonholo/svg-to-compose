@@ -1,7 +1,9 @@
 package dev.tonholo.s2c.gradle.internal.inject
 
 import dev.tonholo.s2c.Processor
-import dev.tonholo.s2c.gradle.internal.cache.CacheManager
+import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
+import dev.tonholo.s2c.gradle.tasks.PERSISTENT_REGISTRY_PATH
+import dev.tonholo.s2c.gradle.tasks.ParseSvgToComposeIconTask
 import dev.tonholo.s2c.inject.SvgToComposeGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
@@ -16,7 +18,7 @@ import org.gradle.api.file.DirectoryProperty
  * App-level dependency graph for the Gradle plugin.
  *
  * This graph includes the core [SvgToComposeGraph] via [@Includes][Includes] and adds
- * Gradle-specific bindings such as the [CacheManager].
+ * Gradle-specific bindings such as the [PersistentOutputRegistry].
  *
  * Created once per task execution. Workers share this graph's [Processor.Factory]
  * via [S2cWorkerBridge][dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge]
@@ -27,15 +29,17 @@ internal interface GradlePluginGraph {
     val processorFactory: Processor.Factory
     val fileManager: FileManager
     val logger: Logger
-    val cacheManager: CacheManager
+    val persistentOutputRegistry: PersistentOutputRegistry
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideCacheManager(
-        logger: Logger,
-        fileManager: FileManager,
-        @BuildDirectory buildDirectory: DirectoryProperty,
-    ): CacheManager = CacheManager(logger, fileManager, buildDirectory)
+    fun providePersistentOutputRegistry(@BuildDirectory buildDirectory: DirectoryProperty): PersistentOutputRegistry {
+        val registryFile = buildDirectory
+            .file(PERSISTENT_REGISTRY_PATH)
+            .get()
+            .asFile
+        return PersistentOutputRegistry(registryFile)
+    }
 
     @DependencyGraph.Factory
     fun interface Factory {
@@ -44,4 +48,6 @@ internal interface GradlePluginGraph {
             @Provides @BuildDirectory buildDirectory: DirectoryProperty,
         ): GradlePluginGraph
     }
+
+    fun inject(task: ParseSvgToComposeIconTask)
 }

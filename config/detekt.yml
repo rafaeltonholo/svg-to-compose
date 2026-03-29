@@ -754,6 +754,8 @@ style:
   VarCouldBeVal:
     active: true
     ignoreLateinitVar: false
+    ignoreAnnotated:
+      - 'Inject'
   WildcardImport:
     active: true
     excludeImports:

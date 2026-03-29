@@ -1,13 +1,9 @@
 package dev.tonholo.s2c.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
+import dev.tonholo.s2c.gradle.common.GradleFunctionalTest
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import java.io.File
-import kotlin.io.path.createTempDirectory
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -23,94 +19,65 @@ import kotlin.test.assertTrue
  * repo's `.editorconfig`. When a test DOES supply an `.editorconfig`, it uses
  * `root = true` to stop the walk.
  */
-class EditorConfigFunctionalTest {
+class EditorConfigFunctionalTest : GradleFunctionalTest() {
 
-    private fun createTempProject(): File {
-        val dir = createTempDirectory("s2c-editorconfig-test").toFile()
-        dir.resolve("settings.gradle.kts").writeText(
+    override val tempDirPrefix: String = "s2c-editorconfig-test"
+
+    private fun setupBuildGradle(pkg: String) {
+        projectDir.resolve("build.gradle.kts").writeText(
             // language=kotlin
             """
-            pluginManagement {
-                repositories {
-                    mavenCentral()
-                    gradlePluginPortal()
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories {
+                mavenCentral()
+            }
+            kotlin {
+                jvm()
+            }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                    }
                 }
             }
-            rootProject.name = "test-project"
             """.trimIndent(),
         )
-        return dir
     }
 
-    private fun buildGradleContent(pkg: String) =
-        // language=kotlin
-        """
-        plugins {
-            kotlin("multiplatform")
-            id("dev.tonholo.s2c")
-        }
-        repositories {
-            mavenCentral()
-        }
-        kotlin {
-            jvm()
-        }
-        svgToCompose {
-            processor {
-                common {
-                    optimize(false)
-                    icons { noPreview() }
-                }
-                val icons by creating {
-                    from(layout.projectDirectory.dir("icons"))
-                    destinationPackage("$pkg")
-                }
-            }
-        }
-        """.trimIndent()
-
-    private fun copyOneIcon(projectDir: File) {
+    private fun copyOneIcon() {
+        copyResourcesToProject("icons", "svg")
+        // Keep only attention-filled.svg for a fast, deterministic test
         val iconsDir = projectDir.resolve("icons")
-        iconsDir.mkdirs()
-        val resourceDir = File(
-            requireNotNull(javaClass.classLoader.getResource("svg")) {
-                "Test resource directory not found: svg"
-            }.toURI(),
-        )
-        val icon = resourceDir.listFiles().orEmpty()
-            .filter { it.isFile && it.extension == "svg" }
-            .first { it.name == "attention-filled.svg" }
-        icon.copyTo(iconsDir.resolve(icon.name))
+        iconsDir.listFiles().orEmpty()
+            .filter { it.name != "attention-filled.svg" }
+            .forEach { it.delete() }
     }
 
-    private fun writeEditorConfig(projectDir: File, content: String) {
+    private fun writeEditorConfig(content: String) {
         projectDir.resolve(".editorconfig").writeText(content)
     }
 
-    private fun runGradle(projectDir: File): BuildResult = GradleRunner.create()
-        .withProjectDir(projectDir)
-        .withPluginClasspath()
-        .withArguments("parseSvgToComposeIcon", "--stacktrace")
-        .forwardOutput()
-        .build()
+    private fun assertTaskSuccess(result: org.gradle.testkit.runner.BuildResult) {
+        assertTaskOutcome(result, ":parseSvgToComposeIcon", TaskOutcome.SUCCESS)
+    }
 
-    private fun readGeneratedFiles(projectDir: File, pkg: String): List<String> {
-        val pkgPath = pkg.replace('.', '/')
-        val generatedDir = projectDir
-            .resolve("build/generated/svgToCompose/commonMain/kotlin/$pkgPath")
+    private fun readGeneratedFiles(pkg: String): List<String> {
+        val generatedDir = generatedBuildDir(pkg)
         assertTrue(generatedDir.exists(), "Generated directory does not exist: $generatedDir")
         return generatedDir.walkTopDown()
             .filter { it.isFile && it.extension == "kt" }
             .map { it.readText() }
             .toList()
             .also { assertTrue(it.isNotEmpty(), "No generated .kt files found") }
-    }
-
-    private fun assertTaskSuccess(result: BuildResult) {
-        val taskName = "parseSvgToComposeIcon"
-        val task = result.task(":$taskName")
-        assertNotNull(task, "Task :$taskName was not found in the build")
-        assertEquals(TaskOutcome.SUCCESS, task.outcome, "Task :$taskName did not succeed")
     }
 
     /**
@@ -160,109 +127,102 @@ class EditorConfigFunctionalTest {
     @Test
     fun `default formatting when no editorconfig exists`() {
         val pkg = "dev.tonholo.s2c.test.editorconfig.defaults"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
-            copyOneIcon(projectDir)
 
-            val result = runGradle(projectDir)
-            assertTaskSuccess(result)
+        // Arrange
+        setupBuildGradle(pkg)
+        copyOneIcon()
 
-            for (content in readGeneratedFiles(projectDir, pkg)) {
-                assertIndentation(content, indentSize = 4, useTabs = false)
-                assertFinalNewline(content, expected = true)
-            }
-        } finally {
-            projectDir.deleteRecursively()
+        // Act
+        val result = runGradle("parseSvgToComposeIcon")
+
+        // Assert
+        assertTaskSuccess(result)
+        for (content in readGeneratedFiles(pkg)) {
+            assertIndentation(content, indentSize = 4, useTabs = false)
+            assertFinalNewline(content, expected = true)
         }
     }
 
     @Test
     fun `editorconfig with 2-space indent is respected`() {
         val pkg = "dev.tonholo.s2c.test.editorconfig.twospace"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
-            copyOneIcon(projectDir)
-            writeEditorConfig(
-                projectDir,
-                """
-                root = true
 
-                [*]
-                indent_style = space
-                indent_size = 2
-                """.trimIndent(),
-            )
+        // Arrange
+        setupBuildGradle(pkg)
+        copyOneIcon()
+        writeEditorConfig(
+            """
+            root = true
 
-            val result = runGradle(projectDir)
-            assertTaskSuccess(result)
+            [*]
+            indent_style = space
+            indent_size = 2
+            """.trimIndent(),
+        )
 
-            for (content in readGeneratedFiles(projectDir, pkg)) {
-                assertIndentation(content, indentSize = 2, useTabs = false)
-            }
-        } finally {
-            projectDir.deleteRecursively()
+        // Act
+        val result = runGradle("parseSvgToComposeIcon")
+
+        // Assert
+        assertTaskSuccess(result)
+        for (content in readGeneratedFiles(pkg)) {
+            assertIndentation(content, indentSize = 2, useTabs = false)
         }
     }
 
     @Test
     fun `editorconfig with tab indent is respected`() {
         val pkg = "dev.tonholo.s2c.test.editorconfig.tabs"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
-            copyOneIcon(projectDir)
-            writeEditorConfig(
-                projectDir,
-                """
-                root = true
 
-                [*]
-                indent_style = tab
-                """.trimIndent(),
-            )
+        // Arrange
+        setupBuildGradle(pkg)
+        copyOneIcon()
+        writeEditorConfig(
+            """
+            root = true
 
-            val result = runGradle(projectDir)
-            assertTaskSuccess(result)
+            [*]
+            indent_style = tab
+            """.trimIndent(),
+        )
 
-            for (content in readGeneratedFiles(projectDir, pkg)) {
-                assertIndentation(content, indentSize = 1, useTabs = true)
-            }
-        } finally {
-            projectDir.deleteRecursively()
+        // Act
+        val result = runGradle("parseSvgToComposeIcon")
+
+        // Assert
+        assertTaskSuccess(result)
+        for (content in readGeneratedFiles(pkg)) {
+            assertIndentation(content, indentSize = 1, useTabs = true)
         }
     }
 
     @Test
     fun `editorconfig with kotlin-specific section overrides global`() {
         val pkg = "dev.tonholo.s2c.test.editorconfig.ktoverride"
-        val projectDir = createTempProject()
-        try {
-            projectDir.resolve("build.gradle.kts").writeText(buildGradleContent(pkg))
-            copyOneIcon(projectDir)
-            writeEditorConfig(
-                projectDir,
-                """
-                root = true
 
-                [*]
-                indent_style = space
-                indent_size = 4
+        // Arrange
+        setupBuildGradle(pkg)
+        copyOneIcon()
+        writeEditorConfig(
+            """
+            root = true
 
-                [*.kt]
-                indent_size = 2
-                """.trimIndent(),
-            )
+            [*]
+            indent_style = space
+            indent_size = 4
 
-            val result = runGradle(projectDir)
-            assertTaskSuccess(result)
+            [*.kt]
+            indent_size = 2
+            """.trimIndent(),
+        )
 
-            for (content in readGeneratedFiles(projectDir, pkg)) {
-                assertIndentation(content, indentSize = 2, useTabs = false)
-            }
-        } finally {
-            projectDir.deleteRecursively()
+        // Act
+        val result = runGradle("parseSvgToComposeIcon")
+
+        // Assert
+        assertTaskSuccess(result)
+        for (content in readGeneratedFiles(pkg)) {
+            assertIndentation(content, indentSize = 2, useTabs = false)
         }
     }
 }

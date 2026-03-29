@@ -3,9 +3,6 @@ package dev.tonholo.s2c.gradle.dsl
 import dev.tonholo.s2c.AppDefaults
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.dsl.source.SourceConfiguration
-import dev.tonholo.s2c.gradle.internal.cache.Cacheable
-import dev.tonholo.s2c.gradle.internal.cache.Sha256Hash
-import dev.tonholo.s2c.gradle.internal.cache.sha256
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
 import org.gradle.api.Action
@@ -13,19 +10,54 @@ import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.property
+import org.gradle.work.Incremental
 import javax.inject.Inject
 
 abstract class ProcessorConfiguration @Inject constructor(private val objectFactory: ObjectFactory) :
-    SourceConfiguration,
-    Cacheable {
+    SourceConfiguration {
+    // Gradle does not inherit annotations from interfaces. These overrides exist solely
+    // to attach @Internal so Gradle doesn't treat Named/Configuration properties as task inputs.
+    @get:Internal
+    abstract override val name: String
+
+    @get:Internal
     override val parentName: String = "svgToCompose.processor"
+
+    @get:Internal
+    override val fullName: String
+        get() = super.fullName
+
+    @get:Internal
+    override val visibleName: String
+        get() = super.visibleName
+
+    @get:Incremental
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     internal val origin: DirectoryProperty = objectFactory.directoryProperty()
+
+    @get:Input
     internal val destinationPackage: Property<String> = objectFactory.property()
+
+    @get:Input
     internal val recursive: Property<Boolean> = objectFactory.property<Boolean>()
+
+    @get:Input
     internal val maxDepth: Property<Int> = objectFactory.property<Int>()
+
+    @get:Input
     internal val optimize: Property<Boolean> = objectFactory.property<Boolean>()
 
+    // Gradle's @Nested traverses into the Property value to visit its @Input annotations.
+    // The convention is set at declaration time, so the value is always present when Gradle inspects it.
+    @get:Nested
     internal val iconConfiguration: Property<IconParserConfigurationImpl> = objectFactory
         .property<IconParserConfigurationImpl>()
         .convention(
@@ -87,21 +119,6 @@ abstract class ProcessorConfiguration @Inject constructor(private val objectFact
         }
 
         return errors
-    }
-
-    override fun calculateHash(): Sha256Hash {
-        val raw = buildString {
-            append(origin.get())
-            append("|")
-            append(destinationPackage.get())
-            append("|")
-            append(recursive.get())
-            append("|")
-            append(maxDepth.get())
-            append("|")
-            append(iconConfiguration.get().calculateHash())
-        }
-        return raw.sha256()
     }
 
     fun merge(common: ProcessorConfiguration) {
