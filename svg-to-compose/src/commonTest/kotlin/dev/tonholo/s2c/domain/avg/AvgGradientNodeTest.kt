@@ -1,15 +1,23 @@
 package dev.tonholo.s2c.domain.avg
 
 import dev.tonholo.s2c.domain.compose.ComposeBrush
-import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlRootNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
+/**
+ * Tests for [AvgGradientNode] color stop computation,
+ * specifically verifying that `centerColor` is included
+ * when building gradient stops from shorthand attributes.
+ */
 class AvgGradientNodeTest {
     private val root = XmlRootNode(children = mutableSetOf())
 
+    /**
+     * Creates an [AvgGradientNode] with no child `<item>` elements,
+     * using only shorthand color attributes.
+     */
     private fun createGradient(attributes: MutableMap<String, String>): AvgGradientNode {
         return AvgGradientNode(
             parent = root,
