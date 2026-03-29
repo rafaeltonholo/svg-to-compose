@@ -116,15 +116,23 @@ private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
         .asSequence()
         .filterIsInstance<AvgGradientItemNode>()
 
-    val colors = if (children.isEmpty()) {
-        listOf(startColor, endColor).mapNotNull { it }
+    val colors: List<AvgColor>
+    val stops: List<Float>
+    if (children.isEmpty()) {
+        val shorthandColors = listOf(startColor, centerColor, endColor).mapNotNull { it }
+        colors = shorthandColors
+        stops = when {
+            centerColor != null && startColor != null && endColor != null -> listOf(0f, 0.5f, 1f)
+            shorthandColors.size == 2 -> listOf(0f, 1f)
+            else -> emptyList()
+        }
     } else {
-        gradientItems
+        colors = gradientItems
             .mapNotNull { it.color }
             .toList()
+        stops = gradientItems
+            .mapNotNull { it.offset }
+            .toList()
     }
-    val stops = gradientItems
-        .mapNotNull { it.offset }
-        .toList()
     return Pair(colors, stops)
 }
