@@ -230,9 +230,17 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
                 fileManager.delete(outputPath.toPath())
                 registry.remove(removedPath.toString())
             } else {
-                val outputDir = requireNotNull(outputDirectories[configuration.name]).toOkioPath()
+                val parent = configuration.origin.get().asFile.toOkioPath()
+                val outputDir = buildOutput(
+                    configuration = configuration,
+                    recursive = configuration.recursive.get(),
+                    path = removedPath,
+                    parent = parent,
+                )
                 val baseName = removedPath.name.substringBeforeLast('.')
-                val outputFile = outputDir / "${baseName.pascalCase()}.kt"
+                val iconConfig = configuration.iconConfiguration.get()
+                val mappedName = iconConfig.mapIconNameTo.orNull?.invoke(baseName) ?: baseName
+                val outputFile = outputDir / "${mappedName.pascalCase()}.kt"
                 if (fileManager.exists(outputFile)) {
                     logger.output("Deleted origin file detected. Deleting generated file $outputFile.")
                     fileManager.delete(outputFile)
@@ -267,7 +275,14 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
     ): Pair<List<Path>, List<Path>> {
         if (!inputChanges.isIncremental) {
             logger.info("Non-incremental build for configuration '${configuration.name}'")
-            return findAllFiles(configuration, fileManager) to emptyList()
+            val allFiles = findAllFiles(configuration, fileManager)
+            // For persistent mode, detect registry entries whose source files no longer exist
+            val removedFromRegistry = if (isPersistent) {
+                findDeletedPersistentOrigins(configuration, registry, fileManager)
+            } else {
+                emptyList()
+            }
+            return allFiles to removedFromRegistry
         }
 
         val added = mutableListOf<Path>()
@@ -465,6 +480,25 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
                 origin.startsWith("$configOrigin/") &&
                     fileManager.exists(origin.toPath()) &&
                     !fileManager.exists(output.toPath())
+            }
+            .map { (origin, _) -> origin.toPath() }
+    }
+
+    /**
+     * Finds registry entries whose source files have been deleted. Used during
+     * non-incremental persistent builds to detect origins that no longer exist
+     * so their outputs can be cleaned up.
+     */
+    private fun findDeletedPersistentOrigins(
+        configuration: ProcessorConfiguration,
+        registry: PersistentOutputRegistry,
+        fileManager: FileManager,
+    ): List<Path> {
+        val configOrigin = configuration.origin.get().asFile.toOkioPath()
+        return registry.allEntries()
+            .filter { (origin, _) ->
+                origin.startsWith("$configOrigin/") &&
+                    !fileManager.exists(origin.toPath())
             }
             .map { (origin, _) -> origin.toPath() }
     }

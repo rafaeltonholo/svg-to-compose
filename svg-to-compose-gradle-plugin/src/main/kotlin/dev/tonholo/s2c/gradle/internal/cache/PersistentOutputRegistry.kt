@@ -29,6 +29,11 @@ internal class PersistentOutputRegistry(private val registryFile: File) {
                     "Failed to load persistent output registry from ${registryFile.path}: " +
                         "${e.message}. Starting with empty registry.",
                 )
+            } catch (e: IllegalArgumentException) {
+                logger.warning(
+                    "Failed to load persistent output registry from ${registryFile.path}: " +
+                        "${e.message}. Starting with empty registry.",
+                )
             }
         }
     }

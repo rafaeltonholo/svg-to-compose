@@ -16,8 +16,8 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.kotlin.dsl.property
+import org.gradle.work.Incremental
 import javax.inject.Inject
 
 abstract class ProcessorConfiguration @Inject constructor(private val objectFactory: ObjectFactory) :
@@ -38,9 +38,9 @@ abstract class ProcessorConfiguration @Inject constructor(private val objectFact
     override val visibleName: String
         get() = super.visibleName
 
+    @get:Incremental
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    @get:SkipWhenEmpty
     internal val origin: DirectoryProperty = objectFactory.directoryProperty()
 
     @get:Input
