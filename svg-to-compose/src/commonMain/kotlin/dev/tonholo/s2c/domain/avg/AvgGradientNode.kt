@@ -38,7 +38,9 @@ class AvgGradientNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attr
     override val centerColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
         it?.let(::AvgColor)
     }
-    override val endColor: AvgColor? by attribute(namespace = AvgNode.NAMESPACE)
+    override val endColor: AvgColor? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) {
+        it?.let(::AvgColor)
+    }
 
     // TODO(#225): figure out a way to avoid this NoOpLogger workaround for context parameters in attribute delegates.
     override val type: AvgGradientType? by attribute<String?, _>(namespace = AvgNode.NAMESPACE) { tileMode ->
