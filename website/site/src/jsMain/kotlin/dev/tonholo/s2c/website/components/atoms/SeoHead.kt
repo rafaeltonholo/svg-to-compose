@@ -43,6 +43,10 @@ fun SeoHead(data: PageLayoutData, path: String) {
         // Canonical link
         upsertCanonicalLink(canonicalUrl)
 
+        // LLMs discovery links
+        upsertLink(rel = "llms", href = "/llms.txt")
+        upsertLink(rel = "llms-full", href = "/llms-full.txt")
+
         // JSON-LD structured data
         val breadcrumbs = buildBreadcrumbs(path)
         upsertJsonLd(listOf(breadcrumbs) + data.structuredData)
@@ -83,6 +87,19 @@ private fun upsertMeta(attributeName: String, attributeValue: String, content: S
         meta.setAttribute(attributeName, attributeValue)
         meta.setAttribute("content", content)
         head.appendChild(meta)
+    }
+}
+
+private fun upsertLink(rel: String, href: String) {
+    val head = document.head ?: return
+    val existing = head.querySelector("link[rel='$rel']")
+    if (existing != null) {
+        existing.setAttribute("href", href)
+    } else {
+        val link = document.createElement("link")
+        link.setAttribute("rel", rel)
+        link.setAttribute("href", href)
+        head.appendChild(link)
     }
 }
 
