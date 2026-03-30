@@ -173,8 +173,9 @@ fun initDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
             title = "Documentation",
-            description = "Documentation for SVG to Compose CLI tool and Gradle plugin. " +
-                "Installation guides, configuration, and API reference.",
+            description = "SVG to Compose documentation. Installation guides, CLI tool reference, " +
+                "Gradle plugin configuration, and API reference for converting SVG and " +
+                "Android XML Drawables to Jetpack Compose ImageVector.",
             canonicalPath = "/docs",
         ),
     )

@@ -7,6 +7,7 @@ import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
 import dev.tonholo.s2c.website.components.layouts.DocsLayout
+import dev.tonholo.s2c.website.components.atoms.HowToStructuredData
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
 import dev.tonholo.s2c.website.components.molecules.TocEntry
 import dev.tonholo.s2c.website.components.organisms.docs.CliDocsContent
@@ -25,10 +26,36 @@ private val cliTocEntries = listOf(
 fun initCliDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "CLI Documentation",
-            description = "SVG to Compose CLI tool documentation. " +
-                "Installation, usage examples, platform support, and all options reference.",
+            title = "CLI Tool - SVG to Compose Command Line Converter",
+            description = "Convert SVG and Android XML Drawable files to Jetpack Compose " +
+                "ImageVector from the command line. Installation, usage examples, " +
+                "and complete options reference.",
             canonicalPath = "/docs/cli",
+            structuredData = listOf(
+                HowToStructuredData(
+                    name = "How to convert SVG to Compose ImageVector using the CLI",
+                    description = "Step-by-step guide to converting SVG files to Jetpack " +
+                        "Compose ImageVector code using the s2c command-line tool.",
+                    steps = listOf(
+                        HowToStructuredData.HowToStep(
+                            name = "Install the CLI tool",
+                            text = "Download the s2c script: curl -o s2c " +
+                                "https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c " +
+                                "&& chmod +x s2c",
+                        ),
+                        HowToStructuredData.HowToStep(
+                            name = "Run the conversion",
+                            text = "Convert your SVG file: ./s2c -o Icon.kt -p com.app.icons " +
+                                "-t com.app.theme.AppTheme icon.svg",
+                        ),
+                        HowToStructuredData.HowToStep(
+                            name = "Use the generated ImageVector",
+                            text = "Import the generated Icon.kt file in your Compose code " +
+                                "and use the ImageVector with the Icon composable.",
+                        ),
+                    ),
+                ),
+            ),
         ),
     )
 }
