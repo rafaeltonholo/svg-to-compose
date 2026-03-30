@@ -110,6 +110,72 @@ val generateLlmsFullTxt by tasks.registering {
     }
 }
 
+val generateSitemap by tasks.registering {
+    val pagesDir = layout.projectDirectory.dir("src/jsMain/kotlin/dev/tonholo/s2c/website/pages")
+    val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/sitemap.xml")
+    val baseUrl = "https://www.svgtocompose.com"
+
+    // Per-path overrides for changefreq and priority.
+    // Pages not listed here get defaults: monthly, 0.5
+    val pageMetadata = mapOf(
+        "/" to ("weekly" to "1.0"),
+        "/docs" to ("monthly" to "0.8"),
+        "/docs/cli" to ("monthly" to "0.7"),
+        "/docs/gradle-plugin" to ("monthly" to "0.7"),
+        "/docs/faq" to ("monthly" to "0.6"),
+        "/docs/alternatives" to ("monthly" to "0.6"),
+    )
+
+    inputs.dir(pagesDir)
+    outputs.file(outputFile)
+
+    doLast {
+        // Discover Kobweb @Page files and map to URL paths.
+        // Kobweb convention: pages/Index.kt -> "/", pages/docs/Cli.kt -> "/docs/cli"
+        val pageFiles = pagesDir.asFile.walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .filter { file -> file.readText().contains("@Page") }
+            .map { file ->
+                val relativePath = file.relativeTo(pagesDir.asFile).path
+                    .removeSuffix(".kt")
+                    .replace("\\", "/")
+                // Index files map to their parent directory
+                val urlPath = if (relativePath == "Index") {
+                    "/"
+                } else {
+                    "/" + relativePath.replace("/Index", "").lowercase()
+                        .split("/")
+                        .joinToString("/") { segment ->
+                            // Convert PascalCase to kebab-case
+                            segment.replace(Regex("([a-z])([A-Z])")) { match ->
+                                "${match.groupValues[1]}-${match.groupValues[2]}"
+                            }.lowercase()
+                        }
+                }
+                urlPath
+            }
+            .sorted()
+            .toList()
+
+        val today = java.time.LocalDate.now().toString()
+        val sitemap = buildString {
+            appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
+            appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
+            for (path in pageFiles) {
+                val (changefreq, priority) = pageMetadata[path] ?: ("monthly" to "0.5")
+                appendLine("  <url>")
+                appendLine("    <loc>$baseUrl$path</loc>")
+                appendLine("    <lastmod>$today</lastmod>")
+                appendLine("    <changefreq>$changefreq</changefreq>")
+                appendLine("    <priority>$priority</priority>")
+                appendLine("  </url>")
+            }
+            appendLine("</urlset>")
+        }
+        outputFile.asFile.writeText(sitemap)
+    }
+}
+
 val copyEditorWasm by tasks.registering(Copy::class) {
     dependsOn(":editor-wasm:wasmJsBrowserDistribution")
     from(project(":editor-wasm").layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
@@ -126,6 +192,7 @@ tasks.configureEach {
     if (name == "jsProcessResources") {
         dependsOn(generateLlmsTxt)
         dependsOn(generateLlmsFullTxt)
+        dependsOn(generateSitemap)
         dependsOn(copyEditorWasm)
         dependsOn(copyDokkaHtml)
     }
