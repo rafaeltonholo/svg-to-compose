@@ -19,6 +19,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.minSize
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.outlineOffset
@@ -141,6 +142,10 @@ fun initSiteStyles(ctx: InitSilkContext) {
                     duration(0.01.ms)
                 }
         }
+    }
+
+    ctx.stylesheet.registerStyleBase("h1, h2, h3, h4, h5, h6") {
+        Modifier.margin(0.px)
     }
 
     ctx.stylesheet.registerStyleBase("body") {

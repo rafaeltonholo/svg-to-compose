@@ -1,113 +1,148 @@
 package dev.tonholo.s2c.website.components.organisms
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.FontWeight
-import com.varabyte.kobweb.compose.css.Overflow
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
-import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.gridTemplateColumns
 import com.varabyte.kobweb.compose.ui.modifiers.margin
-import com.varabyte.kobweb.compose.ui.modifiers.minWidth
-import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
+import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.components.atoms.icon.GradleSvg
 import dev.tonholo.s2c.website.components.layouts.SectionContainer
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
+import dev.tonholo.s2c.website.components.molecules.Platform
+import dev.tonholo.s2c.website.components.molecules.PlatformChipSelector
+import dev.tonholo.s2c.website.components.molecules.TabPanel
+import dev.tonholo.s2c.website.components.molecules.detectPlatform
 import dev.tonholo.s2c.website.config.BuildConfig
 import dev.tonholo.s2c.website.theme.LabelTextStyle
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.fr
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H2
+import org.jetbrains.compose.web.dom.Text
 
-val InstallGridStyle = CssStyle {
-    base {
-        Modifier
-            .fillMaxWidth()
-            .display(DisplayStyle.Grid)
-            .gridTemplateColumns { size(1.fr) }
-            .gap(SiteTheme.dimensions.size.Xxl)
-    }
-    cssRule(" > *") {
-        Modifier.minWidth(0.px).overflow(Overflow.Hidden)
-    }
-    Breakpoint.MD {
-        Modifier.gridTemplateColumns { repeat(2) { size(1.fr) } }
+val InstallContentStyle = CssStyle.base {
+    Modifier
+        .fillMaxWidth()
+        .margin(top = SiteTheme.dimensions.size.Xl)
+}
+
+@Composable
+fun InstallSection(selectedToolTab: Int, onToolTabSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val palette = ColorMode.current.toSitePalette()
+    SectionContainer(id = "install", modifier = modifier, altBackground = true) {
+        H2(
+            attrs = LabelTextStyle.toModifier()
+                .color(palette.onSurfaceVariant)
+                .margin(bottom = SiteTheme.dimensions.size.Lg)
+                .toAttrs(),
+        ) {
+            Text("Install")
+        }
+
+        TabPanel(
+            tabs = listOf("CLI", "Gradle Plugin"),
+            selectedIndex = selectedToolTab,
+            onSelect = onToolTabSelect,
+            tabContent = { index, label ->
+                {
+                    when (index) {
+                        0 -> FaTerminal(size = IconSize.SM)
+
+                        1 -> GradleSvg(
+                            color = if (selectedToolTab == index) {
+                                palette.onSurface
+                            } else {
+                                palette.onSurfaceVariant
+                            },
+                            width = 16,
+                            height = 16,
+                        )
+                    }
+                    SpanText(label)
+                }
+            },
+        ) {
+            Div(attrs = InstallContentStyle.toModifier().toAttrs()) {
+                when (selectedToolTab) {
+                    0 -> CliInstallContent()
+                    1 -> GradlePluginInstallContent()
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun InstallSection(modifier: Modifier = Modifier) {
-    val palette = ColorMode.current.toSitePalette()
-    SectionContainer(id = "install", modifier = modifier, altBackground = true) {
-        SpanText(
-            "Install",
-            modifier = LabelTextStyle.toModifier()
-                .color(palette.onSurfaceVariant)
-                .margin(bottom = SiteTheme.dimensions.size.Lg),
+private fun CliInstallContent() {
+    var selectedPlatform by remember { mutableStateOf(detectPlatform()) }
+
+    PlatformChipSelector(
+        selectedPlatform = selectedPlatform,
+        onSelect = { selectedPlatform = it },
+        modifier = Modifier.margin(bottom = SiteTheme.dimensions.size.Lg),
+    )
+
+    when (selectedPlatform) {
+        Platform.MAC_LINUX -> CodeBlock(
+            language = "bash",
+            // language=sh
+            code = """
+                |brew tap dev-tonholo/svg-to-compose
+                |brew install s2c
+                |# Call s2c
+                |s2c --help
+            """.trimMargin(),
         )
 
-        Div(attrs = InstallGridStyle.toModifier().toAttrs()) {
-            // CLI column
-            Div {
-                SpanText(
-                    "CLI",
-                    modifier = Modifier
-                        .fontWeight(FontWeight.SemiBold)
-                        .fontSize(1.125.cssRem)
-                        .color(SiteTheme.palette.onSurface)
-                        .margin(bottom = SiteTheme.dimensions.size.Md)
-                        .display(DisplayStyle.Block),
-                )
-                CodeBlock(
-                    language = "bash",
-                    // language=sh
-                    code = $$"""
-                        |# Download the s2c wrapper script directly from GitHub.
-                        |curl -o your/target/path/s2c \ 
-                        |     https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
-                        |# Add execution permission to the script.
-                        |chmod +x your/target/path/s2c
-                        |# Add s2c to your path, so you can use it anywhere.
-                        |export PATH="your/target/path/s2c:$PATH"
-                        |# Call s2c
-                        |s2c --help
-                    """.trimMargin(),
-                )
-            }
+        Platform.WINDOWS -> CodeBlock(
+            language = "bash",
+            // language=sh
+            code = """
+                |scoop bucket add svg-to-compose https://github.com/dev-tonholo/scoop-svg-to-compose
+                |scoop install s2c
+                |# Call s2c
+                |s2c --help
+            """.trimMargin(),
+        )
 
-            // Gradle column
-            Div {
-                SpanText(
-                    "Gradle Plugin",
-                    modifier = Modifier
-                        .fontWeight(FontWeight.SemiBold)
-                        .fontSize(1.125.cssRem)
-                        .color(SiteTheme.palette.onSurface)
-                        .margin(bottom = SiteTheme.dimensions.size.Md)
-                        .display(DisplayStyle.Block),
-                )
-                CodeBlock(
-                    language = "kotlin",
-                    // language=kotlin
-                    code = """plugins {
-                            |    id("dev.tonholo.s2c") version "${BuildConfig.VERSION}"
-                            |}
-                    """.trimMargin(),
-                )
-            }
-        }
+        Platform.MANUAL -> CodeBlock(
+            language = "bash",
+            // language=sh
+            code = $$"""
+                |# Download the s2c wrapper script directly from GitHub.
+                |curl -o your/target/path/s2c \
+                |     https://raw.githubusercontent.com/rafaeltonholo/svg-to-compose/main/s2c
+                |# Add execution permission to the script.
+                |chmod +x your/target/path/s2c
+                |# Add s2c to your path, so you can use it anywhere.
+                |export PATH="your/target/path/s2c:$PATH"
+                |# Call s2c
+                |s2c --help
+            """.trimMargin(),
+        )
     }
+}
+
+@Composable
+private fun GradlePluginInstallContent() {
+    CodeBlock(
+        language = "kotlin",
+        // language=kotlin
+        code = """plugins {
+            |    id("dev.tonholo.s2c") version "${BuildConfig.VERSION}"
+            |}
+        """.trimMargin(),
+    )
 }

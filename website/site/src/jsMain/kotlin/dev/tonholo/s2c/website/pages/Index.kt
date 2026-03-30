@@ -1,6 +1,10 @@
 package dev.tonholo.s2c.website.pages
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
@@ -36,9 +40,21 @@ fun initHomePage(ctx: InitRouteContext) {
 @Layout(".components.layouts.PageLayout")
 @Composable
 fun HomePage() {
+    var selectedToolTab by remember { mutableIntStateOf(0) }
+
     HeroSection()
     ScrollReveal { PlaygroundSection() }
-    ScrollReveal { InstallSection() }
-    ScrollReveal { HowToUseSection() }
+    ScrollReveal {
+        InstallSection(
+            selectedToolTab = selectedToolTab,
+            onToolTabSelect = { selectedToolTab = it },
+        )
+    }
+    ScrollReveal {
+        HowToUseSection(
+            selectedToolTab = selectedToolTab,
+            onToolTabSelect = { selectedToolTab = it },
+        )
+    }
     ScrollReveal { CapabilitiesSection() }
 }
