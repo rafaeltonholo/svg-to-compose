@@ -10,6 +10,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
@@ -27,6 +28,7 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
+import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.ms
@@ -48,7 +50,8 @@ val ActiveChipStyle = CssStyle.base {
         .textTransform(TextTransform.Uppercase)
         .fontWeight(FontWeight.SemiBold)
         .color(palette.onSurface)
-        .backgroundColor(palette.surface)
+        .backgroundColor(palette.background)
+        .border(1.px, LineStyle.Solid, palette.outline)
         .padding(topBottom = 4.px, leftRight = 12.px)
         .borderRadius(4.px)
         .cursor(Cursor.Pointer)
@@ -67,6 +70,7 @@ val InactiveChipStyle = CssStyle {
             .fontWeight(FontWeight.Medium)
             .color(colorMode.toSitePalette().onSurfaceVariant)
             .backgroundColor(Colors.Transparent)
+            .border(1.px, LineStyle.Solid, Colors.Transparent)
             .padding(topBottom = 4.px, leftRight = 12.px)
             .borderRadius(4.px)
             .cursor(Cursor.Pointer)
