@@ -52,10 +52,8 @@ fun HowToUseSection(modifier: Modifier = Modifier) {
                         0 -> FaTerminal(size = IconSize.SM)
 
                         1 -> GradleSvg(
-                            color = if (selectedTab ==
-                                index
-                            ) {
-                                SiteTheme.palette.onPrimary
+                            color = if (selectedTab == index) {
+                                SiteTheme.palette.onSurface
                             } else {
                                 SiteTheme.palette.onSurfaceVariant
                             },
