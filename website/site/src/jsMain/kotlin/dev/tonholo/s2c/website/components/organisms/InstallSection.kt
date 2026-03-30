@@ -73,14 +73,19 @@ fun InstallSection(selectedToolTab: Int, onToolTabSelect: (Int) -> Unit, modifie
                     SpanText(label)
                 }
             },
-        ) {
-            Div(attrs = InstallContentStyle.toModifier().toAttrs()) {
-                when (selectedToolTab) {
-                    0 -> CliInstallContent()
-                    1 -> GradlePluginInstallContent()
-                }
-            }
-        }
+            panels = listOf(
+                {
+                    Div(attrs = InstallContentStyle.toModifier().toAttrs()) {
+                        CliInstallContent()
+                    }
+                },
+                {
+                    Div(attrs = InstallContentStyle.toModifier().toAttrs()) {
+                        GradlePluginInstallContent()
+                    }
+                },
+            ),
+        )
     }
 }
 

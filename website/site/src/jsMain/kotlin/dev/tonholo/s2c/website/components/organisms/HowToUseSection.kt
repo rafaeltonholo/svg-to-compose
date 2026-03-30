@@ -66,13 +66,18 @@ fun HowToUseSection(selectedToolTab: Int, onToolTabSelect: (Int) -> Unit, modifi
                     SpanText(label)
                 }
             },
-        ) {
-            Div(attrs = UsageTabContentStyle.toModifier().toAttrs()) {
-                when (selectedToolTab) {
-                    0 -> CliUsageContent()
-                    1 -> GradleUsageContent()
-                }
-            }
-        }
+            panels = listOf(
+                {
+                    Div(attrs = UsageTabContentStyle.toModifier().toAttrs()) {
+                        CliUsageContent()
+                    }
+                },
+                {
+                    Div(attrs = UsageTabContentStyle.toModifier().toAttrs()) {
+                        GradleUsageContent()
+                    }
+                },
+            ),
+        )
     }
 }
