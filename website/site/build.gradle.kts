@@ -91,6 +91,25 @@ val generateLlmsTxt by tasks.registering {
     }
 }
 
+val generateLlmsFullTxt by tasks.registering {
+    val templateFile = layout.projectDirectory.file("src/jsMain/resources/llms-full.txt.template")
+    val publicDir = layout.projectDirectory.dir("src/jsMain/resources/public")
+    val outputFile = publicDir.file("llms-full.txt")
+    val wellKnownOutputFile = publicDir.file(".well-known/llms-full.txt")
+    val appVersion = appProperties["VERSION"].toString()
+    inputs.file(templateFile)
+    inputs.property("version", appVersion)
+    outputs.files(outputFile, wellKnownOutputFile)
+    doLast {
+        val content = templateFile.asFile.readText().replace("\${VERSION}", appVersion)
+        outputFile.asFile.writeText(content)
+        wellKnownOutputFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(content)
+        }
+    }
+}
+
 val copyEditorWasm by tasks.registering(Copy::class) {
     dependsOn(":editor-wasm:wasmJsBrowserDistribution")
     from(project(":editor-wasm").layout.buildDirectory.dir("dist/wasmJs/productionExecutable"))
@@ -106,6 +125,7 @@ val copyDokkaHtml by tasks.registering(Sync::class) {
 tasks.configureEach {
     if (name == "jsProcessResources") {
         dependsOn(generateLlmsTxt)
+        dependsOn(generateLlmsFullTxt)
         dependsOn(copyEditorWasm)
         dependsOn(copyDokkaHtml)
     }
