@@ -74,15 +74,20 @@ kobweb {
 
 val generateLlmsTxt by tasks.registering {
     val templateFile = layout.projectDirectory.file("src/jsMain/resources/llms.txt.template")
-    val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/llms.txt")
+    val publicDir = layout.projectDirectory.dir("src/jsMain/resources/public")
+    val outputFile = publicDir.file("llms.txt")
+    val wellKnownOutputFile = publicDir.file(".well-known/llms.txt")
     val appVersion = appProperties["VERSION"].toString()
     inputs.file(templateFile)
     inputs.property("version", appVersion)
-    outputs.file(outputFile)
+    outputs.files(outputFile, wellKnownOutputFile)
     doLast {
-        outputFile.asFile.writeText(
-            templateFile.asFile.readText().replace("\${VERSION}", appVersion),
-        )
+        val content = templateFile.asFile.readText().replace("\${VERSION}", appVersion)
+        outputFile.asFile.writeText(content)
+        wellKnownOutputFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(content)
+        }
     }
 }
 

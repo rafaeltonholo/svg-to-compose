@@ -1,12 +1,12 @@
 # SVG to Compose
 
-> Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.
+> Convert SVG and Android XML Drawables into Jetpack Compose ImageVector code.
 
-SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android Vector Drawable (AVD/XML) files into Jetpack Compose ImageVector code. Available as a CLI tool, a Gradle plugin, and a library.
+SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML Drawable files into Jetpack Compose ImageVector code. Available as a CLI tool, a Gradle plugin, and a library.
 
 ## Documentation
 
-- [CLI Tool](https://www.svgtocompose.com/docs/cli): Command-line tool for converting SVG/AVD files
+- [CLI Tool](https://www.svgtocompose.com/docs/cli): Command-line tool for converting SVG and Android XML Drawable files
 - [Gradle Plugin](https://www.svgtocompose.com/docs/gradle-plugin): Automate conversion in your build pipeline
 - [API Reference](https://www.svgtocompose.com/api-docs/index.html): Generated API documentation
 
@@ -61,7 +61,7 @@ With Material Icons receiver:
 s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme -rt "Icons.Filled" icon.svg
 ```
 
-Android Vector Drawable:
+Android XML Drawable:
 
 ```sh
 s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.xml
