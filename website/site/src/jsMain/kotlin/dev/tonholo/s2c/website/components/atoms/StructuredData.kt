@@ -49,3 +49,112 @@ data object SoftwareApplicationStructuredData : StructuredDataType {
         }
     """.trimIndent()
 }
+
+data class BreadcrumbListStructuredData(
+    val items: List<BreadcrumbItem>,
+) : StructuredDataType {
+    data class BreadcrumbItem(
+        val name: String,
+        val url: String,
+    )
+
+    override fun toJsonLd(): String {
+        val itemsJson = items.mapIndexed { index, item ->
+            """
+            |    {
+            |      "@type": "ListItem",
+            |      "position": ${index + 1},
+            |      "name": "${item.name}",
+            |      "item": "${item.url}"
+            |    }
+            """.trimMargin()
+        }.joinToString(",\n")
+
+        return """
+            |{
+            |  "@context": "https://schema.org",
+            |  "@type": "BreadcrumbList",
+            |  "itemListElement": [
+            |$itemsJson
+            |  ]
+            |}
+        """.trimMargin()
+    }
+}
+
+data class FAQPageStructuredData(
+    val questions: List<QuestionAnswer>,
+) : StructuredDataType {
+    data class QuestionAnswer(
+        val question: String,
+        val answer: String,
+    )
+
+    override fun toJsonLd(): String {
+        val questionsJson = questions.joinToString(",\n") { qa ->
+            """
+            |    {
+            |      "@type": "Question",
+            |      "name": "${qa.question.escapeJsonString()}",
+            |      "acceptedAnswer": {
+            |        "@type": "Answer",
+            |        "text": "${qa.answer.escapeJsonString()}"
+            |      }
+            |    }
+            """.trimMargin()
+        }
+
+        return """
+            |{
+            |  "@context": "https://schema.org",
+            |  "@type": "FAQPage",
+            |  "mainEntity": [
+            |$questionsJson
+            |  ]
+            |}
+        """.trimMargin()
+    }
+}
+
+data class HowToStructuredData(
+    val name: String,
+    val description: String,
+    val steps: List<HowToStep>,
+) : StructuredDataType {
+    data class HowToStep(
+        val name: String,
+        val text: String,
+    )
+
+    override fun toJsonLd(): String {
+        val stepsJson = steps.mapIndexed { index, step ->
+            """
+            |    {
+            |      "@type": "HowToStep",
+            |      "position": ${index + 1},
+            |      "name": "${step.name.escapeJsonString()}",
+            |      "text": "${step.text.escapeJsonString()}"
+            |    }
+            """.trimMargin()
+        }.joinToString(",\n")
+
+        return """
+            |{
+            |  "@context": "https://schema.org",
+            |  "@type": "HowTo",
+            |  "name": "${name.escapeJsonString()}",
+            |  "description": "${description.escapeJsonString()}",
+            |  "step": [
+            |$stepsJson
+            |  ]
+            |}
+        """.trimMargin()
+    }
+}
+
+internal fun String.escapeJsonString(): String =
+    replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")

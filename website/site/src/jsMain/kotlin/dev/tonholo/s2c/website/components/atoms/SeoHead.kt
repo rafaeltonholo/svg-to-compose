@@ -44,8 +44,32 @@ fun SeoHead(data: PageLayoutData, path: String) {
         upsertCanonicalLink(canonicalUrl)
 
         // JSON-LD structured data
-        upsertJsonLd(data.structuredData)
+        val breadcrumbs = buildBreadcrumbs(path)
+        upsertJsonLd(listOf(breadcrumbs) + data.structuredData)
     }
+}
+
+private fun buildBreadcrumbs(path: String): BreadcrumbListStructuredData {
+    val segments = path.trim('/').split('/').filter { it.isNotEmpty() }
+    val items = mutableListOf(
+        BreadcrumbListStructuredData.BreadcrumbItem(
+            name = "Home",
+            url = BASE_URL,
+        ),
+    )
+    var currentPath = ""
+    for (segment in segments) {
+        currentPath += "/$segment"
+        val name = segment.replaceFirstChar { it.uppercase() }
+            .replace("-", " ")
+        items.add(
+            BreadcrumbListStructuredData.BreadcrumbItem(
+                name = name,
+                url = "$BASE_URL$currentPath",
+            ),
+        )
+    }
+    return BreadcrumbListStructuredData(items)
 }
 
 private fun upsertMeta(attributeName: String, attributeValue: String, content: String) {
