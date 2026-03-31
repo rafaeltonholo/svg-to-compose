@@ -39,6 +39,7 @@ import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.components.icons.fa.FaCircleQuestion
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
+import com.varabyte.kobweb.silk.components.icons.fa.FaCodeCompare
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -233,6 +234,13 @@ fun DocsPage() {
                     "and how to get started.",
                 href = "/docs/faq",
                 icon = { FaCircleQuestion(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
+            )
+            DocsCard(
+                title = "Alternatives",
+                description = "Compare SVG to Compose with manual coding, Android Studio, " +
+                    "and other conversion tools.",
+                href = "/docs/alternatives",
+                icon = { FaCodeCompare(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
             )
         }
     }
