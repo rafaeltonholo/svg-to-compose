@@ -225,5 +225,21 @@ private fun DropdownPanel(isOpen: Boolean) {
                 .role("menuitem"),
             variant = docLinkVariant,
         )
+        Link(
+            path = "/docs/faq",
+            text = "FAQ",
+            modifier = DocNavDropdownLinkStyle.toModifier()
+                .tabIndex(linkTabIndex)
+                .role("menuitem"),
+            variant = docLinkVariant,
+        )
+        Link(
+            path = "/docs/alternatives",
+            text = "Alternatives",
+            modifier = DocNavDropdownLinkStyle.toModifier()
+                .tabIndex(linkTabIndex)
+                .role("menuitem"),
+            variant = docLinkVariant,
+        )
     }
 }
