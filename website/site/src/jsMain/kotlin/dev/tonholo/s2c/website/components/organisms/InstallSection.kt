@@ -132,7 +132,7 @@ private fun CliInstallContent() {
                 |# Add execution permission to the script.
                 |chmod +x your/target/path/s2c
                 |# Add s2c to your path, so you can use it anywhere.
-                |export PATH="your/target/path/s2c:$PATH"
+                |export PATH="your/target/path:$PATH"
                 |# Call s2c
                 |s2c --help
             """.trimMargin(),

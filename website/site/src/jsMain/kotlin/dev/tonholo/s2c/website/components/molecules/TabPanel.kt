@@ -108,6 +108,9 @@ fun TabPanel(
     tabContent: ((index: Int, label: String) -> @Composable () -> Unit)? = null,
     panels: List<@Composable () -> Unit>,
 ) {
+    require(panels.size == tabs.size) {
+        "TabPanel: panels.size (${panels.size}) must match tabs.size (${tabs.size})"
+    }
     Div(attrs = modifier.fillMaxWidth().toAttrs()) {
         Row(
             modifier = TabBarStyle.toModifier().role("tablist"),

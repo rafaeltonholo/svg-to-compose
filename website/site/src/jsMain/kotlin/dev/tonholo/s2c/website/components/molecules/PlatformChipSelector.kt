@@ -20,6 +20,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.letterSpacing
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.role
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
 import com.varabyte.kobweb.compose.ui.modifiers.textTransform
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -86,13 +88,30 @@ val InactiveChipStyle = CssStyle {
 
 @Composable
 fun PlatformChipSelector(selectedPlatform: Platform, onSelect: (Platform) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier = ChipContainerStyle.toModifier().then(modifier)) {
+    Row(
+        modifier = ChipContainerStyle.toModifier()
+            .role("tablist")
+            .then(modifier),
+    ) {
         Platform.entries.forEach { platform ->
-            val style = if (platform == selectedPlatform) ActiveChipStyle else InactiveChipStyle
+            val isSelected = platform == selectedPlatform
+            val style = if (isSelected) ActiveChipStyle else InactiveChipStyle
             Div(
                 attrs = style.toModifier()
                     .onClick { onSelect(platform) }
-                    .toAttrs(),
+                    .tabIndex(if (isSelected) 0 else -1)
+                    .role("tab")
+                    .toAttrs {
+                        attr("aria-selected", isSelected.toString())
+                        onKeyDown { event ->
+                            when (event.key) {
+                                " ", "Enter" -> {
+                                    event.preventDefault()
+                                    onSelect(platform)
+                                }
+                            }
+                        }
+                    },
             ) {
                 Span { Text(platform.label) }
             }
