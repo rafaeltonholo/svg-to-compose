@@ -1,5 +1,6 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.link
+import java.time.LocalDate
 import java.util.Properties
 
 plugins {
@@ -143,7 +144,7 @@ val generateSitemap by tasks.registering {
                 val urlPath = if (relativePath == "Index") {
                     "/"
                 } else {
-                    "/" + relativePath.replace("/Index", "").lowercase()
+                    "/" + relativePath.replace("/Index", "")
                         .split("/")
                         .joinToString("/") { segment ->
                             // Convert PascalCase to kebab-case
@@ -157,7 +158,7 @@ val generateSitemap by tasks.registering {
             .sorted()
             .toList()
 
-        val today = java.time.LocalDate.now().toString()
+        val today = LocalDate.now().toString()
         val sitemap = buildString {
             appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
             appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
