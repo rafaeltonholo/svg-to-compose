@@ -18,9 +18,11 @@ import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.DocSection
+import dev.tonholo.s2c.website.components.atoms.InlineCode
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.Tbody
 import org.jetbrains.compose.web.dom.Td
@@ -44,26 +46,33 @@ fun AlternativesContent(modifier: Modifier = Modifier) {
 @Composable
 private fun OverviewSection() {
     DocSection(id = "overview", title = "Overview") {
-        SpanText(
-            text = "There are several ways to get Compose ImageVector code from vector graphics. " +
-                "Each approach has trade-offs in automation, platform support, and feature coverage. " +
-                "SVG to Compose aims to provide the most comprehensive solution for Kotlin " +
-                "Multiplatform projects.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(
+                "There are several ways to get Compose ",
+            )
+            InlineCode("ImageVector")
+            Text(
+                " code from vector graphics. Each approach has trade-offs in automation, platform " +
+                    "support, and feature coverage. SVG to Compose aims to provide the most " +
+                    "comprehensive solution for Kotlin Multiplatform projects.",
+            )
+        }
     }
 }
 
 @Composable
 private fun ManualConversionSection() {
     DocSection(id = "manual-conversion", title = "Manual Conversion") {
-        SpanText(
-            text = "Writing ImageVector.Builder code by hand works for simple icons but becomes " +
-                "tedious and error-prone for complex vectors with many path commands. There is no " +
-                "optimization, no automation, and no batch processing. Manual coding is suitable " +
-                "only for very simple icons with fewer than 5 path commands.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("Writing ")
+            InlineCode("ImageVector.Builder")
+            Text(
+                " code by hand works for simple icons but becomes tedious and error-prone for " +
+                    "complex vectors with many path commands. There is no optimization, no automation, " +
+                    "and no batch processing. Manual coding is suitable only for very simple icons " +
+                    "with fewer than 5 path commands.",
+            )
+        }
     }
 }
 
@@ -71,12 +80,32 @@ private fun ManualConversionSection() {
 private fun AndroidStudioImportSection() {
     DocSection(id = "android-studio-import", title = "Android Studio Import") {
         SpanText(
-            text = "Android Studio's built-in Vector Asset tool can import SVG files. However, it " +
-                "only targets Android (no Kotlin Multiplatform support), has no CLI for CI/CD " +
-                "pipelines, no batch processing, and limited SVG feature support. It converts to " +
-                "Android Vector Drawable XML, not directly to Compose ImageVector code.",
+            text = "Android Studio's built-in Vector Asset tool can import SVG files. While it " +
+                "technically works with Compose Multiplatform, it requires creating the drawable " +
+                "inside the Android target and then manually moving it to composeResources, " +
+                "which is impractical for larger icon sets.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
+        SpanText(
+            text = "The Android Studio import also has no CLI for CI/CD pipelines, no batch " +
+                "processing, and limited SVG feature support. It converts to Android Vector " +
+                "Drawable XML, not directly to Compose ImageVector code.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(
+                "A key limitation is that Android Vector Drawables only support a subset of " +
+                    "SVG features. Most community tools rely on the same Android Studio import " +
+                    "algorithm, inheriting these limitations. SVG to Compose uses its own parsing " +
+                    "algorithm, supporting almost all SVG features that the ",
+            )
+            InlineCode("ImageVector")
+            Text(
+                " API can represent - including features like ",
+            )
+            InlineCode("stroke-dasharray")
+            Text(" that other tools cannot handle.")
+        }
     }
 }
 
@@ -84,12 +113,15 @@ private fun AndroidStudioImportSection() {
 private fun CommunityToolsSection() {
     DocSection(id = "community-tools", title = "Community Tools") {
         SpanText(
-            text = "Other open-source tools exist for SVG-to-Compose conversion. SVG to Compose " +
-                "differentiates with:",
+            text = "Other open-source tools exist for SVG-to-Compose conversion. Most of them " +
+                "rely on the same Android Studio import algorithm, which limits them to the " +
+                "subset of SVG features that Android Vector Drawables support. " +
+                "SVG to Compose differentiates with:",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Ul(attrs = DocsBulletListStyle.toModifier().toAttrs()) {
-            Li { Text("Broader Kotlin Multiplatform target support (6 platforms)") }
+            Li { Text("Custom parsing algorithm with broader SVG feature coverage") }
+            Li { Text("Kotlin Multiplatform support across JVM, JS, WASM, macOS, Linux, and Windows") }
             Li { Text("Both CLI and Gradle plugin interfaces") }
             Li { Text("SVG optimization integration via SVGO and Avocado") }
             Li { Text("Active maintenance") }
@@ -106,13 +138,13 @@ private data class ComparisonRow(
 )
 
 private val comparisonRows = listOf(
-    ComparisonRow("KMP Support", "Yes (6 targets)", "Yes", "Android only", "Varies"),
+    ComparisonRow("KMP Support", "Yes", "Yes", "Android only", "Varies"),
     ComparisonRow("CLI Tool", "Yes", "N/A", "No", "Varies"),
     ComparisonRow("Gradle Plugin", "Yes", "N/A", "No", "Rare"),
     ComparisonRow("Batch Processing", "Yes", "Manual", "No", "Varies"),
     ComparisonRow("SVG Optimization", "Yes (SVGO)", "Manual", "Limited", "Varies"),
     ComparisonRow("Incremental Builds", "Yes", "N/A", "N/A", "Rare"),
-    ComparisonRow("Complex SVG Support", "High", "Depends on skill", "Moderate", "Varies"),
+    ComparisonRow("SVG Feature Coverage", "High (custom parser)", "Depends on skill", "Limited (SVG subset)", "Limited (SVG subset)"),
 )
 
 @Composable

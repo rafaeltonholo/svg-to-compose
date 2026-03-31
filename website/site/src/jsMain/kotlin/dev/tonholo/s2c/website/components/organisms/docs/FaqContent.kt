@@ -5,11 +5,18 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.FAQPageStructuredData
+import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
 
 val faqQuestions: List<FAQPageStructuredData.QuestionAnswer> = listOf(
     FAQPageStructuredData.QuestionAnswer(
@@ -76,13 +83,17 @@ fun FaqContent(modifier: Modifier = Modifier) {
 @Composable
 private fun WhatIsS2cSection() {
     DocSection(id = "what-is-s2c", title = "What is SVG to Compose?") {
-        SpanText(
-            text = "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +
-                "Drawable files into Jetpack Compose ImageVector code. It eliminates the manual, " +
-                "error-prone process of hand-writing ImageVector builder code. Available as a CLI " +
-                "tool, a Gradle plugin, and a library.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(
+                "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +
+                    "Drawable files into Jetpack Compose ",
+            )
+            InlineCode("ImageVector")
+            Text(
+                " code. It eliminates the manual, error-prone process of hand-writing " +
+                    "ImageVector builder code. Available as a CLI tool, a Gradle plugin, and a library.",
+            )
+        }
     }
 }
 
@@ -93,9 +104,9 @@ private fun HowToConvertSection() {
             text = "Install the CLI tool and run:",
             modifier = DocsBodyTextStyle.toModifier(),
         )
-        SpanText(
-            text = "s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.svg",
-            modifier = DocsBodyTextStyle.toModifier(),
+        CodeBlock(
+            code = "s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.svg",
+            language = "console",
         )
         SpanText(
             text = "For automated build integration, use the Gradle plugin instead. Both approaches " +
@@ -108,24 +119,32 @@ private fun HowToConvertSection() {
 @Composable
 private fun AndroidXmlDrawablesSection() {
     DocSection(id = "android-xml-drawables", title = "Android XML Drawables") {
-        SpanText(
-            text = "Yes. Pass an .xml file instead of .svg. The parser handles Android Vector " +
-                "Drawable XML format including path data, groups, gradients, and clip paths.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("Yes. Pass an ")
+            InlineCode(".xml")
+            Text(" file instead of ")
+            InlineCode(".svg")
+            Text(
+                ". The parser handles Android Vector Drawable XML format including path data, " +
+                    "groups, gradients, and clip paths.",
+            )
+        }
     }
 }
 
 @Composable
 private fun KotlinMultiplatformSection() {
     DocSection(id = "kotlin-multiplatform", title = "Kotlin Multiplatform") {
-        SpanText(
-            text = "Yes. SVG to Compose is built with Kotlin Multiplatform. The core library targets " +
-                "JVM, JS, WASM/JS, macOS, Linux, and Windows. Generated code uses Jetpack Compose's " +
-                "ImageVector API which works across all Compose targets. Use the --kmp flag with the " +
-                "CLI for KMP-compatible output.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(
+                "Yes. SVG to Compose is built with Kotlin Multiplatform. The core library targets " +
+                    "JVM, JS, WASM/JS, macOS, Linux, and Windows. Generated code uses Jetpack Compose's ",
+            )
+            InlineCode("ImageVector")
+            Text(" API which works across all Compose targets. Use the ")
+            InlineCode("--kmp")
+            Text(" flag with the CLI for KMP-compatible output.")
+        }
     }
 }
 
@@ -157,11 +176,27 @@ private fun CliVsGradleSection() {
 @Composable
 private fun OptimizationSection() {
     DocSection(id = "optimization", title = "Code Optimization") {
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
+                "for XML Drawable optimization to optimize vector paths before code generation. The generated ")
+            InlineCode("ImageVector")
+            Text(" uses lazy initialization with a backing field for efficient caching.")
+        }
         SpanText(
-            text = "Yes. SVG to Compose integrates with SVGO (for SVG files) and Avocado (for Android " +
-                "XML Drawables) to optimize vector paths before code generation. The generated " +
-                "ImageVector uses lazy initialization with a backing field for efficient caching.",
+            text = "Install the optimization tools globally:",
             modifier = DocsBodyTextStyle.toModifier(),
         )
+        CodeBlock(
+            code = """
+                |npm install -g svgo    # SVG optimization
+                |npm install -g avocado # XML Drawable optimization
+            """.trimMargin(),
+            language = "console",
+        )
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("For more details, see the ")
+            Link(path = "/docs/cli", variant = SiteLinkStyleVariant) { Text("CLI documentation") }
+            Text(" section on external dependencies.")
+        }
     }
 }
