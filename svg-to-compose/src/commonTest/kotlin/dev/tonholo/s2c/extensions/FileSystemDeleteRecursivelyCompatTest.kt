@@ -57,4 +57,15 @@ class FileSystemDeleteRecursivelyCompatTest {
         // Assert
         assertTrue(!fs.exists(file))
     }
+
+    @Test
+    fun `given empty directory when deleteRecursivelyCompat then directory is removed`() {
+        // Arrange
+        val dir = "/empty-dir".toPath()
+        fs.createDirectories(dir)
+        // Act
+        fs.deleteRecursivelyCompat(dir)
+        // Assert
+        assertTrue(!fs.exists(dir))
+    }
 }

@@ -5,6 +5,7 @@ import okio.fakefilesystem.FakeFileSystem
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class FileSystemListRecursivelyTest {
@@ -71,5 +72,33 @@ class FileSystemListRecursivelyTest {
         val result = fs.listRecursively(root).toList()
         // Assert
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `given non-existent directory when listing then throws on iteration`() {
+        // Arrange
+        val root = "/does-not-exist".toPath()
+        // Act & Assert
+        assertFailsWith<okio.IOException> {
+            fs.listRecursively(root).toList()
+        }
+    }
+
+    @Test
+    fun `given deep directory tree when listing with no maxDepth then returns all levels`() {
+        // Arrange
+        // root/
+        //   d1/
+        //     d2/
+        //       d3/
+        //         d4/
+        //           deep.svg
+        val root = "/deep".toPath()
+        fs.createDirectories(root / "d1" / "d2" / "d3" / "d4")
+        fs.write(root / "d1" / "d2" / "d3" / "d4" / "deep.svg") { writeUtf8("deep") }
+        // Act
+        val result = fs.listRecursively(root).map { it.name }.toList()
+        // Assert
+        assertEquals(listOf("d1", "d2", "d3", "d4", "deep.svg"), result)
     }
 }
