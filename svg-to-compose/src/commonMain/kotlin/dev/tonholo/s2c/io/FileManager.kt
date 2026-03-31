@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.io
 
 import dev.tonholo.s2c.domain.FileType
+import dev.tonholo.s2c.extensions.deleteRecursivelyCompat
 import dev.tonholo.s2c.extensions.listRecursively
 import dev.tonholo.s2c.logger.Logger
 import okio.BufferedSink
@@ -99,7 +100,7 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
     }
 
     override fun deleteRecursively(fileOrDirectory: Path, mustExist: Boolean) {
-        fileSystem.deleteRecursively(fileOrDirectory, mustExist)
+        fileSystem.deleteRecursivelyCompat(fileOrDirectory, mustExist)
     }
 
     override fun delete(fileOrDirectory: Path, mustExist: Boolean) {
