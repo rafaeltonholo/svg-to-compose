@@ -37,6 +37,7 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
+import com.varabyte.kobweb.silk.components.icons.fa.FaCircleQuestion
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
@@ -225,6 +226,13 @@ fun DocsPage() {
                 description = "Detailed API documentation generated from source code with Dokka.",
                 href = "/api-docs/index.html",
                 icon = { FaCode(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
+            )
+            DocsCard(
+                title = "FAQ",
+                description = "Common questions about SVG to Compose, supported features, " +
+                    "and how to get started.",
+                href = "/docs/faq",
+                icon = { FaCircleQuestion(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
             )
         }
     }
