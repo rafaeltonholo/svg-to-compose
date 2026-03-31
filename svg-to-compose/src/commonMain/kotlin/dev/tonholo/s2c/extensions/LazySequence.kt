@@ -22,6 +22,11 @@ internal fun <T> lazySequence(seeds: Iterable<T>, childrenOf: (T) -> Iterable<T>
  * Each level of the tree is represented by an [Iterator] on the [stack].
  * When a node is emitted its children (if any) are pushed so they are
  * visited before remaining siblings.
+ *
+ * **Not thread-safe.** A new instance is created per [Sequence.iterator] call,
+ * so concurrent iteration of the same [Sequence] instance is safe as long as
+ * each consumer obtains its own iterator. Sharing a single iterator across
+ * threads will corrupt the internal stack.
  */
 private class DepthFirstIterator<T>(seeds: Iterable<T>, private val childrenOf: (T) -> Iterable<T>?) : Iterator<T> {
     private val stack = ArrayDeque<Iterator<T>>()
