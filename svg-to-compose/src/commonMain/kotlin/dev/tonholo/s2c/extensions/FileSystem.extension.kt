@@ -5,103 +5,89 @@ import okio.IOException
 import okio.Path
 
 /**
- * Okio has a nice API for listing directories recursively;
- * however, it doesn't provide a way to limit for how much
- * deep the recursive directory search goes.
+ * Lists all paths within [dir] recursively with an optional [maxDepth] limit.
  *
- * Having that in mind, and to avoid CLI searching forever
- * in the filesystem in case of user input a root directory
- * like `/`, I have copied their implementation of
- * [FileSystem.listRecursively], extending it to receive a
- * [maxDepth] parameter to limit that search, in case of
- * specified.
+ * Uses [lazySequence] backed by a stack-based [Iterator] instead of Kotlin's
+ * [sequence] builder.  This avoids coroutine bytecode that references
+ * `kotlin.coroutines.jvm.internal.SpillingKt` - a class absent from the Kotlin
+ * stdlib bundled with Gradle 8.x, which would cause [ClassNotFoundException] at
+ * runtime inside the Gradle plugin.
  *
- * If [maxDepth] is not specified, it forwards to the Okio API.
- *
- * Refer to [FileSystem.listRecursively] documentation to
- * understand about this API.
+ * @param maxDepth maximum directory depth to descend into. `null` means
+ *   unlimited. Depth 0 returns only the direct children of [dir].
  */
 internal fun FileSystem.listRecursively(
     dir: Path,
     followSymlinks: Boolean = false,
     maxDepth: Int? = null,
-): Sequence<Path> = if (maxDepth == null) {
-    listRecursively(dir, followSymlinks)
-} else {
-    sequence {
-        val stack = ArrayDeque<Path>()
-        stack.addLast(dir)
-        for (child in list(dir)) {
-            collectRecursively(
-                fileSystem = this@listRecursively,
-                stack = stack,
-                path = child,
-                followSymlinks = followSymlinks,
-                postorder = false,
-                depth = 0,
-                maxDepth = maxDepth,
-            )
-        }
-    }
-}
+): Sequence<Path> {
+    val fileSystem = this
+    val rootDepth = dir.segments.size
 
-@Suppress("CognitiveComplexMethod", "NestedBlockDepth")
-private suspend fun SequenceScope<Path>.collectRecursively(
-    fileSystem: FileSystem,
-    stack: ArrayDeque<Path>,
-    path: Path,
-    followSymlinks: Boolean,
-    postorder: Boolean,
-    depth: Int,
-    maxDepth: Int,
-) {
-    // stop when deep overpass the maximum deep.
-    if (depth > maxDepth) return
+    return lazySequence(seeds = list(dir)) { path ->
+        val depth = path.segments.size - rootDepth - 1
+        if (maxDepth != null && depth >= maxDepth) return@lazySequence null
 
-    // For listRecursively, visit enclosing directory first.
-    if (!postorder) {
-        yield(path)
-    }
-
-    val children = fileSystem.listOrNull(path).orEmpty()
-    if (children.isNotEmpty()) {
-        // Figure out if the path is a symlink and detect symlink cycles.
-        var symlinkPath = path
-        var symlinkCount = 0
-        while (true) {
-            if (followSymlinks && symlinkPath in stack) throw IOException("symlink cycle at $path")
-            symlinkPath = fileSystem.symlinkTarget(symlinkPath) ?: break
-            symlinkCount++
-        }
-
-        // Recursively visit children.
-        if (followSymlinks || symlinkCount == 0) {
-            stack.addLast(symlinkPath)
-            try {
-                for (child in children) {
-                    collectRecursively(
-                        fileSystem = fileSystem,
-                        stack = stack,
-                        path = child,
-                        followSymlinks = followSymlinks,
-                        postorder = postorder,
-                        depth = depth + 1,
-                        maxDepth = maxDepth,
-                    )
-                }
-            } finally {
-                stack.removeLast()
+        val children = fileSystem.listOrNull(path).orEmpty()
+        children.takeIf { it.isNotEmpty() }?.also {
+            val symlinkTarget = fileSystem.symlinkTarget(path)
+            if (symlinkTarget != null && followSymlinks) {
+                // Following symlinks: resolve the full chain and check for chain cycles.
+                fileSystem.resolveSymlinks(path)
             }
         }
     }
+}
 
-    // For deleteRecursively, visit enclosing directory last.
-    if (postorder) {
-        yield(path)
+/**
+ * Resolves the full symlink chain for [path], detecting chain cycles.
+ *
+ * Uses a local visited set per call so that two independent symlinks pointing
+ * to the same target are **not** falsely flagged as a cycle.
+ *
+ * @return the resolved real path.
+ * @throws IOException if the symlink chain forms a loop.
+ */
+@Throws(IOException::class)
+private fun FileSystem.resolveSymlinks(path: Path): Path {
+    val visited = mutableSetOf<Path>()
+    var current = path
+    while (true) {
+        if (!visited.add(current)) {
+            throw IOException("symlink cycle at $path")
+        }
+        current = symlinkTarget(current) ?: break
+    }
+    return current
+}
+
+/**
+ * Recursively deletes all children of [fileOrDirectory] then the directory
+ * itself, using [lazySequence] to enumerate paths (preorder) and deleting in
+ * reverse (postorder) to satisfy the filesystem constraint that a directory
+ * must be empty before deletion.
+ *
+ * Avoids Okio's [FileSystem.deleteRecursively] which internally uses Kotlin's
+ * [sequence] builder
+ *
+ * @see [listRecursively] KDoc for why.
+ */
+internal fun FileSystem.deleteRecursivelyCompat(fileOrDirectory: Path, mustExist: Boolean = false) {
+    if (!exists(fileOrDirectory)) {
+        if (mustExist) throw IOException("$fileOrDirectory does not exist")
+        return
+    }
+    val allPaths = lazySequence(seeds = listOf(fileOrDirectory)) { path ->
+        listOrNull(path)
+    }.toList()
+
+    // Delete in reverse order (deepest children first).
+    for (path in allPaths.asReversed()) {
+        delete(path, mustExist = false)
     }
 }
 
-/** Returns a resolved path to the symlink target, resolving it if necessary. */
+/** Resolves a symlink target relative to its parent, or returns null if not a symlink. */
 @Throws(IOException::class)
 private fun FileSystem.symlinkTarget(path: Path): Path? {
     val target = metadata(path).symlinkTarget ?: return null

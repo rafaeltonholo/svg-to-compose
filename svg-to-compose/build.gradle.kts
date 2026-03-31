@@ -28,6 +28,7 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.org.jetbrains.kotlinx.coroutines.test)
+            implementation(libs.com.squareup.okio.fakefilesystem)
         }
 
         nativeMain.dependencies {

@@ -6,7 +6,7 @@ import kotlin.test.assertTrue
 
 class LazySequenceTest {
     @Test
-    fun `given empty seeds, when iterating, then returns empty sequence`() {
+    fun `given empty seeds when iterating then returns empty sequence`() {
         // Arrange
         val seeds = emptyList<String>()
         // Act
@@ -16,7 +16,7 @@ class LazySequenceTest {
     }
 
     @Test
-    fun `given flat seeds with no children, when iterating, then returns seeds in order`() {
+    fun `given flat seeds with no children when iterating then returns seeds in order`() {
         // Arrange
         val seeds = listOf("a", "b", "c")
         // Act
@@ -26,7 +26,7 @@ class LazySequenceTest {
     }
 
     @Test
-    fun `given tree structure, when iterating, then returns depth-first preorder`() {
+    fun `given tree structure when iterating then returns depth-first preorder`() {
         // Arrange
         // Tree:  a -> [a1, a2], a1 -> [a1x], b -> [b1]
         val tree = mapOf(
@@ -42,7 +42,7 @@ class LazySequenceTest {
     }
 
     @Test
-    fun `given tree structure, when iterating lazily, then only visits as needed`() {
+    fun `given tree structure when iterating lazily then only visits as needed`() {
         // Arrange
         var childrenCalls = 0
         val tree = mapOf(
