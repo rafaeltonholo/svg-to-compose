@@ -31,7 +31,7 @@ class FileSystemDeleteRecursivelyCompatTest {
         // Act
         fs.deleteRecursivelyCompat(root)
         // Assert
-        assertTrue(!fs.exists(root))
+        assertFalse(fs.exists(root))
     }
 
     @Test
@@ -60,7 +60,7 @@ class FileSystemDeleteRecursivelyCompatTest {
         // Act
         fs.deleteRecursivelyCompat(file)
         // Assert
-        assertTrue(!fs.exists(file))
+        assertFalse(fs.exists(file))
     }
 
     @Test
@@ -71,7 +71,7 @@ class FileSystemDeleteRecursivelyCompatTest {
         // Act
         fs.deleteRecursivelyCompat(dir)
         // Assert
-        assertTrue(!fs.exists(dir))
+        assertFalse(fs.exists(dir))
     }
 
     @Test
@@ -116,12 +116,12 @@ class FileSystemDeleteRecursivelyCompatTest {
         // Act
         recorder.deleteRecursivelyCompat(root)
         // Assert - all paths deleted and nothing remains
-        assertTrue(!fs.exists(root))
+        assertFalse(fs.exists(root))
         // Each file should have been deleted individually (500 files + 10 dirs + root = 511).
         val expectedDeletions = 500 + 10 + 1
         assertEquals(
-            expected = recorder.deletedPaths.size,
-            actual = expectedDeletions,
+            expected = expectedDeletions,
+            actual = recorder.deletedPaths.size,
             message = "Expected $expectedDeletions deletions but got ${recorder.deletedPaths.size}",
         )
         // The peak live set during deletion should be bounded by tree depth,
