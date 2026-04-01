@@ -36,10 +36,12 @@ internal fun FileSystem.listRecursively(dir: Path, maxDepth: Int? = null): Seque
 }
 
 /**
- * Recursively deletes all children of [fileOrDirectory] then the directory
- * itself, using [lazySequence] to enumerate paths (preorder) and deleting in
- * reverse (postorder) to satisfy the filesystem constraint that a directory
- * must be empty before deletion.
+ * Recursively deletes [fileOrDirectory] and all of its contents using a
+ * stack-based post-order traversal. Each directory's children are deleted
+ * before the directory itself, satisfying the filesystem constraint that a
+ * directory must be empty before deletion. Files are deleted immediately
+ * as they are visited, so memory usage is proportional to the tree depth,
+ * not total node count.
  *
  * Avoids Okio's [FileSystem.deleteRecursively] which internally uses Kotlin's
  * [sequence] builder.
@@ -51,12 +53,24 @@ internal fun FileSystem.deleteRecursivelyCompat(fileOrDirectory: Path, mustExist
         if (mustExist) throw IOException("$fileOrDirectory does not exist")
         return
     }
-    val allPaths = lazySequence(seeds = listOf(fileOrDirectory)) { path ->
-        listOrNull(path)
-    }.toList()
+    // Stack holds directories whose children still need to be visited.
+    // Once all children of a directory are processed, the directory itself
+    // is deleted.
+    val stack = ArrayDeque<Path>()
+    stack.addLast(fileOrDirectory)
 
-    // Delete in reverse order (deepest children first).
-    for (path in allPaths.asReversed()) {
-        delete(path, mustExist = false)
+    while (stack.isNotEmpty()) {
+        val current = stack.last()
+        val children = listOrNull(current)
+        if (children.isNullOrEmpty()) {
+            // Leaf file or now-empty directory: delete and pop.
+            stack.removeLast()
+            delete(current, mustExist = false)
+        } else {
+            // Push children so they are processed before the parent.
+            for (child in children) {
+                stack.addLast(child)
+            }
+        }
     }
 }
