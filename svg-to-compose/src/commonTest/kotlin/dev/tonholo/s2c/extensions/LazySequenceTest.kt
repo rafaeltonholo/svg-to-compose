@@ -10,7 +10,7 @@ class LazySequenceTest {
         // Arrange
         val seeds = emptyList<String>()
         // Act
-        val result = lazySequence(seeds) { null }.toList()
+        val result = depthFirstSequence(seeds) { null }.toList()
         // Assert
         assertTrue(result.isEmpty())
     }
@@ -20,7 +20,7 @@ class LazySequenceTest {
         // Arrange
         val seeds = listOf("a", "b", "c")
         // Act
-        val result = lazySequence(seeds) { null }.toList()
+        val result = depthFirstSequence(seeds) { null }.toList()
         // Assert
         assertEquals(listOf("a", "b", "c"), result)
     }
@@ -36,7 +36,7 @@ class LazySequenceTest {
         )
         val seeds = listOf("a", "b")
         // Act
-        val result = lazySequence(seeds) { node -> tree[node] }.toList()
+        val result = depthFirstSequence(seeds) { node -> tree[node] }.toList()
         // Assert
         assertEquals(listOf("a", "a1", "a1x", "a2", "b", "b1"), result)
     }
@@ -51,7 +51,7 @@ class LazySequenceTest {
         )
         val seeds = listOf("a")
         // Act - only take first 2
-        val result = lazySequence(seeds) { node ->
+        val result = depthFirstSequence(seeds) { node ->
             childrenCalls++
             tree[node]
         }.take(2).toList()

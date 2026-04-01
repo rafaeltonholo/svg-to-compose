@@ -122,7 +122,7 @@ class FileSystemDeleteRecursivelyCompatTest {
         assertEquals(
             expected = recorder.deletedPaths.size,
             actual = expectedDeletions,
-            message = "Expected $expectedDeletions deletions but got ${recorder.deletedPaths.size}"
+            message = "Expected $expectedDeletions deletions but got ${recorder.deletedPaths.size}",
         )
         // The peak live set during deletion should be bounded by tree depth,
         // not total node count. We verify this indirectly: if the

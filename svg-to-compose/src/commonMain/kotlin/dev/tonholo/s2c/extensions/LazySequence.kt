@@ -13,7 +13,7 @@ package dev.tonholo.s2c.extensions
  * @param childrenOf returns the children of a node, or `null`/empty if the node
  *   is a leaf.
  */
-internal fun <T> lazySequence(seeds: Iterable<T>, childrenOf: (T) -> Iterable<T>?): Sequence<T> =
+internal fun <T> depthFirstSequence(seeds: Iterable<T>, childrenOf: (T) -> Iterable<T>?): Sequence<T> =
     Sequence { DepthFirstIterator(seeds, childrenOf) }
 
 /**

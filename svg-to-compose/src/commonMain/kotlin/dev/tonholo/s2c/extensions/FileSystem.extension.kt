@@ -10,7 +10,7 @@ import okio.Path
  * Symlinks are **not** followed. Symlink entries are emitted as regular paths
  * but their targets are not traversed.
  *
- * Uses [lazySequence] backed by a stack-based [Iterator] instead of Kotlin's
+ * Uses [depthFirstSequence] backed by a stack-based [Iterator] instead of Kotlin's
  * [sequence] builder. This avoids coroutine bytecode that references
  * `kotlin.coroutines.jvm.internal.SpillingKt`, a class absent from the Kotlin
  * stdlib bundled with Gradle 8.x, which would cause [ClassNotFoundException] at
@@ -22,14 +22,14 @@ import okio.Path
 internal fun FileSystem.listRecursively(dir: Path, maxDepth: Int? = null): Sequence<Path> {
     val rootDepth = dir.segments.size
 
-    return lazySequence(seeds = list(dir)) { path ->
+    return depthFirstSequence(seeds = list(dir)) { path ->
         // Depth is relative to `dir`: direct children are depth 0, their
         // children are depth 1, etc.  `segments.size` counts every component
         // of the absolute path, so subtracting `rootDepth` (the segment count
         // of `dir`) gives the nesting level, minus 1 because `dir` itself is
         // not part of the result.
         val depth = path.segments.size - rootDepth - 1
-        if (maxDepth != null && depth >= maxDepth) return@lazySequence null
+        if (maxDepth != null && depth >= maxDepth) return@depthFirstSequence null
 
         listOrNull(path)?.ifEmpty { null }
     }
