@@ -96,12 +96,11 @@ private fun InstallationSection() {
             tabs = tabs,
             selectedIndex = selectedTab,
             onSelect = { selectedTab = it },
-        ) {
-            when (selectedTab) {
-                0 -> PluginsDslTab()
-                1 -> BuildSrcTab()
-            }
-        }
+            panels = listOf(
+                { PluginsDslTab() },
+                { BuildSrcTab() },
+            ),
+        )
     }
 }
 

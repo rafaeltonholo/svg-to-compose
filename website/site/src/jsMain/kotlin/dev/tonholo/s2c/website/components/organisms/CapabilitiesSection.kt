@@ -30,6 +30,9 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H2
+import org.jetbrains.compose.web.dom.H3
+import org.jetbrains.compose.web.dom.Text
 
 private const val CAPABILITIES_COLUMN_COUNT = 3
 
@@ -86,19 +89,20 @@ private val categories = listOf(
 fun CapabilitiesSection(modifier: Modifier = Modifier) {
     val palette = ColorMode.current.toSitePalette()
     SectionContainer(id = "capabilities", modifier = modifier, altBackground = true) {
-        SpanText(
-            "Capabilities",
-            modifier = LabelTextStyle.toModifier()
+        H2(
+            attrs = LabelTextStyle.toModifier()
                 .color(palette.onSurfaceVariant)
-                .margin(bottom = SiteTheme.dimensions.size.Lg),
-        )
+                .margin(bottom = SiteTheme.dimensions.size.Lg)
+                .toAttrs(),
+        ) {
+            Text("Capabilities")
+        }
 
         Div(attrs = CapabilitiesGridStyle.toModifier().toAttrs()) {
             categories.forEach { category ->
                 Div {
-                    SpanText(
-                        category.title,
-                        modifier = Modifier
+                    H3(
+                        attrs = Modifier
                             .fontWeight(FontWeight.SemiBold)
                             .fontSize(1.125.cssRem)
                             .display(DisplayStyle.Block)
@@ -108,8 +112,11 @@ fun CapabilitiesSection(modifier: Modifier = Modifier) {
                                 width = 2.px,
                                 style = LineStyle.Solid,
                                 color = palette.primary,
-                            ),
-                    )
+                            )
+                            .toAttrs(),
+                    ) {
+                        Text(category.title)
+                    }
                     category.items.forEach { item ->
                         SpanText(
                             item,

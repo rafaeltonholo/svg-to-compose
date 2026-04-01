@@ -32,6 +32,7 @@ import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.FlexWrap
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Section
 
 val CompactIntroStyle = CssStyle {
@@ -79,7 +80,7 @@ fun HeroSection(modifier: Modifier = Modifier) {
             .toAttrs(),
     ) {
         Div(attrs = IntroContentStyle.toModifier().toAttrs()) {
-            Div(
+            H1(
                 attrs = DisplayTextStyle
                     .toModifier()
                     .display(DisplayStyle.Flex)
