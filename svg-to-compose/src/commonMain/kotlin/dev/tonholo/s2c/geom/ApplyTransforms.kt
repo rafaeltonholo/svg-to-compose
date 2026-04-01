@@ -122,27 +122,45 @@ fun List<PathNodes>.applyTransformations(vararg transformations: AffineTransform
     return applyTransformation(combinedMatrix)
 }
 
-fun List<PathNodes>.applyTransformation(transformation: AffineTransformation): Sequence<PathNodes> = sequence {
-    val start = doubleArrayOf(0.0, 0.0)
-    val cursor = doubleArrayOf(0.0, 0.0)
+/**
+ * Applies [transformation] to every [PathNodes] in this list, returning a
+ * lazy [Sequence] of transformed nodes.
+ *
+ * Uses an explicit [Iterator] instead of Kotlin's [sequence] builder to
+ * avoid coroutine bytecode (`SpillingKt`) that is absent from the Kotlin
+ * stdlib bundled with Gradle 8.x.
+ */
+fun List<PathNodes>.applyTransformation(transformation: AffineTransformation): Sequence<PathNodes> {
+    val source = this
+    return Sequence {
+        object : Iterator<PathNodes> {
+            private val delegate = source.iterator()
+            private val start = doubleArrayOf(0.0, 0.0)
+            private val cursor = doubleArrayOf(0.0, 0.0)
 
-    for (node in this@applyTransformation) {
-        val newNode = node.transform(cursor, start, transformation).let { transformed ->
-            // As some transformation changes the type of the node,
-            // we need to run the transformation again for the new type.
-            if (node::class != transformed::class) {
-                transformed.transform(cursor, start, transformation)
-            } else {
-                transformed
+            override fun hasNext(): Boolean = delegate.hasNext()
+
+            override fun next(): PathNodes {
+                if (!hasNext()) throw NoSuchElementException()
+                val node = delegate.next()
+                val newNode = node.transform(cursor, start, transformation).let { transformed ->
+                    // As some transformation changes the type of the node,
+                    // we need to run the transformation again for the new type.
+                    if (node::class != transformed::class) {
+                        transformed.transform(cursor, start, transformation)
+                    } else {
+                        transformed
+                    }
+                }
+
+                if (newNode.shouldClose) {
+                    cursor[0] = start[0]
+                    cursor[1] = start[1]
+                }
+
+                return newNode
             }
         }
-
-        if (newNode.shouldClose) {
-            cursor[0] = start[0]
-            cursor[1] = start[1]
-        }
-
-        yield(newNode)
     }
 }
 
