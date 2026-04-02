@@ -12,42 +12,42 @@ sealed interface StructuredDataType {
 data object WebSiteStructuredData : StructuredDataType {
     // language=json
     override fun toJsonLd(): String = """
-        {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "SVG to Compose",
-          "url": "$BASE_URL",
-          "description": "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.",
-          "publisher": {
-            "@type": "Person",
-            "name": "Rafael Tonholo",
-            "url": "https://rafael.tonholo.dev"
-          }
-        }
-    """.trimIndent()
+        |{
+        |  "@context": "https://schema.org",
+        |  "@type": "WebSite",
+        |  "name": "SVG to Compose",
+        |  "url": "${BASE_URL.escapeJsonString()}",
+        |  "description": "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code.",
+        |  "publisher": {
+        |    "@type": "Person",
+        |    "name": "Rafael Tonholo",
+        |    "url": "https://rafael.tonholo.dev"
+        |  }
+        |}
+    """.trimMargin()
 }
 
 data object SoftwareApplicationStructuredData : StructuredDataType {
     // language=json
     override fun toJsonLd(): String = """
-        {
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "SVG to Compose",
-          "applicationCategory": "DeveloperApplication",
-          "operatingSystem": "macOS, Linux, Windows",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "softwareVersion": "${BuildConfig.VERSION}",
-          "url": "$BASE_URL",
-          "description": "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code. Available as a CLI tool, Gradle plugin, and Kotlin Multiplatform library.",
-          "downloadUrl": "https://github.com/rafaeltonholo/svg-to-compose",
-          "license": "https://opensource.org/licenses/MIT"
-        }
-    """.trimIndent()
+        |{
+        |  "@context": "https://schema.org",
+        |  "@type": "SoftwareApplication",
+        |  "name": "SVG to Compose",
+        |  "applicationCategory": "DeveloperApplication",
+        |  "operatingSystem": "macOS, Linux, Windows",
+        |  "offers": {
+        |    "@type": "Offer",
+        |    "price": "0",
+        |    "priceCurrency": "USD"
+        |  },
+        |  "softwareVersion": "${BuildConfig.VERSION.escapeJsonString()}",
+        |  "url": "${BASE_URL.escapeJsonString()}",
+        |  "description": "Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code. Available as a CLI tool, Gradle plugin, and Kotlin Multiplatform library.",
+        |  "downloadUrl": "https://github.com/rafaeltonholo/svg-to-compose",
+        |  "license": "https://opensource.org/licenses/MIT"
+        |}
+    """.trimMargin()
 }
 
 data class BreadcrumbListStructuredData(
@@ -60,16 +60,18 @@ data class BreadcrumbListStructuredData(
 
     override fun toJsonLd(): String {
         val itemsJson = items.mapIndexed { index, item ->
+            // language=json
             """
             |    {
             |      "@type": "ListItem",
             |      "position": ${index + 1},
-            |      "name": "${item.name}",
-            |      "item": "${item.url}"
+            |      "name": "${item.name.escapeJsonString()}",
+            |      "item": "${item.url.escapeJsonString()}"
             |    }
             """.trimMargin()
         }.joinToString(",\n")
 
+        // language=json
         return """
             |{
             |  "@context": "https://schema.org",

@@ -1,6 +1,6 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.link
-import java.time.LocalDate
+import kotlinx.html.meta
 import java.util.Properties
 
 plugins {
@@ -26,8 +26,29 @@ version = "1.0-SNAPSHOT"
 kobweb {
     app {
         index {
-            description.set("Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code")
+            val desc = "Convert SVG and Android XML Drawables into Jetpack Compose ImageVector code"
+            description.set(desc)
             head.add {
+                // Default meta for crawlers that don't execute JS (Bing, social media scrapers)
+                meta(name = "robots", content = "index, follow")
+                meta(name = "theme-color", content = "#ffffff")
+                meta {
+                    attributes["property"] = "og:title"
+                    attributes["content"] = "SVG to Compose"
+                }
+                meta {
+                    attributes["property"] = "og:description"
+                    attributes["content"] = desc
+                }
+                meta {
+                    attributes["property"] = "og:type"
+                    attributes["content"] = "website"
+                }
+                meta {
+                    attributes["property"] = "og:locale"
+                    attributes["content"] = "en_US"
+                }
+                meta(name = "twitter:card", content = "summary_large_image")
                 link {
                     rel = "preconnect"
                     href = "https://fonts.googleapis.com"
@@ -83,7 +104,7 @@ val generateLlmsTxt by tasks.registering {
     inputs.property("version", appVersion)
     outputs.files(outputFile, wellKnownOutputFile)
     doLast {
-        val content = templateFile.asFile.readText().replace("\${VERSION}", appVersion)
+        val content = templateFile.asFile.readText().replace($$"${VERSION}", appVersion)
         outputFile.asFile.writeText(content)
         wellKnownOutputFile.asFile.apply {
             parentFile.mkdirs()
@@ -102,7 +123,7 @@ val generateLlmsFullTxt by tasks.registering {
     inputs.property("version", appVersion)
     outputs.files(outputFile, wellKnownOutputFile)
     doLast {
-        val content = templateFile.asFile.readText().replace("\${VERSION}", appVersion)
+        val content = templateFile.asFile.readText().replace($$"${VERSION}", appVersion)
         outputFile.asFile.writeText(content)
         wellKnownOutputFile.asFile.apply {
             parentFile.mkdirs()
@@ -158,7 +179,9 @@ val generateSitemap by tasks.registering {
             .sorted()
             .toList()
 
-        val today = LocalDate.now().toString()
+        val today = providers.exec {
+            commandLine("git", "log", "-1", "--format=%cs")
+        }.standardOutput.asText.get().trim()
         val sitemap = buildString {
             appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
             appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
@@ -183,7 +206,7 @@ val copyEditorWasm by tasks.registering(Copy::class) {
     into(layout.projectDirectory.dir("src/jsMain/resources/public/editor"))
 }
 
-val dokkaOutputDir = rootProject.layout.projectDirectory.dir("../build/dokka")
+val dokkaOutputDir: Directory = rootProject.layout.projectDirectory.dir("../build/dokka")
 val copyDokkaHtml by tasks.registering(Sync::class) {
     from(dokkaOutputDir)
     into(layout.projectDirectory.dir("src/jsMain/resources/public/api-docs"))

@@ -13,13 +13,16 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
+import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
 import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Span
@@ -126,6 +129,15 @@ private fun CommunityToolsSection() {
             Li { Text("SVG optimization integration via SVGO and Avocado") }
             Li { Text("Active maintenance") }
         }
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("Learn more about the ")
+            Link(path = "/docs/cli", variant = SiteLinkStyleVariant) { Text("CLI tool") }
+            Text(" and ")
+            Link(path = "/docs/gradle-plugin", variant = SiteLinkStyleVariant) { Text("Gradle plugin") }
+            Text(", or check the ")
+            Link(path = "/docs/faq", variant = SiteLinkStyleVariant) { Text("FAQ") }
+            Text(" for common questions.")
+        }
     }
 }
 
@@ -158,14 +170,14 @@ private fun ComparisonTableSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Table(
-            attrs = PlatformTableStyle.toModifier()
+            attrs = DocsTableStyle.toModifier()
                 .attrsModifier { attr("aria-label", "Feature comparison table") }
                 .toAttrs(),
         ) {
             Thead {
                 Tr {
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .textAlign(TextAlign.Start)
                             .color(palette.onSurface)
@@ -175,7 +187,7 @@ private fun ComparisonTableSection() {
                         Text("Feature")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
@@ -184,7 +196,7 @@ private fun ComparisonTableSection() {
                         Text("SVG to Compose")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
@@ -193,7 +205,7 @@ private fun ComparisonTableSection() {
                         Text("Manual Coding")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
@@ -202,7 +214,7 @@ private fun ComparisonTableSection() {
                         Text("Android Studio")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
@@ -214,7 +226,7 @@ private fun ComparisonTableSection() {
             }
             Tbody {
                 comparisonRows.forEachIndexed { index, row ->
-                    ComparisonTableRow(row = row, index = index)
+                    ComparisonTableRow(row = row, index = index, palette = palette)
                 }
             }
         }
@@ -222,8 +234,7 @@ private fun ComparisonTableSection() {
 }
 
 @Composable
-private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
-    val palette = ColorMode.current.toSitePalette()
+private fun ComparisonTableRow(row: ComparisonRow, index: Int, palette: SitePalette) {
     val backgroundModifier = if (index % 2 != 0) {
         Modifier.backgroundColor(palette.onBackground.toRgb().copyf(alpha = 0.06f))
     } else {
@@ -231,7 +242,7 @@ private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
     }
     Tr(attrs = backgroundModifier.toAttrs()) {
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .fontWeight(FontWeight.Medium)
                 .color(palette.onSurface)
@@ -240,7 +251,7 @@ private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
             Text(row.feature)
         }
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .textAlign(TextAlign.Center)
                 .color(palette.onSurface)
@@ -249,7 +260,7 @@ private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
             Text(row.svgToCompose)
         }
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .textAlign(TextAlign.Center)
                 .color(palette.onSurface)
@@ -258,7 +269,7 @@ private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
             Text(row.manualCoding)
         }
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .textAlign(TextAlign.Center)
                 .color(palette.onSurface)
@@ -267,7 +278,7 @@ private fun ComparisonTableRow(row: ComparisonRow, index: Int) {
             Text(row.androidStudio)
         }
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .textAlign(TextAlign.Center)
                 .color(palette.onSurface)

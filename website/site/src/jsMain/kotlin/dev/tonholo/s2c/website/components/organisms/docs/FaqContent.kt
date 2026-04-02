@@ -18,7 +18,7 @@ import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-val faqQuestions: List<FAQPageStructuredData.QuestionAnswer> = listOf(
+internal val faqQuestions: List<FAQPageStructuredData.QuestionAnswer> = listOf(
     FAQPageStructuredData.QuestionAnswer(
         question = "What is SVG to Compose?",
         answer = "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +

@@ -4,3 +4,7 @@
 src/jsMain/resources/public/editor
 src/jsMain/resources/public/api-docs
 src/jsMain/resources/public/llms.txt
+src/jsMain/resources/public/llms-full.txt
+src/jsMain/resources/public/.well-known/llms.txt
+src/jsMain/resources/public/.well-known/llms-full.txt
+src/jsMain/resources/public/sitemap.xml
