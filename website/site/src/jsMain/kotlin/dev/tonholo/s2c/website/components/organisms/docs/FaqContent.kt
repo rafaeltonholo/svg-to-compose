@@ -118,7 +118,7 @@ private fun HowToConvertSection() {
 
 @Composable
 private fun AndroidXmlDrawablesSection() {
-    DocSection(id = "android-xml-drawables", title = "Android XML Drawables") {
+    DocSection(id = "android-xml-drawables", title = "Does it support Android XML Drawables?") {
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text("Yes. Pass an ")
             InlineCode(".xml")
@@ -134,7 +134,7 @@ private fun AndroidXmlDrawablesSection() {
 
 @Composable
 private fun KotlinMultiplatformSection() {
-    DocSection(id = "kotlin-multiplatform", title = "Kotlin Multiplatform") {
+    DocSection(id = "kotlin-multiplatform", title = "Can I use it in a Kotlin Multiplatform project?") {
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text(
                 "Yes. SVG to Compose is built with Kotlin Multiplatform. The core library targets " +
@@ -150,7 +150,7 @@ private fun KotlinMultiplatformSection() {
 
 @Composable
 private fun SupportedFeaturesSection() {
-    DocSection(id = "supported-features", title = "Supported Features") {
+    DocSection(id = "supported-features", title = "What SVG features are supported?") {
         SpanText(
             text = "Supported features include all path commands, basic shapes, groups with transforms, " +
                 "linear and radial gradients, clip paths, fill and stroke styling, viewBox, and opacity. " +
@@ -162,7 +162,7 @@ private fun SupportedFeaturesSection() {
 
 @Composable
 private fun CliVsGradleSection() {
-    DocSection(id = "cli-vs-gradle", title = "CLI vs Gradle Plugin") {
+    DocSection(id = "cli-vs-gradle", title = "How does the Gradle plugin differ from the CLI?") {
         SpanText(
             text = "The Gradle plugin integrates conversion into your build pipeline with incremental " +
                 "build support, smart caching, and parallel processing. It automatically re-converts " +
@@ -175,7 +175,7 @@ private fun CliVsGradleSection() {
 
 @Composable
 private fun OptimizationSection() {
-    DocSection(id = "optimization", title = "Code Optimization") {
+    DocSection(id = "optimization", title = "Is the generated code optimized?") {
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text("Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
                 "for XML Drawable optimization to optimize vector paths before code generation. The generated ")
