@@ -22,7 +22,8 @@ data object WebSiteStructuredData : StructuredDataType {
         |    "@type": "Person",
         |    "name": "Rafael Tonholo",
         |    "url": "https://rafael.tonholo.dev"
-        |  }
+        |  },
+        |  "sameAs": ["https://github.com/rafaeltonholo/svg-to-compose"]
         |}
     """.trimMargin()
 }
@@ -94,6 +95,7 @@ data class FAQPageStructuredData(
 
     override fun toJsonLd(): String {
         val questionsJson = questions.joinToString(",\n") { qa ->
+            // language=json
             """
             |    {
             |      "@type": "Question",
@@ -106,6 +108,7 @@ data class FAQPageStructuredData(
             """.trimMargin()
         }
 
+        // language=json
         return """
             |{
             |  "@context": "https://schema.org",
@@ -130,6 +133,7 @@ data class HowToStructuredData(
 
     override fun toJsonLd(): String {
         val stepsJson = steps.mapIndexed { index, step ->
+            // language=json
             """
             |    {
             |      "@type": "HowToStep",
@@ -140,6 +144,7 @@ data class HowToStructuredData(
             """.trimMargin()
         }.joinToString(",\n")
 
+        // language=json
         return """
             |{
             |  "@context": "https://schema.org",
@@ -160,3 +165,8 @@ internal fun String.escapeJsonString(): String =
         .replace("\n", "\\n")
         .replace("\r", "\\r")
         .replace("\t", "\\t")
+        .replace("\u000C", "\\f")
+        .replace("\u0008", "\\b")
+        .replace(Regex("[\\u0000-\\u001F]")) { match ->
+            "\\u${match.value[0].code.toString(16).padStart(4, '0')}"
+        }
