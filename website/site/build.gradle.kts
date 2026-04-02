@@ -136,6 +136,8 @@ val generateSitemap by tasks.registering {
     val pagesDir = layout.projectDirectory.dir("src/jsMain/kotlin/dev/tonholo/s2c/website/pages")
     val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/sitemap.xml")
     val baseUrl = "https://www.svgtocompose.com"
+    val lastModified = appProperties["LAST_MODIFIED"]?.toString()
+        ?: error("LAST_MODIFIED not set in app.properties")
 
     // Per-path overrides for changefreq and priority.
     // Pages not listed here get defaults: monthly, 0.5
@@ -179,9 +181,7 @@ val generateSitemap by tasks.registering {
             .sorted()
             .toList()
 
-        val today = providers.exec {
-            commandLine("git", "log", "-1", "--format=%cs")
-        }.standardOutput.asText.get().trim()
+        val today = lastModified
         val sitemap = buildString {
             appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
             appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
