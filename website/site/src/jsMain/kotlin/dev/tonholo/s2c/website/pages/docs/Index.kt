@@ -174,10 +174,9 @@ val DocsCardLinkVariant = LinkStyle.addVariant {
 fun initDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Documentation",
-            description = "SVG to Compose documentation. Installation guides, CLI tool reference, " +
-                "Gradle plugin configuration, and API reference for converting SVG and " +
-                "Android XML Drawables to Jetpack Compose ImageVector.",
+            title = "Documentation - Guides and API Reference",
+            description = "SVG to Compose documentation. Installation guides, CLI reference, " +
+                "Gradle plugin setup, and API docs for SVG-to-ImageVector conversion.",
             canonicalPath = "/docs",
         ),
     )
@@ -251,7 +250,7 @@ private fun DocsCard(title: String, description: String, href: String, icon: @Co
     val palette = SiteTheme.palette
     Link(
         path = href,
-        modifier = Modifier.ariaLabel("$title — $description"),
+        modifier = Modifier.ariaLabel("$title: $description"),
         variant = DocsCardLinkVariant.then(UncoloredLinkVariant),
     ) {
         Div(attrs = DocsCardStyle.toModifier().toAttrs()) {

@@ -26,7 +26,7 @@ private val cliTocEntries = listOf(
 fun initCliDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "CLI Tool - SVG to Compose Command Line Converter",
+            title = "CLI Tool - Convert SVG to Compose",
             description = "Convert SVG and Android XML Drawable files to Jetpack Compose " +
                 "ImageVector from the command line. Installation, usage examples, " +
                 "and complete options reference.",

@@ -30,7 +30,7 @@ private val gradlePluginTocEntries = listOf(
 fun initGradlePluginDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Gradle Plugin - Automated SVG to Compose Build Integration",
+            title = "Gradle Plugin for SVG to Compose",
             description = "Automate SVG and Android XML Drawable to Compose ImageVector " +
                 "conversion in your Gradle build. Incremental builds, smart caching, " +
                 "and parallel processing.",

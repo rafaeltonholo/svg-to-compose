@@ -23,10 +23,9 @@ private val alternativesTocEntries = listOf(
 fun initAlternativesPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Alternatives - SVG to Compose vs Other Tools",
-            description = "Compare SVG to Compose with alternatives: manual ImageVector coding, " +
-                "Android Studio SVG import, and other community tools. Feature comparison " +
-                "for Kotlin Multiplatform SVG conversion.",
+            title = "Alternatives - SVG to Compose vs Others",
+            description = "Compare SVG to Compose with alternatives like Android Studio import " +
+                "and manual coding. Side-by-side feature comparison for Kotlin Multiplatform.",
             canonicalPath = "/docs/alternatives",
         ),
     )

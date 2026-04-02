@@ -25,7 +25,7 @@ import dev.tonholo.s2c.website.components.organisms.playground.PlaygroundSection
 fun initHomePage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Convert SVG & Android XML Drawables to Compose ImageVector",
+            title = "SVG & XML Drawable to Compose Converter",
             description = "SVG to Compose converts SVG and Android XML Drawable files into " +
                 "Jetpack Compose ImageVector code. CLI tool and Gradle plugin for " +
                 "Kotlin Multiplatform projects.",
