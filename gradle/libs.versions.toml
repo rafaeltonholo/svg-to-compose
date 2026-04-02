@@ -12,6 +12,7 @@ ksoup = "0.2.6"
 jetbrains-annotation = "26.1.0"
 metro = "0.11.3"
 maven-publish = "0.31.0"
+gradle-plugin-publish = "2.1.1"
 buildconfig = "6.0.9"
 dokka = "2.1.0"
 junit-jupiter = "5.14.0"
@@ -38,6 +39,7 @@ org-jetbrains-kotlin-samWithReceiver-plugin = { module = "org.jetbrains.kotlin:k
 com-android-tools-build-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 com-github-gmazzo-buildconfig-plugin = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 com-vanniktech-gradle-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
+com-gradle-plugin-publish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "gradle-plugin-publish" }
 org-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 
 # region [Website]

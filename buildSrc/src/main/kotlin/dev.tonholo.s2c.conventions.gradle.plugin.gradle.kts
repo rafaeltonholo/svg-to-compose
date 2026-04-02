@@ -4,6 +4,7 @@ plugins {
     id("dev.tonholo.s2c.conventions.publication")
     org.jetbrains.kotlin.jvm
     id("org.jetbrains.kotlin.plugin.sam.with.receiver")
+    id("com.gradle.plugin-publish")
 }
 
 samWithReceiver {
