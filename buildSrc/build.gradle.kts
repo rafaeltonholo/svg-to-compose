@@ -20,4 +20,5 @@ dependencies {
     implementation(libs.dev.detekt.gradle.plugin)
     implementation(libs.com.github.gmazzo.buildconfig.plugin)
     implementation(libs.com.vanniktech.gradle.maven.publish)
+    implementation(libs.com.gradle.plugin.publish)
 }
