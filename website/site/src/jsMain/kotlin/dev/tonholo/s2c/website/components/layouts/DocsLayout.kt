@@ -138,23 +138,26 @@ fun DocsLayout(
                 attrs = Modifier
                     .displayUntil(Breakpoint.MD)
                     .padding(bottom = SiteTheme.dimensions.size.Lg)
+                    .fillMaxWidth()
                     .toAttrs(),
             ) {
                 CollapsibleSection(title = "Table of Contents") {
-                    tocEntries.forEach { entry ->
-                        val linkPadding = if (entry.level >= MOBILE_TOC_INDENT_LEVEL) {
-                            Modifier.padding(left = SiteTheme.dimensions.size.Lg)
-                        } else {
-                            Modifier
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        tocEntries.forEach { entry ->
+                            val linkPadding = if (entry.level >= MOBILE_TOC_INDENT_LEVEL) {
+                                Modifier.padding(left = SiteTheme.dimensions.size.Lg)
+                            } else {
+                                Modifier
+                            }
+                            Link(
+                                path = "#${entry.id}",
+                                text = entry.label,
+                                modifier = TocLinkStyle.toModifier()
+                                    .then(linkPadding)
+                                    .padding(topBottom = SiteTheme.dimensions.size.Sm),
+                                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+                            )
                         }
-                        Link(
-                            path = "#${entry.id}",
-                            text = entry.label,
-                            modifier = TocLinkStyle.toModifier()
-                                .then(linkPadding)
-                                .padding(topBottom = SiteTheme.dimensions.size.Sm),
-                            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-                        )
                     }
                 }
             }
