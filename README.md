@@ -15,6 +15,8 @@ Android Jetpack Compose Icons. This project provides:
 - A **command-line tool** for manual conversion.
 - A **Gradle plugin** for automating the conversion within your build process.
 
+**Website:** [svgtocompose.com](https://www.svgtocompose.com)
+
 ---
 
 For more detailed information on each tool, configurations, and features, please
@@ -112,6 +114,22 @@ saving development time.
 ## Getting Started
 
 ### Command-line Tool Installation
+
+#### Homebrew (macOS / Linux)
+
+```console
+brew tap dev-tonholo/svg-to-compose
+brew install s2c
+```
+
+#### Scoop (Windows)
+
+```console
+scoop bucket add svg-to-compose https://github.com/dev-tonholo/scoop-svg-to-compose
+scoop install s2c
+```
+
+#### Manual Installation
 
 The CLI tool relies
 on [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) to parse
