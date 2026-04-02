@@ -8,10 +8,15 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.content
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.flexWrap
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowUpRightFromSquare
@@ -25,6 +30,9 @@ import dev.tonholo.s2c.website.components.atoms.BadgeVars
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
 import dev.tonholo.s2c.website.components.atoms.resolveBadgeColors
+import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.style.extendedBy
+import dev.tonholo.s2c.website.components.molecules.docLinkEntries
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
 import dev.tonholo.s2c.website.theme.palette
@@ -32,13 +40,15 @@ import dev.tonholo.s2c.website.theme.toSitePalette
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexWrap
+import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.dom.Nav
 
 @Composable
 fun Links(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .gap(SiteTheme.dimensions.size.Sm)
+            .gap(SiteTheme.dimensions.size.Xsm)
             .flexWrap(FlexWrap.Wrap),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -83,10 +93,51 @@ fun Links(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun DocsLinks(modifier: Modifier = Modifier) {
+    Nav(
+        attrs = modifier
+            .ariaLabel("Documentation links")
+            .toAttrs(),
+    ) {
+        Row(
+            modifier = Modifier
+                .gap(SiteTheme.dimensions.size.Sm)
+                .flexWrap(FlexWrap.Wrap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val linkModifier = Modifier.fontSize(0.8.cssRem)
+            Link(
+                path = "/docs",
+                text = "Docs",
+                modifier = linkModifier,
+                variant = DocsLinkVariant,
+            )
+            docLinkEntries.forEach { entry ->
+                Link(
+                    path = entry.path,
+                    text = entry.label,
+                    modifier = linkModifier,
+                    variant = DocsLinkVariant,
+                )
+            }
+        }
+    }
+}
+
 val FooterLinksVariant = SiteLinkStyleVariant.extendedByBase {
     Modifier
         .display(DisplayStyle.Flex)
         .alignItems(AlignItems.Center)
+}
+
+val DocsLinkVariant = FooterLinksVariant.extendedBy {
+    cssRule(":not(:first-child)::before") {
+        Modifier
+            .content("\u00B7")
+            .margin(right = SiteTheme.dimensions.size.Sm)
+            .color(colorMode.toSitePalette().onSurfaceVariant)
+    }
 }
 
 val FooterLinkBadgeVariant = SquaredBadge.extendedByBase {
