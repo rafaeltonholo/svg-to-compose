@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -62,6 +63,16 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
 private const val DROPDOWN_Z_INDEX = 100
+
+data class DocLinkEntry(val path: String, val label: String)
+
+val docLinkEntries = listOf(
+    DocLinkEntry(path = "/docs/cli", label = "CLI"),
+    DocLinkEntry(path = "/docs/gradle-plugin", label = "Gradle Plugin"),
+    DocLinkEntry(path = "/api-docs/index.html", label = "API Reference"),
+    DocLinkEntry(path = "/docs/faq", label = "FAQ"),
+    DocLinkEntry(path = "/docs/alternatives", label = "Alternatives"),
+)
 
 val DocNavDropdownTriggerStyle = CssStyle(
     extraModifier = Modifier
@@ -197,49 +208,63 @@ private fun DropdownPanel(isOpen: Boolean) {
             )
             .ariaHidden(!isOpen)
             .gap(0.125.cssRem)
-            .role("menu"),
+            .role("menu")
+            .ariaLabel("Documentation")
+            .attrsModifier {
+                onKeyDown { event ->
+                    when (event.key) {
+                        "ArrowDown", "ArrowUp" -> {
+                            event.preventDefault()
+                            val container = event.currentTarget as? org.w3c.dom.Element
+                                ?: return@onKeyDown
+                            val items = container.querySelectorAll("[role='menuitem']")
+                            if (items.length == 0) return@onKeyDown
+                            val active = kotlinx.browser.document.activeElement
+                            var index = -1
+                            for (i in 0 until items.length) {
+                                if (items.item(i) == active) {
+                                    index = i
+                                    break
+                                }
+                            }
+                            val next = if (event.key == "ArrowDown") {
+                                if (index < items.length - 1) index + 1 else 0
+                            } else {
+                                if (index > 0) index - 1 else items.length - 1
+                            }
+                            (items.item(next) as? org.w3c.dom.HTMLElement)?.focus()
+                        }
+
+                        "Home" -> {
+                            event.preventDefault()
+                            val container = event.currentTarget as? org.w3c.dom.Element
+                                ?: return@onKeyDown
+                            val items = container.querySelectorAll("[role='menuitem']")
+                            (items.item(0) as? org.w3c.dom.HTMLElement)?.focus()
+                        }
+
+                        "End" -> {
+                            event.preventDefault()
+                            val container = event.currentTarget as? org.w3c.dom.Element
+                                ?: return@onKeyDown
+                            val items = container.querySelectorAll("[role='menuitem']")
+                            (items.item(items.length - 1) as? org.w3c.dom.HTMLElement)?.focus()
+                        }
+                    }
+                }
+            },
     ) {
         val linkTabIndex = if (isOpen) 0 else -1
         val docLinkVariant = UndecoratedLinkVariant.then(UncoloredLinkVariant)
-        Link(
-            path = "/docs/cli",
-            text = "CLI",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/docs/gradle-plugin",
-            text = "Gradle Plugin",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/api-docs/index.html",
-            text = "API Reference",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/docs/faq",
-            text = "FAQ",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/docs/alternatives",
-            text = "Alternatives",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
+        docLinkEntries.forEach { entry ->
+            Link(
+                path = entry.path,
+                text = entry.label,
+                modifier = DocNavDropdownLinkStyle.toModifier()
+                    .tabIndex(linkTabIndex)
+                    .role("menuitem"),
+                variant = docLinkVariant,
+            )
+        }
     }
 }
