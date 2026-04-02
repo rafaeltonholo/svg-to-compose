@@ -13,6 +13,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.role
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -128,9 +129,6 @@ private const val OUTPUT_EXAMPLE = """
 |private var _myIcon: ImageVector? = null
 """
 
-val PlatformTableStyle = DocsTableStyle
-val PlatformTableHeaderStyle = DocsTableHeaderStyle
-val PlatformTableCellStyle = DocsTableCellStyle
 
 val CliDocsOptionsTableStyle = CssStyle.base {
     Modifier
@@ -185,13 +183,13 @@ private fun PlatformSupportSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Table(
-            attrs = PlatformTableStyle.toModifier()
+            attrs = DocsTableStyle.toModifier()
                 .toAttrs(),
         ) {
             Thead {
                 Tr {
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .textAlign(TextAlign.Start)
                             .color(palette.onSurface)
@@ -201,7 +199,7 @@ private fun PlatformSupportSection() {
                         Text("Platform")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle.toModifier()
+                        attrs = DocsTableHeaderStyle.toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
                             .toAttrs(),
@@ -209,7 +207,7 @@ private fun PlatformSupportSection() {
                         Text("With optimization")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle.toModifier()
+                        attrs = DocsTableHeaderStyle.toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
                             .toAttrs(),
@@ -239,7 +237,7 @@ private fun PlatformRow(platform: String, index: Int) {
     }
     Tr(attrs = backgroundModifier.toAttrs()) {
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .fontWeight(FontWeight.Medium)
                 .color(palette.onSurface)
@@ -255,7 +253,7 @@ private fun PlatformRow(platform: String, index: Int) {
 @Composable
 private fun SupportedCell(palette: SitePalette) {
     Td(
-        attrs = PlatformTableCellStyle.toModifier()
+        attrs = DocsTableCellStyle.toModifier()
             .ariaLabel("Supported")
             .textAlign(TextAlign.Center)
             .toAttrs(),
@@ -389,8 +387,8 @@ private fun OptionsReferenceSection() {
         )
         Column(
             modifier = CliDocsOptionsTableStyle.toModifier()
+                .role("table")
                 .attrsModifier {
-                    attr("role", "table")
                     attr("aria-label", "CLI options reference")
                 },
         ) {
