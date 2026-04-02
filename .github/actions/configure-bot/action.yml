@@ -1,0 +1,21 @@
+name: Configure Bot Identity
+description: >
+  Generates a GitHub App token and configures Git with the bot identity
+  for authenticated commits and pushes.
+
+inputs:
+  app-id:
+    description: 'GitHub App ID used to build the bot email address'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure Git identity
+      shell: bash
+      env:
+        BOT_APP_ID: ${{ inputs.app-id }}
+      run: |
+        BOT_NAME="svg-to-compose-bot[bot]"
+        git config user.name "$BOT_NAME"
+        git config user.email "${BOT_APP_ID}+${BOT_NAME}@users.noreply.github.com"
