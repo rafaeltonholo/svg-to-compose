@@ -12,6 +12,7 @@ on:
 
 jobs:
   publish-maven-central:
+    environment: publish
     name: Publish to Maven Central
     runs-on: ubuntu-latest
     permissions:
