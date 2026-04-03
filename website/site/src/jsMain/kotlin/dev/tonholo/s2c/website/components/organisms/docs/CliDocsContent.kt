@@ -47,7 +47,6 @@ import org.jetbrains.compose.web.dom.Thead
 import org.jetbrains.compose.web.dom.Tr
 import org.jetbrains.compose.web.dom.Ul
 
-
 // language=sh
 private const val S2C_CONVERT_SINGLE_FILE = """
 |s2c \
@@ -128,7 +127,6 @@ private const val OUTPUT_EXAMPLE = """
 |
 |private var _myIcon: ImageVector? = null
 """
-
 
 val CliDocsOptionsTableStyle = CssStyle.base {
     Modifier

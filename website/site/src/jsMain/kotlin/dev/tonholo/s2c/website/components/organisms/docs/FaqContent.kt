@@ -82,7 +82,7 @@ fun FaqContent(modifier: Modifier = Modifier) {
 
 @Composable
 private fun WhatIsS2cSection() {
-    DocSection(id = "what-is-s2c", title = "What is SVG to Compose?") {
+    DocSection(id = "what-is-svg-to-compose", title = "What is SVG to Compose?") {
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text(
                 "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +
@@ -177,8 +177,10 @@ private fun CliVsGradleSection() {
 private fun OptimizationSection() {
     DocSection(id = "optimization", title = "Is the generated code optimized?") {
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
-                "for XML Drawable optimization to optimize vector paths before code generation. The generated ")
+            Text(
+                "Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
+                    "for XML Drawable optimization to optimize vector paths before code generation. The generated ",
+            )
             InlineCode("ImageVector")
             Text(" uses lazy initialization with a backing field for efficient caching.")
         }

@@ -156,7 +156,13 @@ private val comparisonRows = listOf(
     ComparisonRow("Batch Processing", "Yes", "Manual", "No", "Varies"),
     ComparisonRow("SVG Optimization", "Yes (SVGO)", "Manual", "Limited", "Varies"),
     ComparisonRow("Incremental Builds", "Yes", "N/A", "N/A", "Rare"),
-    ComparisonRow("SVG Feature Coverage", "High (custom parser)", "Depends on skill", "Limited (SVG subset)", "Limited (SVG subset)"),
+    ComparisonRow(
+        "SVG Feature Coverage",
+        "High (custom parser)",
+        "Depends on skill",
+        "Limited (SVG subset)",
+        "Limited (SVG subset)",
+    ),
 )
 
 @Composable

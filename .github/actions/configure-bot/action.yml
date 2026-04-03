@@ -1,7 +1,6 @@
 name: Configure Bot Identity
 description: >
-  Generates a GitHub App token and configures Git with the bot identity
-  for authenticated commits and pushes.
+  Configures Git with the bot identity for authenticated commits and pushes.
 
 inputs:
   app-id:

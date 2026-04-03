@@ -51,13 +51,8 @@ data object SoftwareApplicationStructuredData : StructuredDataType {
     """.trimMargin()
 }
 
-data class BreadcrumbListStructuredData(
-    val items: List<BreadcrumbItem>,
-) : StructuredDataType {
-    data class BreadcrumbItem(
-        val name: String,
-        val url: String,
-    )
+data class BreadcrumbListStructuredData(val items: List<BreadcrumbItem>) : StructuredDataType {
+    data class BreadcrumbItem(val name: String, val url: String)
 
     override fun toJsonLd(): String {
         val itemsJson = items.mapIndexed { index, item ->
@@ -85,13 +80,8 @@ data class BreadcrumbListStructuredData(
     }
 }
 
-data class FAQPageStructuredData(
-    val questions: List<QuestionAnswer>,
-) : StructuredDataType {
-    data class QuestionAnswer(
-        val question: String,
-        val answer: String,
-    )
+data class FAQPageStructuredData(val questions: List<QuestionAnswer>) : StructuredDataType {
+    data class QuestionAnswer(val question: String, val answer: String)
 
     override fun toJsonLd(): String {
         val questionsJson = questions.joinToString(",\n") { qa ->
@@ -121,15 +111,9 @@ data class FAQPageStructuredData(
     }
 }
 
-data class HowToStructuredData(
-    val name: String,
-    val description: String,
-    val steps: List<HowToStep>,
-) : StructuredDataType {
-    data class HowToStep(
-        val name: String,
-        val text: String,
-    )
+data class HowToStructuredData(val name: String, val description: String, val steps: List<HowToStep>) :
+    StructuredDataType {
+    data class HowToStep(val name: String, val text: String)
 
     override fun toJsonLd(): String {
         val stepsJson = steps.mapIndexed { index, step ->
@@ -159,14 +143,15 @@ data class HowToStructuredData(
     }
 }
 
-internal fun String.escapeJsonString(): String =
-    replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t")
-        .replace("\u000C", "\\f")
-        .replace("\u0008", "\\b")
-        .replace(Regex("[\\u0000-\\u001F]")) { match ->
-            "\\u${match.value[0].code.toString(16).padStart(4, '0')}"
-        }
+private val CONTROL_CHAR_REGEX = Regex("[\\u0000-\\u001F]")
+
+internal fun String.escapeJsonString(): String = replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+    .replace("\n", "\\n")
+    .replace("\r", "\\r")
+    .replace("\t", "\\t")
+    .replace("\u000C", "\\f")
+    .replace("\u0008", "\\b")
+    .replace(CONTROL_CHAR_REGEX) { match ->
+        "\\u${match.value[0].code.toString(16).padStart(4, '0')}"
+    }

@@ -6,8 +6,8 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
-import dev.tonholo.s2c.website.components.layouts.DocsLayout
 import dev.tonholo.s2c.website.components.atoms.HowToStructuredData
+import dev.tonholo.s2c.website.components.layouts.DocsLayout
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData
 import dev.tonholo.s2c.website.components.molecules.TocEntry
 import dev.tonholo.s2c.website.components.organisms.docs.GradlePluginDocsContent

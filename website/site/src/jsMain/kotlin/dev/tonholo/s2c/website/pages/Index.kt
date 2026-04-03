@@ -10,8 +10,8 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
-import dev.tonholo.s2c.website.components.atoms.ScrollReveal
 import dev.tonholo.s2c.website.components.atoms.HowToStructuredData
+import dev.tonholo.s2c.website.components.atoms.ScrollReveal
 import dev.tonholo.s2c.website.components.atoms.SoftwareApplicationStructuredData
 import dev.tonholo.s2c.website.components.atoms.WebSiteStructuredData
 import dev.tonholo.s2c.website.components.layouts.PageLayoutData

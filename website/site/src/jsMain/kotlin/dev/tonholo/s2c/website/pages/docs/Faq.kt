@@ -14,7 +14,7 @@ import dev.tonholo.s2c.website.components.organisms.docs.FaqContent
 import dev.tonholo.s2c.website.components.organisms.docs.faqQuestions
 
 private val faqTocEntries = listOf(
-    TocEntry(id = "what-is-s2c", label = "What is SVG to Compose?"),
+    TocEntry(id = "what-is-svg-to-compose", label = "What is SVG to Compose?"),
     TocEntry(id = "how-to-convert", label = "How to Convert"),
     TocEntry(id = "android-xml-drawables", label = "Android XML Drawables"),
     TocEntry(id = "kotlin-multiplatform", label = "Kotlin Multiplatform"),

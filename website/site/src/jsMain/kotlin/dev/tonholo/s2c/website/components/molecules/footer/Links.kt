@@ -19,10 +19,12 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowUpRightFromSquare
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.extendedBy
 import com.varabyte.kobweb.silk.style.extendedByBase
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.Badge
@@ -30,8 +32,6 @@ import dev.tonholo.s2c.website.components.atoms.BadgeVars
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
 import dev.tonholo.s2c.website.components.atoms.resolveBadgeColors
-import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.style.extendedBy
 import dev.tonholo.s2c.website.components.molecules.docLinkEntries
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant

@@ -32,7 +32,7 @@ fun LogoAndDescription(modifier: Modifier = Modifier) {
         ) {
             Image(
                 src = "/images/s2c-icon.svg",
-                alt = "SVG to Compose icon",
+                alt = "",
                 modifier = Modifier.size(1.25.cssRem),
             )
             SpanText(
