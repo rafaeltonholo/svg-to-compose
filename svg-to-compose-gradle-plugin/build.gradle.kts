@@ -57,7 +57,11 @@ kotlin {
 mavenPublishing {
     configure(
         GradlePlugin(
-            javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+            // DGPv2 (Dokka 2.x) auto-attaches a javadoc JAR when the java plugin
+            // is present. Using JavadocJar.Dokka(...) here would add a second one,
+            // causing "multiple artifacts with identical extension and classifier"
+            // on publish.
+            javadocJar = JavadocJar.None(),
             sourcesJar = true,
         )
     )

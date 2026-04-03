@@ -64,33 +64,67 @@ With optimization (requires [svgo](https://github.com/svg/svgo) and
 
 ## Phase 3: Integration Validation
 
-These test real-world Gradle plugin behavior that functional tests cannot
-fully cover.
+These test real-world Gradle plugin behaviour that functional tests cannot fully
+cover.
 
+- [ ] Bootstrap the test repository (needed by included builds):
+  ```bash
+  export CI=true
+  ./gradlew publishAllPublicationsToTestMavenRepository
+  ```
 - [ ] Build the playground app:
   ```bash
-  ./gradlew :playground:app:assembleDebug
+  ./gradlew -p playground :app:assembleDebug
   ```
 - [ ] Run again and confirm tasks show `UP-TO-DATE` (incremental cache works):
   ```bash
-  ./gradlew :playground:app:assembleDebug --info 2>&1 | grep -E "UP-TO-DATE|is not up-to-date"
+  ./gradlew -p playground :app:assembleDebug --info 2>&1 | grep -E "UP-TO-DATE|is not up-to-date"
   ```
-- [ ] Touch a sample file and rebuild; only the changed file should be
-  reprocessed:
+- [ ] Modify a sample file and rebuild; only the changed file should be
+  reprocessed (Gradle uses content hashing, so `touch` alone is not enough):
   ```bash
-  touch samples/svg/android.svg
-  ./gradlew :playground:app:assembleDebug --info 2>&1 | grep -E "incremental|out-of-date"
+  sed -i.bak '2i\
+  <!-- release test -->' samples/svg/android.svg
+  ./gradlew -p playground :app:assembleDebug --info 2>&1 | grep -E "parseSvgToComposeIcon.*(not up-to-date)|android\.svg has changed"
+  git checkout samples/svg/android.svg && rm -f samples/svg/android.svg.bak
   ```
 - [ ] Clean build after incremental (verifies clean state recovery):
   ```bash
-  ./gradlew :playground:app:clean :playground:app:assembleDebug
+  ./gradlew -p playground :app:clean :app:assembleDebug
+  ```
+- [ ] Build the playground-kmp app (all KMP targets: Android, iOS, JVM, JS,
+  WasmJS):
+  ```bash
+  ./gradlew -p playground-kmp :composeApp:assemble
+  ```
+- [ ] Run again and confirm tasks show `UP-TO-DATE` (incremental cache works):
+  ```bash
+  ./gradlew -p playground-kmp :composeApp:assemble --info 2>&1 | grep -E "UP-TO-DATE|is not up-to-date"
+  ```
+- [ ] Modify a sample file and rebuild; only the changed file should be
+  reprocessed:
+  ```bash
+  sed -i.bak '2i\
+  <!-- release test -->' samples/svg/android.svg
+  ./gradlew -p playground-kmp :composeApp:assemble --info 2>&1 | grep -E "parseSvgToComposeIcon.*(not up-to-date)|android\.svg has changed"
+  git checkout samples/svg/android.svg && rm -f samples/svg/android.svg.bak
+  ```
+- [ ] Clean build after incremental (verifies clean state recovery):
+  ```bash
+  ./gradlew -p playground-kmp :composeApp:clean :composeApp:assemble
   ```
 
 ## Phase 4: Publish Smoke Test
 
 Publish to Maven Local and verify the artifacts are generated correctly.
 
-- [ ] Publish:
+- [ ] Bootstrap the test repository (skip if Phase 3 already ran in this
+  session):
+  ```bash
+  export CI=true
+  ./gradlew publishAllPublicationsToTestMavenRepository
+  ```
+- [ ] Publish to Maven Local:
   ```bash
   ./gradlew publishAllToMavenLocal
   ```
@@ -146,7 +180,8 @@ Full local validation in a single script:
 ./.github/actions/cli-integrity-check/script.sh . xml
 
 # Integration
-./gradlew :playground:app:assembleDebug
+./gradlew -p playground :app:assembleDebug
+./gradlew -p playground-kmp :composeApp:assemble
 
 # Publish smoke test
 ./gradlew publishAllToMavenLocal
