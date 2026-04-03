@@ -67,6 +67,11 @@ With optimization (requires [svgo](https://github.com/svg/svgo) and
 These test real-world Gradle plugin behaviour that functional tests cannot fully
 cover.
 
+- [ ] Bootstrap the test repository (needed by included builds):
+  ```bash
+  export CI=true
+  ./gradlew publishAllPublicationsToTestMavenRepository
+  ```
 - [ ] Build the playground app:
   ```bash
   ./gradlew -p playground :app:assembleDebug
@@ -113,7 +118,13 @@ cover.
 
 Publish to Maven Local and verify the artifacts are generated correctly.
 
-- [ ] Publish:
+- [ ] Bootstrap the test repository (skip if Phase 3 already ran in this
+  session):
+  ```bash
+  export CI=true
+  ./gradlew publishAllPublicationsToTestMavenRepository
+  ```
+- [ ] Publish to Maven Local:
   ```bash
   ./gradlew publishAllToMavenLocal
   ```
