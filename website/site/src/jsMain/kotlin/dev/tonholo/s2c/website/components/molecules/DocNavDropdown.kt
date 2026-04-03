@@ -66,7 +66,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
-import org.w3c.dom.events.KeyboardEvent
+import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 
 private const val DROPDOWN_Z_INDEX = 100
 
@@ -235,8 +235,8 @@ private fun DropdownPanel(isOpen: Boolean, onClose: () -> Unit) {
     }
 }
 
-private fun handleMenuKeyDown(event: KeyboardEvent, closeMenu: () -> Unit) {
-    val container = event.currentTarget as? Element ?: return
+private fun handleMenuKeyDown(event: SyntheticKeyboardEvent, closeMenu: () -> Unit) {
+    val container = event.nativeEvent.currentTarget as? Element ?: return
     val items = container.querySelectorAll("[role='menuitem']")
     when (event.key) {
         "ArrowDown", "ArrowUp" -> {
