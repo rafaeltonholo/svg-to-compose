@@ -153,5 +153,5 @@ internal fun String.escapeJsonString(): String = replace("\\", "\\\\")
     .replace("\u000C", "\\f")
     .replace("\u0008", "\\b")
     .replace(CONTROL_CHAR_REGEX) { match ->
-        "\\u${match.value[0].code.toString(16).padStart(4, '0')}"
+        "\\u${match.value[0].code.toString(radix = 16).padStart(length = 4, padChar = '0')}"
     }

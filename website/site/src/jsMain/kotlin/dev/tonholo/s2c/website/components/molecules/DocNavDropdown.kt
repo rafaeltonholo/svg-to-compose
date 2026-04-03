@@ -62,11 +62,11 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
-import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 
 private const val DROPDOWN_Z_INDEX = 100
 
