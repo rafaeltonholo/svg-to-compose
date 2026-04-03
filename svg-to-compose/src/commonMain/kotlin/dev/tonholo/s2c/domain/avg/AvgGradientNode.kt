@@ -126,7 +126,9 @@ private fun AvgGradientNode.getColorStops(): Pair<List<AvgColor>, List<Float>> {
         stops = when {
             centerColor != null && startColor != null && endColor != null ->
                 listOf(0f, CENTER_COLOR_STOP_OFFSET, 1f)
+
             shorthandColors.size == 2 -> listOf(0f, 1f)
+
             else -> emptyList()
         }
     } else {

@@ -18,13 +18,11 @@ class AvgGradientNodeTest {
     private fun createGradient(
         attributes: MutableMap<String, String>,
         children: MutableSet<XmlNode> = mutableSetOf(),
-    ): AvgGradientNode {
-        return AvgGradientNode(
-            parent = root,
-            children = children,
-            attributes = attributes,
-        )
-    }
+    ): AvgGradientNode = AvgGradientNode(
+        parent = root,
+        children = children,
+        attributes = attributes,
+    )
 
     private fun createItem(
         parent: AvgGradientNode,
