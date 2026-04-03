@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
+import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.border
 import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
@@ -53,6 +54,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
+import kotlinx.browser.document
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Position
@@ -60,8 +62,23 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 
 private const val DROPDOWN_Z_INDEX = 100
+
+data class DocLinkEntry(val path: String, val label: String)
+
+val docLinkEntries = listOf(
+    DocLinkEntry(path = "/docs/cli", label = "CLI"),
+    DocLinkEntry(path = "/docs/gradle-plugin", label = "Gradle Plugin"),
+    DocLinkEntry(path = "/api-docs/index.html", label = "API Reference"),
+    DocLinkEntry(path = "/docs/faq", label = "FAQ"),
+    DocLinkEntry(path = "/docs/alternatives", label = "Alternatives"),
+)
 
 val DocNavDropdownTriggerStyle = CssStyle(
     extraModifier = Modifier
@@ -141,8 +158,8 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
             .onMouseLeave { isOpen = false }
             .attrsModifier {
                 onFocusOut { event ->
-                    val related = event.relatedTarget as? org.w3c.dom.Node
-                    val container = event.currentTarget as? org.w3c.dom.Node
+                    val related = event.relatedTarget as? Node
+                    val container = event.currentTarget as? Node
                     if (container != null && (related == null || !container.contains(related))) {
                         isOpen = false
                     }
@@ -180,12 +197,12 @@ fun DocNavDropdown(modifier: Modifier = Modifier) {
             )
         }
 
-        DropdownPanel(isOpen)
+        DropdownPanel(isOpen, onClose = { isOpen = false })
     }
 }
 
 @Composable
-private fun DropdownPanel(isOpen: Boolean) {
+private fun DropdownPanel(isOpen: Boolean, onClose: () -> Unit) {
     Column(
         modifier = DocNavDropdownPanelStyle.toModifier()
             .opacity(value = if (isOpen) 1 else 0)
@@ -197,33 +214,69 @@ private fun DropdownPanel(isOpen: Boolean) {
             )
             .ariaHidden(!isOpen)
             .gap(0.125.cssRem)
-            .role("menu"),
+            .role("menu")
+            .ariaLabel("Documentation")
+            .attrsModifier {
+                onKeyDown { event -> handleMenuKeyDown(event, onClose) }
+            },
     ) {
         val linkTabIndex = if (isOpen) 0 else -1
         val docLinkVariant = UndecoratedLinkVariant.then(UncoloredLinkVariant)
-        Link(
-            path = "/docs/cli",
-            text = "CLI",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/docs/gradle-plugin",
-            text = "Gradle Plugin",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
-        Link(
-            path = "/api-docs/index.html",
-            text = "API Reference",
-            modifier = DocNavDropdownLinkStyle.toModifier()
-                .tabIndex(linkTabIndex)
-                .role("menuitem"),
-            variant = docLinkVariant,
-        )
+        docLinkEntries.forEach { entry ->
+            Link(
+                path = entry.path,
+                text = entry.label,
+                modifier = DocNavDropdownLinkStyle.toModifier()
+                    .tabIndex(linkTabIndex)
+                    .role("menuitem"),
+                variant = docLinkVariant,
+            )
+        }
     }
+}
+
+private fun handleMenuKeyDown(event: SyntheticKeyboardEvent, closeMenu: () -> Unit) {
+    val container = event.nativeEvent.currentTarget as? Element ?: return
+    val items = container.querySelectorAll("[role='menuitem']")
+    when (event.key) {
+        "ArrowDown", "ArrowUp" -> {
+            event.preventDefault()
+            focusAdjacentMenuItem(items, forward = event.key == "ArrowDown")
+        }
+
+        "Home" -> {
+            event.preventDefault()
+            (items.item(0) as? HTMLElement)?.focus()
+        }
+
+        "End" -> {
+            event.preventDefault()
+            (items.item(items.length - 1) as? HTMLElement)?.focus()
+        }
+
+        "Escape" -> {
+            event.preventDefault()
+            event.stopPropagation()
+            closeMenu()
+            (container.parentElement?.querySelector("[role='button']") as? HTMLElement)?.focus()
+        }
+    }
+}
+
+private fun focusAdjacentMenuItem(items: NodeList, forward: Boolean) {
+    if (items.length == 0) return
+    val active = document.activeElement
+    var index = -1
+    for (i in 0 until items.length) {
+        if (items.item(i) == active) {
+            index = i
+            break
+        }
+    }
+    val next = if (forward) {
+        if (index < items.length - 1) index + 1 else 0
+    } else {
+        if (index > 0) index - 1 else items.length - 1
+    }
+    (items.item(next) as? HTMLElement)?.focus()
 }

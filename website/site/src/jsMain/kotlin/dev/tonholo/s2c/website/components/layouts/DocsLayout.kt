@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.autoLength
 import com.varabyte.kobweb.compose.css.functions.clamp
+import com.varabyte.kobweb.compose.foundation.layout.Arrangement
+import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.display
@@ -84,6 +86,9 @@ val DocsContentStyle = CssStyle.base {
     Modifier
         .minWidth(0.px)
         .maxWidth(48.cssRem)
+        .padding {
+            bottom(SiteTheme.dimensions.size.Xxl)
+        }
 }
 
 private const val DOCS_TITLE_LINE_HEIGHT = 1.2
@@ -124,31 +129,35 @@ fun DocsLayout(
         }
 
         // Main content column
-        Div(
-            attrs = DocsContentStyle.toModifier().toAttrs(),
+        Column(
+            modifier = DocsContentStyle.toModifier(),
+            verticalArrangement = Arrangement.spacedBy(SiteTheme.dimensions.size.Xxl),
         ) {
             // Collapsible TOC for mobile - visible below MD
             Div(
                 attrs = Modifier
                     .displayUntil(Breakpoint.MD)
                     .padding(bottom = SiteTheme.dimensions.size.Lg)
+                    .fillMaxWidth()
                     .toAttrs(),
             ) {
                 CollapsibleSection(title = "Table of Contents") {
-                    tocEntries.forEach { entry ->
-                        val linkPadding = if (entry.level >= MOBILE_TOC_INDENT_LEVEL) {
-                            Modifier.padding(left = SiteTheme.dimensions.size.Lg)
-                        } else {
-                            Modifier
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        tocEntries.forEach { entry ->
+                            val linkPadding = if (entry.level >= MOBILE_TOC_INDENT_LEVEL) {
+                                Modifier.padding(left = SiteTheme.dimensions.size.Lg)
+                            } else {
+                                Modifier
+                            }
+                            Link(
+                                path = "#${entry.id}",
+                                text = entry.label,
+                                modifier = TocLinkStyle.toModifier()
+                                    .then(linkPadding)
+                                    .padding(topBottom = SiteTheme.dimensions.size.Sm),
+                                variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
+                            )
                         }
-                        Link(
-                            path = "#${entry.id}",
-                            text = entry.label,
-                            modifier = TocLinkStyle.toModifier()
-                                .then(linkPadding)
-                                .padding(topBottom = SiteTheme.dimensions.size.Sm),
-                            variant = UndecoratedLinkVariant.then(UncoloredLinkVariant),
-                        )
                     }
                 }
             }

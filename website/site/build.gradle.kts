@@ -1,5 +1,6 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.link
+import kotlinx.html.meta
 import java.util.Properties
 
 plugins {
@@ -25,8 +26,29 @@ version = "1.0-SNAPSHOT"
 kobweb {
     app {
         index {
-            description.set("Convert SVG and Android Vector Drawables into Jetpack Compose ImageVector code")
+            val desc = "Convert SVG and Android XML Drawables into Jetpack Compose ImageVector code"
+            description.set(desc)
             head.add {
+                // Default meta for crawlers that don't execute JS (Bing, social media scrapers)
+                meta(name = "robots", content = "index, follow")
+                meta(name = "theme-color", content = "#ffffff")
+                meta {
+                    attributes["property"] = "og:title"
+                    attributes["content"] = "SVG to Compose"
+                }
+                meta {
+                    attributes["property"] = "og:description"
+                    attributes["content"] = desc
+                }
+                meta {
+                    attributes["property"] = "og:type"
+                    attributes["content"] = "website"
+                }
+                meta {
+                    attributes["property"] = "og:locale"
+                    attributes["content"] = "en_US"
+                }
+                meta(name = "twitter:card", content = "summary_large_image")
                 link {
                     rel = "preconnect"
                     href = "https://fonts.googleapis.com"
@@ -74,15 +96,107 @@ kobweb {
 
 val generateLlmsTxt by tasks.registering {
     val templateFile = layout.projectDirectory.file("src/jsMain/resources/llms.txt.template")
-    val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/llms.txt")
+    val publicDir = layout.projectDirectory.dir("src/jsMain/resources/public")
+    val outputFile = publicDir.file("llms.txt")
+    val wellKnownOutputFile = publicDir.file(".well-known/llms.txt")
     val appVersion = appProperties["VERSION"].toString()
     inputs.file(templateFile)
     inputs.property("version", appVersion)
-    outputs.file(outputFile)
+    outputs.files(outputFile, wellKnownOutputFile)
     doLast {
-        outputFile.asFile.writeText(
-            templateFile.asFile.readText().replace("\${VERSION}", appVersion),
-        )
+        val content = templateFile.asFile.readText().replace($$"${VERSION}", appVersion)
+        outputFile.asFile.writeText(content)
+        wellKnownOutputFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(content)
+        }
+    }
+}
+
+val generateLlmsFullTxt by tasks.registering {
+    val templateFile = layout.projectDirectory.file("src/jsMain/resources/llms-full.txt.template")
+    val publicDir = layout.projectDirectory.dir("src/jsMain/resources/public")
+    val outputFile = publicDir.file("llms-full.txt")
+    val wellKnownOutputFile = publicDir.file(".well-known/llms-full.txt")
+    val appVersion = appProperties["VERSION"].toString()
+    inputs.file(templateFile)
+    inputs.property("version", appVersion)
+    outputs.files(outputFile, wellKnownOutputFile)
+    doLast {
+        val content = templateFile.asFile.readText().replace($$"${VERSION}", appVersion)
+        outputFile.asFile.writeText(content)
+        wellKnownOutputFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(content)
+        }
+    }
+}
+
+val generateSitemap by tasks.registering {
+    val pagesDir = layout.projectDirectory.dir("src/jsMain/kotlin/dev/tonholo/s2c/website/pages")
+    val outputFile = layout.projectDirectory.file("src/jsMain/resources/public/sitemap.xml")
+    val baseUrl = "https://www.svgtocompose.com"
+    val lastModified = appProperties["LAST_MODIFIED"]?.toString()
+        ?: error("LAST_MODIFIED not set in app.properties")
+
+    // Per-path overrides for changefreq and priority.
+    // Pages not listed here get defaults: monthly, 0.5
+    val pageMetadata = mapOf(
+        "/" to ("weekly" to "1.0"),
+        "/docs" to ("monthly" to "0.8"),
+        "/docs/cli" to ("monthly" to "0.7"),
+        "/docs/gradle-plugin" to ("monthly" to "0.7"),
+        "/docs/faq" to ("monthly" to "0.6"),
+        "/docs/alternatives" to ("monthly" to "0.6"),
+    )
+
+    inputs.dir(pagesDir)
+    outputs.file(outputFile)
+
+    doLast {
+        // Discover Kobweb @Page files and map to URL paths.
+        // Kobweb convention: pages/Index.kt -> "/", pages/docs/Cli.kt -> "/docs/cli"
+        val pageFiles = pagesDir.asFile.walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .filter { file -> file.readText().contains("@Page") }
+            .map { file ->
+                val relativePath = file.relativeTo(pagesDir.asFile).path
+                    .removeSuffix(".kt")
+                    .replace("\\", "/")
+                // Index files map to their parent directory
+                val urlPath = if (relativePath == "Index") {
+                    "/"
+                } else {
+                    "/" + relativePath.replace("/Index", "")
+                        .split("/")
+                        .joinToString("/") { segment ->
+                            // Convert PascalCase to kebab-case
+                            segment.replace(Regex("([a-z])([A-Z])")) { match ->
+                                "${match.groupValues[1]}-${match.groupValues[2]}"
+                            }.lowercase()
+                        }
+                }
+                urlPath
+            }
+            .sorted()
+            .toList()
+
+        val today = lastModified
+        val sitemap = buildString {
+            appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
+            appendLine("""<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
+            for (path in pageFiles) {
+                val (changefreq, priority) = pageMetadata[path] ?: ("monthly" to "0.5")
+                appendLine("  <url>")
+                appendLine("    <loc>$baseUrl$path</loc>")
+                appendLine("    <lastmod>$today</lastmod>")
+                appendLine("    <changefreq>$changefreq</changefreq>")
+                appendLine("    <priority>$priority</priority>")
+                appendLine("  </url>")
+            }
+            appendLine("</urlset>")
+        }
+        outputFile.asFile.writeText(sitemap)
     }
 }
 
@@ -92,7 +206,7 @@ val copyEditorWasm by tasks.registering(Copy::class) {
     into(layout.projectDirectory.dir("src/jsMain/resources/public/editor"))
 }
 
-val dokkaOutputDir = rootProject.layout.projectDirectory.dir("../build/dokka")
+val dokkaOutputDir: Directory = rootProject.layout.projectDirectory.dir("../build/dokka")
 val copyDokkaHtml by tasks.registering(Sync::class) {
     from(dokkaOutputDir)
     into(layout.projectDirectory.dir("src/jsMain/resources/public/api-docs"))
@@ -101,6 +215,8 @@ val copyDokkaHtml by tasks.registering(Sync::class) {
 tasks.configureEach {
     if (name == "jsProcessResources") {
         dependsOn(generateLlmsTxt)
+        dependsOn(generateLlmsFullTxt)
+        dependsOn(generateSitemap)
         dependsOn(copyEditorWasm)
         dependsOn(copyDokkaHtml)
     }

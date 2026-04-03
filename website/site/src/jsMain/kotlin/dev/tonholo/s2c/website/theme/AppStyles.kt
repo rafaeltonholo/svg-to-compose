@@ -177,7 +177,7 @@ private const val DISPLAY_LETTER_SPACING = -0.02
 
 val DisplayTextStyle = CssStyle.base {
     Modifier
-        .fontSize(clamp(1.75.cssRem, 5.vw, 3.5.cssRem))
+        .fontSize(clamp(2.25.cssRem, 5.vw, 3.5.cssRem))
         .fontWeight(FontWeight.Bold)
         .lineHeight(DISPLAY_LINE_HEIGHT)
         .letterSpacing(DISPLAY_LETTER_SPACING.em)

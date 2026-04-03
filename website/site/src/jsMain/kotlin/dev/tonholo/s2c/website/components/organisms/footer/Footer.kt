@@ -11,9 +11,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.justifyContent
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.molecules.footer.LogoAndDescription
@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
+import org.jetbrains.compose.web.css.keywords.auto
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -37,6 +38,12 @@ val FooterStyle = CssStyle {
             .flexDirection(FlexDirection.Column)
             .alignItems(AlignItems.Center)
             .padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Lg)
+            .padding {
+                top(SiteTheme.dimensions.padding.section)
+                left(SiteTheme.dimensions.size.Lg)
+                right(SiteTheme.dimensions.size.Lg)
+                bottom(SiteTheme.dimensions.size.Sm)
+            }
             .gap(SiteTheme.dimensions.padding.section)
             .borderTop(
                 width = 1.px,
@@ -44,28 +51,27 @@ val FooterStyle = CssStyle {
                 color = palette.outline,
             )
     }
-    Breakpoint.SM {
-        Modifier.padding(topBottom = SiteTheme.dimensions.padding.section, leftRight = SiteTheme.dimensions.size.Xl)
-    }
     Breakpoint.MD {
-        Modifier.padding(
-            topBottom = SiteTheme.dimensions.padding.footerVertical,
-            leftRight = SiteTheme.dimensions.size.Xxl,
-        )
+        Modifier
+            .padding(
+                topBottom = SiteTheme.dimensions.padding.footerVertical,
+                leftRight = SiteTheme.dimensions.size.Xxl,
+            )
     }
 }
 
-val FooterContentStyle = CssStyle.base {
-    Modifier
-        .fillMaxWidth()
-        .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
-        .display(DisplayStyle.Flex)
-        .flexDirection(FlexDirection.Column)
-        .alignItems(AlignItems.Center)
-        .gap(SiteTheme.dimensions.padding.section)
-}
+val FooterContentStyle = CssStyle {
+    base {
+        Modifier
+            .fillMaxWidth()
+            .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
+            .display(DisplayStyle.Flex)
+            .flexDirection(FlexDirection.Column)
+            .alignItems(AlignItems.Center)
+            .gap(SiteTheme.dimensions.padding.section)
+            .fillMaxWidth()
+    }
 
-val FooterContentMdStyle = CssStyle {
     Breakpoint.MD {
         Modifier
             .flexDirection(FlexDirection.Row)
@@ -74,18 +80,23 @@ val FooterContentMdStyle = CssStyle {
     }
 }
 
+val FooterInnerContentStyle = CssStyle {
+    base { Modifier.fillMaxWidth() }
+    Breakpoint.MD { Modifier.width(auto) }
+}
+
 @Composable
 fun Footer(modifier: Modifier = Modifier) {
     Footer(
         attrs = FooterStyle.toModifier().then(modifier).toAttrs(),
     ) {
         Div(
-            attrs = FooterContentStyle.toModifier()
-                .then(FooterContentMdStyle.toModifier())
+            attrs = FooterContentStyle
+                .toModifier()
                 .toAttrs(),
         ) {
-            LogoAndDescription()
-            LinksAndAttribution()
+            LogoAndDescription(modifier = FooterInnerContentStyle.toModifier())
+            LinksAndAttribution(modifier = FooterInnerContentStyle.toModifier())
         }
     }
 }

@@ -13,13 +13,16 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.loadFromLocalStorage
 import com.varabyte.kobweb.silk.theme.colors.saveToLocalStorage
+import kotlinx.browser.document
 import org.jetbrains.compose.web.css.vh
+import org.w3c.dom.HTMLElement
 
 private const val COLOR_MODE_KEY = "website:colorMode"
 
 @InitSilk
-fun initColorMode(ctx: InitSilkContext) {
+fun initSilk(ctx: InitSilkContext) {
     ctx.config.initialColorMode = ColorMode.loadFromLocalStorage(COLOR_MODE_KEY) ?: ColorMode.DARK
+    (document.documentElement as? HTMLElement)?.lang = "en"
 }
 
 @App

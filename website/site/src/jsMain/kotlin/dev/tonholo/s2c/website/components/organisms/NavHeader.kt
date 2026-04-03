@@ -231,6 +231,7 @@ private fun S2CLogo() {
         ) {
             Image(
                 src = "/images/s2c-logo.svg",
+                alt = "SVG to Compose logo",
                 modifier = CompactLogoStyle.toModifier().size(1.75.cssRem),
             )
             Row(
@@ -239,6 +240,7 @@ private fun S2CLogo() {
             ) {
                 Image(
                     src = "/images/s2c-icon.svg",
+                    alt = "SVG to Compose icon",
                     modifier = Modifier.size(1.25.cssRem),
                 )
                 SpanText(
@@ -284,6 +286,8 @@ private fun SideMenuItems(onNavigate: () -> Unit) {
         NavLink("/docs/cli", "CLI", modifier = clickModifier)
         NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
         NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
+        NavLink("/docs/faq", "FAQ", modifier = clickModifier)
+        NavLink("/docs/alternatives", "Alternatives", modifier = clickModifier)
     }
 }
 

@@ -1,9 +1,7 @@
 package dev.tonholo.s2c.website.components.organisms.docs
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.BorderCollapse
 import com.varabyte.kobweb.compose.css.FontWeight
-import com.varabyte.kobweb.compose.css.TableLayout
 import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -11,17 +9,12 @@ import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.ariaHidden
 import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.borderBottom
-import com.varabyte.kobweb.compose.ui.modifiers.borderCollapse
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
-import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.role
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
-import com.varabyte.kobweb.compose.ui.modifiers.tableLayout
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
@@ -43,9 +36,6 @@ import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
@@ -56,8 +46,6 @@ import org.jetbrains.compose.web.dom.Th
 import org.jetbrains.compose.web.dom.Thead
 import org.jetbrains.compose.web.dom.Tr
 import org.jetbrains.compose.web.dom.Ul
-
-private const val PLATFORM_TABLE_LINE_HEIGHT = 1.5
 
 // language=sh
 private const val S2C_CONVERT_SINGLE_FILE = """
@@ -107,7 +95,6 @@ private const val S2C_DISABLE_OPTIMIZATION = """
 |  icon.svg
 """
 
-// language=kotlin
 private const val OUTPUT_EXAMPLE = """
 |package com.app.icons
 |
@@ -140,41 +127,6 @@ private const val OUTPUT_EXAMPLE = """
 |
 |private var _myIcon: ImageVector? = null
 """
-
-val PlatformTableStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
-    Modifier
-        .fillMaxWidth()
-        .backgroundColor(palette.surfaceVariant)
-        .fontSize(0.75.cssRem)
-        .lineHeight(PLATFORM_TABLE_LINE_HEIGHT)
-        .borderCollapse(BorderCollapse.Collapse)
-        .tableLayout(TableLayout.Fixed)
-}
-
-val PlatformTableHeaderStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
-    Modifier
-        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
-        .fontWeight(FontWeight.SemiBold)
-        .backgroundColor(palette.surface)
-        .borderBottom(
-            width = 1.px,
-            style = LineStyle.Solid,
-            color = palette.outline,
-        )
-}
-
-val PlatformTableCellStyle = CssStyle.base {
-    val palette = colorMode.toSitePalette()
-    Modifier
-        .padding(topBottom = SiteTheme.dimensions.size.Md, leftRight = SiteTheme.dimensions.size.Lg)
-        .borderBottom(
-            width = 1.px,
-            style = LineStyle.Solid,
-            color = palette.outline,
-        )
-}
 
 val CliDocsOptionsTableStyle = CssStyle.base {
     Modifier
@@ -229,13 +181,13 @@ private fun PlatformSupportSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Table(
-            attrs = PlatformTableStyle.toModifier()
+            attrs = DocsTableStyle.toModifier()
                 .toAttrs(),
         ) {
             Thead {
                 Tr {
                     Th(
-                        attrs = PlatformTableHeaderStyle
+                        attrs = DocsTableHeaderStyle
                             .toModifier()
                             .textAlign(TextAlign.Start)
                             .color(palette.onSurface)
@@ -245,7 +197,7 @@ private fun PlatformSupportSection() {
                         Text("Platform")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle.toModifier()
+                        attrs = DocsTableHeaderStyle.toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
                             .toAttrs(),
@@ -253,7 +205,7 @@ private fun PlatformSupportSection() {
                         Text("With optimization")
                     }
                     Th(
-                        attrs = PlatformTableHeaderStyle.toModifier()
+                        attrs = DocsTableHeaderStyle.toModifier()
                             .color(palette.onSurface)
                             .attrsModifier { attr("scope", "col") }
                             .toAttrs(),
@@ -283,7 +235,7 @@ private fun PlatformRow(platform: String, index: Int) {
     }
     Tr(attrs = backgroundModifier.toAttrs()) {
         Td(
-            attrs = PlatformTableCellStyle
+            attrs = DocsTableCellStyle
                 .toModifier()
                 .fontWeight(FontWeight.Medium)
                 .color(palette.onSurface)
@@ -299,7 +251,7 @@ private fun PlatformRow(platform: String, index: Int) {
 @Composable
 private fun SupportedCell(palette: SitePalette) {
     Td(
-        attrs = PlatformTableCellStyle.toModifier()
+        attrs = DocsTableCellStyle.toModifier()
             .ariaLabel("Supported")
             .textAlign(TextAlign.Center)
             .toAttrs(),
@@ -433,8 +385,8 @@ private fun OptionsReferenceSection() {
         )
         Column(
             modifier = CliDocsOptionsTableStyle.toModifier()
+                .role("table")
                 .attrsModifier {
-                    attr("role", "table")
                     attr("aria-label", "CLI options reference")
                 },
         ) {

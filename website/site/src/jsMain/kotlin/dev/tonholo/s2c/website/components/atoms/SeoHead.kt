@@ -13,7 +13,7 @@ private const val JSON_LD_SCRIPT_ID = "seo-json-ld"
 
 @Composable
 fun SeoHead(data: PageLayoutData, path: String) {
-    val fullTitle = "$SITE_NAME - ${data.title}"
+    val fullTitle = "${data.title} | $SITE_NAME"
     val canonicalPath = data.canonicalPath ?: path
     val canonicalUrl = "$BASE_URL$canonicalPath"
     val ogImageUrl = "$BASE_URL${data.ogImage}"
@@ -33,6 +33,7 @@ fun SeoHead(data: PageLayoutData, path: String) {
         upsertMeta(attributeName = "property", attributeValue = "og:image:width", content = OG_IMAGE_WIDTH)
         upsertMeta(attributeName = "property", attributeValue = "og:image:height", content = OG_IMAGE_HEIGHT)
         upsertMeta(attributeName = "property", attributeValue = "og:site_name", content = SITE_NAME)
+        upsertMeta(attributeName = "property", attributeValue = "og:locale", content = "en_US")
 
         // Twitter Card
         upsertMeta(attributeName = "name", attributeValue = "twitter:card", content = "summary_large_image")
@@ -41,16 +42,52 @@ fun SeoHead(data: PageLayoutData, path: String) {
         upsertMeta(attributeName = "name", attributeValue = "twitter:image", content = ogImageUrl)
 
         // Canonical link
-        upsertCanonicalLink(canonicalUrl)
+        upsertLink(rel = "canonical", href = canonicalUrl)
+
+        // LLMs discovery links
+        upsertLink(rel = "llms", href = "/llms.txt")
+        upsertLink(rel = "llms-full", href = "/llms-full.txt")
 
         // JSON-LD structured data
-        upsertJsonLd(data.structuredData)
+        val breadcrumbs = buildBreadcrumbs(path)
+        val allStructuredData = if (breadcrumbs != null) {
+            listOf(breadcrumbs) + data.structuredData
+        } else {
+            data.structuredData
+        }
+        upsertJsonLd(allStructuredData)
     }
+}
+
+private fun buildBreadcrumbs(path: String): BreadcrumbListStructuredData? {
+    val segments = path.trim('/').split('/').filter { it.isNotEmpty() }
+    if (segments.isEmpty()) return null
+    val items = mutableListOf(
+        BreadcrumbListStructuredData.BreadcrumbItem(
+            name = "Home",
+            url = BASE_URL,
+        ),
+    )
+    var currentPath = ""
+    for (segment in segments) {
+        currentPath += "/$segment"
+        val name = segment.split("-").joinToString(" ") { word ->
+            word.replaceFirstChar { it.uppercase() }
+        }
+        items.add(
+            BreadcrumbListStructuredData.BreadcrumbItem(
+                name = name,
+                url = "$BASE_URL$currentPath",
+            ),
+        )
+    }
+    return BreadcrumbListStructuredData(items)
 }
 
 private fun upsertMeta(attributeName: String, attributeValue: String, content: String) {
     val head = document.head ?: return
-    val selector = "meta[$attributeName='$attributeValue']"
+    val escapedValue = attributeValue.replace("'", "\\'")
+    val selector = "meta[$attributeName='$escapedValue']"
     val existing = head.querySelector(selector)
     if (existing != null) {
         existing.setAttribute("content", content)
@@ -62,14 +99,15 @@ private fun upsertMeta(attributeName: String, attributeValue: String, content: S
     }
 }
 
-private fun upsertCanonicalLink(href: String) {
+private fun upsertLink(rel: String, href: String) {
     val head = document.head ?: return
-    val existing = head.querySelector("link[rel='canonical']")
+    val escapedRel = rel.replace("'", "\\'")
+    val existing = head.querySelector("link[rel='$escapedRel']")
     if (existing != null) {
         existing.setAttribute("href", href)
     } else {
         val link = document.createElement("link")
-        link.setAttribute("rel", "canonical")
+        link.setAttribute("rel", rel)
         link.setAttribute("href", href)
         head.appendChild(link)
     }

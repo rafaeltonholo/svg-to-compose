@@ -37,7 +37,9 @@ import com.varabyte.kobweb.core.data.add
 import com.varabyte.kobweb.core.init.InitRoute
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
+import com.varabyte.kobweb.silk.components.icons.fa.FaCircleQuestion
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
+import com.varabyte.kobweb.silk.components.icons.fa.FaCodeCompare
 import com.varabyte.kobweb.silk.components.icons.fa.FaTerminal
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -172,9 +174,9 @@ val DocsCardLinkVariant = LinkStyle.addVariant {
 fun initDocsPage(ctx: InitRouteContext) {
     ctx.data.add(
         PageLayoutData(
-            title = "Documentation",
-            description = "Documentation for SVG to Compose CLI tool and Gradle plugin. " +
-                "Installation guides, configuration, and API reference.",
+            title = "Documentation - Guides and API Reference",
+            description = "SVG to Compose documentation. Installation guides, CLI reference, " +
+                "Gradle plugin setup, and API docs for SVG-to-ImageVector conversion.",
             canonicalPath = "/docs",
         ),
     )
@@ -225,6 +227,20 @@ fun DocsPage() {
                 href = "/api-docs/index.html",
                 icon = { FaCode(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
             )
+            DocsCard(
+                title = "FAQ",
+                description = "Common questions about SVG to Compose, supported features, " +
+                    "and how to get started.",
+                href = "/docs/faq",
+                icon = { FaCircleQuestion(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
+            )
+            DocsCard(
+                title = "Alternatives",
+                description = "Compare SVG to Compose with manual coding, Android Studio, " +
+                    "and other conversion tools.",
+                href = "/docs/alternatives",
+                icon = { FaCodeCompare(modifier = Modifier.color(palette.primary), size = IconSize.LG) },
+            )
         }
     }
 }
@@ -234,7 +250,7 @@ private fun DocsCard(title: String, description: String, href: String, icon: @Co
     val palette = SiteTheme.palette
     Link(
         path = href,
-        modifier = Modifier.ariaLabel("$title — $description"),
+        modifier = Modifier.ariaLabel("$title: $description"),
         variant = DocsCardLinkVariant.then(UncoloredLinkVariant),
     ) {
         Div(attrs = DocsCardStyle.toModifier().toAttrs()) {
