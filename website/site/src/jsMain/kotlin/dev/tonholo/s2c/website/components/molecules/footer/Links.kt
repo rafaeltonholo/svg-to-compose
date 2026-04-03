@@ -10,13 +10,11 @@ import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.alignItems
 import com.varabyte.kobweb.compose.ui.modifiers.ariaLabel
 import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.content
 import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.modifiers.flexWrap
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.gap
-import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -24,7 +22,6 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaArrowUpRightFromSquare
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.style.extendedBy
 import com.varabyte.kobweb.silk.style.extendedByBase
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.Badge
@@ -32,6 +29,7 @@ import dev.tonholo.s2c.website.components.atoms.BadgeVars
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
 import dev.tonholo.s2c.website.components.atoms.resolveBadgeColors
+import dev.tonholo.s2c.website.components.molecules.DocLinkEntry
 import dev.tonholo.s2c.website.components.molecules.docLinkEntries
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
@@ -43,6 +41,7 @@ import org.jetbrains.compose.web.css.FlexWrap
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.dom.Nav
+import org.jetbrains.compose.web.dom.Span
 
 @Composable
 fun Links(modifier: Modifier = Modifier) {
@@ -100,24 +99,22 @@ fun DocsLinks(modifier: Modifier = Modifier) {
             .ariaLabel("Documentation links")
             .toAttrs(),
     ) {
-        Row(
-            modifier = Modifier
-                .gap(SiteTheme.dimensions.size.Sm)
-                .flexWrap(FlexWrap.Wrap),
-            verticalAlignment = Alignment.CenterVertically,
+        Span(
+            attrs = Modifier
+                .fontSize(0.8.cssRem)
+                .toAttrs(),
         ) {
-            val linkModifier = Modifier.fontSize(0.8.cssRem)
-            Link(
-                path = "/docs",
-                text = "Docs",
-                modifier = linkModifier,
-                variant = DocsLinkVariant,
-            )
-            docLinkEntries.forEach { entry ->
+            val allLinks = listOf(DocLinkEntry(path = "/docs", label = "Docs")) + docLinkEntries
+            allLinks.forEachIndexed { index, entry ->
+                if (index > 0) {
+                    SpanText(
+                        " \u00B7 ",
+                        modifier = Modifier.color(ColorMode.current.toSitePalette().onSurfaceVariant),
+                    )
+                }
                 Link(
                     path = entry.path,
                     text = entry.label,
-                    modifier = linkModifier,
                     variant = DocsLinkVariant,
                 )
             }
@@ -131,14 +128,7 @@ val FooterLinksVariant = SiteLinkStyleVariant.extendedByBase {
         .alignItems(AlignItems.Center)
 }
 
-val DocsLinkVariant = FooterLinksVariant.extendedBy {
-    cssRule(":not(:first-child)::before") {
-        Modifier
-            .content("\u00B7")
-            .margin(right = SiteTheme.dimensions.size.Sm)
-            .color(colorMode.toSitePalette().onSurfaceVariant)
-    }
-}
+val DocsLinkVariant = SiteLinkStyleVariant
 
 val FooterLinkBadgeVariant = SquaredBadge.extendedByBase {
     val color = palette.primary.lightened(byPercent = 0.5f)
