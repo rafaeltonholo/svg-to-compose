@@ -37,6 +37,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
 
   publish-gradle-plugin-portal:
+    environment: publish
     name: Publish to Gradle Plugin Portal
     runs-on: ubuntu-latest
     permissions:
