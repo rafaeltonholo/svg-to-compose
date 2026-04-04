@@ -54,7 +54,9 @@ class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
                     type = "module"
                     textContent = """
                         |import * as shiki from 'https://esm.sh/shiki@$SHIKI_VERSION'
+                        |import * as shikiTransformers from 'https://esm.sh/@shikijs/transformers@$SHIKI_VERSION'
                         |
+                        |globalThis.shikiTransformers = shikiTransformers
                         |KotlinWrapperShiki.invoke(shiki)
                     """.trimMargin()
                 }.also { script ->

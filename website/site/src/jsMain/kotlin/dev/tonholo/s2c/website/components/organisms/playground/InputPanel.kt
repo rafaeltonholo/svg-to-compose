@@ -59,6 +59,7 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.molecules.PanelHeaderStyle
+import dev.tonholo.s2c.website.components.molecules.playground.ScrollSyncEffect
 import dev.tonholo.s2c.website.shiki.DARK_THEME
 import dev.tonholo.s2c.website.shiki.LIGHT_THEME
 import dev.tonholo.s2c.website.shiki.SHIKI_CODE_BLOCK_DARK_BACKGROUND
@@ -81,7 +82,6 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.TextArea
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.events.Event
 
 private const val HIGHLIGHT_LANGUAGE = "xml"
 private const val TAB_INDENT = "  "
@@ -365,20 +365,4 @@ private fun computeOutdent(value: String, start: Int): EditorEdit? {
 private fun computeIndent(value: String, start: Int, end: Int): EditorEdit {
     val newValue = value.substring(0, start) + TAB_INDENT + value.substring(end)
     return EditorEdit(newValue, start + TAB_INDENT.length)
-}
-
-@Composable
-private fun ScrollSyncEffect(textareaElement: HTMLTextAreaElement?, backdropElement: HTMLElement?) {
-    DisposableEffect(textareaElement, backdropElement) {
-        val textarea = textareaElement ?: return@DisposableEffect onDispose { }
-        val backdrop = backdropElement ?: return@DisposableEffect onDispose { }
-        val onScroll: (Event) -> Unit = {
-            backdrop.scrollTop = textarea.scrollTop
-            backdrop.scrollLeft = textarea.scrollLeft
-        }
-        textarea.addEventListener("scroll", onScroll)
-        onDispose {
-            textarea.removeEventListener("scroll", onScroll)
-        }
-    }
 }

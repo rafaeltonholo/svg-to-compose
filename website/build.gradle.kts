@@ -6,7 +6,7 @@ plugins {
     alias(websiteLibs.plugins.compose.multiplatform) apply false
     alias(websiteLibs.plugins.kobweb.application) apply false
     alias(websiteLibs.plugins.kobweb.worker) apply false
-    alias(libs.plugins.kotlinx.serialization) apply false
+    alias(libs.plugins.org.jetbrains.kotlin.serialization) apply false
     alias(libs.plugins.dev.zacsweers.metro) apply false
     alias(libs.plugins.buildconfig) apply false
     alias(libs.plugins.detekt) apply false

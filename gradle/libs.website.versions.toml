@@ -1,23 +1,25 @@
 [versions]
 kobweb = "0.24.0"
-compose-html = "1.10.0"
-compose-multiplatform = "1.10.2"
-compose-runtime = "1.10.2"
+compose-html = "1.10.3"
+compose-multiplatform = "1.10.3"
+compose-runtime = "1.10.6"
 compose-viewmodel = "2.10.0"
+kotlinx-serialization = "1.10.0"
 jszip = "3.10.1"
-s2c = "2.2.0"
+s2c = "3.0.0"
 
 [libraries]
-dev-tonholo-s2c = { module = "dev.tonholo.s2c:svg-to-compose", version.ref = "s2c" }
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-html" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "compose-viewmodel" }
+dev-tonholo-s2c = { module = "dev.tonholo.s2c:svg-to-compose", version.ref = "s2c" }
 kobweb-api = { module = "com.varabyte.kobweb:kobweb-api", version.ref = "kobweb" }
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core", version.ref = "kobweb" }
 kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
 kobweb-worker = { module = "com.varabyte.kobweb:kobweb-worker", version.ref = "kobweb" }
 kobwebx-markdown = { module = "com.varabyte.kobwebx:kobwebx-markdown", version.ref = "kobweb" }
 kobwebx-serialization-kotlinx = { module = "com.varabyte.kobwebx:kobwebx-serialization-kotlinx", version.ref = "kobweb" }
+org-jetbrains-kotlinx-kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 silk-foundation = { module = "com.varabyte.kobweb:silk-foundation", version.ref = "kobweb" }
 silk-icons-fa = { module = "com.varabyte.kobwebx:silk-icons-fa", version.ref = "kobweb" }
 silk-icons-mdi = { module = "com.varabyte.kobwebx:silk-icons-mdi", version.ref = "kobweb" }

@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.website.state.playground
 
+import dev.tonholo.s2c.website.components.organisms.playground.DEFAULT_TEMPLATE_TOML
+import dev.tonholo.s2c.website.domain.model.playground.template.TemplateValidationError
 import dev.tonholo.s2c.website.state.playground.batch.BatchPhase
 import dev.tonholo.s2c.website.state.playground.batch.FileGroup
 
@@ -27,6 +29,9 @@ internal data class PlaygroundState(
     val fileGroups: List<FileGroup> = emptyList(),
     val selectedFiles: Set<String> = emptySet(),
     val expandedFolders: Set<String> = emptySet(),
+    val templateToml: String = DEFAULT_TEMPLATE_TOML,
+    val templateErrors: List<TemplateValidationError> = emptyList(),
+    val templateExpanded: Boolean = false,
 ) {
     companion object {
         // region Sample Data

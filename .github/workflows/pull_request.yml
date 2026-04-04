@@ -1,7 +1,7 @@
 name: Pull request check
 on: pull_request
 jobs:
-  build-and-check:
+  build-and-test:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
@@ -12,12 +12,7 @@ jobs:
 
         - name: Prepares environment for building
           uses: ./.github/actions/setup
-  
-        - name: Prepare nodeJS enviroment for integrity check
-          uses: ./.github/actions/setup-nodejs
-          with:
-            os: ${{ matrix.os }}
-        
+
         - name: Cache Kotlin Konan
           id: cache-kotlin-konan
           uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
@@ -25,7 +20,7 @@ jobs:
             path: |
               ~/.konan/**/*
             key: kotlin-konan-${{ matrix.os }}
-  
+
         - name: Build Native Binary for macos
           if: matrix.os == 'macos-latest'
           uses: burrunan/gradle-cache-action@v3
@@ -33,7 +28,7 @@ jobs:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
             arguments: releaseMacOS
-  
+
         - name: Build Native Binary for Windows
           if: matrix.os == 'windows-latest'
           uses: burrunan/gradle-cache-action@v3
@@ -41,7 +36,7 @@ jobs:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
             arguments: releaseWindows
-  
+
         - name: Build Native Binary for Linux
           if: matrix.os == 'ubuntu-latest'
           uses: burrunan/gradle-cache-action@v3
@@ -61,19 +56,66 @@ jobs:
             ./gradlew cleanAllTests allTests
           continue-on-error: false
 
+        - name: Upload native binary
+          uses: actions/upload-artifact@v4
+          with:
+            name: native-binary-${{ matrix.os }}
+            path: svg-to-compose/build/bin/
+            retention-days: 1
+
+  integrity-checks:
+    needs: build-and-test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        check: [ cli-svg, cli-xml, template, gradle-plugin ]
+        exclude:
+          - os: macos-latest
+            check: gradle-plugin
+          - os: windows-latest
+            check: gradle-plugin
+    runs-on: ${{ matrix.os }}
+    steps:
+        - name: Checkout the repo
+          uses: actions/checkout@v6
+
+        - name: Prepares environment for building
+          uses: ./.github/actions/setup
+
+        - name: Prepare nodeJS environment for integrity check
+          uses: ./.github/actions/setup-nodejs
+          with:
+            os: ${{ matrix.os }}
+
+        - name: Download native binary
+          if: matrix.check != 'gradle-plugin'
+          uses: actions/download-artifact@v4
+          with:
+            name: native-binary-${{ matrix.os }}
+            path: svg-to-compose/build/bin/
+
+        - name: Restore binary permissions
+          if: matrix.check != 'gradle-plugin' && matrix.os != 'windows-latest'
+          shell: bash
+          run: chmod +x svg-to-compose/build/bin/*/releaseExecutable/s2c.*
+
         - name: CLI Integrity check using SVG
+          if: matrix.check == 'cli-svg'
           uses: ./.github/actions/cli-integrity-check
           with:
             type: svg
-          continue-on-error: false
-  
+
         - name: CLI Integrity check using XML
+          if: matrix.check == 'cli-xml'
           uses: ./.github/actions/cli-integrity-check
           with:
             type: xml
-          continue-on-error: false
+
+        - name: Template Integrity check
+          if: matrix.check == 'template'
+          uses: ./.github/actions/template-integrity-check
 
         - name: Gradle Plugin Integrity check
-          if: matrix.os == 'ubuntu-latest'
+          if: matrix.check == 'gradle-plugin'
           uses: ./.github/actions/gradle-plugin-integrity-check
-          continue-on-error: false

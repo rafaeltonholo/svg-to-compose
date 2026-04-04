@@ -15,18 +15,19 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.listStyle
-import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
-import dev.tonholo.s2c.website.components.atoms.InlineCode
-import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.TabPanel
+import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
+import dev.tonholo.s2c.website.components.molecules.WarningCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Ol
@@ -118,17 +119,11 @@ private fun PluginsDslTab() {
             filename = "build.gradle.kts",
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("Make sure Maven Central is included in your plugin repositories ")
-                val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
-                InlineCode(
-                    code = "settings.gradle.kts",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(".")
-            }
+            CodeAwareSpanText(
+                text = "Make sure Maven Central is included in your plugin repositories `settings.gradle.kts`.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
         }
     }
 }
@@ -325,8 +320,8 @@ private fun ProcessorConfigurationSubsection() {
 @Composable
 private fun IconParserConfigurationSubsection() {
     DocSection(id = "icon-parser-configuration", title = "Icon Parser Configuration", level = 3) {
-        SpanText(
-            text = "These options are available inside the icons { } block:",
+        CodeAwareSpanText(
+            text = "These options are available inside the `icons { }` block:",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Ul(
@@ -340,7 +335,7 @@ private fun IconParserConfigurationSubsection() {
                 description = "Fully qualified theme class name used for preview annotations",
             )
             OptionItem(name = "minify()", description = "Remove comments and extra whitespace from generated code")
-            OptionItem(name = "noPreview()", description = "Disable generation of @Preview composable functions")
+            OptionItem(name = "noPreview()", description = "Disable generation of `@Preview` composable functions")
             OptionItem(name = "makeInternal()", description = "Add the internal visibility modifier to generated code")
             OptionItem(
                 name = "receiverType(String)",
@@ -352,7 +347,7 @@ private fun IconParserConfigurationSubsection() {
             )
             OptionItem(
                 name = "mapIconNameTo((String) -> String)",
-                description = "Transform function to customize generated icon names",
+                description = "Transform function to customise generated icon names",
             )
             OptionItem(
                 name = "exclude(vararg Regex)",
@@ -362,6 +357,47 @@ private fun IconParserConfigurationSubsection() {
                 name = "persist()",
                 description = "Persist generated files to the source directory (delicate API)",
             )
+            OptionItem(
+                name = "templateFile(path: RegularFile)",
+                description = "Path to an `s2c.template.toml` file for customising generated code",
+            )
+        }
+        TemplateFileExample()
+    }
+}
+
+@Composable
+private fun TemplateFileExample() {
+    SpanText(
+        text = "Example usage with a template file:",
+        modifier = DocsBodyTextStyle.toModifier()
+            .fontWeight(FontWeight.SemiBold),
+    )
+    CodeBlock(
+        // language=kotlin
+        code = """
+            |svgToCompose {
+            |    processor {
+            |        val icons by creating {
+            |            from(layout.projectDirectory.dir("src/main/resources/icons"))
+            |            destinationPackage("com.example.app.ui.icons")
+            |            icons {
+            |                theme("com.example.app.ui.theme.AppTheme")
+            |                // TIP: You can choose whatever name for the template, as soon as it is a toml file.
+            |                templateFile(layout.projectDirectory.file("s2c.template.toml"))
+            |            }
+            |        }
+            |    }
+            |}
+        """.trimMargin(),
+        language = "kotlin",
+        filename = "build.gradle.kts",
+    )
+    DocCallout(variant = CalloutVariant.TIP) {
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("See the ")
+            Link(path = "/docs/templates", text = "Template System documentation")
+            Text(" for the full schema reference and placeholder grammar.")
         }
     }
 }
@@ -369,8 +405,7 @@ private fun IconParserConfigurationSubsection() {
 @Composable
 private fun OptionItem(name: String, description: String) {
     Li {
-        InlineCode(name)
-        Text(": $description")
+        CodeAwareSpanText(text = "`$name`: $description")
     }
 }
 
@@ -400,8 +435,7 @@ private fun ParallelProcessingSection() {
                 .toAttrs(),
         ) {
             Li {
-                Text("Parallelism is bounded by Gradle's ")
-                InlineCode("--max-workers setting")
+                CodeAwareSpanText("Parallelism is bounded by Gradle's `--max-workers` setting.")
             }
             Li { Text("Default value (0 or 1) runs processing sequentially") }
             Li { Text("Caching is preserved: unchanged icons are skipped regardless of parallelism") }
@@ -413,21 +447,13 @@ private fun ParallelProcessingSection() {
 private fun PersistentGenerationSection() {
     DocSection(id = "persistent-generation", title = "Persistent Generation") {
         DocCallout(variant = CalloutVariant.WARNING) {
-            val (borderColor, containerColor) = CalloutVariant.WARNING.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("The ")
-                InlineCode(
-                    code = "persist()",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(
-                    " function is a delicate API. When enabled, generated files " +
-                        "are written directly to your source directory instead of the build directory. " +
-                        "Use this only when you need to commit generated code to version control.",
-                )
-            }
+            CodeAwareSpanText(
+                text = "The `persist()` function is a delicate API. When enabled, generated files " +
+                    "are written directly to your source directory instead of the build directory. " +
+                    "Use this only when you need to commit generated code to version control.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = WarningCalloutCodeAwareVariant,
+            )
         }
         CodeBlock(
             // language=kotlin

@@ -141,6 +141,8 @@ svgToCompose {
                 mapIconNameTo { iconName ->
                     iconName.replace("_filled", "")
                 }
+                // Optional: customize generated code with a template
+                // templateFile(layout.projectDirectory.file("s2c.template.toml"))
             }
         }
     }
@@ -206,6 +208,10 @@ Within the `icons` block, you can customize how icons are processed:
 - **mapIconNameTo((String) → String)**: Customizes icon names using a mapping
   function.
 - **exclude(vararg Regex)**: Excludes icons based on filename patterns.
+- **templateFile(RegularFile)**: Path to a template TOML file for output
+  customization. The file can have any name; when omitted, auto-discovers a file
+  named `s2c.template.toml` by walking up from the output directory. See
+  [Template System](../docs/TEMPLATES.md) for the full schema reference.
 - **persist()**: Persists generated files in the source set (use with caution).
 
 ### Parallel Processing

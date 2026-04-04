@@ -77,6 +77,7 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.IconButton
 import dev.tonholo.s2c.website.components.atoms.NavLink
 import dev.tonholo.s2c.website.components.molecules.DocNavDropdown
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.window
@@ -256,10 +257,9 @@ private fun S2CLogo() {
 
 @Composable
 private fun MenuItems() {
-    NavLink("/#playground", "Playground")
-    NavLink("/#install", "Install")
-    NavLink("/#usage", "Usage")
-    NavLink("/#capabilities", "Capabilities")
+    WebRoute.Home.subRoutes.forEach {
+        NavLink(href = it.path, text = it.label)
+    }
     DocNavDropdown()
 }
 
@@ -271,23 +271,20 @@ private fun SideMenuItems(onNavigate: () -> Unit) {
         Modifier.gap(SiteTheme.dimensions.size.Xl),
         horizontalAlignment = Alignment.End,
     ) {
-        NavLink("/#playground", "Playground", modifier = clickModifier)
-        NavLink("/#install", "Install", modifier = clickModifier)
-        NavLink("/#usage", "Usage", modifier = clickModifier)
-        NavLink("/#capabilities", "Capabilities", modifier = clickModifier)
-        SpanText(
-            "Docs",
-            modifier = Modifier
-                .fontWeight(FontWeight.SemiBold)
+        WebRoute.Home.subRoutes.forEach {
+            NavLink(href = it.path, text = it.label, modifier = clickModifier)
+        }
+        NavLink(
+            href = WebRoute.Docs.path,
+            text = WebRoute.Docs.label,
+            modifier = clickModifier.fontWeight(FontWeight.SemiBold)
                 .color(palette.onSurfaceVariant)
                 .fontSize(0.75.cssRem)
                 .padding(top = SiteTheme.dimensions.size.Sm),
         )
-        NavLink("/docs/cli", "CLI", modifier = clickModifier)
-        NavLink("/docs/gradle-plugin", "Gradle Plugin", modifier = clickModifier)
-        NavLink("/api-docs/index.html", "API Reference", modifier = clickModifier)
-        NavLink("/docs/faq", "FAQ", modifier = clickModifier)
-        NavLink("/docs/alternatives", "Alternatives", modifier = clickModifier)
+        WebRoute.Docs.subRoutes.forEach {
+            NavLink(href = it.path, text = it.label, modifier = clickModifier)
+        }
     }
 }
 

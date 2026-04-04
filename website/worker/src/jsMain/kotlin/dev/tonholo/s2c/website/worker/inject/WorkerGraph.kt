@@ -13,7 +13,7 @@ import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import kotlinx.serialization.json.Json
 
-/** Metro dependency graph providing [Converter] and [Json] instances for the worker. */
+/** Metro dependency graph providing [Converter], [CodeEmitterFactory], and [Json] instances for the worker. */
 @DependencyGraph
 internal interface WorkerGraph {
     val converter: Converter

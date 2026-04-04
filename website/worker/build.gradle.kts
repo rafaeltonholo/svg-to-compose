@@ -3,7 +3,7 @@ import com.varabyte.kobweb.gradle.worker.util.configAsKobwebWorker
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(websiteLibs.plugins.kobweb.worker)
-    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.org.jetbrains.kotlin.serialization)
     alias(libs.plugins.dev.zacsweers.metro)
 }
 

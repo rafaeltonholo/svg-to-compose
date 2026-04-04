@@ -29,8 +29,7 @@ import dev.tonholo.s2c.website.components.atoms.BadgeVars
 import dev.tonholo.s2c.website.components.atoms.SquaredBadge
 import dev.tonholo.s2c.website.components.atoms.icon.GithubSvg
 import dev.tonholo.s2c.website.components.atoms.resolveBadgeColors
-import dev.tonholo.s2c.website.components.molecules.DocLinkEntry
-import dev.tonholo.s2c.website.components.molecules.docLinkEntries
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
 import dev.tonholo.s2c.website.theme.palette
@@ -104,8 +103,7 @@ fun DocsLinks(modifier: Modifier = Modifier) {
                 .fontSize(0.8.cssRem)
                 .toAttrs(),
         ) {
-            val allLinks = listOf(DocLinkEntry(path = "/docs", label = "Docs")) + docLinkEntries
-            allLinks.forEachIndexed { index, entry ->
+            WebRoute.Docs.all.forEachIndexed { index, entry ->
                 if (index > 0) {
                     SpanText(
                         " \u00B7 ",

@@ -14,6 +14,7 @@ internal class PlaygroundReducer(
     private val batchReducer: BatchReducer = BatchReducer(),
     private val singleFileReducer: SingleFileReducer = SingleFileReducer(),
     private val uiReducer: PlaygroundUiReducer = PlaygroundUiReducer(),
+    private val templateReducer: TemplateReducer = TemplateReducer(),
 ) : Reducer<PlaygroundAction, PlaygroundState> {
     override fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
         is PlaygroundAction.SelectSample, is PlaygroundAction.SampleLoaded -> sampleReducer.reduce(state, action)
@@ -49,6 +50,13 @@ internal class PlaygroundReducer(
         is PlaygroundAction.BackToBatchList,
         is PlaygroundAction.ZipUploadError,
         -> batchReducer.reduce(state, action)
+
+        is PlaygroundAction.UpdateTemplateToml,
+        is PlaygroundAction.TemplateValidated,
+        is PlaygroundAction.TemplateFileLoaded,
+        is PlaygroundAction.ClearTemplate,
+        is PlaygroundAction.ChangeTemplateExpanded,
+        -> templateReducer.reduce(state, action)
 
         is PlaygroundAction.ConversionOutputReceived ->
             reduceConversionOutput(state, action.output)

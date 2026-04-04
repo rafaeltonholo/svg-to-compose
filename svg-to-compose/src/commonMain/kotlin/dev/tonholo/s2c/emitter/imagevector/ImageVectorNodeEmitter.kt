@@ -32,6 +32,39 @@ internal class ImageVectorNodeEmitter(
     }
 
     /**
+     * Emits only the path drawing commands (moveTo, lineTo, etc.) for a [path] node,
+     * without the surrounding `path(...)` call or braces.
+     *
+     * @param path The path node whose commands to emit.
+     * @return The emitted path command strings, one per line.
+     */
+    fun emitPathCommands(path: ImageVectorNode.Path): String = path.wrapper.nodes.joinToString("\n") {
+        pathNodeEmitter.emit(it).trimEnd()
+    }
+
+    /**
+     * Emits a `PathData { ... }` block for a clip path.
+     *
+     * @param clipPath The clip path wrapper containing the path nodes.
+     * @return The emitted `PathData { ... }` string, or `null` if [clipPath] is `null`.
+     */
+    fun emitClipPathData(clipPath: ImageVectorNode.NodeWrapper?): String? {
+        if (clipPath == null) return null
+        val doubleIndent = indent.repeat(2)
+        val clipPathData = clipPath.nodes
+            .joinToString("\n$doubleIndent") { node ->
+                pathNodeEmitter.emit(node)
+                    .replace("\n", "\n$doubleIndent")
+                    .trimEnd()
+            }
+        return """
+            |PathData {
+            |$indent$indent$clipPathData
+            |$indent}"""
+            .trimMargin()
+    }
+
+    /**
      * Emits a chunk function definition (the private extension function body).
      *
      * @param chunk The chunk function to emit.
@@ -85,6 +118,20 @@ internal class ImageVectorNodeEmitter(
                 emit(it).trimEnd()
             }.prependIndent(indent)
 
+        val header = emitGroupHeader(group)
+        return """
+            |$header {
+            |$groupPaths
+            |}
+        """.trimMargin()
+    }
+
+    /**
+     * Emits only the `group(...)` call signature without the body or braces.
+     * Used by [TemplateNodeEmitter] when no group fragment is configured but
+     * template-aware recursion of children is still needed.
+     */
+    fun emitGroupHeader(group: ImageVectorNode.Group): String {
         val groupParams = buildGroupParameters(group)
 
         val groupParamsString = if (groupParams.isNotEmpty()) {
@@ -97,16 +144,12 @@ internal class ImageVectorNodeEmitter(
             }
             """(
             |$params
-            |)"""
+            |)
+            """.trimMargin()
         } else {
             ""
         }
-
-        return """
-            |group$groupParamsString {
-            |$groupPaths
-            |}
-        """.trimMargin()
+        return "group$groupParamsString"
     }
 
     private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String = "${chunk.functionName}()"
@@ -149,22 +192,8 @@ internal class ImageVectorNodeEmitter(
 
     @Suppress("CyclomaticComplexMethod")
     private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
-        val doubleIndent = indent.repeat(2)
         buildSet {
-            clipPath?.let {
-                val clipPathData = clipPath.nodes
-                    .joinToString("\n$doubleIndent") { node ->
-                        pathNodeEmitter.emit(node)
-                            .replace("\n", "\n$doubleIndent")
-                            .trimEnd()
-                    }
-                val value = """
-                    |PathData {
-                    |$indent$indent$clipPathData
-                    |$indent}"""
-                    .trimMargin()
-                add(CLIP_PATH_PARAM_NAME to value)
-            }
+            emitClipPathData(clipPath)?.let { add(CLIP_PATH_PARAM_NAME to it) }
             rotate?.let { add(ROTATE_PARAM_NAME to "${rotate.toStringConsistent()}f") }
             pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX.toStringConsistent()}f") }
             pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY.toStringConsistent()}f") }

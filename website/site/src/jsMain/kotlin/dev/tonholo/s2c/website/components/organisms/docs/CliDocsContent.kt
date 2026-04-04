@@ -13,8 +13,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.role
-import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
@@ -26,17 +26,20 @@ import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.DocSection
-import dev.tonholo.s2c.website.components.atoms.InlineCode
-import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
+import dev.tonholo.s2c.website.components.molecules.ImportantCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
+import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.Tbody
@@ -143,6 +146,7 @@ fun CliDocsContent(modifier: Modifier = Modifier) {
         ExternalDependenciesSection()
         UsageSection()
         OptionsReferenceSection()
+        TemplateSystemCallout()
         OutputExamplesSection()
     }
 }
@@ -277,7 +281,8 @@ private fun InstallationSection() {
         }
         CodeBlock(
             code = "chmod +x s2c",
-            language = "console",
+            language = "shell",
+            filename = "Terminal",
         )
         SpanText(
             text = "2. Add the binary to your PATH:",
@@ -286,6 +291,7 @@ private fun InstallationSection() {
         CodeBlock(
             code = $$"export PATH=\"/path/to/s2c:$PATH\"",
             language = "shell",
+            filename = "Terminal",
         )
     }
 }
@@ -299,20 +305,12 @@ private fun ExternalDependenciesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
-            val (borderColor, containerColor) = CalloutVariant.IMPORTANT.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text(
-                    "If you do not have Node.js installed or do not need optimization, " +
-                        "you can disable it with the ",
-                )
-                InlineCode(
-                    code = "-opt false",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" flag.")
-            }
+            CodeAwareSpanText(
+                text = "If you do not have Node.js installed or do not need optimization, " +
+                    "you can disable it with the `-opt false` flag.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = ImportantCalloutCodeAwareVariant,
+            )
         }
         SpanText(
             text = "Install the optimization tools globally:",
@@ -320,7 +318,8 @@ private fun ExternalDependenciesSection() {
         )
         CodeBlock(
             code = "npm -g install svgo\nnpm -g install avocado",
-            language = "console",
+            language = "shell",
+            filename = "Terminal",
         )
     }
 }
@@ -336,6 +335,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_SINGLE_FILE.trimMargin(),
             language = "shell",
+            filename = "Terminal",
         )
         SpanText(
             text = "Batch convert a directory recursively:",
@@ -345,6 +345,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_DIRECTORY.trimMargin(),
             language = "shell",
+            filename = "Terminal",
         )
         SpanText(
             text = "Generate with a Material Icons receiver type:",
@@ -354,6 +355,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_MATERIAL_ICON_RECEIVER.trimMargin(),
             language = "shell",
+            filename = "Terminal",
         )
         SpanText(
             text = "Convert an Android Vector Drawable (AVG/XML):",
@@ -363,6 +365,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_AVG.trimMargin(),
             language = "shell",
+            filename = "Terminal",
         )
         SpanText(
             text = "Disable optimization:",
@@ -372,6 +375,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_DISABLE_OPTIMIZATION.trimMargin(),
             language = "shell",
+            filename = "Terminal",
         )
     }
 }
@@ -404,6 +408,27 @@ private fun OptionsReferenceSection() {
 }
 
 @Composable
+private fun TemplateSystemCallout() {
+    DocCallout(variant = CalloutVariant.TIP) {
+        P(attrs = DocsBodyTextStyle.toModifier().margin { top(0.px) }.toAttrs()) {
+            CodeAwareSpanText(
+                text = "You can customise the generated code using the template system. Use " +
+                    "`--template=<path>` to specify a template file, or let the CLI auto-discover " +
+                    "`s2c.template.toml` from your project.",
+                variant = TipCalloutCodeAwareVariant,
+            )
+        }
+        P(attrs = DocsBodyTextStyle.toAttrs()) {
+            Span {
+                Text("See the ")
+                Link(path = "/docs/templates", text = "Template System documentation")
+                Text(" for the full schema reference.")
+            }
+        }
+    }
+}
+
+@Composable
 private fun OutputExamplesSection() {
     DocSection(id = "output-examples", title = "Output Examples") {
         SpanText(
@@ -412,17 +437,12 @@ private fun OutputExamplesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("The generated code uses the same ")
-                InlineCode(
-                    code = "ImageVector.Builder",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" API that Jetpack Compose uses internally, ensuring full compatibility.")
-            }
+            CodeAwareSpanText(
+                text = "The generated code uses the same `ImageVector.Builder` API that Jetpack " +
+                    "Compose uses internally, ensuring full compatibility.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
         }
         CodeBlock(
             code = OUTPUT_EXAMPLE.trimMargin(),

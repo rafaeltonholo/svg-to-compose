@@ -6,6 +6,8 @@ import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.parser.IconParserConfiguration
 import dev.tonholo.s2c.gradle.internal.Configuration
 import dev.tonholo.s2c.gradle.internal.provider.setIfNotPresent
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -57,7 +59,7 @@ internal class IconParserConfigurationImpl(
     @get:Internal
     @Suppress("UNCHECKED_CAST")
     internal val mapIconNameTo: Property<IconMapper> =
-        objectFactory.property(IconMapper::class.java) as Property<IconMapper>
+        objectFactory.property(IconMapper::class.java)
 
     @get:Internal
     internal val exclude: Property<Regex> = objectFactory.property<Regex>()
@@ -66,6 +68,8 @@ internal class IconParserConfigurationImpl(
     @get:Optional
     val excludePattern: String?
         get() = exclude.orNull?.pattern
+
+    internal val templateFile: RegularFileProperty = objectFactory.fileProperty()
 
     internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
 
@@ -118,6 +122,10 @@ internal class IconParserConfigurationImpl(
         )
     }
 
+    override fun templateFile(path: RegularFile) {
+        templateFile.set(path)
+    }
+
     @DelicateSvg2ComposeApi
     override fun persist() {
         isCodeGenerationPersistent.set(true)
@@ -153,6 +161,9 @@ internal class IconParserConfigurationImpl(
         theme.setIfNotPresent(provider = common.theme, defaultValue = "")
         mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo)
         exclude.setIfNotPresent(provider = common.exclude)
+        if (!templateFile.isPresent && common.templateFile.isPresent) {
+            templateFile.set(common.templateFile)
+        }
     }
 
     override fun toString(): String = buildString {
@@ -166,6 +177,7 @@ internal class IconParserConfigurationImpl(
         appendLine("  theme='${theme.orNull}', ")
         appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
         appendLine("  exclude=${exclude.orNull}, ")
+        appendLine("  templateFile=${templateFile.orNull?.asFile?.absolutePath}, ")
         append(")")
     }
 }

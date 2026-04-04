@@ -1,11 +1,11 @@
 [versions]
 agp = "9.1.0"
-activity-compose = "1.12.4"
-compose-bom = "2026.02.00"
-core-ktx = "1.17.0"
+activity-compose = "1.13.0"
+compose-bom = "2026.03.01"
+core-ktx = "1.18.0"
 googleMaterial = "1.13.0"
 lifecycle-runtime-ktx = "2.10.0"
-s2c = "2.2.0"
+s2c = "3.0.0"
 
 [libraries]
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }

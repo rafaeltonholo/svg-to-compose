@@ -16,6 +16,9 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
     testClassesDirs = functionalTest.output.classesDirs
     classpath = functionalTest.runtimeClasspath
     useJUnitPlatform()
+    // Template tests read this file at runtime via copyTemplateConfigToProject().
+    // Declaring it as an input ensures Gradle invalidates the cache when it changes.
+    inputs.file(rootProject.layout.projectDirectory.file("playground/s2c.template.toml"))
 //    // Each test spawns a GradleRunner that loads AGP classes into the test JVM
 //    // via buildscript classpath resolution. Running many tests exhausts Metaspace.
 //    jvmArgs("-XX:MaxMetaspaceSize=4g")

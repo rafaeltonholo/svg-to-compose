@@ -3,6 +3,7 @@ package dev.tonholo.s2c.gradle.dsl.parser
 import dev.tonholo.s2c.annotations.DelicateSvg2ComposeApi
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 
 /**
@@ -119,6 +120,24 @@ interface IconParserConfiguration {
      * exclude them from the generation process.
      */
     fun exclude(vararg patterns: Regex)
+
+    /**
+     * Sets the path to an `s2c.template.toml` file for output customization.
+     *
+     * The template file allows users to control the generated Kotlin code shape —
+     * using custom builder functions, receiver types, imports, and property patterns.
+     *
+     * Usage:
+     * ```kotlin
+     * icons {
+     *     templateFile(layout.projectDirectory.file("config/s2c.template.toml"))
+     * }
+     * ```
+     *
+     * @param path A [RegularFile] pointing to the template file, typically obtained
+     *   via `layout.projectDirectory.file(...)`.
+     */
+    fun templateFile(path: RegularFile)
 
     /**
      * Persists all generated files inside the project's source set, using the given

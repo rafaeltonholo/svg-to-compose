@@ -101,7 +101,7 @@ private fun CliInstallContent() {
 
     when (selectedPlatform) {
         Platform.MAC_LINUX -> CodeBlock(
-            language = "bash",
+            language = "shell",
             // language=sh
             code = """
                 |brew tap dev-tonholo/svg-to-compose
@@ -109,10 +109,11 @@ private fun CliInstallContent() {
                 |# Call s2c
                 |s2c --help
             """.trimMargin(),
+            filename = "Terminal",
         )
 
         Platform.WINDOWS -> CodeBlock(
-            language = "bash",
+            language = "shell",
             // language=sh
             code = """
                 |scoop bucket add svg-to-compose https://github.com/dev-tonholo/scoop-svg-to-compose
@@ -120,10 +121,11 @@ private fun CliInstallContent() {
                 |# Call s2c
                 |s2c --help
             """.trimMargin(),
+            filename = "PowerShell",
         )
 
         Platform.MANUAL -> CodeBlock(
-            language = "bash",
+            language = "shell",
             // language=sh
             code = $$"""
                 |# Download the s2c wrapper script directly from GitHub.
@@ -136,6 +138,7 @@ private fun CliInstallContent() {
                 |# Call s2c
                 |s2c --help
             """.trimMargin(),
+            filename = "Terminal",
         )
     }
 }

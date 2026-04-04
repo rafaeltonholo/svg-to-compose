@@ -11,10 +11,12 @@ import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.FAQPageStructuredData
-import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
@@ -83,17 +85,13 @@ fun FaqContent(modifier: Modifier = Modifier) {
 @Composable
 private fun WhatIsS2cSection() {
     DocSection(id = "what-is-svg-to-compose", title = "What is SVG to Compose?") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +
-                    "Drawable files into Jetpack Compose ",
-            )
-            InlineCode("ImageVector")
-            Text(
-                " code. It eliminates the manual, error-prone process of hand-writing " +
-                    "ImageVector builder code. Available as a CLI tool, a Gradle plugin, and a library.",
-            )
-        }
+        CodeAwareSpanText(
+            text = "SVG to Compose is a Kotlin Multiplatform tool that converts SVG and Android XML " +
+                "Drawable files into Jetpack Compose `ImageVector` code. It eliminates the manual, " +
+                "error-prone process of hand-writing ImageVector builder code. Available as a CLI " +
+                "tool, a Gradle plugin, and a library.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 
@@ -105,46 +103,43 @@ private fun HowToConvertSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = "s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.svg",
-            language = "console",
+            code = """s2c --package com.app.icons \
+                |   --theme com.app.theme.AppTheme \
+                |   --output Icon.kt \
+                |   icon.svg
+""".trimMargin(),
+            language = "shell",
+            filename = "Terminal",
         )
-        SpanText(
-            text = "For automated build integration, use the Gradle plugin instead. Both approaches " +
-                "use the same conversion engine.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        P(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(value = "For automated build integration, use the")
+            Link(path = WebRoute.DocsGradlePlugin.path, text = " Gradle plugin ", variant = SiteLinkStyleVariant)
+            Text(value = "instead. Both approaches use the same conversion engine.")
+        }
     }
 }
 
 @Composable
 private fun AndroidXmlDrawablesSection() {
     DocSection(id = "android-xml-drawables", title = "Does it support Android XML Drawables?") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Yes. Pass an ")
-            InlineCode(".xml")
-            Text(" file instead of ")
-            InlineCode(".svg")
-            Text(
-                ". The parser handles Android Vector Drawable XML format including path data, " +
-                    "groups, gradients, and clip paths.",
-            )
-        }
+        CodeAwareSpanText(
+            text = "Yes. Pass an `.xml` file instead of `.svg`. The parser handles Android Vector " +
+                "Drawable XML format including path data, groups, gradients, and clip paths.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 
 @Composable
 private fun KotlinMultiplatformSection() {
     DocSection(id = "kotlin-multiplatform", title = "Can I use it in a Kotlin Multiplatform project?") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "Yes. SVG to Compose is built with Kotlin Multiplatform. The core library targets " +
-                    "JVM, JS, WASM/JS, macOS, Linux, and Windows. Generated code uses Jetpack Compose's ",
-            )
-            InlineCode("ImageVector")
-            Text(" API which works across all Compose targets. Use the ")
-            InlineCode("--kmp")
-            Text(" flag with the CLI for KMP-compatible output.")
-        }
+        CodeAwareSpanText(
+            text = "Yes. SVG to Compose is built with Kotlin Multiplatform. The core library targets " +
+                "JVM, JS, WASM/JS, macOS, Linux, and Windows. Generated code uses Jetpack Compose's " +
+                "`ImageVector` API which works across all Compose targets. Use the `--kmp` flag " +
+                "with the CLI for KMP-compatible output.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 
@@ -176,14 +171,13 @@ private fun CliVsGradleSection() {
 @Composable
 private fun OptimizationSection() {
     DocSection(id = "optimization", title = "Is the generated code optimized?") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
-                    "for XML Drawable optimization to optimize vector paths before code generation. The generated ",
-            )
-            InlineCode("ImageVector")
-            Text(" uses lazy initialization with a backing field for efficient caching.")
-        }
+        CodeAwareSpanText(
+            text = "Yes. SVG to Compose integrates with SVGO for SVG optimization and Avocado " +
+                "for XML Drawable optimization to optimize vector paths before code generation. " +
+                "The generated `ImageVector` uses lazy initialization with a backing field for " +
+                "efficient caching.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         SpanText(
             text = "Install the optimization tools globally:",
             modifier = DocsBodyTextStyle.toModifier(),
@@ -193,7 +187,8 @@ private fun OptimizationSection() {
                 |npm install -g svgo    # SVG optimization
                 |npm install -g avocado # XML Drawable optimization
             """.trimMargin(),
-            language = "console",
+            language = "shell",
+            filename = "Terminal",
         )
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text("For more details, see the ")

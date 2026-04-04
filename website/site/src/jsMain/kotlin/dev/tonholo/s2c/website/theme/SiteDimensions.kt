@@ -87,6 +87,7 @@ object PaddingTokens {
 
     /** Docs layout top padding including nav offset (10rem base) */
     val docsLayoutTop get() = calc { SiteSizeVar.Xxl.value() + 8.cssRem }
+    val docsLayoutBottom get() = calc { SiteSizeVar.Xxl.value() + 4.cssRem }
 }
 
 /**

@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(websiteLibs.plugins.compose.multiplatform)
-    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
 kotlin {

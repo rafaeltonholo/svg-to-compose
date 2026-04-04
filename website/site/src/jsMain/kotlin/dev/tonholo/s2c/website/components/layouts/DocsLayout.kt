@@ -57,12 +57,11 @@ val DocsLayoutStyle = CssStyle {
             .fillMaxWidth()
             .maxWidth(SiteTheme.dimensions.layout.contentMaxWidth)
             .marginInline(autoLength)
-            .padding(top = SiteTheme.dimensions.padding.docsLayoutTop, leftRight = SiteTheme.dimensions.size.Lg)
-    }
-    Breakpoint.SM {
-        Modifier.padding {
-            leftRight(SiteTheme.dimensions.size.Xl)
-        }
+            .padding(
+                top = SiteTheme.dimensions.padding.docsLayoutTop,
+                leftRight = SiteTheme.dimensions.size.Xl,
+                bottom = SiteTheme.dimensions.padding.docsLayoutBottom,
+            )
     }
     Breakpoint.MD {
         Modifier

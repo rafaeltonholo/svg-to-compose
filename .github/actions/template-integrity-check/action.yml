@@ -1,0 +1,9 @@
+name: Template Integrity check
+description: Runs the CLI command checking if template-based output still works as intended
+runs:
+  using: composite
+  steps:
+    - name: Verify template conversion
+      shell: bash
+      run: |
+        bash ./.github/actions/template-integrity-check/script.sh .

@@ -19,7 +19,7 @@ import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.DocSection
-import dev.tonholo.s2c.website.components.atoms.InlineCode
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
@@ -49,33 +49,26 @@ fun AlternativesContent(modifier: Modifier = Modifier) {
 @Composable
 private fun OverviewSection() {
     DocSection(id = "overview", title = "Overview") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "There are several ways to get Compose ",
-            )
-            InlineCode("ImageVector")
-            Text(
-                " code from vector graphics. Each approach has trade-offs in automation, platform " +
-                    "support, and feature coverage. SVG to Compose aims to provide the most " +
-                    "comprehensive solution for Kotlin Multiplatform projects.",
-            )
-        }
+        CodeAwareSpanText(
+            text = "There are several ways to get Compose `ImageVector` code from vector graphics. " +
+                "Each approach has trade-offs in automation, platform support, and feature coverage. " +
+                "SVG to Compose aims to provide the most comprehensive solution for Kotlin " +
+                "Multiplatform projects.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 
 @Composable
 private fun ManualConversionSection() {
     DocSection(id = "manual-conversion", title = "Manual Conversion") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Writing ")
-            InlineCode("ImageVector.Builder")
-            Text(
-                " code by hand works for simple icons but becomes tedious and error-prone for " +
-                    "complex vectors with many path commands. There is no optimization, no automation, " +
-                    "and no batch processing. Manual coding is suitable only for very simple icons " +
-                    "with fewer than 5 path commands.",
-            )
-        }
+        CodeAwareSpanText(
+            text = "Writing `ImageVector.Builder` code by hand works for simple icons but becomes " +
+                "tedious and error-prone for complex vectors with many path commands. There is no " +
+                "optimization, no automation, and no batch processing. Manual coding is suitable " +
+                "only for very simple icons with fewer than 5 path commands.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 
@@ -95,20 +88,14 @@ private fun AndroidStudioImportSection() {
                 "Drawable XML, not directly to Compose ImageVector code.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "A key limitation is that Android Vector Drawables only support a subset of " +
-                    "SVG features. Most community tools rely on the same Android Studio import " +
-                    "algorithm, inheriting these limitations. SVG to Compose uses its own parsing " +
-                    "algorithm, supporting almost all SVG features that the ",
-            )
-            InlineCode("ImageVector")
-            Text(
-                " API can represent - including features like ",
-            )
-            InlineCode("stroke-dasharray")
-            Text(" that other tools cannot handle.")
-        }
+        CodeAwareSpanText(
+            text = "A key limitation is that Android Vector Drawables only support a subset of " +
+                "SVG features. Most community tools rely on the same Android Studio import " +
+                "algorithm, inheriting these limitations. SVG to Compose uses its own parsing " +
+                "algorithm, supporting almost all SVG features that the `ImageVector` API can " +
+                "represent - including features like `stroke-dasharray` that other tools cannot handle.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
     }
 }
 

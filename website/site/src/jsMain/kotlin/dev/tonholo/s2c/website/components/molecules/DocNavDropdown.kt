@@ -52,6 +52,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
 import kotlinx.browser.document
@@ -69,16 +70,6 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 
 private const val DROPDOWN_Z_INDEX = 100
-
-data class DocLinkEntry(val path: String, val label: String)
-
-val docLinkEntries = listOf(
-    DocLinkEntry(path = "/docs/cli", label = "CLI"),
-    DocLinkEntry(path = "/docs/gradle-plugin", label = "Gradle Plugin"),
-    DocLinkEntry(path = "/api-docs/index.html", label = "API Reference"),
-    DocLinkEntry(path = "/docs/faq", label = "FAQ"),
-    DocLinkEntry(path = "/docs/alternatives", label = "Alternatives"),
-)
 
 val DocNavDropdownTriggerStyle = CssStyle(
     extraModifier = Modifier
@@ -222,7 +213,7 @@ private fun DropdownPanel(isOpen: Boolean, onClose: () -> Unit) {
     ) {
         val linkTabIndex = if (isOpen) 0 else -1
         val docLinkVariant = UndecoratedLinkVariant.then(UncoloredLinkVariant)
-        docLinkEntries.forEach { entry ->
+        WebRoute.Docs.subRoutes.forEach { entry ->
             Link(
                 path = entry.path,
                 text = entry.label,

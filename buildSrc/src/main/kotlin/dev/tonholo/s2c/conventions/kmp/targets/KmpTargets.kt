@@ -60,13 +60,30 @@ fun KotlinMultiplatformExtension.useJvm() {
 
 fun KotlinMultiplatformExtension.useJs() {
     js {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs()
     }
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.useWasmJs() {
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                // TODO(#243): re-enable once ktoml ships a wasm-compatible release
+                //  (https://github.com/akuleshov7/ktoml — WASM CompileError).
+                enabled = false
+            }
+        }
     }
 }
+

@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.website.state.playground
 
+import dev.tonholo.s2c.website.domain.model.playground.template.TemplateValidationError
 import dev.tonholo.s2c.website.state.playground.batch.BatchConversionResult
 import dev.tonholo.s2c.website.state.playground.reducer.PlaygroundReducer
 import dev.tonholo.s2c.website.worker.ConversionOutput
@@ -50,6 +51,13 @@ internal sealed interface PlaygroundAction {
 
     // Upload errors
     data class ZipUploadError(val message: String) : PlaygroundAction
+
+    // Template actions
+    data class UpdateTemplateToml(val toml: String) : PlaygroundAction
+    data class TemplateValidated(val errors: List<TemplateValidationError>) : PlaygroundAction
+    data class TemplateFileLoaded(val content: String) : PlaygroundAction
+    data object ClearTemplate : PlaygroundAction
+    data class ChangeTemplateExpanded(val expanded: Boolean) : PlaygroundAction
 
     // Conversion output
     data class ConversionOutputReceived(val output: ConversionOutput) : PlaygroundAction

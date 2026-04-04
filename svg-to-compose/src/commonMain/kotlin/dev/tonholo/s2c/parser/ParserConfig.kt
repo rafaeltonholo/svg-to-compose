@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.parser
 
 import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.parser.config.TemplateConfig
 
 /**
  * Configuration parameters for the Parser class.
@@ -44,6 +45,8 @@ import dev.tonholo.s2c.emitter.FormatConfig
  * @property formatOverrides optional partial overrides applied on top of the resolved
  * [FormatConfig]. Use this to let CLI flags override individual fields while still
  * inheriting unspecified values from `.editorconfig`.
+ * @property template optional template configuration for output customization.
+ * When `null`, the processor will attempt auto-discovery of `s2c.template.toml`.
  */
 data class ParserConfig(
     val pkg: String,
@@ -60,4 +63,5 @@ data class ParserConfig(
     val keepTempFolder: Boolean = false,
     val formatConfig: FormatConfig? = null,
     val formatOverrides: FormatConfig.Overrides? = null,
+    val template: TemplateConfig? = null,
 )

@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
  * @property minified If `true`, emits compact code without extra formatting.
  * @property kmpPreview If `true`, emits KMP-compatible preview annotations.
  * @property receiverType Optional receiver type (e.g. `Icons.Filled`).
+ * @property templateToml Optional raw TOML content for template-based code generation.
  */
 @Serializable
 data class ConversionInput(
@@ -33,6 +34,7 @@ data class ConversionInput(
     val minified: Boolean,
     val kmpPreview: Boolean = false,
     val receiverType: String? = null,
+    val templateToml: String? = null,
 )
 
 /**

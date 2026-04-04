@@ -6,6 +6,7 @@ import com.varabyte.kobweb.worker.WorkerFactory
 import com.varabyte.kobweb.worker.WorkerStrategy
 import dev.tonholo.s2c.ConversionStep
 import dev.tonholo.s2c.domain.IconFileContents
+import dev.tonholo.s2c.emitter.template.config.TemplateConfigParser
 import dev.tonholo.s2c.website.worker.inject.WorkerGraph
 import dev.zacsweers.metro.createGraph
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,15 @@ internal class IconConvertWorkerFactory : WorkerFactory<ConversionInput, Convers
             val config = input.toParserConfig()
             val fileType = input.resolveFileType()
             val optimizer = input.resolveOptimizer()
+            val templateConfig = input.templateToml
+                ?.takeIf { it.isNotBlank() }
+                ?.let { toml ->
+                    runCatching { TemplateConfigParser.parse(toml) }
+                        .onFailure { e ->
+                            postOutput(ConversionOutput.Error("Template error: ${e.message}"))
+                        }
+                        .getOrNull() ?: return@WorkerStrategy
+                }
 
             coroutineScope.launch {
                 graph.converter.convert(
@@ -47,6 +57,7 @@ internal class IconConvertWorkerFactory : WorkerFactory<ConversionInput, Convers
                     config = config,
                     fileType = fileType,
                     optimizer = optimizer,
+                    templateEmitterConfig = templateConfig,
                 ).collect { step ->
                     postOutput(step.toConversionOutput(graph.json))
                 }
@@ -81,5 +92,8 @@ private fun ConversionStep.toConversionOutput(json: Json): ConversionOutput = wh
         ),
     )
 
-    is ConversionStep.Error -> ConversionOutput.Error(error.message ?: "Unknown error")
+    is ConversionStep.Error -> {
+        console.error("Conversion error:", error)
+        ConversionOutput.Error(error.message ?: "Unknown error")
+    }
 }
