@@ -25,7 +25,7 @@ private val templatesTocEntries = listOf(
     TocEntry(id = "fragments", label = "Fragments"),
     TocEntry(id = "placeholder-grammar", label = "Placeholder Grammar"),
     TocEntry(id = "variables-by-namespace", label = "Variables by Namespace"),
-    TocEntry(id = "null-handling", label = "Null Handling & Line Elision"),
+    TocEntry(id = "null-handling", label = "Null Handling & Line Trimming"),
     TocEntry(id = "auto-discovery", label = "Auto-Discovery"),
     TocEntry(id = "examples", label = "Examples"),
 )

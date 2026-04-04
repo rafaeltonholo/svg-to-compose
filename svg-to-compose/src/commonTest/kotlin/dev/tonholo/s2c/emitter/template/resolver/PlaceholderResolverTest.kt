@@ -73,7 +73,7 @@ class PlaceholderResolverTest {
     }
 
     @Test
-    fun `null variable elides entire line`() {
+    fun `null variable trims entire line`() {
         val ctx = createContext(iconVars = mapOf("name" to "MyIcon", "receiver" to null))
         val result = PlaceholderResolver.resolve(
             $$"name = ${icon:name},$\n    receiver = ${icon:receiver},$\nend",
@@ -135,7 +135,7 @@ class PlaceholderResolverTest {
         assertEquals("val MyIcon: ImageVector get() = builder.build()", result)
     }
 
-    // --- Inline null elision tests ---
+    // --- Inline null trimming tests ---
 
     @Test
     fun `null at start of inline param list`() {
