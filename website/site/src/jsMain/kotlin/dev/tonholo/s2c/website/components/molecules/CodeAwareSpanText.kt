@@ -22,8 +22,25 @@ import org.jetbrains.compose.web.dom.Text
 private const val INLINE_CODE_DARKEN_PERCENT = .25f
 private const val INLINE_CODE_LIGHTEN_PERCENT = .25f
 
+/**
+ * Component kind marker for [CodeAwareSpanTextStyle] and its variants.
+ */
 sealed interface CodeAwareSpanTextKind : ComponentKind
 
+/**
+ * Renders text that may contain inline code segments delimited by backticks.
+ *
+ * Plain text (no backticks) is rendered as a [SpanText]. When backticks are
+ * present, the text is split and segments between backticks are rendered as
+ * [InlineCode] elements.
+ *
+ * Use [variant] to apply callout-specific [InlineCode] colour theming
+ * (e.g., [TipCalloutCodeAwareVariant], [ImportantCalloutCodeAwareVariant]).
+ *
+ * @param text The text to render. Backtick-delimited segments become inline code.
+ * @param modifier Additional [Modifier] applied to the root element.
+ * @param variant Optional [CssStyleVariant] for contextual styling.
+ */
 @Composable
 fun CodeAwareSpanText(
     text: String,
@@ -59,6 +76,9 @@ val CodeAwareSpanTextStyle = CssStyle<CodeAwareSpanTextKind> {
     }
 }
 
+/**
+ * [CodeAwareSpanTextStyle] variant for [InlineCode] elements inside [CalloutVariant.TIP] callouts.
+ */
 val TipCalloutCodeAwareVariant = CodeAwareSpanTextStyle.addVariant {
     val palette = colorMode.toSitePalette()
     val (borderColor, containerColor) = CalloutVariant.TIP.resolveColors(palette)
@@ -67,6 +87,9 @@ val TipCalloutCodeAwareVariant = CodeAwareSpanTextStyle.addVariant {
         .setVariable(InlineCodeVars.ContainerColor, containerColor.lightened(byPercent = INLINE_CODE_LIGHTEN_PERCENT))
 }
 
+/**
+ * [CodeAwareSpanTextStyle] variant for [InlineCode] elements inside [CalloutVariant.WARNING] callouts.
+ */
 val WarningCalloutCodeAwareVariant = CodeAwareSpanTextStyle.addVariant {
     val palette = colorMode.toSitePalette()
     val (borderColor, containerColor) = CalloutVariant.WARNING.resolveColors(palette)
@@ -75,6 +98,9 @@ val WarningCalloutCodeAwareVariant = CodeAwareSpanTextStyle.addVariant {
         .setVariable(InlineCodeVars.ContainerColor, containerColor.lightened(byPercent = INLINE_CODE_LIGHTEN_PERCENT))
 }
 
+/**
+ * [CodeAwareSpanTextStyle] variant for [InlineCode] elements inside [CalloutVariant.IMPORTANT] callouts.
+ */
 val ImportantCalloutCodeAwareVariant = CodeAwareSpanTextStyle.addVariant {
     val palette = colorMode.toSitePalette()
     val (borderColor, containerColor) = CalloutVariant.IMPORTANT.resolveColors(palette)

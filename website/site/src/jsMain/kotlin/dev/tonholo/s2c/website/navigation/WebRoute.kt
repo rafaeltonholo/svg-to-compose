@@ -1,13 +1,22 @@
 package dev.tonholo.s2c.website.navigation
 
-data class WebRoute(
-    val path: String,
-    val label: String,
-    val subRoutes: Set<WebRoute> = emptySet(),
-) {
+/**
+ * Represents a navigation route in the website with an optional set of child routes.
+ *
+ * @property path The URL path for this route.
+ * @property label The display label shown in navigation links.
+ * @property subRoutes Child routes nested under this route.
+ */
+data class WebRoute(val path: String, val label: String, val subRoutes: Set<WebRoute> = emptySet()) {
+    /**
+     * All routes in this hierarchy, including this route and its [subRoutes].
+     */
     val all = setOf(this) + subRoutes
 
     companion object {
+        /**
+         * Home page route with anchor-based sub-routes for each landing page section.
+         */
         val Home = WebRoute(
             path = "/",
             label = "Home",
@@ -18,6 +27,9 @@ data class WebRoute(
                 WebRoute(path = "/#capabilities", label = "Capabilities"),
             ),
         )
+        /**
+         * Documentation section route with sub-routes for each documentation page.
+         */
         val Docs = WebRoute(
             path = "/docs",
             label = "Docs",

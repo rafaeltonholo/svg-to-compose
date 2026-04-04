@@ -275,7 +275,8 @@ private fun SideMenuItems(onNavigate: () -> Unit) {
             NavLink(href = it.path, text = it.label, modifier = clickModifier)
         }
         NavLink(
-            href = WebRoute.Docs.path, text = WebRoute.Docs.label,
+            href = WebRoute.Docs.path,
+            text = WebRoute.Docs.label,
             modifier = clickModifier.fontWeight(FontWeight.SemiBold)
                 .color(palette.onSurfaceVariant)
                 .fontSize(0.75.cssRem)
