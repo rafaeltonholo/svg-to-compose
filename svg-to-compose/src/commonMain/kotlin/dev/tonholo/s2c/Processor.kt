@@ -4,6 +4,7 @@ import AppConfig
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
+import dev.tonholo.s2c.emitter.template.config.TemplateConfigReader
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
@@ -37,6 +38,7 @@ class Processor(
     private val parser: ImageParser,
     private val codeEmitterFactory: CodeEmitterFactory,
     private val editorConfigReader: EditorConfigReader,
+    private val templateConfigReader: TemplateConfigReader,
 ) {
     private val tempFileWriter = TempFileWriter(logger, fileManager, tempDirectory)
 
@@ -402,7 +404,20 @@ class Processor(
 
         val resolved = config.formatConfig ?: editorConfigReader.resolve(iconOutput)
         val formatConfig = config.formatOverrides?.applyTo(resolved) ?: resolved
-        val emitter = codeEmitterFactory.create(formatConfig = formatConfig)
+        val templateEmitterConfig = config.template?.let { templateConfig ->
+            val configPath = templateConfig.configPath
+            if (configPath != null) {
+                templateConfigReader.resolve(configPath)
+            } else if (!templateConfig.noDiscovery) {
+                templateConfigReader.discover(iconOutput)
+            } else {
+                null
+            }
+        }
+        val emitter = codeEmitterFactory.create(
+            formatConfig = formatConfig,
+            templateEmitterConfig = templateEmitterConfig,
+        )
         val fileContents = emitter.emit(iconModel)
 
         logger.verbose("File contents = $fileContents")
