@@ -136,9 +136,10 @@ fun OptionRow(flag: String, type: String, description: String, index: Int, modif
                 .color(palette.primary)
                 .role("cell"),
         )
-        SpanText(
+        CodeAwareSpanText(
             description,
             modifier = Modifier
+                .whiteSpace(WhiteSpace.Normal)
                 .color(palette.onSurfaceVariant)
                 .role("cell"),
         )

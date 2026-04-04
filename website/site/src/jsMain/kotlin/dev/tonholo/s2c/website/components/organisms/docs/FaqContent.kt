@@ -13,8 +13,10 @@ import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.FAQPageStructuredData
 import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
@@ -101,14 +103,19 @@ private fun HowToConvertSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = "s2c -o Icon.kt -p com.app.icons -t com.app.theme.AppTheme icon.svg",
-            language = "console",
+            code = """s2c --package com.app.icons \ 
+                |   --theme com.app.theme.AppTheme \ 
+                |   --output Icon.kt \ 
+                |   icon.svg
+""".trimMargin(),
+            language = "shell",
+            filename = "Terminal",
         )
-        SpanText(
-            text = "For automated build integration, use the Gradle plugin instead. Both approaches " +
-                "use the same conversion engine.",
-            modifier = DocsBodyTextStyle.toModifier(),
-        )
+        P(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text(value = "For automated build integration, use the")
+            Link(path = WebRoute.DocsGradlePlugin.path, text = " Gradle plugin ", variant = SiteLinkStyleVariant)
+            Text(value = "instead. Both approaches use the same conversion engine.")
+        }
     }
 }
 
@@ -180,8 +187,8 @@ private fun OptimizationSection() {
                 |npm install -g svgo    # SVG optimization
                 |npm install -g avocado # XML Drawable optimization
             """.trimMargin(),
-            language = "console",
-            filename = "terminal",
+            language = "shell",
+            filename = "Terminal",
         )
         Span(attrs = DocsBodyTextStyle.toAttrs()) {
             Text("For more details, see the ")

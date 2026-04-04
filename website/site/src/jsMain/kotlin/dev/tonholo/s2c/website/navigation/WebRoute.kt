@@ -15,27 +15,35 @@ data class WebRoute(val path: String, val label: String, val subRoutes: Set<WebR
 
     companion object {
         /**
+         * Playground route anchored to the landing page, allowing users to quickly access the interactive
+         * playground section.
+         */
+        val Playground = WebRoute(path = "/#playground", label = "Playground")
+
+        /**
          * Home page route with anchor-based sub-routes for each landing page section.
          */
         val Home = WebRoute(
             path = "/",
             label = "Home",
             subRoutes = setOf(
-                WebRoute(path = "/#playground", label = "Playground"),
+                Playground,
                 WebRoute(path = "/#install", label = "Install"),
                 WebRoute(path = "/#usage", label = "Usage"),
                 WebRoute(path = "/#capabilities", label = "Capabilities"),
             ),
         )
-        /**
-         * Documentation section route with sub-routes for each documentation page.
-         */
+
+        /** Gradle Plugin documentation route, nested under the main Docs section. */
+        val DocsGradlePlugin = WebRoute(path = "/docs/gradle-plugin", label = "Gradle Plugin")
+
+        /** Documentation section route with sub-routes for each documentation page. */
         val Docs = WebRoute(
             path = "/docs",
             label = "Docs",
             subRoutes = setOf(
                 WebRoute(path = "/docs/cli", label = "CLI"),
-                WebRoute(path = "/docs/gradle-plugin", label = "Gradle Plugin"),
+                DocsGradlePlugin,
                 WebRoute(path = "/docs/templates", label = "Template System"),
                 WebRoute(path = "/api-docs/index.html", label = "API Reference"),
                 WebRoute(path = "/docs/faq", label = "FAQ"),

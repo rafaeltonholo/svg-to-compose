@@ -21,7 +21,6 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
-import dev.tonholo.s2c.website.components.atoms.InlineCode
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
 import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
@@ -321,8 +320,8 @@ private fun ProcessorConfigurationSubsection() {
 @Composable
 private fun IconParserConfigurationSubsection() {
     DocSection(id = "icon-parser-configuration", title = "Icon Parser Configuration", level = 3) {
-        SpanText(
-            text = "These options are available inside the icons { } block:",
+        CodeAwareSpanText(
+            text = "These options are available inside the `icons { }` block:",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         Ul(
@@ -336,7 +335,7 @@ private fun IconParserConfigurationSubsection() {
                 description = "Fully qualified theme class name used for preview annotations",
             )
             OptionItem(name = "minify()", description = "Remove comments and extra whitespace from generated code")
-            OptionItem(name = "noPreview()", description = "Disable generation of @Preview composable functions")
+            OptionItem(name = "noPreview()", description = "Disable generation of `@Preview` composable functions")
             OptionItem(name = "makeInternal()", description = "Add the internal visibility modifier to generated code")
             OptionItem(
                 name = "receiverType(String)",
@@ -360,7 +359,7 @@ private fun IconParserConfigurationSubsection() {
             )
             OptionItem(
                 name = "templateFile(path: RegularFile)",
-                description = "Path to an s2c.template.toml file for customising generated code",
+                description = "Path to an `s2c.template.toml` file for customising generated code",
             )
         }
         TemplateFileExample()
@@ -406,8 +405,7 @@ private fun TemplateFileExample() {
 @Composable
 private fun OptionItem(name: String, description: String) {
     Li {
-        InlineCode(name)
-        Text(": $description")
+        CodeAwareSpanText(text = "`$name`: $description")
     }
 }
 

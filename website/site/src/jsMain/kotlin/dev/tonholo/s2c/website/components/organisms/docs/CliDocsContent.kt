@@ -282,7 +282,7 @@ private fun InstallationSection() {
         CodeBlock(
             code = "chmod +x s2c",
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "2. Add the binary to your PATH:",
@@ -291,7 +291,7 @@ private fun InstallationSection() {
         CodeBlock(
             code = $$"export PATH=\"/path/to/s2c:$PATH\"",
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
     }
 }
@@ -319,7 +319,7 @@ private fun ExternalDependenciesSection() {
         CodeBlock(
             code = "npm -g install svgo\nnpm -g install avocado",
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
     }
 }
@@ -335,7 +335,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_SINGLE_FILE.trimMargin(),
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "Batch convert a directory recursively:",
@@ -345,7 +345,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_DIRECTORY.trimMargin(),
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "Generate with a Material Icons receiver type:",
@@ -355,7 +355,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_MATERIAL_ICON_RECEIVER.trimMargin(),
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "Convert an Android Vector Drawable (AVG/XML):",
@@ -365,7 +365,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_CONVERT_AVG.trimMargin(),
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "Disable optimization:",
@@ -375,7 +375,7 @@ private fun UsageSection() {
         CodeBlock(
             code = S2C_DISABLE_OPTIMIZATION.trimMargin(),
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
     }
 }

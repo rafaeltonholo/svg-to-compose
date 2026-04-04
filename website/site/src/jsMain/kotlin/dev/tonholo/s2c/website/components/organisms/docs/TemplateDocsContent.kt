@@ -332,7 +332,7 @@ private fun QuickStartSection() {
         CodeBlock(
             code = "./s2c --template s2c.template.toml -p com.example -t MyTheme input.svg -o output/",
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         SpanText(
             text = "Or configure via the Gradle plugin:",
@@ -797,7 +797,7 @@ private fun ExamplesSection() {
         CodeBlock(
             code = "./s2c --template s2c.template.toml -p com.example -t MyTheme input.svg -o output/",
             language = "shell",
-            filename = "terminal",
+            filename = "Terminal",
         )
         DocCallout(variant = CalloutVariant.TIP) {
             Span(attrs = DocsBodyTextStyle.toAttrs()) {
