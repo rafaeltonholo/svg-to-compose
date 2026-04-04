@@ -158,12 +158,11 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
             val expectedFileName = "${generatedFile.nameWithoutExtension}.$fileType.template.kt"
             val expectedFile = templateExpectedDir.resolve(expectedFileName)
 
-            if (!expectedFile.exists()) {
-                templateExpectedDir.mkdirs()
-                generatedFile.copyTo(expectedFile, overwrite = true)
-                println("BOOTSTRAP: Wrote expected file template/$expectedFileName")
-                continue
-            }
+            assertTrue(
+                expectedFile.exists(),
+                "Missing expected golden file: template/$expectedFileName. " +
+                    "Add the reviewed golden file at ${expectedFile.absolutePath} before the test can pass.",
+            )
 
             assertEquals(
                 expectedFile.readText(),

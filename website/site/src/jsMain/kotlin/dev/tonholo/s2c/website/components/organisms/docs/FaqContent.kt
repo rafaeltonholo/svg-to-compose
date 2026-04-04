@@ -103,9 +103,9 @@ private fun HowToConvertSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
-            code = """s2c --package com.app.icons \ 
-                |   --theme com.app.theme.AppTheme \ 
-                |   --output Icon.kt \ 
+            code = """s2c --package com.app.icons \
+                |   --theme com.app.theme.AppTheme \
+                |   --output Icon.kt \
                 |   icon.svg
 """.trimMargin(),
             language = "shell",

@@ -1,16 +1,16 @@
 #!/bin/bash
-# Parse and validate required parameters
+# Parse and validate the required positional parameter
 root_directory="${1:?Error: Root directory must be the first parameter}"
-ext="${2:?Error: File extension must be the second parameter}"
+shift # consume root_directory, leaving only flags
 
-# Parse optional flags
+# Parse flags
 optimize="false"
 suffix="nonoptimized"
 rebuild=""
 use_default_differ="false"
 rebuild_applied="false"
+ext=""
 
-shift # consume root_directory ($1), leaving only flags
 while [ $# -gt 0 ]; do
   case "$1" in
     --extension)
@@ -19,6 +19,7 @@ while [ $# -gt 0 ]; do
       ;;
     --optimize)
       optimize="true"
+      suffix="optimized"
       shift
       ;;
     --rebuild)
@@ -36,8 +37,13 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+if [ -z "$ext" ]; then
+  echo "Error: --extension flag is required" >&2
+  exit 1
+fi
+
 # Determine file type based on extension
-if [ "$ext" == "xml" ]; then
+if [ "$ext" = "xml" ]; then
   type="avg"
 else
   type="svg"
@@ -45,7 +51,7 @@ else
 fi
 
 differ="diff --strip-trailing-cr"
-if [ "$use_default_differ" == "false" ] && command -v delta &> /dev/null; then
+if [ "$use_default_differ" = "false" ] && command -v delta &> /dev/null; then
   differ="delta -s --paging=never"
 fi
 
@@ -57,10 +63,10 @@ errors=()
 
 # Convert kebab-case or snake_case filename to PascalCase.
 to_pascal_case() {
-   echo "$1" | awk -F'[-_]' '{ for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print }' OFS=''
- }
+  echo "$1" | awk -F'[-_]' '{ for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print }' OFS=''
+}
 
-# Only process flat (non-directory) files in samples/{type}/ — subdirectories
+# Only process flat (non-directory) files in samples/{type}/ - subdirectories
 # such as gradient/, rects/, css/ etc. are intentionally excluded.
 for input in "$root_directory/samples/${type}"/*."${ext}"; do
   [ -f "$input" ] || continue
@@ -70,8 +76,8 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
   icon_name=$(to_pascal_case "$stem")
   expected_file="$expected_dir/${icon_name}.${ext}.${suffix}.kt"
 
-  if [ "$optimize" == "true" ]; then
-    if [ "$type" == "svg" ]; then
+  if [ "$optimize" = "true" ]; then
+    if [ "$type" = "svg" ]; then
       echo "svgo version $(svgo --version)"
     else
       echo "avocado version $(avocado --version)"
@@ -87,7 +93,7 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
   tmp_output="${tmp_dir}/${icon_name}.kt"
 
   rebuild_arg=""
-  if [ "$rebuild_applied" == "false" ]; then
+  if [ "$rebuild_applied" = "false" ]; then
     rebuild_arg="$rebuild"
   fi
 
@@ -129,7 +135,7 @@ done
 
 echo
 echo
-if [ "${#errors[@]}" == 0 ]; then
+if [ "${#errors[@]}" -eq 0 ]; then
   echo "✅ Integrity check pass"
   exit 0
 else

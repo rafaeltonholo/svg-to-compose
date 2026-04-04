@@ -11,7 +11,7 @@ data class WebRoute(val path: String, val label: String, val subRoutes: Set<WebR
     /**
      * All routes in this hierarchy, including this route and its [subRoutes].
      */
-    val all = setOf(this) + subRoutes
+    val all by lazy { setOf(this) + subRoutes }
 
     companion object {
         /**

@@ -570,7 +570,7 @@ private fun PlaceholderGrammarSection() {
                     namespace = "icon",
                     syntax = $$"${icon:<field>}",
                     resolves = "Value from icon metadata",
-                    scope = "`icon_template`, `icon_builder`",
+                    scope = "`icon_template`, `icon_builder`, `icon_file_header`, `icon_preview`",
                     index = 0,
                 )
                 NamespaceRow(
@@ -731,7 +731,7 @@ private fun NullHandlingSection() {
             code = $$"""
                 |path(
                 |    fill = SolidColor(Color.Black),
-                |    fillAlpha = ${path:fill_alpha},    // <- this line is removed
+                |    fillAlpha = ${path:fill_alpha},
                 |    pathFillType = EvenOdd,
                 |)
             """.trimMargin(),
@@ -752,8 +752,8 @@ private fun AutoDiscoverySection() {
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
             CodeAwareSpanText(
-                text = "Disable auto-discovery with `--no-template` (CLI) or by omitting " +
-                    "`templateFile()` from the Gradle DSL.",
+                text = "Disable auto-discovery with `--no-template` (CLI). In the Gradle DSL, " +
+                    "omitting `templateFile()` inherits the common config rather than disabling templates.",
                 modifier = DocsBodyTextStyle.toModifier(),
                 variant = ImportantCalloutCodeAwareVariant,
             )
