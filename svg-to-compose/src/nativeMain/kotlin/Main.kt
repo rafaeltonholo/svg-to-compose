@@ -178,9 +178,13 @@ class Client : CliktCommand(name = "s2c") {
 
     private val template by option(
         names = arrayOf("--template"),
-        help = "Path to template configuration file. When provided, the template " +
-            "is used to customise the generated Kotlin code.",
+        help = "Path to an template file for output customisation. When omitted, auto-discovers by" +
+            "walking up from the output directory.",
     )
+    private val noTemplate by option(
+        names = arrayOf("--no-template"),
+        help = "Disable auto-discovery of s2c.template.toml files.",
+    ).flag()
 
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
@@ -254,7 +258,7 @@ class Client : CliktCommand(name = "s2c") {
                     exclude = exclude?.let(::Regex),
                     formatConfig = buildFormatConfig(),
                     formatOverrides = buildFormatOverrides(),
-                    template = template?.let { TemplateConfig(configPath = it.toPath()) },
+                    template = template?.let { TemplateConfig(configPath = it.toPath(), noDiscovery = noTemplate) },
                 ),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
