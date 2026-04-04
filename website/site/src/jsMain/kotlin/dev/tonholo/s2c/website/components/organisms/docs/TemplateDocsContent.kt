@@ -18,7 +18,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.modifiers.tableLayout
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -31,10 +30,12 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.InlineCode
-import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
+import dev.tonholo.s2c.website.components.molecules.ImportantCalloutCodeAwareVariant
+import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
@@ -279,7 +280,7 @@ private fun OverviewSection() {
             Li { Text("Custom icon property shapes (lazy, backing-field, function)") }
             Li { Text("Custom builder call signatures (icon, path, group)") }
             Li { Text("Named import definitions resolved via placeholders") }
-            Li { Text("Color mapping from hex values to named constants") }
+            Li { Text("Colour mapping from hex values to named constants") }
             Li { Text("Preview function customization or suppression") }
         }
         DocCallout(variant = CalloutVariant.TIP) {
@@ -312,6 +313,7 @@ private fun QuickStartSection() {
         CodeBlock(
             code = "./s2c --template s2c.template.toml -p com.example -t MyTheme input.svg -o output/",
             language = "shell",
+            filename = "terminal",
         )
         SpanText(
             text = "Or configure via the Gradle plugin:",
@@ -343,8 +345,8 @@ private fun QuickStartSection() {
 @Composable
 private fun DefinitionsSection() {
     DocSection(id = "definitions", title = "Schema Reference: Definitions") {
-        SpanText(
-            text = "The [definitions] section declares reusable values referenced throughout templates " +
+        CodeAwareSpanText(
+            text = "The `[definitions]` section declares reusable values referenced throughout templates " +
                 "and fragments.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
@@ -357,14 +359,15 @@ private fun DefinitionsSection() {
 @Composable
 private fun ReceiverSubsection() {
     DocSection(id = "definitions-receiver", title = "Receiver", level = 3) {
-        SpanText(
+        CodeAwareSpanText(
             text = "Optional receiver type for the icon property. Adds " +
-                "val <Receiver>.<IconName>: ImageVector and auto-imports the receiver.",
+                "`val <Receiver>.<IconName>: ImageVector` and auto-imports the receiver.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
             code = RECEIVER_EXAMPLE.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
         FieldTable(
             headers = listOf("Field", "Type", "Description"),
@@ -379,58 +382,50 @@ private fun ReceiverSubsection() {
 @Composable
 private fun ImportsSubsection() {
     DocSection(id = "definitions-imports", title = "Imports", level = 3) {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Keyed imports referenced in templates via ")
-            InlineCode($$"${def:<key>}")
-            Text(". Each key maps to a fully qualified import path. During resolution, ")
-            InlineCode($$"${def:key}")
-            Text(
-                " is replaced with the simple name (last segment), and the full path is added to " +
-                    "the file's import list.",
-            )
-        }
+        CodeAwareSpanText(
+            text = $$"Keyed imports referenced in templates via `${def:<key>}`. Each key maps to a fully " +
+                $$"qualified import path. During resolution, `${def:key}` is replaced with the simple name " +
+                "(last segment), and the full path is added to the file's import list.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         CodeBlock(
             code = IMPORTS_EXAMPLE.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
     }
 }
 
 @Composable
 private fun ColorMappingSubsection() {
-    DocSection(id = "definitions-color-mapping", title = "Color Mapping", level = 3) {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Optional array of color mappings. When a generated ")
-            InlineCode("Color(<hex>)")
-            Text(
-                " expression matches a mapping's value, it is replaced with the mapping's name " +
-                    "and the full import is added to the file.",
-            )
-        }
+    DocSection(id = "definitions-color-mapping", title = "Colour Mapping", level = 3) {
+        CodeAwareSpanText(
+            text = "Optional array of colour mappings. When a generated " +
+                "`Color(<hex>)` expression matches a mapping's value, it is replaced with the mapping's name " +
+                "and the full import is added to the file.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         CodeBlock(
             code = COLOR_MAPPING_EXAMPLE.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
         FieldTable(
             headers = listOf("Field", "Type", "Description"),
             rows = listOf(
                 listOf("name", "String", "Constant name used in generated code (e.g., BLACK)"),
                 listOf("import", "String", "Package containing the constant"),
-                listOf("value", "String", "Hex color value to match (e.g., 0xFF121212)"),
+                listOf("value", "String", "Hex colour value to match (e.g., 0xFF121212)"),
             ),
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("For example, given ")
-                InlineCode("fill=\"#121212\"")
-                Text(" in the SVG, the emitter generates ")
-                InlineCode("SolidColor(Color(0xFF121212))")
-                Text(". With the mapping above, this becomes ")
-                InlineCode("SolidColor(BLACK)")
-                Text(" and ")
-                InlineCode("import com.example.theme.colors.BLACK")
-                Text(" is added.")
-            }
+            CodeAwareSpanText(
+                text = "For example, given `fill=\"#121212\"` in the SVG, the emitter generates " +
+                    "`SolidColor(Color(0xFF121212))`. With the mapping above, this becomes `SolidColor(BLACK)` and " +
+                    "`import com.example.theme.colors.BLACK` is added.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
         }
     }
 }
@@ -438,8 +433,8 @@ private fun ColorMappingSubsection() {
 @Composable
 private fun TemplatesSection() {
     DocSection(id = "templates", title = "Schema Reference: Templates") {
-        SpanText(
-            text = "The [templates] section controls the overall shape of the generated output file.",
+        CodeAwareSpanText(
+            text = "The `[templates]` section controls the overall shape of the generated output file.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         FileHeaderSubsection()
@@ -451,15 +446,16 @@ private fun TemplatesSection() {
 @Composable
 private fun FileHeaderSubsection() {
     DocSection(id = "templates-file-header", title = "File Header", level = 3) {
-        SpanText(
+        CodeAwareSpanText(
             text = "Optional file header placed before the package statement. Use for license " +
-                "headers, @file:Suppress(...), or @file:OptIn(...) annotations. Supports " +
+                "headers, `@file:Suppress(...)`, or `@file:OptIn(...)` annotations. Supports " +
                 "all icon-level placeholders.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
             code = FILE_HEADER_EXAMPLE.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
     }
 }
@@ -467,20 +463,17 @@ private fun FileHeaderSubsection() {
 @Composable
 private fun IconTemplateSubsection() {
     DocSection(id = "templates-icon-template", title = "Icon Template", level = 3) {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text(
-                "The outer icon property template. Controls the generated property/function " +
-                    "shape. If absent, the default backing-field pattern is used. Use ",
-            )
-            InlineCode($$"${icon:visibility}")
-            Text(
-                " to place the visibility modifier. When the icon is not internal, this " +
-                    "resolves to an empty string and leading whitespace is trimmed.",
-            )
-        }
+        CodeAwareSpanText(
+            text = "The outer icon property template. Controls the generated property/function shape. If absent, " +
+                $$"the default backing-field pattern is used. Use `${icon:visibility}` to place the visibility " +
+                "modifier. When the icon is not internal, this resolves to an empty string and leading whitespace " +
+                "is trimmed.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         CodeBlock(
             code = ICON_TEMPLATE_EXAMPLE.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
     }
 }
@@ -488,15 +481,16 @@ private fun IconTemplateSubsection() {
 @Composable
 private fun PreviewSubsection() {
     DocSection(id = "templates-preview", title = "Preview", level = 3) {
-        SpanText(
-            text = "Full control over the preview function. If absent, default preview behavior " +
-                "applies (controlled by --no-preview / --theme). If present with an empty " +
+        CodeAwareSpanText(
+            text = "Full control over the preview function. If absent, default preview behaviour " +
+                "applies (controlled by `--no-preview` / `--theme`). If present with an empty " +
                 "template, preview generation is suppressed.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
             code = previewExample.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
     }
 }
@@ -514,6 +508,7 @@ private fun FragmentsSection() {
         CodeBlock(
             code = fragmentsExample.trimMargin(),
             language = "toml",
+            filename = "s2c.template.toml",
         )
         SpanText(
             text = "Two optional fragments control chunk function generation for large icons:",
@@ -541,12 +536,13 @@ private fun PlaceholderGrammarSection() {
     val palette = ColorMode.current.toSitePalette()
 
     DocSection(id = "placeholder-grammar", title = "Placeholder Grammar") {
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("Placeholders use the syntax ")
-            InlineCode($$"${namespace:key}")
-            Text(". The regex pattern is: ")
-            InlineCode("\\$\\{(icon|path|group|chunk|template|def):([a-z][a-z0-9_.]*)\\}")
-        }
+        CodeAwareSpanText(
+            text = "Placeholders use the syntax " +
+                $$"`${namespace:key}`" +
+                ". The regex pattern is: " +
+                "`\\$\\{(icon|path|group|chunk|template|def):([a-z][a-z0-9_.]*)\\}`",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         Table(attrs = TemplateTableStyle.toModifier().toAttrs()) {
             PlaceholderGrammarTableHeader(palette)
             Tbody {
@@ -624,10 +620,10 @@ private val iconVariables = listOf(
 )
 
 private val pathVariables = listOf(
-    $$"${path:fill}" to "Fill brush/color",
+    $$"${path:fill}" to "Fill brush/colour",
     $$"${path:fill_alpha}" to "Fill alpha (float)",
     $$"${path:fill_type}" to "Path fill type",
-    $$"${path:stroke}" to "Stroke brush/color",
+    $$"${path:stroke}" to "Stroke brush/colour",
     $$"${path:stroke_alpha}" to "Stroke alpha (float)",
     $$"${path:stroke_line_cap}" to "Stroke line cap",
     $$"${path:stroke_line_join}" to "Stroke line join",
@@ -707,11 +703,10 @@ private fun NullHandlingSection() {
                 "requiring conditional logic in your template.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
-        Span(attrs = DocsBodyTextStyle.toAttrs()) {
-            Text("For example, if ")
-            InlineCode($$"${path:fill_alpha}")
-            Text(" is null:")
-        }
+        CodeAwareSpanText(
+            text = $$"For example, if `${path:fill_alpha}` is null:",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
         CodeBlock(
             code = $$"""
                 |path(
@@ -728,31 +723,19 @@ private fun NullHandlingSection() {
 @Composable
 private fun AutoDiscoverySection() {
     DocSection(id = "auto-discovery", title = "Auto-Discovery") {
-        SpanText(
+        CodeAwareSpanText(
             text = "When no explicit template path is given, the tool walks up from the output " +
-                "directory looking for s2c.template.toml. This matches the behavior of " +
+                "directory looking for `s2c.template.toml`. This matches the behaviour of " +
                 ".editorconfig discovery.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
-            val (borderColor, containerColor) = CalloutVariant.IMPORTANT.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("Disable auto-discovery with ")
-                InlineCode(
-                    code = "--no-template",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" (CLI) or by omitting ")
-                InlineCode(
-                    code = "templateFile()",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" from the Gradle DSL.")
-            }
+            CodeAwareSpanText(
+                text = "Disable auto-discovery with `--no-template` (CLI) or by omitting " +
+                    "`templateFile()` from the Gradle DSL.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = ImportantCalloutCodeAwareVariant,
+            )
         }
         SpanText(
             text = "Precedence (highest to lowest):",
@@ -793,6 +776,7 @@ private fun ExamplesSection() {
         CodeBlock(
             code = "./s2c --template s2c.template.toml -p com.example -t MyTheme input.svg -o output/",
             language = "shell",
+            filename = "terminal",
         )
         DocCallout(variant = CalloutVariant.TIP) {
             Span(attrs = DocsBodyTextStyle.toAttrs()) {

@@ -29,10 +29,13 @@ import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.InlineCode
 import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
+import dev.tonholo.s2c.website.components.molecules.ImportantCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.components.molecules.OptionRow
 import dev.tonholo.s2c.website.components.molecules.OptionsHeaderRow
+import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.toSitePalette
@@ -300,20 +303,12 @@ private fun ExternalDependenciesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
-            val (borderColor, containerColor) = CalloutVariant.IMPORTANT.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text(
-                    "If you do not have Node.js installed or do not need optimization, " +
-                        "you can disable it with the ",
-                )
-                InlineCode(
-                    code = "-opt false",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" flag.")
-            }
+            CodeAwareSpanText(
+                text = "If you do not have Node.js installed or do not need optimization, " +
+                    "you can disable it with the `-opt false` flag.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = ImportantCalloutCodeAwareVariant,
+            )
         }
         SpanText(
             text = "Install the optimization tools globally:",
@@ -439,17 +434,12 @@ private fun OutputExamplesSection() {
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("The generated code uses the same ")
-                InlineCode(
-                    code = "ImageVector.Builder",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(" API that Jetpack Compose uses internally, ensuring full compatibility.")
-            }
+            CodeAwareSpanText(
+                text = "The generated code uses the same `ImageVector.Builder` API that Jetpack " +
+                    "Compose uses internally, ensuring full compatibility.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
         }
         CodeBlock(
             code = OUTPUT_EXAMPLE.trimMargin(),

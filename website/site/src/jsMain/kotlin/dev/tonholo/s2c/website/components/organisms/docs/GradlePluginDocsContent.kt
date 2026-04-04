@@ -15,7 +15,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.listStyle
-import com.varabyte.kobweb.compose.ui.modifiers.setVariable
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -23,11 +22,13 @@ import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import dev.tonholo.s2c.website.components.atoms.DocSection
 import dev.tonholo.s2c.website.components.atoms.InlineCode
-import dev.tonholo.s2c.website.components.atoms.InlineCodeVars
 import dev.tonholo.s2c.website.components.molecules.CalloutVariant
+import dev.tonholo.s2c.website.components.molecules.CodeAwareSpanText
 import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.TabPanel
+import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
+import dev.tonholo.s2c.website.components.molecules.WarningCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.theme.SiteTheme
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Ol
@@ -119,17 +120,11 @@ private fun PluginsDslTab() {
             filename = "build.gradle.kts",
         )
         DocCallout(variant = CalloutVariant.TIP) {
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("Make sure Maven Central is included in your plugin repositories ")
-                val (borderColor, containerColor) = CalloutVariant.TIP.resolveInlineCodeColors()
-                InlineCode(
-                    code = "settings.gradle.kts",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(".")
-            }
+            CodeAwareSpanText(
+                text = "Make sure Maven Central is included in your plugin repositories `settings.gradle.kts`.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
         }
     }
 }
@@ -455,21 +450,13 @@ private fun ParallelProcessingSection() {
 private fun PersistentGenerationSection() {
     DocSection(id = "persistent-generation", title = "Persistent Generation") {
         DocCallout(variant = CalloutVariant.WARNING) {
-            val (borderColor, containerColor) = CalloutVariant.WARNING.resolveInlineCodeColors()
-            Span(attrs = DocsBodyTextStyle.toAttrs()) {
-                Text("The ")
-                InlineCode(
-                    code = "persist()",
-                    modifier = Modifier
-                        .setVariable(InlineCodeVars.ContainerColor, containerColor)
-                        .setVariable(InlineCodeVars.BorderColor, borderColor),
-                )
-                Text(
-                    " function is a delicate API. When enabled, generated files " +
-                        "are written directly to your source directory instead of the build directory. " +
-                        "Use this only when you need to commit generated code to version control.",
-                )
-            }
+            CodeAwareSpanText(
+                text = "The `persist()` function is a delicate API. When enabled, generated files " +
+                    "are written directly to your source directory instead of the build directory. " +
+                    "Use this only when you need to commit generated code to version control.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = WarningCalloutCodeAwareVariant,
+            )
         }
         CodeBlock(
             // language=kotlin
