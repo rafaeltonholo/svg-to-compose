@@ -36,7 +36,7 @@ fun initTemplatesDocsPage(ctx: InitRouteContext) {
         PageLayoutData(
             title = "Template System Documentation",
             description = "SVG to Compose template system documentation. " +
-                "Customize generated Kotlin code with TOML-based templates, placeholders, and fragments.",
+                "Customise generated Kotlin code with TOML-based templates, placeholders, and fragments.",
             canonicalPath = "/docs/templates",
         ),
     )

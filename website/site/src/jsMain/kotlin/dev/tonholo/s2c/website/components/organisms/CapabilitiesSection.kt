@@ -81,7 +81,7 @@ private val categories = listOf(
             "Code minification",
             "Custom naming rules",
             "Material Icons receiver types",
-            "Template-based customization",
+            "Template-based customisation",
         ),
     ),
 )

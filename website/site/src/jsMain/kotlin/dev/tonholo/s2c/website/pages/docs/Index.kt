@@ -224,7 +224,7 @@ fun DocsPage() {
             )
             DocsCard(
                 title = "Template System",
-                description = "Customize generated Kotlin code with TOML-based templates. " +
+                description = "Customise generated Kotlin code with TOML-based templates. " +
                     "Control property shapes, imports, previews, and more.",
                 href = "/docs/templates",
                 icon = { FaFileCode(modifier = Modifier.color(palette.primary), size = IconSize.LG) },

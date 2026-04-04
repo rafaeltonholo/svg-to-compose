@@ -53,7 +53,7 @@ internal data class CliOption(val flag: String, val type: String, val descriptio
                 flag = "--template",
                 type = "String",
                 description = "Path to s2c.template.toml configuration file. When provided, the template " +
-                    "is used to customize the generated Kotlin code.",
+                    "is used to customise the generated Kotlin code.",
             ),
             CliOption(
                 flag = "--no-template",

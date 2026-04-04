@@ -237,7 +237,7 @@ fun TemplateEditorSection(
 private fun HelperText() {
     val palette = ColorMode.current.toSitePalette()
     SpanText(
-        "Customize generated code with a template",
+        "Customise generated code with a template",
         modifier = Modifier
             .fontSize(0.75.cssRem)
             .color(palette.onSurfaceVariant),

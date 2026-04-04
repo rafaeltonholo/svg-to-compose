@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.fontWeight
 import com.varabyte.kobweb.compose.ui.modifiers.gap
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.tableLayout
 import com.varabyte.kobweb.compose.ui.modifiers.textAlign
@@ -36,6 +37,7 @@ import dev.tonholo.s2c.website.components.molecules.CodeBlock
 import dev.tonholo.s2c.website.components.molecules.DocCallout
 import dev.tonholo.s2c.website.components.molecules.ImportantCalloutCodeAwareVariant
 import dev.tonholo.s2c.website.components.molecules.TipCalloutCodeAwareVariant
+import dev.tonholo.s2c.website.navigation.WebRoute
 import dev.tonholo.s2c.website.theme.SitePalette
 import dev.tonholo.s2c.website.theme.SiteTheme
 import dev.tonholo.s2c.website.theme.common.SiteLinkStyleVariant
@@ -44,6 +46,7 @@ import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.Tbody
@@ -143,9 +146,9 @@ private val FILE_HEADER_EXAMPLE = """
 private val ICON_TEMPLATE_EXAMPLE = $$"""
 |[templates]
 |icon_template = $$TRIPLE_QUOTE
-|${'$'}{icon:visibility} val ${'$'}{icon:property_name}: ImageVector by lazy {
-|    ${'$'}{template:icon_builder} {
-|        ${'$'}{icon:body}
+|${icon:visibility} val ${icon:property_name}: ImageVector by lazy {
+|    ${template:icon_builder} {
+|        ${icon:body}
 |    }
 |}
 |$$TRIPLE_QUOTE
@@ -264,9 +267,9 @@ fun TemplateDocsContent(modifier: Modifier = Modifier) {
 @Composable
 private fun OverviewSection() {
     DocSection(id = "overview", title = "Overview") {
-        SpanText(
+        CodeAwareSpanText(
             text = "The template system lets you control the shape of the generated Kotlin code " +
-                "without modifying the tool. Place an s2c.template.toml file in your project " +
+                "without modifying the tool. Place an `s2c.template.toml` file in your project " +
                 "and configure builder functions, receiver types, imports, and property patterns.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
@@ -281,14 +284,30 @@ private fun OverviewSection() {
             Li { Text("Custom builder call signatures (icon, path, group)") }
             Li { Text("Named import definitions resolved via placeholders") }
             Li { Text("Colour mapping from hex values to named constants") }
-            Li { Text("Preview function customization or suppression") }
+            Li { Text("Preview function customisation or suppression") }
         }
         DocCallout(variant = CalloutVariant.TIP) {
-            SpanText(
-                text = "Every template piece is independently optional. Missing pieces fall back to the " +
-                    "default output, so you only need to define what you want to change.",
-                modifier = DocsBodyTextStyle.toModifier(),
-            )
+            P(attrs = DocsBodyTextStyle.toModifier().margin { top(0.px) }.toAttrs()) {
+                Text(
+                    value = "Every template piece is independently optional. Missing pieces fall back to the " +
+                        "default output, so you only need to define what you want to change.",
+                )
+            }
+            P(attrs = DocsBodyTextStyle.toAttrs()) {
+                Text(
+                    value = "You can use our ",
+                )
+                Link(
+                    path = WebRoute.Playground.path,
+                    text = "interactive template playground",
+                    variant = SiteLinkStyleVariant,
+                )
+                Text(
+                    value = " to experiment with template syntax and see how it affects the generated code. " +
+                        "The playground also features an auto-complete reference for all available variables and " +
+                        "placeholders.",
+                )
+            }
         }
     }
 }
@@ -296,8 +315,8 @@ private fun OverviewSection() {
 @Composable
 private fun QuickStartSection() {
     DocSection(id = "quick-start", title = "Quick Start") {
-        SpanText(
-            text = "Create s2c.template.toml in your project root (or next to the output directory):",
+        CodeAwareSpanText(
+            text = "Create `s2c.template.toml` in your project root (or next to the output directory):",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         CodeBlock(
@@ -517,14 +536,15 @@ private fun FragmentsSection() {
         )
         Ul(attrs = DocsBulletListStyle.toModifier().toAttrs()) {
             Li {
-                InlineCode("chunk_function_name")
-                Text($$": controls the function name. Receives ${icon:name} and ${chunk:index}.")
+                CodeAwareSpanText(
+                    text = $$"`chunk_function_name`: controls the function name. Receives `${icon:name}`" +
+                        $$" and `${chunk:index}`.",
+                )
             }
             Li {
-                InlineCode("chunk_function_definition")
-                Text(
-                    ": controls the full function signature and body. " +
-                        $$"Receives ${chunk:name} and ${chunk:body}.",
+                CodeAwareSpanText(
+                    text = "`chunk_function_definition`: controls the full function signature and body. " +
+                        $$"Receives `${chunk:name}` and `${chunk:body}`.",
                 )
             }
         }
@@ -550,35 +570,35 @@ private fun PlaceholderGrammarSection() {
                     namespace = "icon",
                     syntax = $$"${icon:<field>}",
                     resolves = "Value from icon metadata",
-                    scope = "icon_template, icon_builder",
+                    scope = "`icon_template`, `icon_builder`",
                     index = 0,
                 )
                 NamespaceRow(
                     namespace = "path",
                     syntax = $$"${path:<field>}",
                     resolves = "Value from path node parameters",
-                    scope = "path_builder fragment only",
+                    scope = "`path_builder` fragment only",
                     index = 1,
                 )
                 NamespaceRow(
                     namespace = "group",
                     syntax = $$"${group:<field>}",
                     resolves = "Value from group node parameters",
-                    scope = "group_builder fragment only",
+                    scope = "`group_builder` fragment only",
                     index = 2,
                 )
                 NamespaceRow(
                     namespace = "template",
                     syntax = $$"${template:<name>}",
                     resolves = "Rendered fragment output",
-                    scope = "icon_template",
+                    scope = "`icon_template`",
                     index = 3,
                 )
                 NamespaceRow(
                     namespace = "chunk",
                     syntax = $$"${chunk:<field>}",
                     resolves = "Value from chunk function context",
-                    scope = "chunk_function_* fragments",
+                    scope = "`chunk_function_*` fragments",
                     index = 4,
                 )
                 NamespaceRow(
@@ -696,10 +716,10 @@ private fun VariablesByNamespaceSection() {
 
 @Composable
 private fun NullHandlingSection() {
-    DocSection(id = "null-handling", title = "Null Handling & Line Elision") {
+    DocSection(id = "null-handling", title = "Null Handling & Line Trimming") {
         SpanText(
             text = "When a variable resolves to null, the entire line containing only that parameter " +
-                "assignment is elided from the output. This keeps generated code clean without " +
+                "assignment is trimmed from the output. This keeps generated code clean without " +
                 "requiring conditional logic in your template.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
@@ -716,6 +736,7 @@ private fun NullHandlingSection() {
                 |)
             """.trimMargin(),
             language = "kotlin",
+            filename = "s2c.template.toml",
         )
     }
 }
@@ -726,7 +747,7 @@ private fun AutoDiscoverySection() {
         CodeAwareSpanText(
             text = "When no explicit template path is given, the tool walks up from the output " +
                 "directory looking for `s2c.template.toml`. This matches the behaviour of " +
-                ".editorconfig discovery.",
+                "`.editorconfig` discovery.",
             modifier = DocsBodyTextStyle.toModifier(),
         )
         DocCallout(variant = CalloutVariant.IMPORTANT) {
@@ -828,7 +849,7 @@ private fun NamespaceRow(namespace: String, syntax: String, resolves: String, sc
             Text(resolves)
         }
         Td(attrs = TemplateTableCellStyle.toModifier().color(palette.onSurface).toAttrs()) {
-            Text(scope)
+            CodeAwareSpanText(scope)
         }
     }
 }
