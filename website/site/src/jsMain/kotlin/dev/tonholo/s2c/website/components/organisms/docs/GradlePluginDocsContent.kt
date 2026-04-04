@@ -348,7 +348,7 @@ private fun IconParserConfigurationSubsection() {
             )
             OptionItem(
                 name = "mapIconNameTo((String) -> String)",
-                description = "Transform function to customize generated icon names",
+                description = "Transform function to customise generated icon names",
             )
             OptionItem(
                 name = "exclude(vararg Regex)",
@@ -360,7 +360,7 @@ private fun IconParserConfigurationSubsection() {
             )
             OptionItem(
                 name = "templateFile(path: RegularFile)",
-                description = "Path to an s2c.template.toml file for customizing generated code",
+                description = "Path to an s2c.template.toml file for customising generated code",
             )
         }
         TemplateFileExample()
@@ -437,8 +437,7 @@ private fun ParallelProcessingSection() {
                 .toAttrs(),
         ) {
             Li {
-                Text("Parallelism is bounded by Gradle's ")
-                InlineCode("--max-workers setting")
+                CodeAwareSpanText("Parallelism is bounded by Gradle's `--max-workers` setting.")
             }
             Li { Text("Default value (0 or 1) runs processing sequentially") }
             Li { Text("Caching is preserved: unchanged icons are skipped regardless of parallelism") }
