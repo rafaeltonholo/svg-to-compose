@@ -57,9 +57,8 @@ fun CodeAwareSpanText(
         )
     } else {
         Span(attrs = styleModifier.toAttrs()) {
-            // if the text starts with backticks, the first part will be empty, so we can ignore it
-            val startIndex = if (parts.first().isEmpty()) 1 else 0
-            parts.drop(startIndex).forEachIndexed { index, part ->
+            parts.forEachIndexed { index, part ->
+                if (part.isEmpty()) return@forEachIndexed
                 if (index % 2 == 0) {
                     Text(value = part)
                 } else {
