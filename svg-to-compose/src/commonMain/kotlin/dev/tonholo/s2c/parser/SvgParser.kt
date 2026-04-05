@@ -11,6 +11,7 @@ import dev.tonholo.s2c.domain.svg.SvgDefsNode
 import dev.tonholo.s2c.domain.svg.SvgEllipseNode
 import dev.tonholo.s2c.domain.svg.SvgGradientStopNode
 import dev.tonholo.s2c.domain.svg.SvgGroupNode
+import dev.tonholo.s2c.domain.svg.SvgLineNode
 import dev.tonholo.s2c.domain.svg.SvgLinearGradientNode
 import dev.tonholo.s2c.domain.svg.SvgMaskNode
 import dev.tonholo.s2c.domain.svg.SvgNode
@@ -182,6 +183,11 @@ class SvgParser(logger: Logger = NoOpLogger) : XmlParser(logger) {
         )
 
         SvgPolylineNode.TAG_NAME -> SvgPolylineNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
+
+        SvgLineNode.TAG_NAME -> SvgLineNode(
             parent = parent,
             attributes = attributes.associate { it.key to it.value }.toMutableMap(),
         )
