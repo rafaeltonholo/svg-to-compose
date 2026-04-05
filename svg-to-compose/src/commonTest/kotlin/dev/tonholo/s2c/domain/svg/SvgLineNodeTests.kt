@@ -2,6 +2,8 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
+import dev.tonholo.s2c.domain.compose.StrokeCap
+import dev.tonholo.s2c.domain.compose.toBrush
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -57,6 +59,27 @@ class SvgLineNodeTests : BaseSvgTest() {
         assertEquals(2, nodes.size)
         assertEquals(PathCommand.MoveTo, nodes[0].command)
         assertEquals(PathCommand.LineTo, nodes[1].command)
+    }
+
+    @Test
+    fun `ensure SvgLineNode propagates stroke styling through asNode`() {
+        val attributes = mutableMapOf(
+            "x1" to "0",
+            "y1" to "0",
+            "x2" to "100",
+            "y2" to "100",
+            "stroke" to "#FF0000",
+            "stroke-width" to "3",
+            "stroke-linecap" to "round",
+        )
+        val line = SvgLineNode(root, attributes)
+
+        val path = line.asNode(minified = false)
+        assertIs<ImageVectorNode.Path>(path)
+
+        assertEquals(expected = "#FF0000".toBrush(), actual = path.params.stroke)
+        assertEquals(expected = 3f, actual = path.params.strokeLineWidth)
+        assertEquals(expected = StrokeCap.Round, actual = path.params.strokeLineCap)
     }
 
     @Test
