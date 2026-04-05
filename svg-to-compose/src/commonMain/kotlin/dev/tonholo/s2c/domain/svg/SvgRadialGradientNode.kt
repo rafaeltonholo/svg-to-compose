@@ -31,7 +31,9 @@ class SvgRadialGradientNode(
     private fun resolveReferencedGradient(): SvgRadialGradientNode {
         val root = rootParent as SvgRootNode
         val hrefId = checkNotNull(href).normalizedId()
-        val referenced = checkNotNull(root.gradients[hrefId])
+        val referenced = checkNotNull(root.gradients[hrefId]) {
+            "radialGradient href='#$hrefId' references an unknown gradient"
+        }
         check(referenced is SvgRadialGradientNode) {
             "radialGradient href='#$hrefId' references a ${referenced::class.simpleName} instead of a radialGradient"
         }
