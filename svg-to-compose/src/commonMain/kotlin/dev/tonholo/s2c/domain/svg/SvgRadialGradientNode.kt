@@ -22,7 +22,36 @@ class SvgRadialGradientNode(
     /**
      * Converts SVG radial gradient to Compose brush with transformed geometry
      */
-    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
+    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial = if (href != null) {
+        resolveReferencedGradient().toBrush(target)
+    } else {
+        createRadialGradientBrush(target)
+    }
+
+    private fun resolveReferencedGradient(): SvgRadialGradientNode {
+        val root = rootParent as SvgRootNode
+        val hrefId = checkNotNull(href).normalizedId()
+        val referenced = checkNotNull(root.gradients[hrefId])
+        check(referenced is SvgRadialGradientNode) {
+            "radialGradient href='#$hrefId' references a ${referenced::class.simpleName} instead of a radialGradient"
+        }
+        val mergedAttributes = buildMergedAttributes(referenced)
+
+        return referenced.copy(attributes = mergedAttributes)
+    }
+
+    private fun buildMergedAttributes(referencedGradient: SvgRadialGradientNode): MutableMap<String, String> =
+        referencedGradient.attributes.toMutableMap().apply {
+            remove(SvgUseNode.HREF_ATTR_KEY)
+            // Overlay this node's attributes onto referenced, so local values override inherited ones
+            for ((key, value) in this@SvgRadialGradientNode.attributes) {
+                if (key != SvgUseNode.HREF_ATTR_KEY) {
+                    put(key, value)
+                }
+            }
+        }
+
+    private fun createRadialGradientBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
         val (colors, stops) = colorStops
 
         var cx = calculateGradientXCoordinate(cx, target)
