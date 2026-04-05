@@ -4,6 +4,7 @@ import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathCommand
 import dev.tonholo.s2c.domain.compose.StrokeCap
 import dev.tonholo.s2c.domain.compose.toBrush
+import dev.tonholo.s2c.domain.xml.XmlRootNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -84,10 +85,13 @@ class SvgLineNodeTests : BaseSvgTest() {
 
     @Test
     fun `ensure SvgLineNode resolves percentage lengths against viewport`() {
-        root.attributes["width"] = "100"
-        root.attributes["height"] = "50"
+        val localRoot = SvgRootNode(
+            parent = XmlRootNode(children = mutableSetOf()),
+            children = mutableSetOf(),
+            attributes = mutableMapOf("width" to "100", "height" to "50"),
+        )
         val attributes = mutableMapOf("x1" to "10%", "y1" to "20%", "x2" to "50%", "y2" to "100%")
-        val line = SvgLineNode(root, attributes)
+        val line = SvgLineNode(localRoot, attributes)
 
         assertEquals(expected = 10f, actual = line.x1)
         assertEquals(expected = 10f, actual = line.y1)
