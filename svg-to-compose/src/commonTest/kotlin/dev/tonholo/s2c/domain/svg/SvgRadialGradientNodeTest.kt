@@ -4,8 +4,11 @@ import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import kotlin.math.sqrt
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class SvgRadialGradientNodeTest : BaseSvgTest() {
 
@@ -391,5 +394,75 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
             expected = 100f,
             actual = brush.radius,
         )
+    }
+
+    @Test
+    fun `given radialGradient href referencing another radialGradient - when toBrush is called - then inherits stops and local geometry wins`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf("id" to "baseGrad"),
+        )
+        root.gradients["baseGrad"] = baseGradient
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "refGrad",
+                "xlink:href" to "#baseGrad",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["refGrad"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert — local cx/cy/r override referenced, stops are inherited from baseGrad
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 50f, y = 50f),
+            actual = brush.center,
+        )
+        assertEquals(
+            expected = 40f,
+            actual = brush.radius,
+        )
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given radialGradient href referencing a linearGradient - when toBrush is called - then throws IllegalStateException`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val linearGradient = SvgLinearGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf("id" to "linGrad1"),
+        )
+        root.gradients["linGrad1"] = linearGradient
+        val radialGradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "radGradRef",
+                "xlink:href" to "#linGrad1",
+            ),
+        )
+
+        // Act & Assert
+        val exception = assertFailsWith<IllegalStateException> {
+            radialGradient.toBrush(target = emptyList())
+        }
+        val message = exception.message
+        assertNotNull(message)
+        assertContains(message, "linGrad1")
+        assertContains(message, "SvgLinearGradientNode")
     }
 }
