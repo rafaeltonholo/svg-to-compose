@@ -36,27 +36,35 @@ jobs:
 
       - name: Build Native Binary for macos
         if: matrix.os == 'macos-latest'
-        uses: burrunan/gradle-cache-action@v3
+        uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
         with:
           gradle-version: wrapper
           job-id: ${{ matrix.os }}
-          arguments: releaseMacOS
+          arguments: -p modules/cli releaseMacOS
 
       - name: Build Native Binary for Windows
         if: matrix.os == 'windows-latest'
-        uses: burrunan/gradle-cache-action@v3
+        uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
         with:
           gradle-version: wrapper
           job-id: ${{ matrix.os }}
-          arguments: releaseWindows
+          arguments: -p modules/cli releaseWindows
 
       - name: Build Native Binary for Linux
         if: matrix.os == 'ubuntu-latest'
-        uses: burrunan/gradle-cache-action@v3
+        uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
         with:
           gradle-version: wrapper
           job-id: ${{ matrix.os }}
-          arguments: releaseLinux
+          arguments: -p modules/cli releaseLinux
+
+      - name: Build JVM fat JAR
+        if: matrix.os == 'ubuntu-latest'
+        uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
+        with:
+          gradle-version: wrapper
+          job-id: ${{ matrix.os }}-jvm
+          arguments: -p modules/cli shadowJar
 
       - name: CLI Integrity check using SVG
         uses: ./.github/actions/cli-integrity-check
@@ -71,39 +79,39 @@ jobs:
         continue-on-error: false
 
       - name: Uploading macos Arm64 binaries
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: matrix.os == 'macos-latest'
         with:
           name: ${{ env.file-name }}-macosArm64-binaries # add tag to file name.
-          path: svg-to-compose/build/bin/macosArm64/releaseExecutable/
-          if-no-files-found: error
-
-      - name: Uploading macos x64 binaries
-        uses: actions/upload-artifact@v7
-        if: matrix.os == 'macos-latest'
-        with:
-          name: ${{ env.file-name }}-macosX64-binaries # add tag to file name.
-          path: svg-to-compose/build/bin/macosX64/releaseExecutable/
+          path: modules/cli/build/bin/macosArm64/releaseExecutable/
           if-no-files-found: error
 
       - name: Uploading Linux binaries
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: matrix.os == 'ubuntu-latest'
         with:
           name: ${{ env.file-name }}-linuxX64-binaries # add tag to file name.
-          path: svg-to-compose/build/bin/linuxX64/releaseExecutable/
+          path: modules/cli/build/bin/linuxX64/releaseExecutable/
           if-no-files-found: error
 
       - name: Uploading Windows binaries
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: matrix.os == 'windows-latest'
         with:
           name: ${{ env.file-name }}-mingwX64-binaries # add tag to file name.
-          path: svg-to-compose/build/bin/mingwX64/releaseExecutable/
+          path: modules/cli/build/bin/mingwX64/releaseExecutable/
+          if-no-files-found: error
+
+      - name: Uploading JVM fat JAR
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: ${{ env.file-name }}-jvm
+          path: modules/cli/build/libs/*-all.jar
           if-no-files-found: error
 
       - name: Uploading script
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: matrix.os == 'ubuntu-latest' # should only run once.
         with:
           name: s2c
@@ -120,13 +128,18 @@ jobs:
     needs: create-release-binaries
     steps:
       - name: Download release artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
           pattern: ${{ env.file-name }}-*-binaries
           merge-multiple: false
+      - name: Download JVM fat JAR artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          path: artifacts
+          name: ${{ env.file-name }}-jvm
       - name: Download script artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
           name: s2c
@@ -134,23 +147,24 @@ jobs:
         id: getversion
         shell: bash
         run: echo "version=$(cat artifacts/app.properties | grep '^VERSION=' | cut -d= -f2)" >> $GITHUB_OUTPUT
+      - name: Rename JVM fat JAR
+        run: mv artifacts/*-all.jar artifacts/s2c-jvm.jar
       - name: Compress binaries
         run: |
           cd artifacts
           zip -r s2c-linuxX64-binaries.zip s2c-linuxX64-binaries
           zip -r s2c-macosArm64-binaries.zip s2c-macosArm64-binaries
-          zip -r s2c-macosX64-binaries.zip s2c-macosX64-binaries
           zip -r s2c-mingwX64-binaries.zip s2c-mingwX64-binaries
       - name: Display structure of downloaded files
         run: ls -R
       - name: Create Github release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2
         with:
           generate_release_notes: true
           draft: true
           files: |
             artifacts/s2c-linuxX64-binaries.zip
             artifacts/s2c-macosArm64-binaries.zip
-            artifacts/s2c-macosX64-binaries.zip
             artifacts/s2c-mingwX64-binaries.zip
+            artifacts/s2c-jvm.jar
             artifacts/s2c

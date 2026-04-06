@@ -23,27 +23,27 @@ jobs:
 
         - name: Build Native Binary for macos
           if: matrix.os == 'macos-latest'
-          uses: burrunan/gradle-cache-action@v3
+          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
-            arguments: releaseMacOS
+            arguments: -p modules/cli releaseMacOS
 
         - name: Build Native Binary for Windows
           if: matrix.os == 'windows-latest'
-          uses: burrunan/gradle-cache-action@v3
+          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
-            arguments: releaseWindows
+            arguments: -p modules/cli releaseWindows
 
         - name: Build Native Binary for Linux
           if: matrix.os == 'ubuntu-latest'
-          uses: burrunan/gradle-cache-action@v3
+          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
-            arguments: releaseLinux
+            arguments: -p modules/cli releaseLinux
 
         - name: Running Detekt
           shell: bash
@@ -57,10 +57,10 @@ jobs:
           continue-on-error: false
 
         - name: Upload native binary
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
           with:
             name: native-binary-${{ matrix.os }}
-            path: svg-to-compose/build/bin/
+            path: modules/cli/build/bin/
             retention-days: 1
 
   integrity-checks:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
         - name: Checkout the repo
-          uses: actions/checkout@v6
+          uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
         - name: Prepares environment for building
           uses: ./.github/actions/setup
@@ -90,15 +90,15 @@ jobs:
 
         - name: Download native binary
           if: matrix.check != 'gradle-plugin'
-          uses: actions/download-artifact@v4
+          uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
           with:
             name: native-binary-${{ matrix.os }}
-            path: svg-to-compose/build/bin/
+            path: modules/cli/build/bin/
 
         - name: Restore binary permissions
           if: matrix.check != 'gradle-plugin' && matrix.os != 'windows-latest'
           shell: bash
-          run: chmod +x svg-to-compose/build/bin/*/releaseExecutable/s2c.*
+          run: chmod +x modules/cli/build/bin/*/releaseExecutable/s2c.*
 
         - name: CLI Integrity check using SVG
           if: matrix.check == 'cli-svg'
