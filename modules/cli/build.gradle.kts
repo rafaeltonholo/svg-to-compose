@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
     alias(libs.plugins.com.gradleup.shadow)
+    alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
 kotlin {
@@ -19,6 +20,10 @@ kotlin {
             implementation(cliLibs.com.github.ajalt.clikt)
             implementation(cliLibs.com.github.ajalt.clikt.markdown)
             implementation(libs.com.squareup.okio)
+            implementation(libs.org.jetbrains.kotlinx.serialization.json)
+        }
+        commonTest.dependencies {
+            implementation(libs.com.squareup.okio.fakefilesystem)
         }
     }
 }
