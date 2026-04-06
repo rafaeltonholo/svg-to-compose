@@ -54,14 +54,14 @@ Build the CLI binaries for your platform (required for integrity checks):
 
 These diff the CLI output against golden files in `integrity-check/expected/`:
 
-- [ ] `./.github/actions/cli-integrity-check/script.sh . svg`
-- [ ] `./.github/actions/cli-integrity-check/script.sh . xml`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension svg`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension xml`
 
 With optimization (requires [svgo](https://github.com/svg/svgo) and
 [avocado](https://github.com/alexjlockwood/avocado) installed):
 
-- [ ] `./.github/actions/cli-integrity-check/script.sh . svg optimize`
-- [ ] `./.github/actions/cli-integrity-check/script.sh . xml optimize`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension svg --optimize`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension xml --optimize`
 
 ## Phase 3: Integration Validation
 
