@@ -27,6 +27,7 @@ class NodeChunkerTest {
         override fun info(message: String) = Unit
         override fun output(message: String) = Unit
         override fun error(message: String, throwable: Throwable?) = Unit
+        override fun printEmpty() = Unit
     }
 
     private val chunker = NodeChunker(noOpLogger)

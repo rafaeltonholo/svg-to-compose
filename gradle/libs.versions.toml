@@ -1,26 +1,24 @@
 [versions]
 agp = "9.1.0"
-burst = "2.11.0"
-kotlin = "2.3.10"
-clikt = "5.0.3"
+burst = "2.12.1"
+kotlin = "2.3.20"
 compose-rules = "0.5.6"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
 ktoml = "0.7.1"
-okio = "3.16.4"
+okio = "3.17.0"
 detekt = "2.0.0-alpha.2"
 ksoup = "0.2.6"
 jetbrains-annotation = "26.1.0"
-metro = "0.11.3"
-maven-publish = "0.31.0"
+metro = "0.13.1"
+maven-publish = "0.36.0"
 gradle-plugin-publish = "2.1.1"
 buildconfig = "6.0.9"
-dokka = "2.1.0"
-junit-jupiter = "5.14.0"
+dokka = "2.2.0"
+junit-jupiter = "6.0.3"
+shadow = "9.4.1"
 
 [libraries]
-com-github-ajalt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
-com-github-ajalt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markdown", version.ref = "clikt" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 com-squareup-okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
@@ -34,6 +32,7 @@ org-jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kot
 
 # Plugins
 dev-detekt-gradle-plugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+dev-zacsweers-metro-gradle-plugin = { module = "dev.zacsweers.metro:dev.zacsweers.metro.gradle.plugin", version.ref = "metro" }
 org-jetbrains-dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 org-jetbrains-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 org-jetbrains-kotlin-powerAssert-plugin = { module = "org.jetbrains.kotlin:kotlin-power-assert", version.ref = "kotlin" }
@@ -56,3 +55,10 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 org-jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+com-gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+
+# build-logic
+dev-tonholo-s2c-conventions-dokka = { id = "dev.tonholo.s2c.conventions.dokka" }
+dev-tonholo-s2c-conventions-gradlePlugin = { id = "dev.tonholo.s2c.conventions.gradle.plugin" }
+dev-tonholo-s2c-conventions-kmp = { id = "dev.tonholo.s2c.conventions.kmp" }
+dev-tonholo-s2c-conventions-testing = { id = "dev.tonholo.s2c.conventions.testing" }

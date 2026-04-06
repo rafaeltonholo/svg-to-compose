@@ -3,8 +3,7 @@ import com.vanniktech.maven.publish.JavadocJar
 
 plugins {
     `java-gradle-plugin`
-    dev.tonholo.s2c.conventions.gradle.plugin
-    alias(libs.plugins.dev.zacsweers.metro)
+    alias(libs.plugins.dev.tonholo.s2c.conventions.gradlePlugin)
 }
 
 // Functional tests: end-to-end tests that exercise the plugin via GradleRunner.
@@ -44,7 +43,10 @@ gradlePlugin {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-receivers")
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xskip-prerelease-check",
+        )
     }
 
     sourceSets {

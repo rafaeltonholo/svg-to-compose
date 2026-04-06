@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.domain.xml
 
-import AppConfig
+import dev.tonholo.s2c.SvgToComposeContextProvider
 import dev.tonholo.s2c.domain.delegate.attribute
 
 interface XmlNode {
@@ -26,7 +26,7 @@ data object XmlPendingParentElement : XmlParentNode {
     override val children: MutableSet<XmlNode> = mutableSetOf()
 }
 
-private const val MAX_DEPTH = 5
+private const val MAX_ANCESTOR_DEPTH = 5
 
 abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
     var parent: XmlParentNode = parent
@@ -53,6 +53,19 @@ abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
     override val className: String? by attribute(name = "class")
     override val style: String? by attribute()
 
+    /**
+     * IMPORTANT: Must be called only for debug purpose. Never call this without checking if
+     * debugging is enabled.
+     *
+     * Converts the node into a JSON string representation.
+     *
+     * This method includes the tag name, node attributes, and a string representation
+     * of the parent hierarchy to avoid infinite recursion during serialization.
+     *
+     * @param extra An optional lambda that allows appending additional JSON properties
+     * to the [StringBuilder] before the object is closed.
+     * @return A JSON-formatted string representing the node.
+     */
     open fun toJsString(extra: (StringBuilder.() -> Unit)? = null): String = buildString {
         append("{")
         append("\"name\":\"$tagName\", ")
@@ -66,17 +79,20 @@ abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
         append("}")
     }
 
-    private fun buildParentName(): String = if (AppConfig.debug) {
-        var parentTag = parent.tagName
-        var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
-        var deep = 0
-        while (currentParent != null && currentParent !is XmlRootNode && deep++ < MAX_DEPTH) {
-            parentTag = "${currentParent.tagName}.$parentTag"
-            currentParent = (currentParent as? XmlChildNode)?.parent
+    private fun buildParentName(): String {
+        val debug = SvgToComposeContextProvider.currentOrNull?.configSnapshot?.debug == true
+        return if (debug) {
+            var parentTag = parent.tagName
+            var currentParent: XmlParentNode? = (parent as? XmlChildNode)?.parent
+            var deep = 0
+            while (currentParent != null && currentParent !is XmlRootNode && deep++ < MAX_ANCESTOR_DEPTH) {
+                parentTag = "${currentParent.tagName}.$parentTag"
+                currentParent = (currentParent as? XmlChildNode)?.parent
+            }
+            parentTag
+        } else {
+            parent.tagName
         }
-        parentTag
-    } else {
-        parent.tagName
     }
 
     fun attachParentIfNeeded(parent: XmlParentNode) {

@@ -1,6 +1,5 @@
 package dev.tonholo.s2c.optimizer
 
-import AppConfig.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.command.command
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.error.ErrorCode
@@ -9,8 +8,8 @@ import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.filename
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.io.TempFileWriter.Companion.S2C_TEMP_FOLDER
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.optimizer.svgo.SvgoConfigContent
 import dev.zacsweers.metro.Inject
 import okio.IOException
@@ -218,7 +217,7 @@ sealed class Optimizer(private val logger: Logger) {
             var hasMissingDependency = false
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
-                    printEmpty()
+                    logger.printEmpty()
                     logger.output(optimizer.errorMessage)
                     hasMissingDependency = true
                 }
@@ -261,7 +260,7 @@ sealed class Optimizer(private val logger: Logger) {
          */
         fun optimize(file: Path): Path {
             logger.output("🏎️  Optimizing ${file.extension}")
-            printEmpty()
+            logger.printEmpty()
             return if (file.extension == FileType.Svg.extension) {
                 svgOptimizers.fold(file) { currentFile, optimizer ->
                     optimizer.run(currentFile)
@@ -271,7 +270,7 @@ sealed class Optimizer(private val logger: Logger) {
                     optimizer.run(currentFile)
                 }
             }.also {
-                printEmpty()
+                logger.printEmpty()
             }
         }
     }

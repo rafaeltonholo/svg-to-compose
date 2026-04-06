@@ -9,7 +9,10 @@ Read [.ai/guidelines.md](../.ai/guidelines.md) first.
 ## Platform Targets
 
 - **JVM**: Java 8 bytecode
-- **Native**: macOS (arm64, x64), Linux (x64), Windows (mingwX64)
+- **Native**: macOS (arm64), Linux (x64), Windows (mingwX64)
+
+> **Note**: This module is a library only. It does not produce executables.
+> The CLI entry point lives in `modules/cli/`.
 
 ## Source Structure
 
@@ -44,10 +47,9 @@ src/
 │   ├── domain/svg/                  # SVG model tests
 │   └── parser/ast/                  # AST parser tests
 ├── jvmMain/                         # JVM-specific implementations
-└── nativeMain/                      # Native-specific (CLI entry points)
-    ├── appleMain/                   # macOS
-    ├── linuxMain/                   # Linux
-    └── mingwMain/                   # Windows
+└── nativeMain/                      # Native platform implementations
+    └── kotlin/dev/tonholo/s2c/extensions/
+        └── Path.extension.native.kt # FileSystem.SYSTEM provider
 ```
 
 ## Key Concepts
@@ -64,8 +66,6 @@ src/
 
 - `com.fleeksoft.ksoup` — XML/HTML parsing (multiplatform)
 - `com.squareup.okio` — File I/O (multiplatform)
-- `com.github.ajalt.clikt` — CLI framework (native targets only)
-
 ## Build and Test
 
 ```bash

@@ -15,7 +15,7 @@ Read [.ai/guidelines.md](../.ai/guidelines.md) first.
 - Keep this module focused on demonstration code. Core parsing/conversion logic
   belongs in `svg-to-compose`.
 - Do not introduce shared build logic here. Put reusable build configuration in
-  `buildSrc` convention plugins.
+  `build-logic` convention plugins.
 - Prefer minimal, readable sample code over production abstractions.
 
 ## Useful Commands

@@ -5,7 +5,7 @@ compose-bom = "2026.03.01"
 core-ktx = "1.18.0"
 googleMaterial = "1.13.0"
 lifecycle-runtime-ktx = "2.10.0"
-s2c = "3.0.0"
+s2c = "3.0.0-SNAPSHOT"
 
 [libraries]
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }

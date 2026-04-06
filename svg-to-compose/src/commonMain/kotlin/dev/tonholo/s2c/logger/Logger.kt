@@ -65,10 +65,9 @@ interface Logger {
      * @param throwable An optional throwable associated with the error.
      */
     fun error(message: String, throwable: Throwable? = null)
-}
 
-internal fun printEmpty() {
-    if (!AppConfig.silent) {
-        println()
-    }
+    /**
+     * Prints an empty line unless output is silenced.
+     */
+    fun printEmpty()
 }

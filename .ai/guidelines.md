@@ -23,9 +23,12 @@ ships as:
 ├── .ai/
 │   ├── guidelines.md                  # AI agent guidelines (you are here)
 │   └── skills/                        # Reusable AI skill definitions
-├── buildSrc/                          # Gradle convention plugins
+├── build-logic/                       # Gradle convention plugins (included build)
 ├── config/detekt.yml                  # Detekt static analysis configuration
-├── gradle/libs.versions.toml          # Dependency version catalog
+├── gradle/
+│   ├── libs.versions.toml            # Shared dependency version catalog
+│   └── libs.cli.versions.toml       # CLI-specific dependency catalog
+├── modules/cli/                       # CLI entry point (composite build)
 ├── playground/                        # Android demo app
 ├── playground-kmp/                    # KMP demo app
 ├── samples/                           # Example SVG/AVG input files
@@ -40,9 +43,11 @@ ships as:
 ### Building
 
 ```bash
-./gradlew build                        # Build everything
+./gradlew build                        # Build everything (root project)
 ./gradlew :svg-to-compose:build        # Build only the core library
 ./gradlew :svg-to-compose-gradle-plugin:build  # Build only the Gradle plugin
+./gradlew -p modules/cli build         # Build the CLI module (native + JVM)
+./gradlew -p modules/cli shadowJar     # Build the JVM fat JAR only
 ```
 
 ### Testing
@@ -156,24 +161,27 @@ Before modifying code in a module, read its `AGENTS.md`:
 | Module                         | Docs                                                                                |
 |--------------------------------|-------------------------------------------------------------------------------------|
 | `svg-to-compose`               | [svg-to-compose/AGENTS.md](../svg-to-compose/AGENTS.md)                             |
+| `modules/cli`                  | [modules/cli/AGENTS.md](../modules/cli/AGENTS.md)                                   |
 | `svg-to-compose-gradle-plugin` | [svg-to-compose-gradle-plugin/AGENTS.md](../svg-to-compose-gradle-plugin/AGENTS.md) |
-| `buildSrc`                     | [buildSrc/AGENTS.md](../buildSrc/AGENTS.md)                                         |
+| `build-logic`                  | [build-logic/AGENTS.md](../build-logic/AGENTS.md)                                   |
 | `playground`                   | [playground/AGENTS.md](../playground/AGENTS.md)                                     |
 | `playground-kmp`               | [playground-kmp/AGENTS.md](../playground-kmp/AGENTS.md)                             |
 
 ## Key Architectural Decisions
 
 - **Kotlin Multiplatform**: The core library targets JVM and native (macOS
-  arm64/x64, Linux x64, Windows mingwX64). Platform-specific code goes in the
-  respective source sets.
-- **Convention Plugins**: All build configuration is centralized in `buildSrc/`
-  as precompiled script plugins. Do not duplicate build logic in module
-  `build.gradle.kts` files.
+  arm64, Linux x64, Windows mingwX64). The CLI module (`modules/cli/`) targets
+  the same platforms plus a JVM fat JAR for unsupported native targets.
+  Platform-specific code goes in the respective source sets.
+- **Convention Plugins**: All build configuration is centralized in `build-logic/`
+  as precompiled script plugins in a standalone included build. Do not duplicate
+  build logic in module `build.gradle.kts` files.
 - **Typesafe Project Accessors**: Enabled via `TYPESAFE_PROJECT_ACCESSORS`
   feature preview. Use `projects.svgToCompose` instead of
   `project(":svg-to-compose")`.
-- **Version Catalog**: All dependency versions are managed in
-  `gradle/libs.versions.toml`.
+- **Version Catalogs**: Shared dependency versions are in
+  `gradle/libs.versions.toml`. CLI-specific dependencies (Clikt) are in
+  `gradle/libs.cli.versions.toml`.
 
 ## Multiplatform Constraints
 
@@ -189,7 +197,7 @@ Before modifying code in a module, read its `AGENTS.md`:
   global state or singletons that might lead to freezing issues in native
   binaries.
 - **Dependency Compatibility**: Before adding a library, verify it supports all
-  current targets: `jvm`, `macosX64`, `macosArm64`, `linuxX64`, and `mingwX64`.
+  current targets: `jvm`, `macosArm64`, `linuxX64`, and `mingwX64`.
 
 ## CI/CD
 

@@ -41,26 +41,27 @@ Run all checks on the release branch. Every command must exit with code 0.
 
 - [ ] `./gradlew :svg-to-compose-gradle-plugin:functionalTest`
 
-### Native Binary Build
+### CLI Binary Build
 
-Build the native binary for your platform (required for integrity checks):
+Build the CLI binaries for your platform (required for integrity checks):
 
-- [ ] `./gradlew releaseMacOS` (macOS)
-- [ ] `./gradlew releaseLinux` (Linux)
-- [ ] `./gradlew releaseWindows` (Windows)
+- [ ] `./gradlew -p modules/cli releaseMacOS` (macOS arm64)
+- [ ] `./gradlew -p modules/cli releaseLinux` (Linux x64)
+- [ ] `./gradlew -p modules/cli releaseWindows` (Windows mingwX64)
+- [ ] `./gradlew -p modules/cli shadowJar` (JVM fat JAR)
 
 ### CLI Integrity Checks
 
 These diff the CLI output against golden files in `integrity-check/expected/`:
 
-- [ ] `./.github/actions/cli-integrity-check/script.sh . svg`
-- [ ] `./.github/actions/cli-integrity-check/script.sh . xml`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension svg`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension xml`
 
 With optimization (requires [svgo](https://github.com/svg/svgo) and
 [avocado](https://github.com/alexjlockwood/avocado) installed):
 
-- [ ] `./.github/actions/cli-integrity-check/script.sh . svg optimize`
-- [ ] `./.github/actions/cli-integrity-check/script.sh . xml optimize`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension svg --optimize`
+- [ ] `./.github/actions/cli-integrity-check/script.sh . --extension xml --optimize`
 
 ## Phase 3: Integration Validation
 
@@ -175,9 +176,10 @@ Full local validation in a single script:
 ./gradlew detekt
 ./gradlew :svg-to-compose:allTests
 ./gradlew :svg-to-compose-gradle-plugin:functionalTest
-./gradlew releaseMacOS
-./.github/actions/cli-integrity-check/script.sh . svg
-./.github/actions/cli-integrity-check/script.sh . xml
+./gradlew -p modules/cli releaseMacOS
+./gradlew -p modules/cli shadowJar
+./.github/actions/cli-integrity-check/script.sh . --extension svg
+./.github/actions/cli-integrity-check/script.sh . --extension xml
 
 # Integration
 ./gradlew -p playground :app:assembleDebug
