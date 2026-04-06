@@ -1,7 +1,7 @@
 pluginManagement {
     includeBuild("../../build-logic")
     repositories {
-        maven { url = uri("../build/localMaven") }
+        maven { url = uri("../../build/localMaven") }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -9,7 +9,7 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        maven { url = uri("../build/localMaven") }
+        maven { url = uri("../../build/localMaven") }
         mavenCentral()
         google()
     }
