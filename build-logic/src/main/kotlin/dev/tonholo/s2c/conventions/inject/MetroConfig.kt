@@ -7,7 +7,11 @@ import org.gradle.kotlin.dsl.configure
 
 fun Project.configureMetro() {
     configure<MetroPluginExtension> {
-        debug.set(System.getenv("METRO_DEBUG").toBoolean())
+        debug.set(
+            project.providers.environmentVariable("METRO_DEBUG")
+                .map { it.toBoolean() }
+                .orElse(false),
+        )
         nonPublicContributionSeverity.set(DiagnosticSeverity.ERROR)
     }
 }

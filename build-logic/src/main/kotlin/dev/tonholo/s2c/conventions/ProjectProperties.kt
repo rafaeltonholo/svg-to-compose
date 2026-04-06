@@ -43,7 +43,7 @@ internal abstract class ProjectProperties(
         var dir: File? = startDir
         while (dir != null) {
             val candidate = File(dir, propertiesName)
-            if (candidate.exists()) return candidate
+            if (candidate.isFile) return candidate
             dir = dir.parentFile
         }
         return null
