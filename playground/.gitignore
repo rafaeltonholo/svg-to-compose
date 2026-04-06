@@ -3,8 +3,8 @@
 # Ignore the icon path since this project is intended
 # just for checking if all icons are correctly rendered
 # on Preview tab.
-/app/src/main/kotlin/dev/tonholo/svg_to_compose/playground/ui/icon/*
-!/app/src/main/kotlin/dev/tonholo/svg_to_compose/playground/ui/icon/template/
+/app/src/main/kotlin/dev/tonholo/svgtocompose/playground/ui/icon/*
+!/app/src/main/kotlin/dev/tonholo/svgtocompose/playground/ui/icon/template/
 
 /app/src/main/res/drawable/*
 !/app/src/main/res/drawable/brasil.xml
