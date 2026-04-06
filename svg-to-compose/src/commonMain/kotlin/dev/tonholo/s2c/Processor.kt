@@ -1,6 +1,5 @@
 package dev.tonholo.s2c
 
-import AppConfig
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
@@ -16,12 +15,12 @@ import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.logger.printEmpty
 import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
+import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -30,6 +29,7 @@ import okio.Path.Companion.toPath
 
 @AssistedInject
 class Processor(
+    private val config: S2cConfig,
     private val logger: Logger,
     private val fileManager: FileManager,
     private val iconWriter: IconWriter,
@@ -79,8 +79,6 @@ class Processor(
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
         mapIconName: IconMapperFn? = null,
     ): List<Path> {
-        // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): Move to Main.kt when logger refactor.
-        AppConfig.silent = config.silent
         logger.verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()
@@ -98,7 +96,7 @@ class Processor(
             )
         }
 
-        printEmpty()
+        logger.printEmpty()
         var runRecursively = recursive
         val files = if (isDirectory) {
             logger.info("🔍 Directory detected")
@@ -132,7 +130,7 @@ class Processor(
             files = files,
             optimizers = optimizers,
             outputPath = outputPath,
-            config = config,
+            parserConfig = config,
             runRecursively = runRecursively,
             filePath = filePath,
             errors = errors,
@@ -236,7 +234,7 @@ class Processor(
         exclude: Regex? = null,
     ): List<Path> = buildList {
         if (outputPath.isDirectory.not()) {
-            printEmpty()
+            logger.printEmpty()
             throw ExitProgramException(
                 errorCode = ErrorCode.OutputNotDirectoryError,
                 message = """
@@ -291,7 +289,7 @@ class Processor(
      * @param files The list of files to process.
      * @param optimizers The optimizer factory.
      * @param outputPath The output path.
-     * @param config The parser configuration.
+     * @param parserConfig The parser configuration.
      * @param runRecursively Whether to run recursively.
      * @param filePath The file path.
      * @param errors The list of errors.
@@ -300,7 +298,7 @@ class Processor(
         files: List<Path>,
         optimizers: Optimizer.Factory?,
         outputPath: Path,
-        config: ParserConfig,
+        parserConfig: ParserConfig,
         runRecursively: Boolean,
         filePath: Path,
         errors: MutableList<Pair<Path, Exception>>,
@@ -313,13 +311,13 @@ class Processor(
                     file = file,
                     optimizers = optimizers,
                     output = outputPath,
-                    config = config,
+                    config = parserConfig,
                     recursive = runRecursively,
                     basePath = filePath,
                     mapIconName = mapIconName,
                 )
                 processedFiles += processedFile
-                printEmpty()
+                logger.printEmpty()
             } catch (e: ExitProgramException) {
                 throw e
             } catch (
@@ -327,13 +325,13 @@ class Processor(
                 @Suppress("TooGenericExceptionCaught")
                 Exception,
             ) {
-                printEmpty()
+                logger.printEmpty()
                 // the generic exception is expected since we are going to exit the program with a failure later.
                 logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
-                if (AppConfig.stackTrace) {
+                if (config.stackTrace) {
                     logger.output(e.stackTraceToString())
                 }
-                printEmpty()
+                logger.printEmpty()
                 errors.add(file to e)
             }
         }

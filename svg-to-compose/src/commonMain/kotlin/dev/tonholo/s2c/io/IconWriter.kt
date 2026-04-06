@@ -3,20 +3,19 @@ package dev.tonholo.s2c.io
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.logger.printEmpty
 import dev.zacsweers.metro.Inject
 import okio.Path
 
 @Inject
 class IconWriter(private val logger: Logger, private val fileManager: FileManager) {
     fun write(iconName: String, fileContents: String, output: Path): Path {
-        printEmpty()
+        logger.printEmpty()
         logger.output("📝 Writing icon file on $output")
         return logger.debugSection("Writing document") {
             val outputExists = fileManager.exists(output)
             logger.verbose("outputExists=$outputExists")
             if (output.isDirectory && outputExists.not()) {
-                printEmpty()
+                logger.printEmpty()
                 logger.output("📢 Output directory is missing. Creating it automatically.")
                 fileManager.createDirectories(output)
             } else if (output.isDirectory.not()) {
@@ -46,7 +45,7 @@ class IconWriter(private val logger: Logger, private val fileManager: FileManage
                 writeUtf8(fileContents)
             }
 
-            printEmpty()
+            logger.printEmpty()
             logger.output("✅ Done writing the file")
             targetFile
         }

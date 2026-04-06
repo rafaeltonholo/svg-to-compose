@@ -3,7 +3,7 @@ import com.vanniktech.maven.publish.JavadocJar
 
 plugins {
     `java-gradle-plugin`
-    dev.tonholo.s2c.conventions.gradle.plugin
+    alias(libs.plugins.dev.tonholo.s2c.conventions.gradlePlugin)
     alias(libs.plugins.dev.zacsweers.metro)
 }
 
@@ -44,7 +44,10 @@ gradlePlugin {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-receivers")
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xskip-prerelease-check",
+        )
     }
 
     sourceSets {
@@ -90,4 +93,8 @@ dependencies {
     "functionalTestImplementation"(kotlin("test"))
     "functionalTestCompileOnly"(libs.com.android.tools.build.gradle)
     "functionalTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+}
+
+metro {
+    debug = true
 }

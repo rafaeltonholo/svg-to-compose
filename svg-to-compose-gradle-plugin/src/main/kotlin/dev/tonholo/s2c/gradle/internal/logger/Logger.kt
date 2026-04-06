@@ -58,6 +58,12 @@ internal fun Logger(logger: GradleLogger): Logger = object : Logger {
     override fun error(message: String, throwable: Throwable?) {
         logger.error(message, throwable)
     }
+
+    override fun printEmpty() {
+        if (logLevel != LogLevel.QUIET) {
+            logger.lifecycle("")
+        }
+    }
 }
 
 @Suppress("UnusedReceiverParameter")

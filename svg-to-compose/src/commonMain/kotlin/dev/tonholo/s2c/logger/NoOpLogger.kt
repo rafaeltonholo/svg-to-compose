@@ -15,4 +15,5 @@ internal object NoOpLogger : Logger {
     override fun info(message: String) = Unit
     override fun output(message: String) = Unit
     override fun error(message: String, throwable: Throwable?) = Unit
+    override fun printEmpty() = Unit
 }

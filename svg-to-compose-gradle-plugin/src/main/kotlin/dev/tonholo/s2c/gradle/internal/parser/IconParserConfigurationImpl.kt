@@ -69,8 +69,10 @@ internal class IconParserConfigurationImpl(
     val excludePattern: String?
         get() = exclude.orNull?.pattern
 
+    @get:Internal
     internal val templateFile: RegularFileProperty = objectFactory.fileProperty()
 
+    @get:Internal
     internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
 
     @get:Input

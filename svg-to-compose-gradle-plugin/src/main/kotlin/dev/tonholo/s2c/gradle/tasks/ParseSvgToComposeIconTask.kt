@@ -1,12 +1,14 @@
 package dev.tonholo.s2c.gradle.tasks
 
 import com.android.build.api.variant.AndroidComponentsExtension
+import dev.tonholo.s2c.SvgToComposeContextProvider
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
+import dev.tonholo.s2c.gradle.internal.GradleS2cConfig
 import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
 import dev.tonholo.s2c.gradle.internal.inject.GradlePluginGraph
 import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
@@ -15,7 +17,6 @@ import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
 import dev.tonholo.s2c.gradle.tasks.worker.toResult
-import dev.tonholo.s2c.inject.createS2cGraph
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.zacsweers.metro.HasMemberInjections
@@ -170,6 +171,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         // Workers create their own isolated processors via S2cWorkerBridge.
         val processor = graph.processorFactory.create(temporaryDir.toOkioPath())
         S2cWorkerBridge.register(bridgeToken, graph.processorFactory)
+        SvgToComposeContextProvider.initializeWith(config = GradleS2cConfig(logger = Logging.getLogger(javaClass)))
         try {
             logger.setLogLevel(if (silent) LogLevel.QUIET else logLevel.get())
             val errors = mutableMapOf<Path, Throwable>()
@@ -197,6 +199,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
                 )
             }
         } finally {
+            SvgToComposeContextProvider.reset()
             S2cWorkerBridge.unregister(bridgeToken)
             processor.dispose()
         }
@@ -609,12 +612,11 @@ private fun Project.addToAndroidSourceSet(task: TaskProvider<ParseSvgToComposeIc
  * @return The configured GradlePluginGraph instance.
  */
 private fun createGraph(projectLayout: ProjectLayout): GradlePluginGraph {
-    val s2cGraph = createS2cGraph(
-        logger = createGradleLogger(Logging.getLogger("ParseSvgToComposeIconTask")),
-        fileSystem = FileSystem.SYSTEM,
-    )
+    val gradleLogger = Logging.getLogger("ParseSvgToComposeIconTask")
     return createGraphFactory<GradlePluginGraph.Factory>().create(
-        svgToComposeGraph = s2cGraph,
+        config = GradleS2cConfig(logger = gradleLogger),
+        logger = createGradleLogger(gradleLogger),
+        fileSystem = FileSystem.SYSTEM,
         buildDirectory = projectLayout.buildDirectory,
     )
 }
