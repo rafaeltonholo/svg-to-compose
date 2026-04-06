@@ -1,7 +1,8 @@
+package dev.tonholo.s2c.cli.runtime
+
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.context
-import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
@@ -15,27 +16,38 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.mordant.platform.MultiplatformSystem.exitProcess
 import dev.tonholo.s2c.AppDefaults
-import dev.tonholo.s2c.config.BuildConfig
+import dev.tonholo.s2c.Processor
+import dev.tonholo.s2c.SvgToComposeContext
+import dev.tonholo.s2c.SvgToComposeContextProvider
+import dev.tonholo.s2c.cli.config.BuildConfig
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.IndentStyle
 import dev.tonholo.s2c.error.ExitProgramException
-import dev.tonholo.s2c.inject.createS2cGraph
-import dev.tonholo.s2c.logger.CommonLogger
-import dev.tonholo.s2c.logger.printEmpty
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.config.TemplateConfig
-import okio.FileSystem
+import dev.tonholo.s2c.updateConfig
+import dev.zacsweers.metro.Inject
 import okio.Path.Companion.toPath
-import platform.posix.exit
 
 private const val MANUAL_LINE_BREAK = "\u0085"
 
-fun main(args: Array<String>) = Client()
-    .main(args)
-
-class Client : CliktCommand(name = "s2c") {
-
+/**
+ * Clikt command that serves as the CLI entry point for SVG-to-Compose.
+ *
+ * Injected by Metro with a [CliConfig], [Logger], and [Processor.Factory].
+ * At the start of [run], the parsed CLI flags are written back to
+ * [config] so that the logger and all downstream components observe the
+ * correct verbosity and debug settings.
+ */
+@Inject
+internal class Client(
+    private val context: SvgToComposeContext,
+    private val logger: Logger,
+    private val processorFactory: Processor.Factory,
+) : CliktCommand(name = "s2c") {
     init {
         eagerOption("-v", "--version", help = "Show this CLI version and exit") {
             throw PrintMessage("SVG to Compose version: ${BuildConfig.VERSION}")
@@ -78,7 +90,7 @@ class Client : CliktCommand(name = "s2c") {
         names = arrayOf("-opt", "--optimize"),
         help = "Enable SVG/AVG optimization before parsing to Jetpack Compose icon. The optimization process uses " +
             "the following programs: svgo, avocado from NPM Registry",
-    ).boolean().default(true)
+    ).boolean().default(value = true)
 
     private val receiverType by option(
         names = arrayOf("-rt", "--receiver-type"),
@@ -118,7 +130,7 @@ class Client : CliktCommand(name = "s2c") {
     private val isKmp by option(
         names = arrayOf("--kmp"),
         help = "Ensures the output is compatible with KMP.",
-    ).boolean().default(false)
+    ).boolean().default(value = false)
 
     private val makeInternal by option(
         names = arrayOf("--make-internal"),
@@ -140,7 +152,7 @@ class Client : CliktCommand(name = "s2c") {
         names = arrayOf("--recursive-depth", "--depth"),
         help = "The depth level for recursive file search within directory. " +
             "The default value is ${AppDefaults.MAX_RECURSIVE_DEPTH}.",
-    ).int().default(AppDefaults.MAX_RECURSIVE_DEPTH)
+    ).int().default(value = AppDefaults.MAX_RECURSIVE_DEPTH)
 
     private val silent by option(
         names = arrayOf("--silent"),
@@ -178,7 +190,7 @@ class Client : CliktCommand(name = "s2c") {
 
     private val template by option(
         names = arrayOf("--template"),
-        help = "Path to an template file for output customisation. When omitted, auto-discovers by" +
+        help = "Path to a template file for output customisation. When omitted, auto-discovers by " +
             "walking up from the output directory.",
     )
     private val noTemplate by option(
@@ -188,7 +200,7 @@ class Client : CliktCommand(name = "s2c") {
 
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
-        help = """Replace the icon's name first value of this parameter with the second. 
+        help = """Replace the icon's name first value of this parameter with the second.
             |This is useful when you want to remove part of the icon's name from the output icon.
             |
             |For example, running the following command:
@@ -204,62 +216,27 @@ class Client : CliktCommand(name = "s2c") {
         """.trimMargin(),
     ).pair()
 
-    private val logger = CommonLogger()
+    private val effectiveDebug get() = verbose || debug
+    private val effectiveStackTrace get() = stackTrace || effectiveDebug
 
     override fun run() {
-        logger.verbose("Args:")
-        logger.verbose("   path = $path")
-        logger.verbose("   package = $pkg")
-        logger.verbose("   theme = $theme")
-        logger.verbose("   output = $output")
-        logger.verbose("   optimize = $optimize")
-        logger.verbose("   receiverType = $receiverType")
-        logger.verbose("   addToMaterial = $addToMaterial")
-        logger.verbose("   debug = $debug")
-        logger.verbose("   verbose = $verbose")
-        logger.verbose("   stackTrace = $stackTrace")
-        logger.verbose("   noPreview = $noPreview")
-        logger.verbose("   isKmp = $isKmp")
-        logger.verbose("   makeInternal = $makeInternal")
-        logger.verbose("   minified = $minified")
-        logger.verbose("   recursive = $recursive")
-        logger.verbose("   recursiveDepth = $recursiveDepth")
-        logger.verbose("   silent = $silent")
-        logger.verbose("   exclude = $exclude")
-        logger.verbose("   mapIconNameTo = $mapIconNameTo")
-        logger.verbose("   indentSize = $indentSize")
-        logger.verbose("   indentStyle = $indentStyle")
-        logger.verbose("   noEditorConfig = $noEditorConfig")
-
-        AppConfig.verbose = verbose
-        AppConfig.debug = verbose || debug
-        AppConfig.stackTrace = stackTrace || AppConfig.debug
-        AppConfig.silent = silent
-
-        try {
-            val graph = createS2cGraph(
-                logger = logger,
-                fileSystem = FileSystem.SYSTEM,
+        context.updateConfig<CliConfig> { config ->
+            config.copy(
+                debug = effectiveDebug,
+                verbose = verbose,
+                silent = silent,
+                stackTrace = effectiveStackTrace,
             )
-            graph.processorFactory.create(tempDirectory = null).run(
+        }
+
+        logArgs()
+
+        SvgToComposeContextProvider.initialize(context)
+        try {
+            processorFactory.create(tempDirectory = null).run(
                 path = path,
                 output = output,
-                config = ParserConfig(
-                    pkg = pkg,
-                    theme = theme,
-                    optimize = optimize,
-                    receiverType = receiverType,
-                    addToMaterial = addToMaterial,
-                    noPreview = noPreview,
-                    makeInternal = makeInternal,
-                    minified = minified,
-                    silent = silent,
-                    kmpPreview = isKmp,
-                    exclude = exclude?.let(::Regex),
-                    formatConfig = buildFormatConfig(),
-                    formatOverrides = buildFormatOverrides(),
-                    template = template?.let { TemplateConfig(configPath = it.toPath(), noDiscovery = noTemplate) },
-                ),
+                config = buildParserConfig(),
                 recursive = recursive,
                 maxDepth = recursiveDepth,
                 mapIconName = mapIconNameTo?.let { (from, to) ->
@@ -267,20 +244,69 @@ class Client : CliktCommand(name = "s2c") {
                 },
             )
         } catch (e: ExitProgramException) {
-            printEmpty()
-            if (AppConfig.stackTrace) {
+            logger.printEmpty()
+            if (effectiveStackTrace) {
                 logger.error(e.message.orEmpty(), e)
             } else {
                 logger.output(e.message.orEmpty())
             }
-            exit(e.errorCode.code)
+            exitProcess(e.errorCode.code)
+        } finally {
+            SvgToComposeContextProvider.reset()
         }
     }
+
+    private fun logArgs() {
+        logger.verbose(
+            """
+                |Args:
+                |   path = $path
+                |   package = $pkg
+                |   theme = $theme
+                |   output = $output
+                |   optimize = $optimize
+                |   receiverType = $receiverType
+                |   addToMaterial = $addToMaterial
+                |   debug = $debug
+                |   verbose = $verbose
+                |   stackTrace = $stackTrace
+                |   noPreview = $noPreview
+                |   isKmp = $isKmp
+                |   makeInternal = $makeInternal
+                |   minified = $minified
+                |   recursive = $recursive
+                |   recursiveDepth = $recursiveDepth
+                |   silent = $silent
+                |   exclude = $exclude
+                |   mapIconNameTo = $mapIconNameTo
+                |   indentSize = $indentSize
+                |   indentStyle = $indentStyle
+                |   noEditorConfig = $noEditorConfig
+            """.trimMargin(),
+        )
+    }
+
+    private fun buildParserConfig(): ParserConfig = ParserConfig(
+        pkg = pkg,
+        theme = theme,
+        optimize = optimize,
+        receiverType = receiverType,
+        addToMaterial = addToMaterial,
+        noPreview = noPreview,
+        makeInternal = makeInternal,
+        minified = minified,
+        silent = silent,
+        kmpPreview = isKmp,
+        exclude = exclude?.let(::Regex),
+        formatConfig = buildFormatConfig(),
+        formatOverrides = buildFormatOverrides(),
+        template = template?.let { TemplateConfig(configPath = it.toPath(), noDiscovery = noTemplate) },
+    )
 
     /**
      * Builds a full [FormatConfig] when `.editorconfig` resolution is
      * disabled via `--no-editorconfig`. Returns `null` otherwise so
-     * the [Processor] resolves formatting from `.editorconfig`.
+     * the Processor resolves formatting from `.editorconfig`.
      */
     private fun buildFormatConfig(): FormatConfig? {
         if (!noEditorConfig) return null
@@ -298,7 +324,7 @@ class Client : CliktCommand(name = "s2c") {
      *
      * Returns `null` when no CLI formatting flags are specified.
      * Non-null overrides are merged on top of the resolved config
-     * (from `.editorconfig` or defaults) by the [Processor].
+     * (from `.editorconfig` or defaults) by the Processor.
      */
     private fun buildFormatOverrides(): FormatConfig.Overrides? {
         if (indentSize == null && indentStyle == null) return null

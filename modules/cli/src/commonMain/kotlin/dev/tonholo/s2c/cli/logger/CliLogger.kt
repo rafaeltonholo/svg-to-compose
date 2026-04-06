@@ -1,16 +1,17 @@
-package dev.tonholo.s2c.logger
+package dev.tonholo.s2c.cli.logger
 
+import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.runtime.S2cConfig
+import dev.zacsweers.metro.Inject
 
 /**
- * Creates a [Logger] backed by the given [S2cConfig] flags.
+ * Creates a [dev.tonholo.s2c.logger.Logger] backed by the given [S2cConfig] flags.
  *
  * This is the public entry point for obtaining a console-based logger.
  * The underlying implementation is internal to the library.
  */
-fun CommonLogger(config: S2cConfig): Logger = CommonLoggerImpl(config)
-
-internal class CommonLoggerImpl(private val config: S2cConfig) : Logger {
+@Inject
+internal class CliLogger(private val config: S2cConfig) : Logger {
     private companion object {
         private const val SECTION_WIDTH = 50
         private const val SECTION_PADDING = SECTION_WIDTH / 2

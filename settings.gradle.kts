@@ -29,6 +29,7 @@ include(
 )
 
 includeBuild("website")
+includeBuild("modules/cli")
 
 // Playground builds are only included when running as the root project
 // (not when included by another build like modules/cli) and not in CI.
