@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.conventions
 
 import org.gradle.api.Project
+import java.io.File
 import java.io.IOException
 import java.util.Properties
 
@@ -18,9 +19,7 @@ internal abstract class ProjectProperties(
         }
 
     open fun init(project: Project) {
-        val propertiesFile = project
-            .file(propertiesName)
-            .takeIf { it.exists() }
+        val propertiesFile = findPropertiesFile(project.rootDir)
         check(propertiesFile != null) {
             "The $propertiesName file is missing in the root project."
         }
@@ -33,6 +32,21 @@ internal abstract class ProjectProperties(
         } catch (e: IOException) {
             throw IllegalStateException("Failed to read properties from app.properties", e)
         }
+    }
+
+    /**
+     * Walks up from [startDir] looking for [propertiesName].
+     * This allows composite builds (e.g. modules/cli) to locate the
+     * properties file that lives in the repository root.
+     */
+    private fun findPropertiesFile(startDir: File): File? {
+        var dir: File? = startDir
+        while (dir != null) {
+            val candidate = File(dir, propertiesName)
+            if (candidate.exists()) return candidate
+            dir = dir.parentFile
+        }
+        return null
     }
 
     inline fun forEach(action: (Map.Entry<String, Any>) -> Unit) {

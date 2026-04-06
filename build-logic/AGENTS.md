@@ -1,7 +1,9 @@
-# buildSrc — Convention Plugins
+# build-logic - Convention Plugins
 
 This module contains Gradle convention plugins that centralize and standardize
-build configuration across all modules.
+build configuration across all modules. It is an included build consumed via
+`pluginManagement { includeBuild("build-logic") }` in each build's
+`settings.gradle.kts`.
 
 Read [.ai/guidelines.md](../.ai/guidelines.md) first.
 
@@ -42,7 +44,8 @@ dev.tonholo.s2c.conventions.gradle.plugin   # Gradle plugin-specific conventions
 | `dev.tonholo.s2c.conventions.gradle.plugin.gradle.kts`        | Conventions for Gradle plugin modules      |
 | `dev/tonholo/s2c/conventions/AppProperties.kt`                | Loads `app.properties` (version, group)    |
 | `dev/tonholo/s2c/conventions/VersionCatalogs.kt`              | Version catalog access utilities           |
-| `dev/tonholo/s2c/conventions/kmp/targets/KmpTargets.kt`       | KMP target definitions                     |
+| `dev/tonholo/s2c/conventions/kmp/targets/KmpTargets.kt`       | KMP target definitions and executable config |
+| `dev/tonholo/s2c/conventions/kmp/tasks/KmpTasks.kt`          | Native build/release task registration     |
 | `dev/tonholo/s2c/conventions/detekt/DetektConfig.kt`          | Detekt configuration constants             |
 | `dev/tonholo/s2c/conventions/detekt/MergeReports.kt`          | Detekt report merging task                 |
 | `dev/tonholo/s2c/conventions/publication/PublicationTasks.kt` | Publish-all task registration              |
@@ -51,17 +54,17 @@ dev.tonholo.s2c.conventions.gradle.plugin   # Gradle plugin-specific conventions
 
 - Do NOT duplicate build logic in module-level `build.gradle.kts` files. Add
   shared logic here.
-- Convention plugins depend on plugins declared in `buildSrc/build.gradle.kts` —
+- Convention plugins depend on plugins declared in `build-logic/build.gradle.kts` -
   check that file when adding new plugin dependencies.
 - Version catalog (`gradle/libs.versions.toml`) is the single source of truth
   for dependency versions.
-- `app.properties` at the repository root defines `VERSION` and `GROUP` — read
+- `app.properties` at the repository root defines `VERSION` and `GROUP` - read
   by `AppProperties.kt`.
 
 ## Build
 
 ```bash
-# buildSrc is built automatically by Gradle before the main build.
+# build-logic is built automatically by Gradle before the main build.
 # To verify convention plugins compile:
-cd buildSrc && ../gradlew build
+./gradlew :build-logic:jar
 ```

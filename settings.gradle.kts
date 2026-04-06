@@ -2,6 +2,7 @@ rootProject.name = "SVG-to-Compose-parent"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         gradlePluginPortal()
@@ -29,7 +30,9 @@ include(
 
 includeBuild("website")
 
-if (System.getenv("CI") == null) {
+// Playground builds are only included when running as the root project
+// (not when included by another build like modules/cli) and not in CI.
+if (gradle.parent == null && System.getenv("CI") == null) {
     includeBuild("playground")
     includeBuild("playground-kmp")
 }

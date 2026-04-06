@@ -7,18 +7,26 @@ import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 
-context(project: Project)
 fun KotlinMultiplatformExtension.useNative() {
-    val macosTargets = useMacOs()
-    val linuxTargets = useLinux()
-    val windowsTargets = useWindows()
+    useMacOs()
+    useLinux()
+    useWindows()
+}
 
-    (macosTargets + linuxTargets + windowsTargets).forEach { target ->
+fun KotlinMultiplatformExtension.configureNativeExecutable(
+    project: Project,
+    entryPoint: String = "main",
+    baseName: String = "s2c",
+) {
+    val macosTargets = mutableListOf<KotlinNativeTargetWithHostTests>()
+    val linuxTargets = mutableListOf<KotlinNativeTargetWithHostTests>()
+    val windowsTargets = mutableListOf<KotlinNativeTargetWithHostTests>()
+
+    targets.filterIsInstance<KotlinNativeTargetWithHostTests>().forEach { target ->
         target.binaries {
             executable {
-                entryPoint = "main"
-                baseName = "s2c"
-
+                this.entryPoint = entryPoint
+                this.baseName = baseName
                 debuggable = true
                 runTaskProvider?.configure {
                     val args = project.providers.gradleProperty("runArgs")
@@ -28,31 +36,36 @@ fun KotlinMultiplatformExtension.useNative() {
                         },
                     )
                 }
-
             }
         }
         project.createBuildTasks(target)
+
+        when {
+            target.name.startsWith("macos") -> macosTargets.add(target)
+            target.name.startsWith("linux") -> linuxTargets.add(target)
+            target.name.startsWith("mingw") -> windowsTargets.add(target)
+        }
     }
+
+    if (macosTargets.isNotEmpty()) project.createReleaseTask("MacOS", macosTargets)
+    if (linuxTargets.isNotEmpty()) project.createReleaseTask("Linux", linuxTargets)
+    if (windowsTargets.isNotEmpty()) project.createReleaseTask("Windows", windowsTargets)
 }
 
-context(project: Project)
 fun KotlinMultiplatformExtension.useMacOs(): List<KotlinNativeTargetWithHostTests> =
     listOf(
         macosArm64(),
-        macosX64(),
-    ).also { targets -> project.createReleaseTask("MacOS", targets) }
+    )
 
-context(project: Project)
 fun KotlinMultiplatformExtension.useLinux(): List<KotlinNativeTargetWithHostTests> =
     listOf(
         linuxX64(),
-    ).also { targets -> project.createReleaseTask("Linux", targets) }
+    )
 
-context(project: Project)
 fun KotlinMultiplatformExtension.useWindows(): List<KotlinNativeTargetWithHostTests> =
     listOf(
         mingwX64(),
-    ).also { targets -> project.createReleaseTask("Windows", targets) }
+    )
 
 fun KotlinMultiplatformExtension.useJvm() {
     jvm()

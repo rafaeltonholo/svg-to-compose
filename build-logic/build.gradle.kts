@@ -3,10 +3,12 @@ plugins {
 }
 
 kotlin {
-    compilerOptions.freeCompilerArgs.addAll(
-        "-Xcontext-parameters",
-        "-opt-in=org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi",
-    )
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-opt-in=org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi",
+        )
+    }
 }
 
 dependencies {

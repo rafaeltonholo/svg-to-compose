@@ -17,8 +17,8 @@ kotlin {
     useJvm()
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-Xwhen-guards",
             "-Xcontext-parameters",
+            "-Xskip-prerelease-check",
         )
     }
 }

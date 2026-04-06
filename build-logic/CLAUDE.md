@@ -1,4 +1,4 @@
-# buildSrc — Convention Plugins
+# build-logic - Convention Plugins
 
 CRITICAL: MUST read and follow `AGENTS.md` in this directory for module-specific conventions.
 
