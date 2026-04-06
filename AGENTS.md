@@ -42,7 +42,7 @@ execution. It resolves binaries from `modules/cli/build/bin/`.
 After making changes to the parser or generator, perform an **Empirical
 Validation**:
 
-1. **Build**: Run `./gradlew -p modules/cli buildDebugMacosarm64` (or the
+1. **Build**: Run `./gradlew -p modules/cli buildDebugMacosArm64` (or the
    appropriate platform target).
 2. **Generate**: Use the `./s2c` script on a sample file:
    ```bash

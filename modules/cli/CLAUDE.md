@@ -8,8 +8,8 @@ This is the CLI entry point for the SVG-to-Compose tool. It depends on the core 
 
 ```bash
 # Native binary (host platform)
-./gradlew -p modules/cli buildDebugMacosarm64
-./gradlew -p modules/cli buildReleaseMacosarm64
+./gradlew -p modules/cli buildDebugMacosArm64
+./gradlew -p modules/cli buildReleaseMacosArm64
 ./gradlew -p modules/cli buildReleaseLinuxx64
 ./gradlew -p modules/cli buildReleaseMingwx64
 

@@ -64,8 +64,8 @@ Runnable via `java -jar`. Built with Shadow plugin and `minimize()`.
 
 ```bash
 # Native (platform-specific)
-./gradlew -p modules/cli buildDebugMacosarm64
-./gradlew -p modules/cli buildReleaseMacosarm64
+./gradlew -p modules/cli buildDebugMacosArm64
+./gradlew -p modules/cli buildReleaseMacosArm64
 
 # JVM fat JAR
 ./gradlew -p modules/cli shadowJar
