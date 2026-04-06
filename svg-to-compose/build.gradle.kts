@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
     alias(libs.plugins.app.cash.burst)
-    alias(libs.plugins.dev.zacsweers.metro)
     alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
@@ -54,8 +53,4 @@ mavenPublishing {
         name.set("SVG/XML to Compose Library")
         description.set("A KMP Library that converts SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.")
     }
-}
-
-metro {
-    debug = true
 }

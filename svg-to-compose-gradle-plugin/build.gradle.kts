@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.JavadocJar
 plugins {
     `java-gradle-plugin`
     alias(libs.plugins.dev.tonholo.s2c.conventions.gradlePlugin)
-    alias(libs.plugins.dev.zacsweers.metro)
 }
 
 // Functional tests: end-to-end tests that exercise the plugin via GradleRunner.
@@ -93,8 +92,4 @@ dependencies {
     "functionalTestImplementation"(kotlin("test"))
     "functionalTestCompileOnly"(libs.com.android.tools.build.gradle)
     "functionalTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")
-}
-
-metro {
-    debug = true
 }

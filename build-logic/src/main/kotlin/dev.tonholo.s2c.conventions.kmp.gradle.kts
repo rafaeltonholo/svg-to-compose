@@ -1,4 +1,5 @@
 import dev.tonholo.s2c.conventions.AppProperties
+import dev.tonholo.s2c.conventions.inject.configureMetro
 import dev.tonholo.s2c.conventions.kmp.targets.useJvm
 import dev.tonholo.s2c.conventions.kmp.targets.useNative
 import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
@@ -10,6 +11,7 @@ plugins {
     org.jetbrains.kotlin.multiplatform
     com.github.gmazzo.buildconfig
     id("dev.tonholo.s2c.conventions.publication")
+    dev.zacsweers.metro
 }
 
 kotlin {
@@ -29,6 +31,8 @@ buildConfig {
         buildConfigField(name, value.toString())
     }
 }
+
+configureMetro()
 
 @OptIn(InternalKotlinGradlePluginApi::class)
 tasks.withType<KotlinJvmRun> {
