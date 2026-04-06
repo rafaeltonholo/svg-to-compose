@@ -14,6 +14,16 @@ class SvgToComposeContextProviderTest {
         SvgToComposeContextProvider.reset()
     }
 
+    private fun createTestContext(): SvgToComposeContextImpl {
+        val config = object : S2cConfig {
+            override val debug: Boolean = false
+            override val verbose: Boolean = false
+            override val silent: Boolean = false
+            override val stackTrace: Boolean = false
+        }
+        return SvgToComposeContextImpl(initial = config)
+    }
+
     @Test
     fun `given uninitialized provider - when current is accessed - then throws IllegalStateException`() {
         // Arrange - provider is not initialized (fresh state after reset)
@@ -27,13 +37,7 @@ class SvgToComposeContextProviderTest {
     @Test
     fun `given initialized provider - when current is accessed - then returns the context`() {
         // Arrange
-        val config = object : S2cConfig {
-            override val debug: Boolean = false
-            override val verbose: Boolean = false
-            override val silent: Boolean = false
-            override val stackTrace: Boolean = false
-        }
-        val context = SvgToComposeContextImpl(initial = config)
+        val context = createTestContext()
         SvgToComposeContextProvider.initialize(context)
 
         // Act
@@ -58,13 +62,7 @@ class SvgToComposeContextProviderTest {
     @Test
     fun `given initialized provider - when currentOrNull is accessed - then returns the context`() {
         // Arrange
-        val config = object : S2cConfig {
-            override val debug: Boolean = false
-            override val verbose: Boolean = false
-            override val silent: Boolean = false
-            override val stackTrace: Boolean = false
-        }
-        val context = SvgToComposeContextImpl(initial = config)
+        val context = createTestContext()
         SvgToComposeContextProvider.initialize(context)
 
         // Act
@@ -78,13 +76,7 @@ class SvgToComposeContextProviderTest {
     @Test
     fun `given initialized provider - when reset is called - then current throws IllegalStateException`() {
         // Arrange
-        val config = object : S2cConfig {
-            override val debug: Boolean = false
-            override val verbose: Boolean = false
-            override val silent: Boolean = false
-            override val stackTrace: Boolean = false
-        }
-        val context = SvgToComposeContextImpl(initial = config)
+        val context = createTestContext()
         SvgToComposeContextProvider.initialize(context)
 
         // Act
