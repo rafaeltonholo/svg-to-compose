@@ -9,6 +9,9 @@ pluginManagement {
         maven("https://s01.oss.sonatype.org/content/repositories/releases/")
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
