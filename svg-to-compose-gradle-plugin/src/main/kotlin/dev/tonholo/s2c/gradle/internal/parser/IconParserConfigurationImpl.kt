@@ -11,8 +11,11 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.property
 
 private typealias IconMapper = (String) -> String
@@ -69,7 +72,9 @@ internal class IconParserConfigurationImpl(
     val excludePattern: String?
         get() = exclude.orNull?.pattern
 
-    @get:Internal
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:Optional
     internal val templateFile: RegularFileProperty = objectFactory.fileProperty()
 
     @get:Internal

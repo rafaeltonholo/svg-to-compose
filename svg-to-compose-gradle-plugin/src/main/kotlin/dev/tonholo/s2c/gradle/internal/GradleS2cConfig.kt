@@ -11,7 +11,7 @@ import org.gradle.api.logging.Logger
  */
 internal class GradleS2cConfig(logger: Logger) : S2cConfig {
     override val debug: Boolean = logger.isDebugEnabled
-    override val verbose: Boolean = logger.isDebugEnabled
+    override val verbose: Boolean = logger.isInfoEnabled
     override val silent: Boolean = false
     override val stackTrace: Boolean = logger.isDebugEnabled
 }
