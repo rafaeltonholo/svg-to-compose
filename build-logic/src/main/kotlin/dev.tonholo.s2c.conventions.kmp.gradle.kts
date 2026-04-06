@@ -18,7 +18,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
             "-Xcontext-parameters",
-            "-Xskip-prerelease-check",
         )
     }
 }

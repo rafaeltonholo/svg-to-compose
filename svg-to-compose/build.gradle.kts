@@ -3,8 +3,6 @@ import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.SourcesJar
 import dev.tonholo.s2c.conventions.kmp.targets.useJs
 import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
-import dev.zacsweers.metro.gradle.DelicateMetroGradleApi
-import dev.zacsweers.metro.gradle.RequiresIdeSupport
 
 plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
@@ -42,12 +40,6 @@ kotlin {
         wasmJsMain.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
         }
-    }
-
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xexplicit-backing-fields",
-        )
     }
 }
 
