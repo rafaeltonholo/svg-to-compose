@@ -36,7 +36,7 @@ broken golden samples, Detekt failures — so that PRs pass CI on the first try.
 ### Architecture
 
 - [ ] Core logic stays in `commonMain`; platform code in appropriate source sets.
-- [ ] Build configuration uses convention plugins in `buildSrc/`, not duplicated
+- [ ] Build configuration uses convention plugins in `build-logic/`, not duplicated
       in module `build.gradle.kts` files.
 - [ ] Dependencies added to `gradle/libs.versions.toml`, not inlined.
 - [ ] New dependencies support all targets: `jvm`, `macosX64`, `macosArm64`,

@@ -12,6 +12,8 @@ skills.
 # Build
 ./gradlew build                        # Build everything
 ./gradlew :svg-to-compose:build        # Core library only
+./gradlew -p modules/cli build         # CLI module (native + JVM)
+./gradlew -p modules/cli shadowJar     # CLI JVM fat JAR only
 
 # Test
 ./gradlew allTests                     # All KMP targets
@@ -31,7 +33,7 @@ skills.
 
 - **Kotlin Multiplatform** — core logic in `commonMain`, use Okio for file I/O,
   no `java.io` in common code.
-- **Convention plugins** — build config lives in `buildSrc/`, don't duplicate in
+- **Convention plugins** - build config lives in `build-logic/`, don't duplicate in
   modules.
 - **Detekt strict mode** — zero tolerance. Run before committing.
 - **Conventional Commits** — `<type>(<scope>): <subject>` (see

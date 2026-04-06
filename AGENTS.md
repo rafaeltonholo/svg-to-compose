@@ -13,33 +13,37 @@
 
 | Module                         | Description                                                                | AGENTS.md                                                                        |
 |--------------------------------|----------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| `svg-to-compose`               | Core KMP library — SVG/AVG parsing and Compose ImageVector code generation | [svg-to-compose/AGENTS.md](svg-to-compose/AGENTS.md)                             |
+| `svg-to-compose`               | Core KMP library - SVG/AVG parsing and Compose ImageVector code generation | [svg-to-compose/AGENTS.md](svg-to-compose/AGENTS.md)                             |
+| `modules/cli`                  | CLI entry point (Clikt), produces native executables (composite build)     | [modules/cli/AGENTS.md](modules/cli/AGENTS.md)                                   |
 | `svg-to-compose-gradle-plugin` | Gradle plugin for automated SVG/AVG to Compose conversion in builds        | [svg-to-compose-gradle-plugin/AGENTS.md](svg-to-compose-gradle-plugin/AGENTS.md) |
-| `buildSrc`                     | Convention plugins and shared build logic                                  | [buildSrc/AGENTS.md](buildSrc/AGENTS.md)                                         |
+| `build-logic`                  | Convention plugins and shared build logic (included build)                 | [build-logic/AGENTS.md](build-logic/AGENTS.md)                                   |
 | `playground`                   | Android demo app                                                           | [playground/AGENTS.md](playground/AGENTS.md)                                     |
 | `playground-kmp`               | Kotlin Multiplatform demo app                                              | [playground-kmp/AGENTS.md](playground-kmp/AGENTS.md)                             |
-| `samples`                      | Example SVG and AVG files for testing                                      | —                                                                                |
+| `samples`                      | Example SVG and AVG files for testing                                      | -                                                                                |
 
 ## The `s2c` Wrapper Script
 
 The root `./s2c` script is the primary entry point for manual testing and local
-execution.
+execution. It resolves binaries from `modules/cli/build/bin/`.
 
-- **Auto-Build**: If native binaries are missing, the script will automatically
-  invoke `./gradlew` to build them for the host platform.
-- **Auto-Download**: If not in a project directory, it can download pre-built
+- **Native-first**: On supported platforms (macOS arm64, Linux x64, Windows
+  mingwX64), the script uses the native binary (`.kexe`/`.exe`).
+- **JVM fallback**: On unsupported native platforms (e.g. macOS x64), the script
+  falls back to `java -jar` using the Shadow fat JAR built by the CLI module.
+- **Auto-Build**: If binaries are missing, the script invokes Gradle to build
+  them (`./gradlew -p modules/cli <task>`).
+- **Auto-Download**: If not in a project directory, it downloads pre-built
   binaries from GitHub.
-- **Debugging**: Use `./s2c --debug` or `./s2c --verbose` to see detailed logs,
-  including optimizer output.
-- **Upgrade**: Use `./s2c --upgrade` to force a rebuild or re-download of
-  binaries.
+- **Debugging**: Use `./s2c --debug` or `./s2c --verbose` to see detailed logs.
+- **Upgrade**: Use `./s2c --upgrade` to force a rebuild or re-download.
 
 ## Verification Workflow
 
 After making changes to the parser or generator, perform an **Empirical
 Validation**:
 
-1. **Build**: Run `./gradlew :svg-to-compose:build`.
+1. **Build**: Run `./gradlew -p modules/cli buildDebugMacosarm64` (or the
+   appropriate platform target).
 2. **Generate**: Use the `./s2c` script on a sample file:
    ```bash
    ./s2c -o output/TestIcon.kt -p dev.test samples/svg/attention-filled.svg

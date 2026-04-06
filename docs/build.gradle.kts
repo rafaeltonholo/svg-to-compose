@@ -1,6 +1,6 @@
 plugins {
-    org.jetbrains.kotlin.jvm
-    dev.tonholo.s2c.conventions.dokka
+    id("org.jetbrains.kotlin.jvm")
+    id("dev.tonholo.s2c.conventions.dokka")
 }
 
 dependencies {

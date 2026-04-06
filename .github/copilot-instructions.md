@@ -10,7 +10,7 @@ available skills.
 
 - **Kotlin Multiplatform** — core logic in `commonMain`, use Okio for file I/O,
   no `java.io` in common code.
-- **Convention plugins** — build config lives in `buildSrc/`, don't duplicate in
+- **Convention plugins** - build config lives in `build-logic/`, don't duplicate in
   module build files.
 - **Detekt strict mode** — zero issues allowed. Config in `config/detekt.yml`.
 - **Conventional Commits** — `<type>(<scope>): <subject>`.
@@ -23,6 +23,6 @@ Before modifying a module, read its `AGENTS.md`:
 
 - `svg-to-compose/AGENTS.md` — core library
 - `svg-to-compose-gradle-plugin/AGENTS.md` — Gradle plugin
-- `buildSrc/AGENTS.md` — convention plugins
+- `build-logic/AGENTS.md` - convention plugins
 - `playground/AGENTS.md` — Android demo
 - `playground-kmp/AGENTS.md` — KMP demo

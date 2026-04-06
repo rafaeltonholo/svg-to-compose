@@ -3,6 +3,19 @@
 This document describes the data flow and architectural components of the
 `svg-to-compose` tool.
 
+## Module Layout
+
+The tool is split across two main modules:
+
+- **`svg-to-compose`** (core library) - parsing, conversion, and code generation
+  logic. This is a KMP library with no executable entry points.
+- **`modules/cli`** (CLI module) - the Clikt command-line entry point. Depends on
+  the core library and produces native executables (macOS arm64, Linux x64,
+  Windows mingwX64) plus a JVM fat JAR for platforms without native support.
+
+The Gradle plugin (`svg-to-compose-gradle-plugin`) also depends on the core
+library.
+
 ## Data Flow Pipeline
 
 The conversion process follows a linear pipeline managed by the `Processor`

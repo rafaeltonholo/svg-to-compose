@@ -14,7 +14,7 @@ Read [.ai/guidelines.md](../.ai/guidelines.md) first.
 
 - Keep sample code concise and focused on usage patterns.
 - Do not move core parser/converter behavior into this module.
-- Keep shared build behavior in `buildSrc` convention plugins.
+- Keep shared build behavior in `build-logic` convention plugins.
 
 ## Useful Commands
 
