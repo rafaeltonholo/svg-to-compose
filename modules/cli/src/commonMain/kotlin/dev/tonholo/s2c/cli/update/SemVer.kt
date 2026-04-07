@@ -25,15 +25,27 @@ data class SemVer(
 
     companion object {
         private val VERSION_REGEX = Regex("""^v?(\d+)\.(\d+)\.(\d+)$""")
+        private val PRE_RELEASE_REGEX = Regex("""^v?\d+\.\d+\.\d+[+-]""")
+
+        /**
+         * Returns true if the version string contains a pre-release suffix
+         * (e.g. `-SNAPSHOT`, `-rc.1`) or build metadata (e.g. `+build.456`).
+         */
+        fun isPreRelease(version: String): Boolean =
+            PRE_RELEASE_REGEX.containsMatchIn(version.trim())
 
         /**
          * Parses a version string in `vX.Y.Z` or `X.Y.Z` format.
+         *
+         * Pre-release suffixes (e.g. `-SNAPSHOT`, `-rc.1`) and build
+         * metadata (e.g. `+build.456`) are stripped before parsing.
          *
          * @param version the version string to parse.
          * @return a [SemVer] instance, or null if the format is invalid.
          */
         fun parse(version: String): SemVer? {
-            val match = VERSION_REGEX.matchEntire(version.trim()) ?: return null
+            val normalized = version.trim().substringBefore('-').substringBefore('+')
+            val match = VERSION_REGEX.matchEntire(normalized) ?: return null
             val (major, minor, patch) = match.destructured
             return SemVer(
                 major = major.toIntOrNull() ?: return null,
