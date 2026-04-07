@@ -23,12 +23,17 @@ class UpdateCache(
     }
 
     /**
-     * Returns true if the cache file exists and the entry
-     * was checked less than [TTL_MILLIS] milliseconds ago.
+     * Reads the cached entry and returns it only when it was checked
+     * less than [TTL_MILLIS] milliseconds ago. Returns null when the
+     * file is missing, corrupted, or stale.
+     *
+     * This avoids the TOCTOU issue of calling `isFresh` then `read`
+     * separately (two file reads for the same check).
      */
-    fun isFresh(nowEpochMillis: Long): Boolean {
-        val entry = read() ?: return false
-        return (nowEpochMillis - entry.checkedAtEpochMillis) < TTL_MILLIS
+    fun readIfFresh(nowEpochMillis: Long): UpdateCacheEntry? {
+        val entry = read() ?: return null
+        val elapsed = nowEpochMillis - entry.checkedAtEpochMillis
+        return if (elapsed < TTL_MILLIS) entry else null
     }
 
     /**
@@ -51,11 +56,17 @@ class UpdateCache(
     /**
      * Writes the given [entry] to the cache file, creating
      * the cache directory if necessary.
+     *
+     * Cache write failure is non-fatal; the next invocation will retry.
      */
     fun write(entry: UpdateCacheEntry) {
-        fileSystem.createDirectories(cachePath.parent ?: cacheDir)
-        fileSystem.write(cachePath) {
-            writeUtf8(json.encodeToString(UpdateCacheEntry.serializer(), entry))
+        try {
+            fileSystem.createDirectories(cachePath.parent ?: cacheDir)
+            fileSystem.write(cachePath) {
+                writeUtf8(json.encodeToString(entry))
+            }
+        } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
+            // Cache write failure is non-fatal; next invocation will retry.
         }
     }
 

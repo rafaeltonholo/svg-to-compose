@@ -13,7 +13,7 @@ class UpdateCacheTest {
     private val cacheDir = "/home/user/.s2c".toPath()
 
     @Test
-    fun `given no cache file - when isFresh is called - then returns false`() {
+    fun `given no cache file - when readIfFresh is called - then returns null`() {
         // Arrange
         val cache = UpdateCache(
             fileSystem = fileSystem,
@@ -21,10 +21,10 @@ class UpdateCacheTest {
         )
 
         // Act
-        val result = cache.isFresh(nowEpochMillis = BASE_TIME)
+        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
 
         // Assert
-        assertFalse(result)
+        assertNull(result)
     }
 
     @Test
@@ -50,7 +50,7 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given expired cache - when isFresh is called - then returns false`() {
+    fun `given expired cache - when readIfFresh is called - then returns null`() {
         // Arrange
         val cache = UpdateCache(
             fileSystem = fileSystem,
@@ -64,10 +64,10 @@ class UpdateCacheTest {
         cache.write(entry)
 
         // Act
-        val result = cache.isFresh(nowEpochMillis = BASE_TIME)
+        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
 
         // Assert
-        assertFalse(result)
+        assertNull(result)
     }
 
     @Test
@@ -112,7 +112,7 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given fresh cache within 24h - when isFresh is called - then returns true`() {
+    fun `given fresh cache within 24h - when readIfFresh is called - then returns entry`() {
         // Arrange
         val cache = UpdateCache(
             fileSystem = fileSystem,
@@ -126,10 +126,10 @@ class UpdateCacheTest {
         cache.write(entry)
 
         // Act
-        val result = cache.isFresh(nowEpochMillis = BASE_TIME)
+        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
 
         // Assert
-        assertTrue(result)
+        assertEquals(expected = entry.latestVersion, actual = result?.latestVersion)
     }
 
     @Test
@@ -152,64 +152,6 @@ class UpdateCacheTest {
         // Assert
         assertTrue(fileSystem.exists(nonExistentDir))
         assertTrue(fileSystem.exists(nonExistentDir / UpdateCache.CACHE_FILE_NAME))
-    }
-
-    @Test
-    fun `given fresh cache - when readIfFresh is called - then returns cached entry`() {
-        // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-        )
-        val entry = UpdateCacheEntry(
-            latestVersion = "2.3.0",
-            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
-            checkedAtEpochMillis = BASE_TIME - ONE_HOUR_MILLIS,
-        )
-        cache.write(entry)
-
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
-
-        // Assert
-        assertEquals(expected = entry.latestVersion, actual = result?.latestVersion)
-        assertEquals(expected = entry.releaseUrl, actual = result?.releaseUrl)
-    }
-
-    @Test
-    fun `given expired cache - when readIfFresh is called - then returns null`() {
-        // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-        )
-        val entry = UpdateCacheEntry(
-            latestVersion = "2.3.0",
-            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
-            checkedAtEpochMillis = BASE_TIME - TWENTY_FIVE_HOURS_MILLIS,
-        )
-        cache.write(entry)
-
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
-
-        // Assert
-        assertNull(result)
-    }
-
-    @Test
-    fun `given no cache file - when readIfFresh is called - then returns null`() {
-        // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-        )
-
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
-
-        // Assert
-        assertNull(result)
     }
 
     @Test
