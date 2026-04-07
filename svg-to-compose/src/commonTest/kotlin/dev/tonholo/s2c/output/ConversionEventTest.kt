@@ -1,9 +1,13 @@
 package dev.tonholo.s2c.output
 
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -61,7 +65,36 @@ class ConversionEventTest {
         // Act
         val result = config.toString()
         // Assert
-        assert(result.contains("RunConfig"))
+        assertEquals(expected = true, actual = result.contains("RunConfig"))
+    }
+
+    @Test
+    fun `given a ParserConfig - when RunConfig from is called - then fields are mapped correctly`() {
+        // Arrange
+        val parserConfig = ParserConfig(
+            pkg = "com.example.icons",
+            theme = "MyTheme",
+            optimize = true,
+            receiverType = null,
+            addToMaterial = false,
+            kmpPreview = false,
+            noPreview = false,
+            makeInternal = false,
+            minified = false,
+        )
+        // Act
+        val runConfig = RunConfig.from(
+            config = parserConfig,
+            inputPath = "/input/icons",
+            outputPath = "/output/generated",
+            recursive = true,
+        )
+        // Assert
+        assertEquals(expected = "/input/icons", actual = runConfig.inputPath)
+        assertEquals(expected = "/output/generated", actual = runConfig.outputPath)
+        assertEquals(expected = "com.example.icons", actual = runConfig.packageName)
+        assertEquals(expected = true, actual = runConfig.optimizationEnabled)
+        assertEquals(expected = true, actual = runConfig.recursive)
     }
     // endregion
 
@@ -74,14 +107,14 @@ class ConversionEventTest {
             succeeded = 8,
             failed = 2,
             totalDuration = 5.seconds,
-            errorCounts = mapOf("ParseSvgError" to 2),
+            errorCounts = mapOf(ErrorCode.ParseSvgError to 2),
         )
         val stats2 = RunStats(
             totalFiles = 10,
             succeeded = 8,
             failed = 2,
             totalDuration = 5.seconds,
-            errorCounts = mapOf("ParseSvgError" to 2),
+            errorCounts = mapOf(ErrorCode.ParseSvgError to 2),
         )
         // Act & Assert
         assertEquals(expected = stats1, actual = stats2)
@@ -104,11 +137,67 @@ class ConversionEventTest {
         assertEquals(expected = 10, actual = modified.succeeded)
         assertEquals(expected = 0, actual = modified.failed)
     }
+
+    @Test
+    fun `given negative totalFiles - when RunStats is created - then it throws IllegalArgumentException`() {
+        // Arrange & Act & Assert
+        assertFailsWith<IllegalArgumentException> {
+            RunStats(
+                totalFiles = -1,
+                succeeded = 0,
+                failed = 0,
+                totalDuration = 1.seconds,
+                errorCounts = emptyMap(),
+            )
+        }
+    }
+
+    @Test
+    fun `given negative succeeded - when RunStats is created - then it throws IllegalArgumentException`() {
+        // Arrange & Act & Assert
+        assertFailsWith<IllegalArgumentException> {
+            RunStats(
+                totalFiles = 0,
+                succeeded = -1,
+                failed = 0,
+                totalDuration = 1.seconds,
+                errorCounts = emptyMap(),
+            )
+        }
+    }
+
+    @Test
+    fun `given negative failed - when RunStats is created - then it throws IllegalArgumentException`() {
+        // Arrange & Act & Assert
+        assertFailsWith<IllegalArgumentException> {
+            RunStats(
+                totalFiles = 0,
+                succeeded = 0,
+                failed = -1,
+                totalDuration = 1.seconds,
+                errorCounts = emptyMap(),
+            )
+        }
+    }
+
+    @Test
+    fun `given succeeded plus failed not equal to totalFiles - when RunStats is created - then it throws IllegalArgumentException`() {
+        // Arrange & Act & Assert
+        assertFailsWith<IllegalArgumentException> {
+            RunStats(
+                totalFiles = 10,
+                succeeded = 5,
+                failed = 3,
+                totalDuration = 1.seconds,
+                errorCounts = emptyMap(),
+            )
+        }
+    }
     // endregion
 
     // region ConversionPhase
     @Test
-    fun `given ConversionPhase enum - when values called - then all four phases are present`() {
+    fun `given ConversionPhase enum - when entries are listed - then they follow the processing pipeline order`() {
         // Arrange & Act
         val phases = ConversionPhase.entries
         // Assert
@@ -133,20 +222,20 @@ class ConversionEventTest {
     fun `given FileResult Failed - when created - then it holds error code and message`() {
         // Arrange
         val result = FileResult.Failed(
-            errorCode = "ParseSvgError",
+            errorCode = ErrorCode.ParseSvgError,
             message = "Unable to parse SVG file",
         )
         // Act & Assert
         assertIs<FileResult.Failed>(result)
-        assertEquals(expected = "ParseSvgError", actual = result.errorCode)
+        assertEquals(expected = ErrorCode.ParseSvgError, actual = result.errorCode)
         assertEquals(expected = "Unable to parse SVG file", actual = result.message)
     }
 
     @Test
     fun `given two identical FileResult Failed - when compared - then they are equal`() {
         // Arrange
-        val result1 = FileResult.Failed(errorCode = "E1", message = "msg")
-        val result2 = FileResult.Failed(errorCode = "E1", message = "msg")
+        val result1 = FileResult.Failed(errorCode = ErrorCode.FileNotFoundError, message = "msg")
+        val result2 = FileResult.Failed(errorCode = ErrorCode.FileNotFoundError, message = "msg")
         // Act & Assert
         assertEquals(expected = result1, actual = result2)
     }
@@ -154,7 +243,7 @@ class ConversionEventTest {
 
     // region ConversionEvent.RunStarted
     @Test
-    fun `given RunStarted event - when created - then it holds config, totalFiles, and version`() {
+    fun `given RunStarted event - when created - then it holds config and totalFiles and version`() {
         // Arrange
         val config = RunConfig(
             inputPath = "/in",
@@ -227,7 +316,7 @@ class ConversionEventTest {
     fun `given FileCompleted event with Failed result - when created - then it holds error info`() {
         // Arrange
         val failResult = FileResult.Failed(
-            errorCode = "ParseSvgError",
+            errorCode = ErrorCode.ParseSvgError,
             message = "bad svg",
         )
         // Act
@@ -238,7 +327,19 @@ class ConversionEventTest {
         )
         // Assert
         val failed = assertIs<FileResult.Failed>(event.result)
-        assertEquals(expected = "ParseSvgError", actual = failed.errorCode)
+        assertEquals(expected = ErrorCode.ParseSvgError, actual = failed.errorCode)
+    }
+
+    @Test
+    fun `given FileCompleted event with Duration ZERO - when created - then duration is zero`() {
+        // Arrange & Act
+        val event = ConversionEvent.FileCompleted(
+            fileName = "instant.svg",
+            duration = Duration.ZERO,
+            result = FileResult.Success,
+        )
+        // Assert
+        assertEquals(expected = Duration.ZERO, actual = event.duration)
     }
     // endregion
 
@@ -251,7 +352,7 @@ class ConversionEventTest {
             succeeded = 9,
             failed = 1,
             totalDuration = 3.seconds,
-            errorCounts = mapOf("E1" to 1),
+            errorCounts = mapOf(ErrorCode.ParseSvgError to 1),
         )
         // Act
         val event = ConversionEvent.RunCompleted(stats = stats)
@@ -277,6 +378,20 @@ class ConversionEventTest {
         assertEquals(expected = "2.0.0", actual = event.latest)
         assertEquals(expected = "https://github.com/example/releases/v2.0.0", actual = event.releaseUrl)
         assertEquals(expected = false, actual = event.isWrapper)
+    }
+
+    @Test
+    fun `given UpdateAvailable event with isWrapper true - when created - then isWrapper is true`() {
+        // Arrange & Act
+        val event = ConversionEvent.UpdateAvailable(
+            current = "1.0.0",
+            latest = "1.1.0",
+            releaseUrl = "https://github.com/example/releases/v1.1.0",
+            isWrapper = true,
+        )
+        // Assert
+        assertIs<ConversionEvent>(event)
+        assertEquals(expected = true, actual = event.isWrapper)
     }
     // endregion
 }

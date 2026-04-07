@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.output
 
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.time.Duration
 
 /**
@@ -68,6 +70,10 @@ sealed interface ConversionEvent {
 
 /**
  * The ordered phases a single file goes through during conversion.
+ *
+ * Declaration order represents the processing pipeline sequence.
+ * Renderers may rely on [ordinal] to display progress indicators,
+ * so new phases must be inserted at the correct pipeline position.
  */
 enum class ConversionPhase {
     Optimizing,
@@ -88,14 +94,20 @@ sealed interface FileResult {
     /**
      * The file conversion failed.
      *
-     * @property errorCode a machine-readable identifier for the failure.
+     * @property errorCode the [ErrorCode] identifying the failure category.
      * @property message a human-readable description of what went wrong.
      */
-    data class Failed(val errorCode: String, val message: String) : FileResult
+    data class Failed(val errorCode: ErrorCode, val message: String) : FileResult
 }
 
 /**
- * Configuration snapshot describing the parameters of a conversion run.
+ * Display-oriented snapshot of the parameters for a conversion run.
+ *
+ * This is intentionally a separate type from [dev.tonholo.s2c.runtime.S2cConfig]
+ * and [ParserConfig]. While those types control runtime behavior and may be mutable
+ * or extended over time, [RunConfig] captures exactly the information that output
+ * renderers need to display in headers and summaries. Keeping it decoupled avoids
+ * leaking internal configuration details into the rendering layer.
  *
  * @property inputPath the source file or directory path.
  * @property outputPath the destination file or directory path.
@@ -109,7 +121,29 @@ data class RunConfig(
     val packageName: String,
     val optimizationEnabled: Boolean,
     val recursive: Boolean,
-)
+) {
+    companion object {
+        /**
+         * Creates a [RunConfig] from the runtime configuration objects.
+         *
+         * This is the single translation site between internal config types and the
+         * display-oriented [RunConfig].
+         *
+         * @param config the parser configuration for this run.
+         * @param inputPath the source file or directory path.
+         * @param outputPath the destination file or directory path.
+         * @param recursive whether directory traversal is recursive.
+         */
+        fun from(config: ParserConfig, inputPath: String, outputPath: String, recursive: Boolean): RunConfig =
+            RunConfig(
+                inputPath = inputPath,
+                outputPath = outputPath,
+                packageName = config.pkg,
+                optimizationEnabled = config.optimize,
+                recursive = recursive,
+            )
+    }
+}
 
 /**
  * Aggregate statistics for a completed conversion run.
@@ -118,12 +152,21 @@ data class RunConfig(
  * @property succeeded the number of files that converted successfully.
  * @property failed the number of files that failed to convert.
  * @property totalDuration the wall-clock duration of the entire run.
- * @property errorCounts per-error-code counts for failures.
+ * @property errorCounts per-[ErrorCode] counts for failures.
  */
 data class RunStats(
     val totalFiles: Int,
     val succeeded: Int,
     val failed: Int,
     val totalDuration: Duration,
-    val errorCounts: Map<String, Int>,
-)
+    val errorCounts: Map<ErrorCode, Int>,
+) {
+    init {
+        require(totalFiles >= 0) { "totalFiles must be non-negative, was $totalFiles" }
+        require(succeeded >= 0) { "succeeded must be non-negative, was $succeeded" }
+        require(failed >= 0) { "failed must be non-negative, was $failed" }
+        require(succeeded + failed == totalFiles) {
+            "succeeded ($succeeded) + failed ($failed) must equal totalFiles ($totalFiles)"
+        }
+    }
+}
