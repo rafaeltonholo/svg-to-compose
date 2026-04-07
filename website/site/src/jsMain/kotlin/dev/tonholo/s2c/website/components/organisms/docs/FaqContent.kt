@@ -107,7 +107,7 @@ private fun HowToConvertSection() {
                 |   --theme com.app.theme.AppTheme \
                 |   --output Icon.kt \
                 |   icon.svg
-""".trimMargin(),
+            """.trimMargin(),
             language = "shell",
             filename = "Terminal",
         )
