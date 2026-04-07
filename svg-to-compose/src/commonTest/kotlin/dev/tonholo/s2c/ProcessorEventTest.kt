@@ -68,12 +68,12 @@ class ProcessorEventTest {
         },
         existsResult: Boolean = true,
     ): Processor {
-        val inputPath = "/input/icon.svg".toPath()
-        val outputPath = "/output/Icon.kt".toPath()
+        val inputPath = if (isDirectory) "/input".toPath() else "/input/icon.svg".toPath()
+        val outputPath = if (isDirectory) "/output".toPath() else "/output/Icon.kt".toPath()
 
         val fileManager = fakeFileManager {
             isDirectory { path ->
-                if (path == inputPath) isDirectory else false
+                if (path == inputPath) isDirectory else path.name.contains('.').not()
             }
             exists { existsResult }
             findFilesToProcess { _, _, _, _ ->
