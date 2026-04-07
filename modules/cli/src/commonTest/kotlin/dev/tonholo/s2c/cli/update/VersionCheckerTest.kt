@@ -4,6 +4,8 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -22,7 +24,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given fresh cache with newer version - when check is called - then returns UpdateAvailable`() {
+    fun `given fresh cache with newer version - when check is called - then returns UpdateAvailable`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
@@ -37,6 +39,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -53,7 +56,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given fresh cache with same version - when check is called - then returns NoUpdate`() {
+    fun `given fresh cache with same version - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
@@ -68,6 +71,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -78,7 +82,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given expired cache - when check is called - then fetches from remote`() {
+    fun `given expired cache - when check is called - then fetches from remote`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
@@ -97,6 +101,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { fetchedRelease },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -108,7 +113,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given fetch failure - when check is called - then returns NoUpdate`() {
+    fun `given fetch failure - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val checker = VersionChecker(
@@ -116,6 +121,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -126,7 +132,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given current version newer than latest - when check is called - then returns NoUpdate`() {
+    fun `given current version newer than latest - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
@@ -141,6 +147,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -151,7 +158,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given no cache and successful fetch - when check is called - then caches result`() {
+    fun `given no cache and successful fetch - when check is called - then caches result`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val fetchedRelease = LatestReleaseInfo(
@@ -163,6 +170,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { fetchedRelease },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -174,7 +182,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given invalid current version - when check is called - then returns NoUpdate`() {
+    fun `given invalid current version - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val checker = VersionChecker(
@@ -182,6 +190,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -192,7 +201,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given current version is SNAPSHOT - when latest is same base version - then returns NoUpdate`() {
+    fun `given current version is SNAPSHOT - when latest is same base version - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
@@ -207,6 +216,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -217,7 +227,7 @@ class VersionCheckerTest {
     }
 
     @Test
-    fun `given GitHub returns pre-release tag - when check is called - then returns NoUpdate`() {
+    fun `given GitHub returns pre-release tag - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
         val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val preReleaseInfo = LatestReleaseInfo(
@@ -229,6 +239,7 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { preReleaseInfo },
             nowEpochMillis = { BASE_TIME },
+            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act

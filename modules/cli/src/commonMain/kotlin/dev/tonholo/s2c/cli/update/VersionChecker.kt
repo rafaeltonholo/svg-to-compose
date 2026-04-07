@@ -1,5 +1,8 @@
 package dev.tonholo.s2c.cli.update
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+
 // TODO(#304): Wire VersionChecker into CLI startup via CliGraph and emit UpdateAvailable event after RunCompleted
 
 /**
@@ -16,12 +19,14 @@ package dev.tonholo.s2c.cli.update
  * @param cache the [UpdateCache] used for reading and writing cached results.
  * @param fetcher the [GitHubReleaseFetcher] abstraction for remote lookups.
  * @param nowEpochMillis provider for the current time in epoch milliseconds.
+ * @param ioDispatcher the [CoroutineDispatcher] used for IO-bound work (file and network).
  */
 class VersionChecker(
     private val currentVersion: String,
     private val cache: UpdateCache,
     private val fetcher: GitHubReleaseFetcher,
     private val nowEpochMillis: () -> Long,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
     /**
      * Checks whether a newer version of the CLI is available.
@@ -32,18 +37,18 @@ class VersionChecker(
      * 4. Compares the current version with the latest. Returns
      *    [UpdateCheckResult.UpdateAvailable] only when the latest is strictly newer.
      */
-    fun check(): UpdateCheckResult {
+    suspend fun check(): UpdateCheckResult = withContext(ioDispatcher) {
         val current = SemVer.parse(currentVersion)
-            ?: return UpdateCheckResult.NoUpdate
+            ?: return@withContext UpdateCheckResult.NoUpdate
 
         val now = nowEpochMillis()
         val entry = resolveLatest(now)
-            ?: return UpdateCheckResult.NoUpdate
+            ?: return@withContext UpdateCheckResult.NoUpdate
 
         val latest = SemVer.parse(entry.latestVersion)
-            ?: return UpdateCheckResult.NoUpdate
+            ?: return@withContext UpdateCheckResult.NoUpdate
 
-        return if (latest > current) {
+        if (latest > current) {
             UpdateCheckResult.UpdateAvailable(
                 current = current,
                 latest = latest,
@@ -59,7 +64,7 @@ class VersionChecker(
      * Uses the cache if it is still fresh, otherwise fetches
      * from the remote and writes the result to cache.
      */
-    private fun resolveLatest(now: Long): UpdateCacheEntry? {
+    private suspend fun resolveLatest(now: Long): UpdateCacheEntry? {
         val cached = cache.readIfFresh(nowEpochMillis = now)
         if (cached != null) {
             return cached

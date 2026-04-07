@@ -12,7 +12,7 @@ fun interface GitHubReleaseFetcher {
      *
      * @return the [LatestReleaseInfo], or null on failure.
      */
-    fun fetch(): LatestReleaseInfo?
+    suspend fun fetch(): LatestReleaseInfo?
 }
 
 /**

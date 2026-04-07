@@ -24,10 +24,12 @@ kotlin {
             implementation(cliLibs.com.github.ajalt.clikt)
             implementation(cliLibs.com.github.ajalt.clikt.markdown)
             implementation(libs.com.squareup.okio)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.test)
         }
     }
 }
