@@ -5,11 +5,7 @@ package dev.tonholo.s2c.cli.update
  *
  * Supports parsing from both `vX.Y.Z` and `X.Y.Z` formats.
  */
-data class SemVer(
-    val major: Int,
-    val minor: Int,
-    val patch: Int,
-) : Comparable<SemVer> {
+data class SemVer(val major: Int, val minor: Int, val patch: Int) : Comparable<SemVer> {
 
     override fun compareTo(other: SemVer): Int {
         val majorDiff = major.compareTo(other.major)
@@ -31,8 +27,7 @@ data class SemVer(
          * Returns true if the version string contains a pre-release suffix
          * (e.g. `-SNAPSHOT`, `-rc.1`) or build metadata (e.g. `+build.456`).
          */
-        fun isPreRelease(version: String): Boolean =
-            PRE_RELEASE_REGEX.containsMatchIn(version.trim())
+        fun isPreRelease(version: String): Boolean = PRE_RELEASE_REGEX.containsMatchIn(version.trim())
 
         /**
          * Parses a version string in `vX.Y.Z` or `X.Y.Z` format.
@@ -46,12 +41,12 @@ data class SemVer(
         fun parse(version: String): SemVer? {
             val normalized = version.trim().substringBefore('-').substringBefore('+')
             val match = VERSION_REGEX.matchEntire(normalized) ?: return null
-            val (major, minor, patch) = match.destructured
-            return SemVer(
-                major = major.toIntOrNull() ?: return null,
-                minor = minor.toIntOrNull() ?: return null,
-                patch = patch.toIntOrNull() ?: return null,
-            )
+            val (majorStr, minorStr, patchStr) = match.destructured
+            val major = majorStr.toIntOrNull()
+            val minor = minorStr.toIntOrNull()
+            val patch = patchStr.toIntOrNull()
+            if (major == null || minor == null || patch == null) return null
+            return SemVer(major = major, minor = minor, patch = patch)
         }
     }
 }

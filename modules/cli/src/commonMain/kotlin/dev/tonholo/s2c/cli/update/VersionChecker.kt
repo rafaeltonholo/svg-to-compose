@@ -65,25 +65,21 @@ class VersionChecker(
      * from the remote and writes the result to cache.
      */
     private suspend fun resolveLatest(now: Long): UpdateCacheEntry? {
-        val cached = cache.readIfFresh(nowEpochMillis = now)
-        if (cached != null) {
-            return cached
-        }
+        cache.readIfFresh(nowEpochMillis = now)?.let { return it }
 
         val release = fetcher.fetch() ?: return null
 
         // Reject pre-release tags from GitHub so users are not
         // prompted to upgrade to unstable versions.
-        if (SemVer.isPreRelease(release.tagName)) return null
+        val version = release.tagName
+            .takeUnless { SemVer.isPreRelease(it) }
+            ?.let { SemVer.parse(it) }
+            ?: return null
 
-        val version = SemVer.parse(release.tagName) ?: return null
-
-        val entry = UpdateCacheEntry(
+        return UpdateCacheEntry(
             latestVersion = version.toString(),
             releaseUrl = release.releaseUrl,
             checkedAtEpochMillis = now,
-        )
-        cache.write(entry)
-        return entry
+        ).also { cache.write(it) }
     }
 }
