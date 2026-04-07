@@ -16,6 +16,30 @@ import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 
+/**
+ * Factory interface for creating and managing optimizers.
+ */
+interface OptimizerFactory {
+    /**
+     * Verify the availability of dependencies required by the optimizers.
+     *
+     * @param hasSvg flag indicating whether to check for SVG-related dependencies.
+     * @param hasAvg flag indicating whether to check for AVG-related dependencies.
+     * @throws MissingDependencyException when an optimizer dependency is missing
+     */
+    fun verifyDependency(hasSvg: Boolean, hasAvg: Boolean)
+
+    /**
+     * Checks the type of file (SVG or AVG) and invokes the correct
+     * optimization process using the appropriate optimization tools.
+     *
+     * @param file A [Path] object that represents the file which
+     * optimization process is to be performed upon.
+     * @return The [Path] object of the optimized file.
+     */
+    fun optimize(file: Path): Path
+}
+
 sealed class Optimizer(private val logger: Logger) {
     /**
      * Represents the external command that will be used
@@ -189,7 +213,7 @@ sealed class Optimizer(private val logger: Logger) {
     }
 
     @Inject
-    class Factory(private val logger: Logger, fileManager: FileManager) {
+    class Factory(private val logger: Logger, fileManager: FileManager) : OptimizerFactory {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */
@@ -213,7 +237,7 @@ sealed class Optimizer(private val logger: Logger) {
          * dependencies.
          * @throws MissingDependencyException when an optimizer dependency is missing
          */
-        fun verifyDependency(hasSvg: Boolean, hasAvg: Boolean) {
+        override fun verifyDependency(hasSvg: Boolean, hasAvg: Boolean) {
             var hasMissingDependency = false
             fun showErrorLog(missingDependency: Boolean, optimizer: Optimizer) {
                 if (missingDependency) {
@@ -258,7 +282,7 @@ sealed class Optimizer(private val logger: Logger) {
          * optimization process is to be performed upon.
          * @return The [Path] object of the optimized file.
          */
-        fun optimize(file: Path): Path {
+        override fun optimize(file: Path): Path {
             logger.output("🏎️  Optimizing ${file.extension}")
             logger.printEmpty()
             return if (file.extension == FileType.Svg.extension) {

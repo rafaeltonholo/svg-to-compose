@@ -2,6 +2,8 @@ package dev.tonholo.s2c
 
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.emitter.OutputFormat
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
 import dev.tonholo.s2c.emitter.template.config.TemplateConfigReader
 import dev.tonholo.s2c.error.ErrorCode
@@ -13,9 +15,10 @@ import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.inject.TempDirectory
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.IconWriter
+import dev.tonholo.s2c.io.DefaultTempFileWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.optimizer.Optimizer
+import dev.tonholo.s2c.optimizer.OptimizerFactory
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
@@ -34,13 +37,13 @@ class Processor(
     private val fileManager: FileManager,
     private val iconWriter: IconWriter,
     @Assisted @param:TempDirectory private val tempDirectory: Path?,
-    private val optimizers: Optimizer.Factory,
+    private val optimizers: OptimizerFactory,
     private val parser: ImageParser,
     private val codeEmitterFactory: CodeEmitterFactory,
     private val editorConfigReader: EditorConfigReader,
     private val templateConfigReader: TemplateConfigReader,
 ) {
-    private val tempFileWriter = TempFileWriter(logger, fileManager, tempDirectory)
+    private val tempFileWriter: TempFileWriter = DefaultTempFileWriter(logger, fileManager, tempDirectory)
 
     @AssistedFactory
     fun interface Factory {
@@ -296,7 +299,7 @@ class Processor(
      */
     private fun processFiles(
         files: List<Path>,
-        optimizers: Optimizer.Factory?,
+        optimizers: OptimizerFactory?,
         outputPath: Path,
         parserConfig: ParserConfig,
         runRecursively: Boolean,
@@ -356,7 +359,7 @@ class Processor(
      */
     private fun processFile(
         file: Path,
-        optimizers: Optimizer.Factory?,
+        optimizers: OptimizerFactory?,
         output: Path,
         config: ParserConfig,
         recursive: Boolean,
@@ -400,7 +403,10 @@ class Processor(
             output / relativePackage.removePrefix(".").replace(".", "/")
         }
 
-        val resolved = config.formatConfig ?: editorConfigReader.resolve(iconOutput)
+        val resolved = config.formatConfig ?: editorConfigReader.resolve(
+            outputPath = iconOutput,
+            defaults = FormatConfig(),
+        )
         val formatConfig = config.formatOverrides?.applyTo(resolved) ?: resolved
         val templateEmitterConfig = config.template?.let { templateConfig ->
             val configPath = templateConfig.configPath
@@ -413,6 +419,7 @@ class Processor(
             }
         }
         val emitter = codeEmitterFactory.create(
+            outputFormat = OutputFormat.IMAGE_VECTOR,
             formatConfig = formatConfig,
             templateEmitterConfig = templateEmitterConfig,
         )

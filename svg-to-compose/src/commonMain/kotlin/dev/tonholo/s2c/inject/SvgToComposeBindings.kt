@@ -3,10 +3,22 @@ package dev.tonholo.s2c.inject
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.SvgToComposeContextImpl
 import dev.tonholo.s2c.domain.FileType
+import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
+import dev.tonholo.s2c.emitter.editorconfig.DefaultEditorConfigReader
+import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
+import dev.tonholo.s2c.emitter.template.config.DefaultTemplateConfigReader
+import dev.tonholo.s2c.emitter.template.config.TemplateConfigReader
+import dev.tonholo.s2c.io.DefaultIconWriter
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.optimizer.Optimizer
+import dev.tonholo.s2c.optimizer.OptimizerFactory
 import dev.tonholo.s2c.parser.AvgContentParser
 import dev.tonholo.s2c.parser.ContentParser
+import dev.tonholo.s2c.parser.DefaultImageParser
+import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.SvgContentParser
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.BindingContainer
@@ -29,6 +41,24 @@ import okio.FileSystem
 interface SvgToComposeBindings {
     @Binds
     val SvgToComposeContextImpl.context: SvgToComposeContext
+
+    @Binds
+    val DefaultIconWriter.iconWriter: IconWriter
+
+    @Binds
+    val DefaultImageParser.imageParser: ImageParser
+
+    @Binds
+    val DefaultCodeEmitterFactory.codeEmitterFactory: CodeEmitterFactory
+
+    @Binds
+    val DefaultEditorConfigReader.editorConfigReader: EditorConfigReader
+
+    @Binds
+    val DefaultTemplateConfigReader.templateConfigReader: TemplateConfigReader
+
+    @Binds
+    val Optimizer.Factory.optimizerFactory: OptimizerFactory
 
     companion object {
         @Provides

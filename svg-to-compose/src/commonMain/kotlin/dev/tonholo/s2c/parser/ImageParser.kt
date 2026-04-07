@@ -25,8 +25,7 @@ import okio.Path
  * @property fileManager reads file content from the file system.
  * @property contentParsers maps each [FileType] to its [ContentParser] strategy.
  */
-@Inject
-class ImageParser(private val fileManager: FileManager, private val contentParsers: Map<FileType, ContentParser>) {
+interface ImageParser {
     /**
      * Parses a file into an [IconFileContents] domain model.
      *
@@ -39,7 +38,15 @@ class ImageParser(private val fileManager: FileManager, private val contentParse
      * @throws ExitProgramException if the file extension is not supported.
      * @return the parsed [IconFileContents].
      */
-    fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents {
+    fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents
+}
+
+@Inject
+class DefaultImageParser(
+    private val fileManager: FileManager,
+    private val contentParsers: Map<FileType, ContentParser>,
+) : ImageParser {
+    override fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents {
         val extension = file.extension
         val fileType = FileType.entries.find { it.extension == extension }
         val parser = fileType?.let(contentParsers::get)

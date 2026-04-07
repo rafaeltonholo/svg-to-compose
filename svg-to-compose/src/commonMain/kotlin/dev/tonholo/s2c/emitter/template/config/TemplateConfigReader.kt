@@ -12,21 +12,15 @@ private const val TEMPLATE_FILENAME = "s2c.template.toml"
  *
  * Auto-discovery walks up from the output directory looking for the
  * template file, following the same pattern as [EditorConfigReader].
- *
- * @property fileManager The file manager for checking file existence and reading content.
  */
-@Inject
-class TemplateConfigReader(private val fileManager: FileManager) {
+interface TemplateConfigReader {
     /**
      * Reads and parses a template config from an explicit path.
      *
      * @param templatePath The path to the `s2c.template.toml` file.
      * @return The parsed [TemplateEmitterConfig].
      */
-    fun resolve(templatePath: Path): TemplateEmitterConfig {
-        val content = fileManager.readContent(templatePath)
-        return TemplateConfigParser.parse(content)
-    }
+    fun resolve(templatePath: Path): TemplateEmitterConfig
 
     /**
      * Discovers a template config by walking up from [outputPath].
@@ -34,7 +28,22 @@ class TemplateConfigReader(private val fileManager: FileManager) {
      * @param outputPath The output file or directory path to start searching from.
      * @return The parsed [TemplateEmitterConfig], or `null` if no template file is found.
      */
-    fun discover(outputPath: Path): TemplateEmitterConfig? {
+    fun discover(outputPath: Path): TemplateEmitterConfig?
+}
+
+/**
+ * Default implementation of [TemplateConfigReader].
+ *
+ * @property fileManager The file manager for checking file existence and reading content.
+ */
+@Inject
+class DefaultTemplateConfigReader(private val fileManager: FileManager) : TemplateConfigReader {
+    override fun resolve(templatePath: Path): TemplateEmitterConfig {
+        val content = fileManager.readContent(templatePath)
+        return TemplateConfigParser.parse(content)
+    }
+
+    override fun discover(outputPath: Path): TemplateEmitterConfig? {
         var dir: Path? = if (isDirectory(outputPath)) outputPath else outputPath.parent
 
         while (dir != null) {

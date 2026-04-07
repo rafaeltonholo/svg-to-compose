@@ -5,14 +5,23 @@ import dev.tonholo.s2c.logger.Logger
 import okio.Path
 import okio.Path.Companion.toPath
 
-class TempFileWriter(private val logger: Logger, private val fileManager: FileManager, baseDirectory: Path? = null) {
-    private val tempFolder: Path = (baseDirectory ?: S2C_TEMP_FOLDER.toPath())
+interface TempFileWriter {
+    fun create(file: Path): Path
+    fun clear()
 
     companion object {
         const val S2C_TEMP_FOLDER = ".s2c/temp"
     }
+}
 
-    fun create(file: Path): Path = logger.debugSection("Creating temporary file") {
+class DefaultTempFileWriter(
+    private val logger: Logger,
+    private val fileManager: FileManager,
+    baseDirectory: Path? = null,
+) : TempFileWriter {
+    private val tempFolder: Path = (baseDirectory ?: TempFileWriter.S2C_TEMP_FOLDER.toPath())
+
+    override fun create(file: Path): Path = logger.debugSection("Creating temporary file") {
         val tempDir = tempFolder / file.encodeToMd5()
         fileManager.createDirectories(dir = tempDir, mustCreate = false)
 
@@ -23,7 +32,7 @@ class TempFileWriter(private val logger: Logger, private val fileManager: FileMa
         return@debugSection targetFile
     }
 
-    fun clear() {
+    override fun clear() {
         logger.debugSection("Deleting temp files") {
             fileManager.deleteRecursively(tempFolder)
         }
