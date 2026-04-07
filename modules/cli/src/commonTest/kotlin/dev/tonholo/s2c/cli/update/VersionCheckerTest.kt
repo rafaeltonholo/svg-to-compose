@@ -4,12 +4,17 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 
 class VersionCheckerTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
+    private val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+    }
 
     @AfterTest
     fun tearDown() {
@@ -19,7 +24,7 @@ class VersionCheckerTest {
     @Test
     fun `given fresh cache with newer version - when check is called - then returns UpdateAvailable`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "2.3.0",
@@ -50,7 +55,7 @@ class VersionCheckerTest {
     @Test
     fun `given fresh cache with same version - when check is called - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "2.0.0",
@@ -75,7 +80,7 @@ class VersionCheckerTest {
     @Test
     fun `given expired cache - when check is called - then fetches from remote`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "1.0.0",
@@ -105,7 +110,7 @@ class VersionCheckerTest {
     @Test
     fun `given fetch failure - when check is called - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val checker = VersionChecker(
             currentVersion = "2.0.0",
             cache = cache,
@@ -123,7 +128,7 @@ class VersionCheckerTest {
     @Test
     fun `given current version newer than latest - when check is called - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "1.0.0",
@@ -148,7 +153,7 @@ class VersionCheckerTest {
     @Test
     fun `given no cache and successful fetch - when check is called - then caches result`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val fetchedRelease = LatestReleaseInfo(
             tagName = "v3.0.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v3.0.0",
@@ -171,7 +176,7 @@ class VersionCheckerTest {
     @Test
     fun `given invalid current version - when check is called - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val checker = VersionChecker(
             currentVersion = "invalid",
             cache = cache,
@@ -189,7 +194,7 @@ class VersionCheckerTest {
     @Test
     fun `given current version is SNAPSHOT - when latest is same base version - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "3.0.0",
@@ -214,7 +219,7 @@ class VersionCheckerTest {
     @Test
     fun `given GitHub returns pre-release tag - when check is called - then returns NoUpdate`() {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir)
+        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
         val preReleaseInfo = LatestReleaseInfo(
             tagName = "v4.0.0-rc.1",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v4.0.0-rc.1",

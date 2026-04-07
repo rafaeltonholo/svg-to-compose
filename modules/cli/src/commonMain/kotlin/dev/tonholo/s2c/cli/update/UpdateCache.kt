@@ -14,13 +14,9 @@ import okio.Path
 class UpdateCache(
     private val fileSystem: FileSystem,
     private val cacheDir: Path,
+    private val json: Json,
 ) {
     private val cachePath: Path get() = cacheDir / CACHE_FILE_NAME
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-        prettyPrint = true
-    }
 
     /**
      * Reads the cached entry and returns it only when it was checked

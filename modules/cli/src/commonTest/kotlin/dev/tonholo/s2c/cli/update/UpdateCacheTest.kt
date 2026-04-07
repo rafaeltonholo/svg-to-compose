@@ -5,12 +5,17 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 
 class UpdateCacheTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
+    private val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+    }
 
     @AfterTest
     fun tearDown() {
@@ -23,6 +28,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
 
         // Act
@@ -38,6 +44,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
@@ -60,6 +67,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
@@ -86,6 +94,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
 
         // Act
@@ -101,6 +110,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
@@ -122,6 +132,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
@@ -144,6 +155,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = nonExistentDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "1.0.0",
@@ -165,6 +177,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = fileSystem,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
@@ -190,6 +203,7 @@ class UpdateCacheTest {
         val cache = UpdateCache(
             fileSystem = readOnlyFs,
             cacheDir = cacheDir,
+            json = json,
         )
         val entry = UpdateCacheEntry(
             latestVersion = "1.0.0",
