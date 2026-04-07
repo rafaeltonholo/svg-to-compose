@@ -6,6 +6,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
+import okio.Path
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -18,6 +19,13 @@ class VersionCheckerTest {
         prettyPrint = true
     }
 
+    private fun createCache(dir: Path = cacheDir) = UpdateCache(
+        fileSystem = fileSystem,
+        cacheDir = dir,
+        json = json,
+        ioDispatcher = Dispatchers.Unconfined,
+    )
+
     @AfterTest
     fun tearDown() {
         fileSystem.checkNoOpenFiles()
@@ -26,7 +34,7 @@ class VersionCheckerTest {
     @Test
     fun `given fresh cache with newer version - when check is called - then returns UpdateAvailable`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "2.3.0",
@@ -39,7 +47,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -58,7 +65,7 @@ class VersionCheckerTest {
     @Test
     fun `given fresh cache with same version - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "2.0.0",
@@ -71,7 +78,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -84,7 +90,7 @@ class VersionCheckerTest {
     @Test
     fun `given expired cache - when check is called - then fetches from remote`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "1.0.0",
@@ -101,7 +107,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { fetchedRelease },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -115,13 +120,12 @@ class VersionCheckerTest {
     @Test
     fun `given fetch failure - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         val checker = VersionChecker(
             currentVersion = "2.0.0",
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -134,7 +138,7 @@ class VersionCheckerTest {
     @Test
     fun `given current version newer than latest - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "1.0.0",
@@ -147,7 +151,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -160,7 +163,7 @@ class VersionCheckerTest {
     @Test
     fun `given no cache and successful fetch - when check is called - then caches result`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         val fetchedRelease = LatestReleaseInfo(
             tagName = "v3.0.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v3.0.0",
@@ -170,7 +173,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { fetchedRelease },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -184,13 +186,12 @@ class VersionCheckerTest {
     @Test
     fun `given invalid current version - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         val checker = VersionChecker(
             currentVersion = "invalid",
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -203,7 +204,7 @@ class VersionCheckerTest {
     @Test
     fun `given current version is SNAPSHOT - when latest is same base version - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         cache.write(
             UpdateCacheEntry(
                 latestVersion = "3.0.0",
@@ -216,7 +217,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { null },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act
@@ -229,7 +229,7 @@ class VersionCheckerTest {
     @Test
     fun `given GitHub returns pre-release tag - when check is called - then returns NoUpdate`() = runTest {
         // Arrange
-        val cache = UpdateCache(fileSystem = fileSystem, cacheDir = cacheDir, json = json)
+        val cache = createCache()
         val preReleaseInfo = LatestReleaseInfo(
             tagName = "v4.0.0-rc.1",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v4.0.0-rc.1",
@@ -239,7 +239,6 @@ class VersionCheckerTest {
             cache = cache,
             fetcher = GitHubReleaseFetcher { preReleaseInfo },
             nowEpochMillis = { BASE_TIME },
-            ioDispatcher = Dispatchers.Unconfined,
         )
 
         // Act

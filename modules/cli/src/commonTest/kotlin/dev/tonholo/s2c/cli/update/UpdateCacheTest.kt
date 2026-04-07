@@ -5,6 +5,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -17,19 +19,22 @@ class UpdateCacheTest {
         prettyPrint = true
     }
 
+    private fun createCache(fs: FakeFileSystem = fileSystem, dir: okio.Path = cacheDir) = UpdateCache(
+        fileSystem = fs,
+        cacheDir = dir,
+        json = json,
+        ioDispatcher = Dispatchers.Unconfined,
+    )
+
     @AfterTest
     fun tearDown() {
         fileSystem.checkNoOpenFiles()
     }
 
     @Test
-    fun `given no cache file - when readIfFresh is called - then returns null`() {
+    fun `given no cache file - when readIfFresh is called - then returns null`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
 
         // Act
         val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
@@ -39,13 +44,9 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given fresh cache - when read is called - then returns cached data`() {
+    fun `given fresh cache - when read is called - then returns cached data`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
@@ -62,13 +63,9 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given expired cache - when readIfFresh is called - then returns null`() {
+    fun `given expired cache - when readIfFresh is called - then returns null`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
@@ -84,18 +81,14 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given corrupted cache - when read is called - then returns null`() {
+    fun `given corrupted cache - when read is called - then returns null`() = runTest {
         // Arrange
         fileSystem.createDirectories(cacheDir)
         val cachePath = cacheDir / UpdateCache.CACHE_FILE_NAME
         fileSystem.write(cachePath) {
             writeUtf8("this is not valid json {{{")
         }
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
 
         // Act
         val result = cache.read()
@@ -105,13 +98,9 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given valid data - when write is called - then file is created`() {
+    fun `given valid data - when write is called - then file is created`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
@@ -127,13 +116,9 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given fresh cache within 24h - when readIfFresh is called - then returns entry`() {
+    fun `given fresh cache within 24h - when readIfFresh is called - then returns entry`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
@@ -149,14 +134,10 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given cache dir does not exist - when write is called - then creates directory and file`() {
+    fun `given cache dir does not exist - when write is called - then creates directory and file`() = runTest {
         // Arrange
         val nonExistentDir = "/home/user/.s2c-new".toPath()
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = nonExistentDir,
-            json = json,
-        )
+        val cache = createCache(dir = nonExistentDir)
         val entry = UpdateCacheEntry(
             latestVersion = "1.0.0",
             releaseUrl = "https://example.com",
@@ -172,13 +153,9 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given cache checked exactly 24h ago - when readIfFresh is called - then returns null`() {
+    fun `given cache checked exactly 24h ago - when readIfFresh is called - then returns null`() = runTest {
         // Arrange
-        val cache = UpdateCache(
-            fileSystem = fileSystem,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache()
         val entry = UpdateCacheEntry(
             latestVersion = "2.3.0",
             releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
@@ -194,17 +171,12 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given write failure - when write is called - then does not throw`() {
+    fun `given write failure - when write is called - then does not throw`() = runTest {
         // Arrange
         val readOnlyFs = FakeFileSystem()
         readOnlyFs.createDirectories(cacheDir)
-        // Make the cache path a directory so writing to it as a file fails
         readOnlyFs.createDirectories(cacheDir / UpdateCache.CACHE_FILE_NAME)
-        val cache = UpdateCache(
-            fileSystem = readOnlyFs,
-            cacheDir = cacheDir,
-            json = json,
-        )
+        val cache = createCache(fs = readOnlyFs)
         val entry = UpdateCacheEntry(
             latestVersion = "1.0.0",
             releaseUrl = "https://example.com",

@@ -1,7 +1,11 @@
 package dev.tonholo.s2c.cli.update
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import okio.FileSystem
+import okio.IOException
 import okio.Path
 
 /**
@@ -10,11 +14,14 @@ import okio.Path
  *
  * The cache has a 24-hour TTL. If the file is missing,
  * corrupted, or older than 24 hours, it is treated as expired.
+ *
+ * All file I/O is dispatched on the provided [ioDispatcher].
  */
 class UpdateCache(
     private val fileSystem: FileSystem,
     private val cacheDir: Path,
     private val json: Json,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
     private val cachePath: Path get() = cacheDir / CACHE_FILE_NAME
 
@@ -26,7 +33,7 @@ class UpdateCache(
      * This avoids the TOCTOU issue of calling `isFresh` then `read`
      * separately (two file reads for the same check).
      */
-    fun readIfFresh(nowEpochMillis: Long): UpdateCacheEntry? {
+    suspend fun readIfFresh(nowEpochMillis: Long): UpdateCacheEntry? {
         val entry = read() ?: return null
         val elapsed = nowEpochMillis - entry.checkedAtEpochMillis
         return if (elapsed < TTL_MILLIS) entry else null
@@ -38,17 +45,19 @@ class UpdateCache(
      * @return the [UpdateCacheEntry], or null if the file
      *   does not exist or cannot be parsed.
      */
-    fun read(): UpdateCacheEntry? = try {
-        if (!fileSystem.exists(cachePath)) {
+    suspend fun read(): UpdateCacheEntry? = withContext(ioDispatcher) {
+        try {
+            if (!fileSystem.exists(cachePath)) {
+                null
+            } else {
+                val content = fileSystem.read(cachePath) { readUtf8() }
+                json.decodeFromString<UpdateCacheEntry>(content)
+            }
+        } catch (_: IOException) {
             null
-        } else {
-            val content = fileSystem.read(cachePath) { readUtf8() }
-            json.decodeFromString<UpdateCacheEntry>(content)
+        } catch (_: SerializationException) {
+            null
         }
-    } catch (_: okio.IOException) {
-        null
-    } catch (_: kotlinx.serialization.SerializationException) {
-        null
     }
 
     /**
@@ -57,14 +66,16 @@ class UpdateCache(
      *
      * Cache write failure is non-fatal; the next invocation will retry.
      */
-    fun write(entry: UpdateCacheEntry) {
-        try {
-            fileSystem.createDirectories(cachePath.parent ?: cacheDir)
-            fileSystem.write(cachePath) {
-                writeUtf8(json.encodeToString(entry))
+    suspend fun write(entry: UpdateCacheEntry) {
+        withContext(ioDispatcher) {
+            try {
+                fileSystem.createDirectories(cachePath.parent ?: cacheDir)
+                fileSystem.write(cachePath) {
+                    writeUtf8(json.encodeToString(entry))
+                }
+            } catch (_: IOException) {
+                // Cache write failure is non-fatal; next invocation will retry.
             }
-        } catch (_: okio.IOException) {
-            // Cache write failure is non-fatal; next invocation will retry.
         }
     }
 
