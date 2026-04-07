@@ -94,6 +94,48 @@ class SemVerTest {
     }
 
     @Test
+    fun `given version with SNAPSHOT suffix - when parse is called - then returns correct SemVer`() {
+        // Arrange
+        val input = "3.0.0-SNAPSHOT"
+
+        // Act
+        val result = SemVer.parse(input)
+
+        // Assert
+        assertEquals(expected = 3, actual = result?.major)
+        assertEquals(expected = 0, actual = result?.minor)
+        assertEquals(expected = 0, actual = result?.patch)
+    }
+
+    @Test
+    fun `given version with rc suffix - when parse is called - then returns correct SemVer`() {
+        // Arrange
+        val input = "v2.1.0-rc.1"
+
+        // Act
+        val result = SemVer.parse(input)
+
+        // Assert
+        assertEquals(expected = 2, actual = result?.major)
+        assertEquals(expected = 1, actual = result?.minor)
+        assertEquals(expected = 0, actual = result?.patch)
+    }
+
+    @Test
+    fun `given version with build metadata - when parse is called - then returns correct SemVer`() {
+        // Arrange
+        val input = "1.2.3+build.456"
+
+        // Act
+        val result = SemVer.parse(input)
+
+        // Assert
+        assertEquals(expected = 1, actual = result?.major)
+        assertEquals(expected = 2, actual = result?.minor)
+        assertEquals(expected = 3, actual = result?.patch)
+    }
+
+    @Test
     fun `given valid SemVer - when toString is called - then returns X_Y_Z format`() {
         // Arrange
         val semVer = SemVer(major = 2, minor = 3, patch = 1)
