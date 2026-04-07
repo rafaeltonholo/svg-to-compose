@@ -7,6 +7,10 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
+detekt {
+    config.setFrom("${rootProject.rootDir.parentFile.parentFile}/config/detekt.yml")
+}
+
 kotlin {
     configureNativeExecutable(
         project = project,
