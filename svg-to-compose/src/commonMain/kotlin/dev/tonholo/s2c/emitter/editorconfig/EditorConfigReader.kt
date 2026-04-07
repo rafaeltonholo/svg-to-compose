@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.emitter.editorconfig
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigParser.toFormatConfig
 import dev.tonholo.s2c.io.FileManager
@@ -16,6 +17,7 @@ private const val EDITOR_CONFIG_FILENAME = ".editorconfig"
  * parent). The walk stops when a file declaring `root = true` is found
  * or the filesystem root is reached.
  */
+@Fake
 interface EditorConfigReader {
     /**
      * Resolves a [FormatConfig] by walking up from [outputPath] and merging

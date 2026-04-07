@@ -1,10 +1,12 @@
 package dev.tonholo.s2c.io
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.extensions.encodeToMd5
 import dev.tonholo.s2c.logger.Logger
 import okio.Path
 import okio.Path.Companion.toPath
 
+@Fake
 interface TempFileWriter {
     fun create(file: Path): Path
     fun clear()

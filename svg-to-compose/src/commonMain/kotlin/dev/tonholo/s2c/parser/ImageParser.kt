@@ -11,6 +11,7 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
+import com.rsicarelli.fakt.Fake
 import dev.zacsweers.metro.Inject
 import okio.Path
 
@@ -25,6 +26,7 @@ import okio.Path
  * @property fileManager reads file content from the file system.
  * @property contentParsers maps each [FileType] to its [ContentParser] strategy.
  */
+@Fake
 interface ImageParser {
     /**
      * Parses a file into an [IconFileContents] domain model.

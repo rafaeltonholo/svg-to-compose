@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.runtime
 
+import com.rsicarelli.fakt.Fake
+
 /**
  * Runtime configuration for the S2C processing system.
  *
@@ -8,6 +10,7 @@ package dev.tonholo.s2c.runtime
  * The implementation is injected via the dependency graph so that all
  * internal components observe the same configuration.
  */
+@Fake
 interface S2cConfig {
     val debug: Boolean
     val verbose: Boolean

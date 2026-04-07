@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.emitter.template.config
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
 import dev.tonholo.s2c.io.FileManager
 import dev.zacsweers.metro.Inject
@@ -13,6 +14,7 @@ private const val TEMPLATE_FILENAME = "s2c.template.toml"
  * Auto-discovery walks up from the output directory looking for the
  * template file, following the same pattern as [EditorConfigReader].
  */
+@Fake
 interface TemplateConfigReader {
     /**
      * Reads and parses a template config from an explicit path.

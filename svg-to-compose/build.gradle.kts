@@ -25,11 +25,11 @@ kotlin {
             implementation(kotlin("reflect"))
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.json)
+            implementation(libs.com.rsicarelli.fakt.annotations)
         }
 
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation(libs.com.rsicarelli.fakt.annotations)
             implementation(libs.org.jetbrains.kotlinx.coroutines.test)
             implementation(libs.com.squareup.okio.fakefilesystem)
         }

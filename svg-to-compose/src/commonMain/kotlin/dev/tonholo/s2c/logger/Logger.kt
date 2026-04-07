@@ -1,8 +1,11 @@
 package dev.tonholo.s2c.logger
 
+import com.rsicarelli.fakt.Fake
+
 /**
  * Abstraction for logging operations.
  */
+@Fake
 interface Logger {
     /**
      * Logs a debug message.

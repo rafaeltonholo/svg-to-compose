@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.optimizer
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.command.command
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.error.ErrorCode
@@ -19,6 +20,7 @@ import okio.Path.Companion.toPath
 /**
  * Factory interface for creating and managing optimizers.
  */
+@Fake
 interface OptimizerFactory {
     /**
      * Verify the availability of dependencies required by the optimizers.

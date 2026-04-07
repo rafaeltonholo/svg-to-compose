@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.io
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.extensions.deleteRecursivelyCompat
 import dev.tonholo.s2c.extensions.listRecursively
@@ -9,6 +10,7 @@ import okio.FileSystem
 import okio.IOException
 import okio.Path
 
+@Fake
 interface FileManager :
     FileFinder,
     FileReader,
