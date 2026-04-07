@@ -1,9 +1,16 @@
 package dev.tonholo.s2c.cli.update
 
+// TODO(#304): Wire VersionChecker into CLI startup via CliGraph and emit UpdateAvailable event after RunCompleted
+
 /**
  * Orchestrates the version update check by reading from cache,
  * fetching from the remote when the cache is stale, and comparing
  * versions.
+ *
+ * Pre-release suffixes (e.g. `-SNAPSHOT`, `-rc.1`) on the current
+ * version are stripped so that dev builds still participate in
+ * update checks. Pre-release tags fetched from GitHub are ignored
+ * to avoid prompting users to upgrade to unstable releases.
  *
  * @param currentVersion the version string of the running CLI (e.g. "2.0.0" or "v2.0.0").
  * @param cache the [UpdateCache] used for reading and writing cached results.
@@ -53,11 +60,17 @@ class VersionChecker(
      * from the remote and writes the result to cache.
      */
     private fun resolveLatest(now: Long): UpdateCacheEntry? {
-        if (cache.isFresh(nowEpochMillis = now)) {
-            return cache.read()
+        val cached = cache.readIfFresh(nowEpochMillis = now)
+        if (cached != null) {
+            return cached
         }
 
         val release = fetcher.fetch() ?: return null
+
+        // Reject pre-release tags from GitHub so users are not
+        // prompted to upgrade to unstable versions.
+        if (SemVer.isPreRelease(release.tagName)) return null
+
         val version = SemVer.parse(release.tagName) ?: return null
 
         val entry = UpdateCacheEntry(
