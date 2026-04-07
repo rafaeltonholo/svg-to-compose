@@ -45,7 +45,9 @@ class UpdateCache(
             val content = fileSystem.read(cachePath) { readUtf8() }
             json.decodeFromString<UpdateCacheEntry>(content)
         }
-    } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
+    } catch (_: okio.IOException) {
+        null
+    } catch (_: kotlinx.serialization.SerializationException) {
         null
     }
 
@@ -61,7 +63,7 @@ class UpdateCache(
             fileSystem.write(cachePath) {
                 writeUtf8(json.encodeToString(entry))
             }
-        } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
+        } catch (_: okio.IOException) {
             // Cache write failure is non-fatal; next invocation will retry.
         }
     }
