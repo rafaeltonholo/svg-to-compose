@@ -2,6 +2,7 @@ package dev.tonholo.s2c.cli.update
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -133,6 +134,66 @@ class SemVerTest {
         assertEquals(expected = 1, actual = result?.major)
         assertEquals(expected = 2, actual = result?.minor)
         assertEquals(expected = 3, actual = result?.patch)
+    }
+
+    @Test
+    fun `given stable version string - when isPreRelease is called - then returns false`() {
+        // Arrange
+        val version = "v2.3.0"
+
+        // Act
+        val result = SemVer.isPreRelease(version)
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `given version with rc suffix - when isPreRelease is called - then returns true`() {
+        // Arrange
+        val version = "v4.0.0-rc.1"
+
+        // Act
+        val result = SemVer.isPreRelease(version)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given version with SNAPSHOT suffix - when isPreRelease is called - then returns true`() {
+        // Arrange
+        val version = "3.0.0-SNAPSHOT"
+
+        // Act
+        val result = SemVer.isPreRelease(version)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given version with build metadata - when isPreRelease is called - then returns true`() {
+        // Arrange
+        val version = "1.2.3+build.456"
+
+        // Act
+        val result = SemVer.isPreRelease(version)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given plain version without v prefix - when isPreRelease is called - then returns false`() {
+        // Arrange
+        val version = "2.3.1"
+
+        // Act
+        val result = SemVer.isPreRelease(version)
+
+        // Assert
+        assertFalse(result)
     }
 
     @Test

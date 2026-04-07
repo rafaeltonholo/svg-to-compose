@@ -1,8 +1,8 @@
 package dev.tonholo.s2c.cli.update
 
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import okio.Path.Companion.toPath
@@ -11,6 +11,11 @@ import okio.fakefilesystem.FakeFileSystem
 class UpdateCacheTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
+
+    @AfterTest
+    fun tearDown() {
+        fileSystem.checkNoOpenFiles()
+    }
 
     @Test
     fun `given no cache file - when readIfFresh is called - then returns null`() {

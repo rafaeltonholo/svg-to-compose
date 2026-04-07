@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.cli.update
 
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -9,6 +10,11 @@ import okio.fakefilesystem.FakeFileSystem
 class VersionCheckerTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
+
+    @AfterTest
+    fun tearDown() {
+        fileSystem.checkNoOpenFiles()
+    }
 
     @Test
     fun `given fresh cache with newer version - when check is called - then returns UpdateAvailable`() {
