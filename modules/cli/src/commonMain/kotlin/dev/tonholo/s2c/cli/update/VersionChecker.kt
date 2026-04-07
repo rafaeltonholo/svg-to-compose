@@ -43,15 +43,15 @@ class VersionChecker(
         val latest = SemVer.parse(entry.latestVersion)
             ?: return UpdateCheckResult.NoUpdate
 
-        if (latest <= current) {
-            return UpdateCheckResult.NoUpdate
+        return if (latest > current) {
+            UpdateCheckResult.UpdateAvailable(
+                current = current,
+                latest = latest,
+                releaseUrl = entry.releaseUrl,
+            )
+        } else {
+            UpdateCheckResult.NoUpdate
         }
-
-        return UpdateCheckResult.UpdateAvailable(
-            current = current,
-            latest = latest,
-            releaseUrl = entry.releaseUrl,
-        )
     }
 
     /**
