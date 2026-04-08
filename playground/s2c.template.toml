@@ -5,20 +5,20 @@
 # Receiver type for the generated icon property (auto-imported).
 [definitions.receiver]
 name = "Icons"
-package = "dev.tonholo.svg_to_compose.playground.ui.icon.template"
+package = "dev.tonholo.svgtocompose.playground.ui.icon.template"
 
 # Keyed imports referenced in templates via ${def:<key>}.
 # The simple name (last segment) is emitted; the full path is auto-imported.
 [definitions.imports]
-icon_builder = "dev.tonholo.svg_to_compose.playground.ui.icon.template.icon"
-icon_path = "dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath"
-icon_group = "dev.tonholo.svg_to_compose.playground.ui.icon.template.iconGroup"
-theme = "dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme"
+icon_builder = "dev.tonholo.svgtocompose.playground.ui.icon.template.icon"
+icon_path = "dev.tonholo.svgtocompose.playground.ui.icon.template.iconPath"
+icon_group = "dev.tonholo.svgtocompose.playground.ui.icon.template.iconGroup"
+theme = "dev.tonholo.svgtocompose.playground.ui.theme.SampleAppTheme"
 
 # Color mappings: replace Color(<value>) with <name> and auto-import <import>.<name>.
 [[definitions.color_mapping]]
 name = "BLACK"
-import = "dev.tonholo.svg_to_compose.playground.ui.icon.template"
+import = "dev.tonholo.svgtocompose.playground.ui.icon.template"
 value = "0xFF121212"
 
 # --- Templates ---
