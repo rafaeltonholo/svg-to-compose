@@ -5,7 +5,6 @@ import dev.tonholo.s2c.gradle.internal.GradleS2cConfig
 import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
 import dev.tonholo.s2c.gradle.tasks.PERSISTENT_REGISTRY_PATH
 import dev.tonholo.s2c.gradle.tasks.ParseSvgToComposeIconTask
-import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.AppScope

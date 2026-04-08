@@ -47,6 +47,9 @@ bin/
 /nbdist/
 /.nb-gradle/
 
+### Worktrees ###
+.worktrees/
+
 ### VS Code ###
 .vscode/
 
