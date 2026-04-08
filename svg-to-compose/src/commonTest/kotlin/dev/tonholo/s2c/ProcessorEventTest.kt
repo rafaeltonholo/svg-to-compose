@@ -3,9 +3,8 @@ package dev.tonholo.s2c
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.emitter.CodeEmitter
-import dev.tonholo.s2c.emitter.FormatConfig
-import dev.tonholo.s2c.emitter.fakeCodeEmitterFactory
 import dev.tonholo.s2c.emitter.editorconfig.fakeEditorConfigReader
+import dev.tonholo.s2c.emitter.fakeCodeEmitterFactory
 import dev.tonholo.s2c.emitter.template.config.fakeTemplateConfigReader
 import dev.tonholo.s2c.io.fakeFileManager
 import dev.tonholo.s2c.io.fakeIconWriter

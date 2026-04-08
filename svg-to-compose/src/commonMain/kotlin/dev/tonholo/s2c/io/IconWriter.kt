@@ -1,9 +1,9 @@
 package dev.tonholo.s2c.io
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.logger.Logger
-import com.rsicarelli.fakt.Fake
 import dev.zacsweers.metro.Inject
 import okio.Path
 

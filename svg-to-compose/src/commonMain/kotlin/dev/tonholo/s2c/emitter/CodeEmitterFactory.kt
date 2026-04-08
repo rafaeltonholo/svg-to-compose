@@ -1,10 +1,10 @@
 package dev.tonholo.s2c.emitter
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
 import dev.tonholo.s2c.emitter.template.TemplateEmitter
 import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
 import dev.tonholo.s2c.logger.Logger
-import com.rsicarelli.fakt.Fake
 import dev.zacsweers.metro.Inject
 
 /**

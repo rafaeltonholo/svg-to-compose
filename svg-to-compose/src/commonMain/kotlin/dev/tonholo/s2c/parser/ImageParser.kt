@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.parser
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
@@ -11,7 +12,6 @@ import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.io.FileManager
-import com.rsicarelli.fakt.Fake
 import dev.zacsweers.metro.Inject
 import okio.Path
 
