@@ -36,7 +36,7 @@ class UpdateCache(
     suspend fun readIfFresh(nowEpochMillis: Long): UpdateCacheEntry? {
         val entry = read() ?: return null
         val elapsed = nowEpochMillis - entry.checkedAtEpochMillis
-        return if (elapsed < TTL_MILLIS) entry else null
+        return if (elapsed in 0..<TTL_MILLIS) entry else null
     }
 
     /**

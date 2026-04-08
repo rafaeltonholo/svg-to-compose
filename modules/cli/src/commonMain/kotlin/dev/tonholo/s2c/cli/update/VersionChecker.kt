@@ -61,10 +61,14 @@ class VersionChecker(
     /**
      * Returns a cache entry with the latest version info.
      * Uses the cache if it is still fresh, otherwise fetches
-     * from the remote and writes the result to cache.
+     * from the remote, and writes the result to cache.
+     *
+     * If the cached entry has an unparseable [UpdateCacheEntry.latestVersion],
+     * it is treated as stale and a remote fetch is attempted.
      */
     private suspend fun resolveLatest(now: Long): UpdateCacheEntry? {
-        cache.readIfFresh(nowEpochMillis = now)?.let { return it }
+        val cached = cache.readIfFresh(nowEpochMillis = now)
+        if (cached != null && SemVer.parse(cached.latestVersion) != null) return cached
 
         val release = fetcher.fetch() ?: return null
 

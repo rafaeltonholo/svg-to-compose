@@ -5,12 +5,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UpdateCacheTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
@@ -23,7 +25,7 @@ class UpdateCacheTest {
         fileSystem = fs,
         cacheDir = dir,
         json = json,
-        ioDispatcher = Dispatchers.Unconfined,
+        ioDispatcher = UnconfinedTestDispatcher(),
     )
 
     @AfterTest
@@ -188,6 +190,24 @@ class UpdateCacheTest {
 
         // Assert - read should return null since write failed
         assertNull(cache.read())
+    }
+
+    @Test
+    fun `given cache with future timestamp - when readIfFresh is called - then returns null`() = runTest {
+        // Arrange
+        val cache = createCache()
+        val entry = UpdateCacheEntry(
+            latestVersion = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
+            checkedAtEpochMillis = BASE_TIME + ONE_HOUR_MILLIS,
+        )
+        cache.write(entry)
+
+        // Act
+        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
+
+        // Assert
+        assertNull(result)
     }
 
     private companion object {

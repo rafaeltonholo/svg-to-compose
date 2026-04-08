@@ -4,13 +4,15 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okio.Path
 import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class VersionCheckerTest {
     private val fileSystem = FakeFileSystem()
     private val cacheDir = "/home/user/.s2c".toPath()
@@ -23,7 +25,7 @@ class VersionCheckerTest {
         fileSystem = fileSystem,
         cacheDir = dir,
         json = json,
-        ioDispatcher = Dispatchers.Unconfined,
+        ioDispatcher = UnconfinedTestDispatcher(),
     )
 
     @AfterTest
@@ -246,6 +248,36 @@ class VersionCheckerTest {
 
         // Assert
         assertIs<UpdateCheckResult.NoUpdate>(result)
+    }
+
+    @Test
+    fun `given fresh cache with unparseable version - when check is called - then falls back to fetcher`() = runTest {
+        // Arrange
+        val cache = createCache()
+        cache.write(
+            UpdateCacheEntry(
+                latestVersion = "not-a-version",
+                releaseUrl = "https://example.com/bad",
+                checkedAtEpochMillis = BASE_TIME - ONE_HOUR_MILLIS,
+            ),
+        )
+        val fetchedRelease = LatestReleaseInfo(
+            tagName = "v3.0.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v3.0.0",
+        )
+        val checker = VersionChecker(
+            currentVersion = "2.0.0",
+            cache = cache,
+            fetcher = GitHubReleaseFetcher { fetchedRelease },
+            nowEpochMillis = { BASE_TIME },
+        )
+
+        // Act
+        val result = checker.check()
+
+        // Assert
+        assertIs<UpdateCheckResult.UpdateAvailable>(result)
+        assertEquals(expected = "3.0.0", actual = result.latest.toString())
     }
 
     private companion object {
