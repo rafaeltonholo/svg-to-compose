@@ -18,7 +18,4 @@ fun interface GitHubReleaseFetcher {
 /**
  * Holds the tag name and URL of the latest GitHub release.
  */
-data class LatestReleaseInfo(
-    val tagName: String,
-    val releaseUrl: String,
-)
+data class LatestReleaseInfo(val tagName: String, val releaseUrl: String)

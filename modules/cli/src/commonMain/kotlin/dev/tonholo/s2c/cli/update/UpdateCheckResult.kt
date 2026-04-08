@@ -16,9 +16,5 @@ sealed interface UpdateCheckResult {
      * @property latest the newest available version.
      * @property releaseUrl the URL to the release page.
      */
-    data class UpdateAvailable(
-        val current: SemVer,
-        val latest: SemVer,
-        val releaseUrl: String,
-    ) : UpdateCheckResult
+    data class UpdateAvailable(val current: SemVer, val latest: SemVer, val releaseUrl: String) : UpdateCheckResult
 }
