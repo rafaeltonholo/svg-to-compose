@@ -8,10 +8,10 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
-import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
+import dev.tonholo.svgtocompose.playground.ui.icon.template.Icons
+import dev.tonholo.svgtocompose.playground.ui.icon.template.icon
+import dev.tonholo.svgtocompose.playground.ui.icon.template.iconPath
+import dev.tonholo.svgtocompose.playground.ui.theme.SampleAppTheme
 
 val Icons.LinearGradient01: ImageVector by lazy {
     icon(name = "LinearGradient01", viewportWidth = 800.0f, viewportHeight = 400.0f) {
