@@ -654,9 +654,10 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given userSpaceOnUse radial gradient with fx fy different from cx cy - when toBrush is called - then center uses focal point not geometric center`() {
-        // Arrange - Compose's radialGradient center = SVG's focal point (fx/fy),
-        // not the geometric center (cx/cy).
+    fun `given userSpaceOnUse radial gradient with fx fy different from cx cy - when toBrush is called - then center uses cx cy and fx fy is dropped`() {
+        // Arrange - Compose has no focal point parameter, so we use cx/cy as
+        // the gradient center (matching Android Studio behavior). The focal
+        // point offset is dropped as an accepted limitation.
         root.attributes["width"] = "500"
         root.attributes["height"] = "400"
         root.attributes["viewBox"] = "0 0 500 400"
@@ -676,13 +677,16 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
         // Act
         val brush = gradient.toBrush(target = emptyList())
 
-        // Assert - center should be (135, 340) from fx/fy, not (150, 350) from cx/cy
+        // Assert - center uses cx/cy, not fx/fy
         assertIs<ComposeBrush.Gradient.Radial>(brush)
         assertEquals(
-            expected = ComposeOffset(x = 135f, y = 340f),
+            expected = ComposeOffset(x = 150f, y = 350f),
             actual = brush.center,
         )
         assertEquals(expected = 45f, actual = brush.radius)
+        // Stops are unchanged
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
     }
 
     /**
