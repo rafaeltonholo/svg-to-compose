@@ -248,15 +248,18 @@ sealed class SvgGradient<out T>(
         val referenced = checkNotNull(root.gradients[hrefId]) {
             "Referenced gradient not found: $hrefId"
         }
-        val mergedAttributes = buildMergedAttributes(referenced)
-        val resolvedChildren = resolveChildren(referenced)
+        val mergedAttributes = buildMergedAttributes(referenced, visited = mutableSetOf(hrefId))
+        val resolvedChildren = resolveChildren(referenced, visited = mutableSetOf(hrefId))
         return ResolvedGradientData(
             attributes = mergedAttributes,
             children = resolvedChildren,
         )
     }
 
-    private fun buildMergedAttributes(referencedGradient: SvgGradient<*>): MutableMap<String, String> {
+    private fun buildMergedAttributes(
+        referencedGradient: SvgGradient<*>,
+        visited: MutableSet<String>,
+    ): MutableMap<String, String> {
         val merged = referencedGradient.attributes.toMutableMap()
         merged.remove(SvgUseNode.HREF_ATTR_KEY)
         // Recursively resolve chained href before overlaying local attributes
@@ -264,10 +267,13 @@ sealed class SvgGradient<out T>(
         if (referencedHref != null) {
             val root = rootParent as SvgRootNode
             val chainedId = referencedHref.normalizedId()
+            check(visited.add(chainedId)) {
+                "Circular gradient reference detected: '$chainedId' was already visited in chain $visited"
+            }
             val chainedGradient = checkNotNull(root.gradients[chainedId]) {
                 "Chained gradient not found: $chainedId"
             }
-            val chainedAttributes = buildMergedAttributes(chainedGradient)
+            val chainedAttributes = buildMergedAttributes(chainedGradient, visited)
             // Chained attributes fill in defaults (don't override what referenced already defines)
             for ((key, value) in chainedAttributes) {
                 if (!merged.containsKey(key)) {
@@ -288,7 +294,7 @@ sealed class SvgGradient<out T>(
      * Resolves stop children: if the referencing gradient has its own stops, use them.
      * Otherwise, walk the href chain to find inherited stops.
      */
-    private fun resolveChildren(referencedGradient: SvgGradient<*>): MutableSet<XmlNode> {
+    private fun resolveChildren(referencedGradient: SvgGradient<*>, visited: MutableSet<String>): MutableSet<XmlNode> {
         val localStops = children.filterIsInstance<SvgGradientStopNode>()
         if (localStops.isNotEmpty()) {
             return children.toMutableSet()
@@ -301,10 +307,13 @@ sealed class SvgGradient<out T>(
         val referencedHref = referencedGradient.href ?: return mutableSetOf()
         val root = rootParent as SvgRootNode
         val chainedId = referencedHref.normalizedId()
+        check(visited.add(chainedId)) {
+            "Circular gradient reference detected: '$chainedId' was already visited in chain $visited"
+        }
         val chainedGradient = checkNotNull(root.gradients[chainedId]) {
             "Chained gradient not found: $chainedId"
         }
-        return resolveChildren(chainedGradient)
+        return resolveChildren(chainedGradient, visited)
     }
 
     protected data class ResolvedGradientData(
