@@ -1,4 +1,9 @@
+@file:OptIn(DelicateMetroGradleApi::class, RequiresIdeSupport::class, ExperimentalMetroGradleApi::class)
+
 import com.varabyte.kobweb.gradle.worker.util.configAsKobwebWorker
+import dev.zacsweers.metro.gradle.DelicateMetroGradleApi
+import dev.zacsweers.metro.gradle.ExperimentalMetroGradleApi
+import dev.zacsweers.metro.gradle.RequiresIdeSupport
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -27,4 +32,10 @@ kotlin {
             implementation(npm("svgo", "4.0.1"))
         }
     }
+}
+
+metro {
+    enableTopLevelFunctionInjection = false
+    generateContributionHints = false
+    generateContributionHintsInFir = false
 }
