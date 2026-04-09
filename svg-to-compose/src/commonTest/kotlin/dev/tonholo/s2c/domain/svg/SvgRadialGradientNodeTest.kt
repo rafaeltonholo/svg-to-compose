@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import kotlin.math.sqrt
@@ -617,4 +618,81 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
         assertEquals(expected = 50f, actual = brush.radius)
         assertEquals(expected = 3, actual = brush.colors.size)
     }
+
+    @Test
+    fun `given objectBoundingBox radial gradient with fractional values - when toBrush is called - then fractions scale by bounding box dimensions`() {
+        // Arrange - Case 6 from the test SVG: derivedBBox with objectBoundingBox
+        // Rect at x=315, y=165, width=120, height=120
+        root.attributes["width"] = "500"
+        root.attributes["height"] = "400"
+        root.attributes["viewBox"] = "0 0 500 400"
+        val gradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "bboxGrad",
+                "gradientUnits" to "objectBoundingBox",
+                "cx" to "0.4",
+                "cy" to "0.4",
+                "r" to "0.6",
+            ),
+        )
+        root.gradients["bboxGrad"] = gradient
+        val target = createRectTarget(x = 315.0, y = 165.0, width = 120.0, height = 120.0)
+
+        // Act
+        val brush = gradient.toBrush(target = target)
+
+        // Assert
+        // cx = 0.4 * 120 + 315 = 363
+        // cy = 0.4 * 120 + 165 = 213
+        // r = 0.6 * 120 = 72
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 363f, y = 213f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 72f, actual = brush.radius)
+    }
+
+    @Test
+    fun `given userSpaceOnUse radial gradient with fx fy different from cx cy - when toBrush is called - then center uses focal point not geometric center`() {
+        // Arrange - Compose's radialGradient center = SVG's focal point (fx/fy),
+        // not the geometric center (cx/cy).
+        root.attributes["width"] = "500"
+        root.attributes["height"] = "400"
+        root.attributes["viewBox"] = "0 0 500 400"
+        val gradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "focalGrad",
+                "cx" to "150",
+                "cy" to "350",
+                "r" to "45",
+                "fx" to "135",
+                "fy" to "340",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["focalGrad"] = gradient
+
+        // Act
+        val brush = gradient.toBrush(target = emptyList())
+
+        // Assert - center should be (135, 340) from fx/fy, not (150, 350) from cx/cy
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 135f, y = 340f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 45f, actual = brush.radius)
+    }
+
+    /**
+     * Creates a list of absolute path nodes forming a rectangle,
+     * used as target for objectBoundingBox gradient calculations.
+     */
+    private fun createRectTarget(x: Double, y: Double, width: Double, height: Double): List<PathNodes> = listOf(
+        PathNodes.MoveTo(values = listOf("$x", "$y"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("${x + width}", "$y"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("${x + width}", "${y + height}"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("$x", "${y + height}"), isRelative = false, minified = false),
+    )
 }

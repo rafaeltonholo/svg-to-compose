@@ -22,18 +22,20 @@ class SvgRadialGradientNode(
     override fun createGradientBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
         val (colors, stops) = colorStops
 
-        var cx = calculateGradientXCoordinate(cx, target)
-        var cy = calculateGradientYCoordinate(cy, target)
+        // Compose's radialGradient centre corresponds to SVG's focal point (fx/fy),
+        // which is where the first colour stop visually originates from.
+        var focalX = calculateGradientXCoordinate(fx, target)
+        var focalY = calculateGradientYCoordinate(fy, target)
         var gradientRadius = calculateGradientXYCoordinate(radius, target, translateByBoundingBoxOrigin = false)
 
         val matrix = computeGradientTransformMatrix()
         if (matrix != null) {
-            val transformed = Point2D(cx, cy).transform(matrix)
-            cx = transformed.x
-            cy = transformed.y
+            val transformed = Point2D(focalX, focalY).transform(matrix)
+            focalX = transformed.x
+            focalY = transformed.y
             gradientRadius = approximateCircleRadius(gradientRadius, matrix)
         }
-        val centerOffset = ComposeOffset(x = cx.toFloat(), y = cy.toFloat())
+        val centerOffset = ComposeOffset(x = focalX.toFloat(), y = focalY.toFloat())
 
         return ComposeBrush.Gradient.Radial(
             center = centerOffset,
