@@ -124,7 +124,12 @@ sealed class SvgGradient<out T>(
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
             val boundingBox = target.boundingBox()
-            length.toDouble(boundingBox.getBoundingBoxDimension()) + boundingBox.getBoundingBoxAxis()
+            val dimension = boundingBox.getBoundingBoxDimension()
+            // objectBoundingBox values are fractions of the bbox dimension.
+            // Normalize by treating the value as a fraction of unit length,
+            // so both "0.4" (fraction) and "40%" map to 0.4 * dimension.
+            val fraction = length.toDouble(baseDimension = 1.0)
+            fraction * dimension + boundingBox.getBoundingBoxAxis()
         } else {
             val translate = -root.getViewportAxis()
             translate + length.toDouble(root.getViewportDimension().toDouble())
@@ -161,7 +166,9 @@ sealed class SvgGradient<out T>(
         return if (gradientUnits == "objectBoundingBox") {
             check(target.isNotEmpty())
             val boundingBox = target.boundingBox()
-            val value = length.toDouble(max(boundingBox.width, boundingBox.height))
+            val dimension = max(boundingBox.width, boundingBox.height)
+            val fraction = length.toDouble(baseDimension = 1.0)
+            val value = fraction * dimension
             if (translateByBoundingBoxOrigin) {
                 value + max(boundingBox.x, boundingBox.y)
             } else {
