@@ -52,6 +52,8 @@ internal class ConsoleLogger(@param:EnableDebugQualifier val enableLogs: Boolean
     }
 
     override fun printEmpty() {
-        console.log("")
+        if (enableLogs) {
+            console.log("")
+        }
     }
 }
