@@ -26,6 +26,11 @@ class ProcessorEventTest {
     private val events = mutableListOf<ConversionEvent>()
     private val onEvent: (ConversionEvent) -> Unit = { events.add(it) }
 
+    @kotlin.test.BeforeTest
+    fun setUp() {
+        events.clear()
+    }
+
     private fun testParserConfig(optimize: Boolean = false) = ParserConfig(
         pkg = "dev.test",
         theme = "TestTheme",

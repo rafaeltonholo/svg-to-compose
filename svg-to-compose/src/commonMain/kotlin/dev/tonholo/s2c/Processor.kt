@@ -28,6 +28,7 @@ import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
+import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -146,7 +147,7 @@ class Processor(
                     recursive = runRecursively,
                 ),
                 totalFiles = files.size,
-                version = "",
+                version = BuildConfig.VERSION,
             ),
         )
 
@@ -376,6 +377,16 @@ class Processor(
                 )
                 logger.printEmpty()
             } catch (e: ExitProgramException) {
+                onEvent(
+                    ConversionEvent.FileCompleted(
+                        fileName = file.name,
+                        duration = fileMark.elapsedNow(),
+                        result = FileResult.Failed(
+                            errorCode = e.errorCode,
+                            message = e.message ?: "Unknown error",
+                        ),
+                    ),
+                )
                 throw e
             } catch (
                 e:
