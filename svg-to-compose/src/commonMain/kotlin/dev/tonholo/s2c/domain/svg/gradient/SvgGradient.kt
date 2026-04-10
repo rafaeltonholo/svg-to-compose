@@ -37,7 +37,15 @@ sealed class SvgGradient<out T>(
     ) { spreadMethod ->
         with(NoOpLogger) { SvgGradientSpreadMethod(spreadMethod) }
     }
-    val href: String? by attribute(name = "xlink:href")
+
+    /**
+     * Resolves the href reference for this gradient, checking both the
+     * SVG2 plain "href" attribute and the legacy "xlink:href" attribute.
+     * SVG2 "href" takes precedence when both are present.
+     */
+    val href: String?
+        get() = attributes[SvgUseNode.HREF_ATTR_NO_NS_KEY]
+            ?: attributes[SvgUseNode.HREF_ATTR_KEY]
 
     val colorStops: Pair<List<SvgColor>, List<Float>>
         get() {
@@ -262,6 +270,7 @@ sealed class SvgGradient<out T>(
     ): MutableMap<String, String> {
         val merged = referencedGradient.attributes.toMutableMap()
         merged.remove(SvgUseNode.HREF_ATTR_KEY)
+        merged.remove(SvgUseNode.HREF_ATTR_NO_NS_KEY)
         // Recursively resolve chained href before overlaying local attributes
         val referencedHref = referencedGradient.href
         if (referencedHref != null) {
@@ -283,7 +292,7 @@ sealed class SvgGradient<out T>(
         }
         // Local attributes always override inherited ones
         for ((key, value) in this@SvgGradient.attributes) {
-            if (key != SvgUseNode.HREF_ATTR_KEY) {
+            if (key != SvgUseNode.HREF_ATTR_KEY && key != SvgUseNode.HREF_ATTR_NO_NS_KEY) {
                 merged[key] = value
             }
         }
