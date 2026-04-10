@@ -1,7 +1,7 @@
 package dev.tonholo.s2c
 
 import dev.tonholo.s2c.domain.FileType
-import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.NoOpLogger
 import dev.tonholo.s2c.optimizer.ContentOptimizer
@@ -38,7 +38,7 @@ class ConverterTest {
 
     private val converter = DefaultConverter(
         contentParsers = contentParsers,
-        codeEmitterFactory = CodeEmitterFactory(logger),
+        codeEmitterFactory = DefaultCodeEmitterFactory(logger),
     )
 
     @Test
@@ -114,7 +114,7 @@ class ConverterTest {
         val svgContent = """<svg viewBox="0 0 24 24"><path d="M10 10L20 20"/></svg>"""
         val emptyParsersConverter = DefaultConverter(
             contentParsers = emptyMap(),
-            codeEmitterFactory = CodeEmitterFactory(logger),
+            codeEmitterFactory = DefaultCodeEmitterFactory(logger),
         )
 
         // Act

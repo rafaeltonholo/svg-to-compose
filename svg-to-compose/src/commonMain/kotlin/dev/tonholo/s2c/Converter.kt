@@ -8,6 +8,8 @@ import dev.tonholo.s2c.ConversionStep.Parsing
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.emitter.OutputFormat
 import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
 import dev.tonholo.s2c.optimizer.ContentOptimizer
 import dev.tonholo.s2c.parser.ContentParser
@@ -92,7 +94,11 @@ class DefaultConverter(
             val iconContents = parser.parse(optimizedContent, iconName, config)
 
             emit(Generating("Generating Kotlin code..."))
-            val emitter = codeEmitterFactory.create(templateEmitterConfig = templateEmitterConfig)
+            val emitter = codeEmitterFactory.create(
+                outputFormat = OutputFormat.IMAGE_VECTOR,
+                formatConfig = FormatConfig(),
+                templateEmitterConfig = templateEmitterConfig,
+            )
             val kotlinCode = emitter.emit(iconContents)
 
             emit(

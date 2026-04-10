@@ -2,6 +2,8 @@ package dev.tonholo.s2c
 
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
+import dev.tonholo.s2c.emitter.FormatConfig
+import dev.tonholo.s2c.emitter.OutputFormat
 import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
 import dev.tonholo.s2c.emitter.template.config.TemplateConfigReader
 import dev.tonholo.s2c.error.ErrorCode
@@ -11,21 +13,29 @@ import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.isFile
 import dev.tonholo.s2c.extensions.pascalCase
 import dev.tonholo.s2c.inject.TempDirectory
+import dev.tonholo.s2c.io.DefaultTempFileWriter
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.IconWriter
 import dev.tonholo.s2c.io.TempFileWriter
 import dev.tonholo.s2c.logger.Logger
-import dev.tonholo.s2c.optimizer.Optimizer
+import dev.tonholo.s2c.optimizer.OptimizerFactory
+import dev.tonholo.s2c.output.ConversionEvent
+import dev.tonholo.s2c.output.ConversionPhase
+import dev.tonholo.s2c.output.FileResult
+import dev.tonholo.s2c.output.RunConfig
+import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
+import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import okio.Path
 import okio.Path.Companion.toPath
+import kotlin.time.TimeSource
 
 @AssistedInject
 class Processor(
@@ -34,13 +44,13 @@ class Processor(
     private val fileManager: FileManager,
     private val iconWriter: IconWriter,
     @Assisted @param:TempDirectory private val tempDirectory: Path?,
-    private val optimizers: Optimizer.Factory,
+    private val optimizers: OptimizerFactory,
     private val parser: ImageParser,
     private val codeEmitterFactory: CodeEmitterFactory,
     private val editorConfigReader: EditorConfigReader,
     private val templateConfigReader: TemplateConfigReader,
 ) {
-    private val tempFileWriter = TempFileWriter(logger, fileManager, tempDirectory)
+    private val tempFileWriter: TempFileWriter = DefaultTempFileWriter(logger, fileManager, tempDirectory)
 
     @AssistedFactory
     fun interface Factory {
@@ -78,7 +88,9 @@ class Processor(
         recursive: Boolean,
         maxDepth: Int = AppDefaults.MAX_RECURSIVE_DEPTH,
         mapIconName: IconMapperFn? = null,
+        onEvent: ((ConversionEvent) -> Unit)? = null,
     ): List<Path> {
+        val emitEvent: (ConversionEvent) -> Unit = onEvent ?: {}
         logger.verbose("Start processor execution")
         val filePath = path.toPath()
         var outputPath = output.toPath()
@@ -125,6 +137,20 @@ class Processor(
 
         val optimizers = createOptimizers(files, config.optimize)
 
+        val runMark = TimeSource.Monotonic.markNow()
+        emitEvent(
+            ConversionEvent.RunStarted(
+                config = RunConfig.from(
+                    config = config,
+                    inputPath = path,
+                    outputPath = output,
+                    recursive = runRecursively,
+                ),
+                totalFiles = files.size,
+                version = BuildConfig.VERSION,
+            ),
+        )
+
         val errors = mutableListOf<Pair<Path, Exception>>()
         val processedFiles = processFiles(
             files = files,
@@ -135,40 +161,61 @@ class Processor(
             filePath = filePath,
             errors = errors,
             mapIconName = mapIconName.orDefault(),
+            onEvent = emitEvent,
         )
 
-        if (errors.isEmpty()) {
-            if (files.size == 1) {
-                logger.output("🎉 ${files.single()} parsed to Jetpack Compose icon with success 🎉")
-            } else {
-                logger.output("🎉 SVG/Android Vector Drawable parsed to Jetpack Compose icon with success 🎉")
+        val runDuration = runMark.elapsedNow()
+        val errorCounts = errors
+            .mapNotNull { (_, exception) ->
+                when (exception) {
+                    is ExitProgramException -> exception.errorCode
+                    else -> ErrorCode.FailedToParseIconError
+                }
             }
-        } else {
+            .groupingBy { it }
+            .eachCount()
+
+        emitEvent(
+            ConversionEvent.RunCompleted(
+                stats = RunStats(
+                    totalFiles = files.size,
+                    succeeded = processedFiles.size,
+                    failed = errors.size,
+                    totalDuration = runDuration,
+                    errorCounts = errorCounts,
+                ),
+            ),
+        )
+
+        if (errors.isNotEmpty()) {
             logger.debugSection("Full error messages") {
                 errors.filter { (_, exception) ->
                     exception.message?.isNotEmpty() == true
                 }.forEach { logger.debug(it) }
             }
 
-            throw ExitProgramException(
-                errorCode = ErrorCode.FailedToParseIconError,
-                message = """
-                    |❌ Failure to parse (${errors.size}) SVG(s)/Android Vector Drawable(s) to Jetpack Compose.
-                    |Please see the logs for more information.
-                    |
-                    |Files failed to parse:
-                    |${
-                    errors.joinToString("\n") { (failedPath, exception) ->
-                        buildString {
-                            appendLine("    - $failedPath")
-                            appendLine("      Cause: ${exception.message}")
+            if (onEvent == null) {
+                throw ExitProgramException(
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    message = """
+                        |Failure to parse (${errors.size}) SVG(s)/Android Vector Drawable(s) to Jetpack Compose.
+                        |Please see the logs for more information.
+                        |
+                        |Files failed to parse:
+                        |${
+                        errors.joinToString("\n") { (failedPath, exception) ->
+                            buildString {
+                                appendLine("    - $failedPath")
+                                appendLine("      Cause: ${exception.message}")
+                            }
                         }
                     }
-                }
-                """.trimMargin(),
-                causes = errors.map { it.second }.toTypedArray(),
-            )
+                    """.trimMargin(),
+                    causes = errors.map { it.second }.toTypedArray(),
+                )
+            }
         }
+
         return processedFiles
     }
 
@@ -296,16 +343,19 @@ class Processor(
      */
     private fun processFiles(
         files: List<Path>,
-        optimizers: Optimizer.Factory?,
+        optimizers: OptimizerFactory?,
         outputPath: Path,
         parserConfig: ParserConfig,
         runRecursively: Boolean,
         filePath: Path,
         errors: MutableList<Pair<Path, Exception>>,
         mapIconName: IconMapperFn,
+        onEvent: (ConversionEvent) -> Unit,
     ): List<Path> {
         val processedFiles = mutableListOf<Path>()
-        for (file in files) {
+        for ((index, file) in files.withIndex()) {
+            val fileMark = TimeSource.Monotonic.markNow()
+            onEvent(ConversionEvent.FileStarted(fileName = file.name, index = index))
             try {
                 val processedFile = processFile(
                     file = file,
@@ -315,18 +365,45 @@ class Processor(
                     recursive = runRecursively,
                     basePath = filePath,
                     mapIconName = mapIconName,
+                    onEvent = onEvent,
                 )
                 processedFiles += processedFile
+                onEvent(
+                    ConversionEvent.FileCompleted(
+                        fileName = file.name,
+                        duration = fileMark.elapsedNow(),
+                        result = FileResult.Success,
+                    ),
+                )
                 logger.printEmpty()
             } catch (e: ExitProgramException) {
+                onEvent(
+                    ConversionEvent.FileCompleted(
+                        fileName = file.name,
+                        duration = fileMark.elapsedNow(),
+                        result = FileResult.Failed(
+                            errorCode = e.errorCode,
+                            message = e.message ?: "Unknown error",
+                        ),
+                    ),
+                )
                 throw e
             } catch (
                 e:
                 @Suppress("TooGenericExceptionCaught")
                 Exception,
             ) {
+                onEvent(
+                    ConversionEvent.FileCompleted(
+                        fileName = file.name,
+                        duration = fileMark.elapsedNow(),
+                        result = FileResult.Failed(
+                            errorCode = ErrorCode.FailedToParseIconError,
+                            message = e.message ?: "Unknown error",
+                        ),
+                    ),
+                )
                 logger.printEmpty()
-                // the generic exception is expected since we are going to exit the program with a failure later.
                 logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
                 if (config.stackTrace) {
                     logger.output(e.stackTraceToString())
@@ -356,15 +433,14 @@ class Processor(
      */
     private fun processFile(
         file: Path,
-        optimizers: Optimizer.Factory?,
+        optimizers: OptimizerFactory?,
         output: Path,
         config: ParserConfig,
         recursive: Boolean,
         basePath: Path,
         mapIconName: IconMapperFn,
+        onEvent: (ConversionEvent) -> Unit,
     ): Path {
-        logger.output("⏳ Processing ${file.name}")
-
         val iconName = if (output.isFile) {
             output.segments.last().removeSuffix(output.extension)
         } else {
@@ -374,6 +450,9 @@ class Processor(
             file = file,
         )
 
+        if (optimizers != null) {
+            onEvent(ConversionEvent.FileStepChanged(fileName = file.name, step = ConversionPhase.Optimizing))
+        }
         val finalFile = optimizers?.optimize(targetFile) ?: targetFile
 
         val relativePackage = buildRelativePackage(
@@ -385,6 +464,7 @@ class Processor(
 
         val pkg = "${config.pkg}$relativePackage"
 
+        onEvent(ConversionEvent.FileStepChanged(fileName = file.name, step = ConversionPhase.Parsing))
         logger.info("👓 Parsing the ${finalFile.extension} file")
         val iconModel = parser.parseToModel(
             file = finalFile,
@@ -400,7 +480,10 @@ class Processor(
             output / relativePackage.removePrefix(".").replace(".", "/")
         }
 
-        val resolved = config.formatConfig ?: editorConfigReader.resolve(iconOutput)
+        val resolved = config.formatConfig ?: editorConfigReader.resolve(
+            outputPath = iconOutput,
+            defaults = FormatConfig(),
+        )
         val formatConfig = config.formatOverrides?.applyTo(resolved) ?: resolved
         val templateEmitterConfig = config.template?.let { templateConfig ->
             val configPath = templateConfig.configPath
@@ -412,13 +495,16 @@ class Processor(
                 null
             }
         }
+        onEvent(ConversionEvent.FileStepChanged(fileName = file.name, step = ConversionPhase.Generating))
         val emitter = codeEmitterFactory.create(
+            outputFormat = OutputFormat.IMAGE_VECTOR,
             formatConfig = formatConfig,
             templateEmitterConfig = templateEmitterConfig,
         )
         val fileContents = emitter.emit(iconModel)
 
         logger.verbose("File contents = $fileContents")
+        onEvent(ConversionEvent.FileStepChanged(fileName = file.name, step = ConversionPhase.Writing))
         val outputFile = iconWriter.write(
             iconName = iconName,
             fileContents = fileContents,

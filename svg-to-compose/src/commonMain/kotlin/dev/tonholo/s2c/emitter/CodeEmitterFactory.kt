@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.emitter
 
+import com.rsicarelli.fakt.Fake
 import dev.tonholo.s2c.emitter.imagevector.ImageVectorEmitter
 import dev.tonholo.s2c.emitter.template.TemplateEmitter
 import dev.tonholo.s2c.emitter.template.config.TemplateEmitterConfig
@@ -8,11 +9,9 @@ import dev.zacsweers.metro.Inject
 
 /**
  * Factory for creating [CodeEmitter] instances based on [OutputFormat].
- *
- * @property logger The logger instance for diagnostic output.
  */
-@Inject
-class CodeEmitterFactory(private val logger: Logger) {
+@Fake
+interface CodeEmitterFactory {
     /**
      * Creates a [CodeEmitter] for the given output format and format configuration.
      *
@@ -25,9 +24,23 @@ class CodeEmitterFactory(private val logger: Logger) {
      * @return A [CodeEmitter] instance.
      */
     fun create(
-        outputFormat: OutputFormat = OutputFormat.IMAGE_VECTOR,
-        formatConfig: FormatConfig = FormatConfig(),
+        outputFormat: OutputFormat,
+        formatConfig: FormatConfig,
         templateEmitterConfig: TemplateEmitterConfig? = null,
+    ): CodeEmitter
+}
+
+/**
+ * Default implementation of [CodeEmitterFactory].
+ *
+ * @property logger The logger instance for diagnostic output.
+ */
+@Inject
+class DefaultCodeEmitterFactory(private val logger: Logger) : CodeEmitterFactory {
+    override fun create(
+        outputFormat: OutputFormat,
+        formatConfig: FormatConfig,
+        templateEmitterConfig: TemplateEmitterConfig?,
     ): CodeEmitter {
         val baseEmitter = when (outputFormat) {
             OutputFormat.IMAGE_VECTOR -> ImageVectorEmitter(logger, formatConfig)

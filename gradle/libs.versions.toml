@@ -8,6 +8,7 @@ kotlinx-serialization = "1.10.0"
 ktoml = "0.7.1"
 okio = "3.17.0"
 detekt = "2.0.0-alpha.2"
+fakt = "1.0.0-beta05"
 ksoup = "0.2.6"
 jetbrains-annotation = "26.1.0"
 metro = "0.13.1"
@@ -24,6 +25,7 @@ com-squareup-okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesy
 detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
 com-akuleshov7-ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
+com-rsicarelli-fakt-annotations = { module = "com.rsicarelli.fakt:annotations", version.ref = "fakt" }
 org-jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotation" }
 org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 org-jetbrains-kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
@@ -49,6 +51,7 @@ io-nlopez-compose-rules-detekt = { module = "io.nlopez.compose.rules:detekt", ve
 
 [plugins]
 app-cash-burst = { id = "app.cash.burst", version.ref = "burst" }
+com-rsicarelli-fakt = { id = "com.rsicarelli.fakt", version.ref = "fakt" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dev-zacsweers-metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

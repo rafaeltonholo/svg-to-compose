@@ -14,7 +14,7 @@ class EditorConfigReaderTest {
     @Test
     fun `resolve returns defaults when no editorconfig found`() {
         val fm = fakeFileManager(files = emptyMap())
-        val reader = EditorConfigReader(fm)
+        val reader = DefaultEditorConfigReader(fm)
         val defaults = FormatConfig(indentSize = 7)
         val result = reader.resolve("/project/src".toPath(), defaults)
         assertEquals(defaults, result)
@@ -33,8 +33,8 @@ class EditorConfigReaderTest {
             ),
             directories = setOf("/project/src", "/project"),
         )
-        val reader = EditorConfigReader(fm)
-        val result = reader.resolve("/project/src".toPath())
+        val reader = DefaultEditorConfigReader(fm)
+        val result = reader.resolve("/project/src".toPath(), defaults = FormatConfig())
         assertEquals(2, result.indentSize)
         assertEquals(IndentStyle.SPACE, result.indentStyle)
     }
@@ -56,8 +56,8 @@ class EditorConfigReaderTest {
             ),
             directories = setOf("/project/module/src", "/project/module", "/project"),
         )
-        val reader = EditorConfigReader(fm)
-        val result = reader.resolve("/project/module/src".toPath())
+        val reader = DefaultEditorConfigReader(fm)
+        val result = reader.resolve("/project/module/src".toPath(), defaults = FormatConfig())
         // child overrides parent
         assertEquals(4, result.indentSize)
         // parent value preserved
@@ -80,8 +80,8 @@ class EditorConfigReaderTest {
             ),
             directories = setOf("/project/src", "/project", "/"),
         )
-        val reader = EditorConfigReader(fm)
-        val result = reader.resolve("/project/src".toPath())
+        val reader = DefaultEditorConfigReader(fm)
+        val result = reader.resolve("/project/src".toPath(), defaults = FormatConfig())
         // Should stop at /project and not read /
         assertEquals(2, result.indentSize)
     }
@@ -98,8 +98,8 @@ class EditorConfigReaderTest {
             ),
             directories = setOf("/project"),
         )
-        val reader = EditorConfigReader(fm)
-        val result = reader.resolve("/project/output.kt".toPath())
+        val reader = DefaultEditorConfigReader(fm)
+        val result = reader.resolve("/project/output.kt".toPath(), defaults = FormatConfig())
         assertEquals(IndentStyle.TAB, result.indentStyle)
     }
 

@@ -18,7 +18,7 @@ class TemplateConfigReaderTest {
             icon_template = "val ${'$'}{icon:name}: ImageVector = TODO()"
         """.trimIndent()
         val fm = fakeFileManager(files = mapOf("/project/s2c.template.toml" to toml))
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.resolve("/project/s2c.template.toml".toPath())
         assertNotNull(config.templates.iconTemplate)
@@ -34,7 +34,7 @@ class TemplateConfigReaderTest {
             files = mapOf("/project/s2c.template.toml" to toml),
             directories = setOf("/project/output", "/project"),
         )
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.discover("/project/output".toPath())
         assertNotNull(config)
@@ -51,7 +51,7 @@ class TemplateConfigReaderTest {
             files = mapOf("/root/s2c.template.toml" to toml),
             directories = setOf("/root/project/src/output", "/root/project/src", "/root/project", "/root"),
         )
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.discover("/root/project/src/output".toPath())
         assertNotNull(config)
@@ -64,7 +64,7 @@ class TemplateConfigReaderTest {
             files = emptyMap(),
             directories = setOf("/project/output", "/project", "/"),
         )
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.discover("/project/output".toPath())
         assertNull(config)
@@ -80,7 +80,7 @@ class TemplateConfigReaderTest {
             files = mapOf("/project/s2c.template.toml" to toml),
             directories = setOf("/project"),
         )
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.discover("/project/output/Icon.kt".toPath())
         assertNotNull(config)
@@ -103,7 +103,7 @@ class TemplateConfigReaderTest {
             ),
             directories = setOf("/root/project/src", "/root/project", "/root"),
         )
-        val reader = TemplateConfigReader(fm)
+        val reader = DefaultTemplateConfigReader(fm)
 
         val config = reader.discover("/root/project/src".toPath())
         assertNotNull(config)

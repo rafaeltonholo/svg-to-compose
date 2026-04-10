@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
     alias(libs.plugins.app.cash.burst)
+    alias(libs.plugins.com.rsicarelli.fakt)
     alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
 
@@ -24,6 +25,7 @@ kotlin {
             implementation(kotlin("reflect"))
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.json)
+            implementation(libs.com.rsicarelli.fakt.annotations)
         }
 
         commonTest.dependencies {
