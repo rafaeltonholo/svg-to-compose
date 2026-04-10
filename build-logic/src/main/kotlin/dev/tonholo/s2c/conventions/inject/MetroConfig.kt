@@ -23,14 +23,11 @@ fun Project.configureMetro() {
         // incremental compilation and no module in this project uses it.
         enableTopLevelFunctionInjection.set(false)
 
-        // FIR contribution hint generation is incompatible with Kotlin/JS
-        // incremental compilation (KT-82395, KT-82989).
-        generateContributionHintsInFir.set(false)
-
-        // Restrict contribution hint generation to platforms that support it
-        // with incremental compilation. JS and WASM are excluded because they
-        // do not support generating top-level declarations from compiler
-        // plugins with IC enabled (KT-82395, KT-82989).
+        // Restrict FIR contribution hint generation to platforms that
+        // support it with incremental compilation. JS and WASM are
+        // excluded because they do not support generating top-level
+        // declarations from compiler plugins with IC enabled
+        // (KT-82395, KT-82989).
         supportedHintContributionPlatforms.set(
             setOf(
                 KotlinPlatformType.jvm,
