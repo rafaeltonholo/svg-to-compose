@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">
+  <!-- Sunset scene with sun glow offset toward horizon -->
+  <defs>
+    <radialGradient id="sky" cx="200" cy="180" r="250" fx="200" fy="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff44f"/>
+      <stop offset="15%" stop-color="#ff9a3c"/>
+      <stop offset="35%" stop-color="#ff6b6b"/>
+      <stop offset="55%" stop-color="#c94b8c"/>
+      <stop offset="75%" stop-color="#5b3a8c"/>
+      <stop offset="100%" stop-color="#1a1a3e"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="200" cy="165" r="40" fx="195" fy="158" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#fff9c4"/>
+      <stop offset="70%" stop-color="#ffcc02"/>
+      <stop offset="100%" stop-color="#ff8800" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="water" cx="200" cy="210" r="220" fx="200" fy="185" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff9a3c" stop-opacity="0.8"/>
+      <stop offset="30%" stop-color="#c94b8c" stop-opacity="0.5"/>
+      <stop offset="60%" stop-color="#2a3a6e" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#0a1628"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="180" fill="url(#sky)"/>
+  <circle cx="200" cy="165" r="40" fill="url(#sun)"/>
+  <rect y="180" width="400" height="70" fill="url(#water)"/>
+</svg>
