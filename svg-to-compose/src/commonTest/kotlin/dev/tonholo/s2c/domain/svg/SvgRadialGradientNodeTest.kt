@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.domain.svg
 
+import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import kotlin.math.sqrt
@@ -392,4 +393,442 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
             actual = brush.radius,
         )
     }
+
+    @Test
+    fun `given radialGradient href referencing another radialGradient - when toBrush is called - then inherits stops and local geometry wins`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf("id" to "baseGrad"),
+        )
+        root.gradients["baseGrad"] = baseGradient
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "refGrad",
+                "xlink:href" to "#baseGrad",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["refGrad"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert — local cx/cy/r override referenced, stops are inherited from baseGrad
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 50f, y = 50f),
+            actual = brush.center,
+        )
+        assertEquals(
+            expected = 40f,
+            actual = brush.radius,
+        )
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given radialGradient href referencing a linearGradient with stops - when toBrush is called - then produces radial brush with linear's stops`() {
+        // Arrange - per SVG spec, cross-type href inherits stops from the referenced gradient
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val linearStop1 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "0", "stop-color" to "#AABBCC"),
+        )
+        val linearStop2 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "1", "stop-color" to "#DDEEFF"),
+        )
+        val linearGradient = SvgLinearGradientNode(
+            parent = root,
+            children = mutableSetOf(linearStop1, linearStop2),
+            attributes = mutableMapOf("id" to "linGrad1"),
+        )
+        root.gradients["linGrad1"] = linearGradient
+        val radialGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "radGradRef",
+                "xlink:href" to "#linGrad1",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["radGradRef"] = radialGradient
+
+        // Act
+        val brush = radialGradient.toBrush(target = emptyList())
+
+        // Assert - must be a RADIAL brush (element type), not linear
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 50f, y = 50f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 40f, actual = brush.radius)
+        assertEquals(expected = 2, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given radialGradient with local stops and href - when toBrush is called - then uses local stops over referenced stops`() {
+        // Arrange - per SVG spec, if the referencing gradient has its own stops, they override
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf("id" to "baseStops"),
+        )
+        root.gradients["baseStops"] = baseGradient
+
+        // Referencing gradient has its own 2 stops (different from baseGradient's 3)
+        val localStop1 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "0", "stop-color" to "#111111"),
+        )
+        val localStop2 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "1", "stop-color" to "#222222"),
+        )
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(localStop1, localStop2),
+            attributes = mutableMapOf(
+                "id" to "localStopsGrad",
+                "xlink:href" to "#baseStops",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["localStopsGrad"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert - local 2 stops should be used, not referenced 3 stops
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(expected = 2, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given chained radialGradient href A to B to C - when toBrush is called - then resolves deepest stops and uses outermost attributes`() {
+        // Arrange - A -> B -> C chain; C has stops, A has geometry overrides
+        root.attributes["width"] = "500"
+        root.attributes["height"] = "400"
+        root.attributes["viewBox"] = "0 0 500 400"
+        val gradientC = createGradientWithStops(
+            attributes = mutableMapOf("id" to "gradC"),
+        )
+        root.gradients["gradC"] = gradientC
+
+        val gradientB = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "gradB",
+                "xlink:href" to "#gradC",
+                "spreadMethod" to "reflect",
+                "gradientUnits" to "userSpaceOnUse",
+                "cx" to "225",
+                "cy" to "75",
+                "r" to "55",
+            ),
+        )
+        root.gradients["gradB"] = gradientB
+
+        val gradientA = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "gradA",
+                "xlink:href" to "#gradB",
+                "cx" to "225",
+                "cy" to "75",
+                "r" to "40",
+            ),
+        )
+        root.gradients["gradA"] = gradientA
+
+        // Act
+        val brush = gradientA.toBrush(target = emptyList())
+
+        // Assert - A's r=40 overrides B's r=55, B's spreadMethod/gradientUnits inherited,
+        // C's stops inherited through the chain
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+        assertEquals(expected = 40f, actual = brush.radius)
+    }
+
+    @Test
+    fun `given radialGradient href with conflicting attributes - when toBrush is called - then local attributes override referenced`() {
+        // Arrange - referenced has cx=30, r=20; referencing has cx=70, r=50. Local should win.
+        root.attributes["width"] = "200"
+        root.attributes["height"] = "200"
+        root.attributes["viewBox"] = "0 0 200 200"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "conflictBase",
+                "cx" to "30",
+                "cy" to "30",
+                "r" to "20",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["conflictBase"] = baseGradient
+
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "conflictRef",
+                "xlink:href" to "#conflictBase",
+                "cx" to "70",
+                "cy" to "70",
+                "r" to "50",
+            ),
+        )
+        root.gradients["conflictRef"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert - local cx=70, cy=70, r=50 must win over referenced cx=30, cy=30, r=20
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 70f, y = 70f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 50f, actual = brush.radius)
+        assertEquals(expected = 3, actual = brush.colors.size)
+    }
+
+    @Test
+    fun `given objectBoundingBox radial gradient with fractional values - when toBrush is called - then fractions scale by bounding box dimensions`() {
+        // Arrange - Case 6 from the test SVG: derivedBBox with objectBoundingBox
+        // Rect at x=315, y=165, width=120, height=120
+        root.attributes["width"] = "500"
+        root.attributes["height"] = "400"
+        root.attributes["viewBox"] = "0 0 500 400"
+        val gradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "bboxGrad",
+                "gradientUnits" to "objectBoundingBox",
+                "cx" to "0.4",
+                "cy" to "0.4",
+                "r" to "0.6",
+            ),
+        )
+        root.gradients["bboxGrad"] = gradient
+        val target = createRectTarget(x = 315.0, y = 165.0, width = 120.0, height = 120.0)
+
+        // Act
+        val brush = gradient.toBrush(target = target)
+
+        // Assert
+        // cx = 0.4 * 120 + 315 = 363
+        // cy = 0.4 * 120 + 165 = 213
+        // r = 0.6 * 120 = 72
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 363f, y = 213f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 72f, actual = brush.radius)
+    }
+
+    @Test
+    fun `given userSpaceOnUse radial gradient with fx fy different from cx cy - when toBrush is called - then center uses cx cy and fx fy is dropped`() {
+        // Arrange - Compose has no focal point parameter, so we use cx/cy as
+        // the gradient center (matching Android Studio behavior). The focal
+        // point offset is dropped as an accepted limitation.
+        root.attributes["width"] = "500"
+        root.attributes["height"] = "400"
+        root.attributes["viewBox"] = "0 0 500 400"
+        val gradient = createGradientWithStops(
+            attributes = mutableMapOf(
+                "id" to "focalGrad",
+                "cx" to "150",
+                "cy" to "350",
+                "r" to "45",
+                "fx" to "135",
+                "fy" to "340",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["focalGrad"] = gradient
+
+        // Act
+        val brush = gradient.toBrush(target = emptyList())
+
+        // Assert - center uses cx/cy, not fx/fy
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 150f, y = 350f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 45f, actual = brush.radius)
+        // Stops are unchanged
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+    }
+
+    // region SVG2 plain "href" tests (mirror of xlink:href tests above)
+
+    @Test
+    fun `given radialGradient with plain href referencing another radialGradient - when toBrush is called - then inherits stops and local geometry wins`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf("id" to "baseGrad"),
+        )
+        root.gradients["baseGrad"] = baseGradient
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "refGrad",
+                "href" to "#baseGrad",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["refGrad"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 50f, y = 50f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 40f, actual = brush.radius)
+        assertEquals(expected = 3, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 0.5f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given radialGradient with plain href referencing a linearGradient - when toBrush is called - then produces radial brush with linear's stops`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val linearStop1 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "0", "stop-color" to "#AABBCC"),
+        )
+        val linearStop2 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "1", "stop-color" to "#DDEEFF"),
+        )
+        val linearGradient = SvgLinearGradientNode(
+            parent = root,
+            children = mutableSetOf(linearStop1, linearStop2),
+            attributes = mutableMapOf("id" to "linGrad1"),
+        )
+        root.gradients["linGrad1"] = linearGradient
+        val radialGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(),
+            attributes = mutableMapOf(
+                "id" to "radGradRef",
+                "href" to "#linGrad1",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["radGradRef"] = radialGradient
+
+        // Act
+        val brush = radialGradient.toBrush(target = emptyList())
+
+        // Assert
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(
+            expected = ComposeOffset(x = 50f, y = 50f),
+            actual = brush.center,
+        )
+        assertEquals(expected = 40f, actual = brush.radius)
+        assertEquals(expected = 2, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 1f), actual = brush.stops)
+    }
+
+    @Test
+    fun `given radialGradient with local stops and plain href - when toBrush is called - then uses local stops over referenced stops`() {
+        // Arrange
+        root.attributes["width"] = "100"
+        root.attributes["height"] = "100"
+        root.attributes["viewBox"] = "0 0 100 100"
+        val baseGradient = createGradientWithStops(
+            attributes = mutableMapOf("id" to "baseStops"),
+        )
+        root.gradients["baseStops"] = baseGradient
+
+        val localStop1 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "0", "stop-color" to "#111111"),
+        )
+        val localStop2 = SvgGradientStopNode(
+            parent = root,
+            attributes = mutableMapOf("offset" to "1", "stop-color" to "#222222"),
+        )
+        val referencingGradient = SvgRadialGradientNode(
+            parent = root,
+            children = mutableSetOf(localStop1, localStop2),
+            attributes = mutableMapOf(
+                "id" to "localStopsGrad",
+                "href" to "#baseStops",
+                "cx" to "50",
+                "cy" to "50",
+                "r" to "40",
+                "gradientUnits" to "userSpaceOnUse",
+            ),
+        )
+        root.gradients["localStopsGrad"] = referencingGradient
+
+        // Act
+        val brush = referencingGradient.toBrush(target = emptyList())
+
+        // Assert
+        assertIs<ComposeBrush.Gradient.Radial>(brush)
+        assertEquals(expected = 2, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 1f), actual = brush.stops)
+    }
+
+    // endregion
+
+    /**
+     * Creates a list of absolute path nodes forming a rectangle,
+     * used as target for objectBoundingBox gradient calculations.
+     */
+    private fun createRectTarget(x: Double, y: Double, width: Double, height: Double): List<PathNodes> = listOf(
+        PathNodes.MoveTo(values = listOf("$x", "$y"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("${x + width}", "$y"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("${x + width}", "${y + height}"), isRelative = false, minified = false),
+        PathNodes.LineTo(values = listOf("$x", "${y + height}"), isRelative = false, minified = false),
+    )
 }

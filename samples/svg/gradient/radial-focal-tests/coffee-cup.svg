@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="250" viewBox="0 0 200 250">
+  <!-- Coffee cup with liquid surface highlight -->
+  <defs>
+    <radialGradient id="cupBody" cx="90" cy="160" r="70" fx="75" fy="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0e6d3"/>
+      <stop offset="40%" stop-color="#d4c4a8"/>
+      <stop offset="70%" stop-color="#b8a080"/>
+      <stop offset="100%" stop-color="#8c7050"/>
+    </radialGradient>
+    <radialGradient id="coffee" cx="90" cy="105" r="55" fx="75" fy="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b6914"/>
+      <stop offset="20%" stop-color="#6b4a10"/>
+      <stop offset="50%" stop-color="#4a3008"/>
+      <stop offset="80%" stop-color="#2d1a04"/>
+      <stop offset="100%" stop-color="#1a0f02"/>
+    </radialGradient>
+    <radialGradient id="coffeeSheen" cx="80" cy="100" r="40" fx="70" fy="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="40%" stop-color="#ddcc88" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="steam" cx="90" cy="60" r="50" fx="85" fy="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Steam -->
+  <ellipse cx="90" cy="55" rx="35" ry="40" fill="url(#steam)"/>
+  <!-- Cup body -->
+  <path d="M40,95 L40,200 Q40,225 65,225 L115,225 Q140,225 140,200 L140,95z" fill="url(#cupBody)"/>
+  <!-- Handle -->
+  <path d="M140,120 Q175,120 175,155 Q175,190 140,190" stroke="#b8a080" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Coffee surface -->
+  <ellipse cx="90" cy="100" rx="50" ry="15" fill="url(#coffee)"/>
+  <ellipse cx="90" cy="100" rx="50" ry="15" fill="url(#coffeeSheen)"/>
+  <!-- Cup rim -->
+  <ellipse cx="90" cy="95" rx="52" ry="8" fill="none" stroke="#c8b090" stroke-width="3"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Realistic eye iris with pupil highlight -->
+  <defs>
+    <radialGradient id="sclera" cx="100" cy="100" r="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f5f5f0"/>
+      <stop offset="70%" stop-color="#e8e0d8"/>
+      <stop offset="100%" stop-color="#d4c8bc"/>
+    </radialGradient>
+    <radialGradient id="iris" cx="100" cy="100" r="45" fx="90" fy="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2a1a0a"/>
+      <stop offset="25%" stop-color="#4a6741"/>
+      <stop offset="50%" stop-color="#6b8f5e"/>
+      <stop offset="70%" stop-color="#3d6b3d"/>
+      <stop offset="90%" stop-color="#1a3d1a"/>
+      <stop offset="100%" stop-color="#0d1f0d"/>
+    </radialGradient>
+    <radialGradient id="pupil" cx="100" cy="100" r="18" fx="95" fy="93" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#000000"/>
+      <stop offset="85%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </radialGradient>
+    <radialGradient id="highlight" cx="88" cy="85" r="12" fx="85" fy="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="100" rx="90" ry="60" fill="url(#sclera)"/>
+  <circle cx="100" cy="100" r="45" fill="url(#iris)"/>
+  <circle cx="100" cy="100" r="18" fill="url(#pupil)"/>
+  <circle cx="88" cy="85" r="12" fill="url(#highlight)"/>
+</svg>

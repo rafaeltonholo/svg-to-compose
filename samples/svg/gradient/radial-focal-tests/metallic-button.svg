@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Metallic raised button with off-center lighting -->
+  <defs>
+    <radialGradient id="btnOuter" cx="100" cy="100" r="70" fx="80" fy="75" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e0e0e0"/>
+      <stop offset="40%" stop-color="#c0c0c0"/>
+      <stop offset="70%" stop-color="#909090"/>
+      <stop offset="100%" stop-color="#505050"/>
+    </radialGradient>
+    <radialGradient id="btnInner" cx="100" cy="100" r="55" fx="85" fy="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8f8f8"/>
+      <stop offset="30%" stop-color="#4a90d9"/>
+      <stop offset="60%" stop-color="#2a70b9"/>
+      <stop offset="100%" stop-color="#1a4a7a"/>
+    </radialGradient>
+    <radialGradient id="btnGloss" cx="100" cy="80" r="50" fx="90" fy="65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="100" cy="100" r="70" fill="url(#btnOuter)"/>
+  <circle cx="100" cy="100" r="55" fill="url(#btnInner)"/>
+  <ellipse cx="100" cy="80" rx="40" ry="30" fill="url(#btnGloss)"/>
+</svg>
