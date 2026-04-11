@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.cli.logger
 
+import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Inject
@@ -11,11 +12,13 @@ import dev.zacsweers.metro.Inject
  * The underlying implementation is internal to the library.
  */
 @Inject
-internal class CliLogger(private val config: S2cConfig) : Logger {
+internal class CliLogger(private val context: SvgToComposeContext) : Logger {
     private companion object {
         private const val SECTION_WIDTH = 50
         private const val SECTION_PADDING = SECTION_WIDTH / 2
     }
+
+    private val config get() = context.configSnapshot
 
     override fun debug(message: Any) {
         if (!config.silent && config.debug) {
