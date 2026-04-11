@@ -14,7 +14,12 @@ import platform.posix.stderr
 @OptIn(ExperimentalForeignApi::class)
 context(logger: Logger)
 actual fun executeCommand(command: Command): CommandResult {
-    val commandToExecute = command.commandToExecute
+    val baseCommand = command.commandToExecute
+    // When stderr display is suppressed, redirect it into stdout so popen
+    // captures both streams. Without this, stderr flows directly to the
+    // terminal, which breaks TUI animations.
+    val commandToExecute = if (!command.showStderr) "$baseCommand 2>&1" else baseCommand
+    logger.verbose("Command to execute: $baseCommand")
     val fp = popen(commandToExecute, "r") ?: error("Failed to run command: $command")
 
     val output = buildString {

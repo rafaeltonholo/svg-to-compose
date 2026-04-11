@@ -16,13 +16,18 @@ import dev.tonholo.s2c.parser.ParserConfig
  * @property packageName the Kotlin package for generated code.
  * @property optimizationEnabled whether SVG/AVG optimization is active.
  * @property recursive whether directory traversal is recursive.
+ * @property recursiveDepth the maximum depth for recursive directory traversal.
+ * @property noTui whether TUI (terminal user interface) is disabled.
  */
 data class RunConfig(
     val inputPath: String,
     val outputPath: String,
+    val parserConfig: ParserConfig,
     val packageName: String,
     val optimizationEnabled: Boolean,
     val recursive: Boolean,
+    val recursiveDepth: Int = 0,
+    val noTui: Boolean = false,
 ) {
     companion object {
         /**
@@ -40,6 +45,7 @@ data class RunConfig(
             RunConfig(
                 inputPath = inputPath,
                 outputPath = outputPath,
+                parserConfig = config,
                 packageName = config.pkg,
                 optimizationEnabled = config.optimize,
                 recursive = recursive,

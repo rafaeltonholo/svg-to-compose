@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.output
 
+import dev.tonholo.s2c.output.ConversionEventTest.Companion.TEST_PARSER_CONFIG
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.seconds
@@ -14,6 +15,7 @@ class OutputRendererTest {
         val config = RunConfig(
             inputPath = "/in",
             outputPath = "/out",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
             recursive = false,
@@ -38,6 +40,7 @@ class OutputRendererTest {
         val config = RunConfig(
             inputPath = "/in",
             outputPath = "/out",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
             recursive = false,
