@@ -77,8 +77,6 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         makeInternal = makeInternal.get(),
         exclude = excludePattern.orNull?.toRegex(),
         kmpPreview = kmpPreview.get(),
-        // Keep plugin silent; CLI/library handle their own output
-        silent = true,
         keepTempFolder = true,
         template = TemplateConfig(
             configPath = templateFilePath.orNull?.asFile?.toOkioPath(),
