@@ -50,4 +50,10 @@ internal class ConsoleLogger(@param:EnableDebugQualifier val enableLogs: Boolean
     override fun error(message: String, throwable: Throwable?) {
         console.error("[ERROR] $message", throwable)
     }
+
+    override fun printEmpty() {
+        if (enableLogs) {
+            console.log("")
+        }
+    }
 }

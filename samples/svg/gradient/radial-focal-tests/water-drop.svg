@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="220" viewBox="0 0 150 220">
+  <!-- Water droplet with caustic highlight -->
+  <defs>
+    <radialGradient id="dropBody" cx="75" cy="130" r="55" fx="60" fy="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#b8e4f0"/>
+      <stop offset="30%" stop-color="#68b8d7"/>
+      <stop offset="60%" stop-color="#3a8eb8"/>
+      <stop offset="85%" stop-color="#1a5f80"/>
+      <stop offset="100%" stop-color="#0d3b52"/>
+    </radialGradient>
+    <radialGradient id="dropHighlight" cx="65" cy="110" r="20" fx="60" fy="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#e0f4ff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#68b8d7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dropShadow" cx="75" cy="200" r="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a3d52" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#1a3d52" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dropCaustic" cx="85" cy="155" r="15" fx="88" fy="158" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#b8e4f0" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#3a8eb8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Ground shadow -->
+  <ellipse cx="75" cy="200" rx="40" ry="8" fill="url(#dropShadow)"/>
+  <!-- Drop body (teardrop shape) -->
+  <path d="M75,40 Q75,40 50,110 Q35,145 50,165 Q60,180 75,180 Q90,180 100,165 Q115,145 100,110 Q75,40 75,40z" fill="url(#dropBody)"/>
+  <!-- Main highlight -->
+  <ellipse cx="65" cy="110" rx="12" ry="16" fill="url(#dropHighlight)"/>
+  <!-- Caustic at bottom -->
+  <ellipse cx="85" cy="155" rx="10" ry="8" fill="url(#dropCaustic)"/>
+</svg>

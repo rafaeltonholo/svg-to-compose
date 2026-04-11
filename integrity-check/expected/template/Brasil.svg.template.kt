@@ -8,11 +8,11 @@ import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.Icons
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.icon
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconGroup
-import dev.tonholo.svg_to_compose.playground.ui.icon.template.iconPath
-import dev.tonholo.svg_to_compose.playground.ui.theme.SampleAppTheme
+import dev.tonholo.svgtocompose.playground.ui.icon.template.Icons
+import dev.tonholo.svgtocompose.playground.ui.icon.template.icon
+import dev.tonholo.svgtocompose.playground.ui.icon.template.iconGroup
+import dev.tonholo.svgtocompose.playground.ui.icon.template.iconPath
+import dev.tonholo.svgtocompose.playground.ui.theme.SampleAppTheme
 
 val Icons.Brasil: ImageVector by lazy {
     icon(name = "Brasil", viewportWidth = 4200.0f, viewportHeight = 2940.0f) {

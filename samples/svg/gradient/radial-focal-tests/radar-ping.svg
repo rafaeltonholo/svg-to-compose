@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" viewBox="0 0 250 250">
+  <!-- Radar/sonar ping with off-center pulse origin -->
+  <defs>
+    <radialGradient id="radarBg" cx="125" cy="125" r="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0a1a0a"/>
+      <stop offset="100%" stop-color="#001200"/>
+    </radialGradient>
+    <radialGradient id="radarGrid" cx="125" cy="125" r="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00ff00" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#00ff00" stop-opacity="0.02"/>
+    </radialGradient>
+    <radialGradient id="ping1" cx="125" cy="125" r="100" fx="95" fy="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00ff88" stop-opacity="0.8"/>
+      <stop offset="15%" stop-color="#00dd66" stop-opacity="0.4"/>
+      <stop offset="40%" stop-color="#00aa44" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#004422" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blip" cx="160" cy="90" r="12" fx="158" fy="87" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00ff00"/>
+      <stop offset="50%" stop-color="#00cc00" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#009900" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blip2" cx="90" cy="170" r="8" fx="88" fy="168" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00ff00"/>
+      <stop offset="50%" stop-color="#00cc00" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#009900" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Background -->
+  <circle cx="125" cy="125" r="120" fill="url(#radarBg)"/>
+  <circle cx="125" cy="125" r="110" fill="url(#radarGrid)"/>
+  <!-- Grid rings -->
+  <circle cx="125" cy="125" r="30" fill="none" stroke="#00ff00" stroke-opacity="0.15" stroke-width="0.5"/>
+  <circle cx="125" cy="125" r="60" fill="none" stroke="#00ff00" stroke-opacity="0.15" stroke-width="0.5"/>
+  <circle cx="125" cy="125" r="90" fill="none" stroke="#00ff00" stroke-opacity="0.15" stroke-width="0.5"/>
+  <!-- Cross hairs -->
+  <line x1="125" y1="15" x2="125" y2="235" stroke="#00ff00" stroke-opacity="0.1" stroke-width="0.5"/>
+  <line x1="15" y1="125" x2="235" y2="125" stroke="#00ff00" stroke-opacity="0.1" stroke-width="0.5"/>
+  <!-- Ping wave -->
+  <circle cx="125" cy="125" r="100" fill="url(#ping1)"/>
+  <!-- Blips -->
+  <circle cx="160" cy="90" r="12" fill="url(#blip)"/>
+  <circle cx="90" cy="170" r="8" fill="url(#blip2)"/>
+  <!-- Center dot -->
+  <circle cx="125" cy="125" r="3" fill="#00ff00" opacity="0.8"/>
+</svg>

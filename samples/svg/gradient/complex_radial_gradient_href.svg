@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250" height="200" viewBox="0 0 500 400">
+  <defs>
+    <!--
+      === CASE 1: Simple href (radial → radial) ===
+      "derived1" inherits stops from "baseRadial" and overrides position/radius.
+    -->
+    <radialGradient id="baseRadial">
+      <stop offset="0%" stop-color="#FF6B6B" />
+      <stop offset="50%" stop-color="#845EC2" />
+      <stop offset="100%" stop-color="#0081CF" />
+    </radialGradient>
+    <radialGradient id="derived1" xlink:href="#baseRadial" cx="75" cy="75" r="60" fx="60" fy="60" />
+
+    <!--
+      === CASE 2: Chained href (radial → radial → radial) ===
+      "chainMiddle" inherits stops from "baseRadial" and sets spreadMethod.
+      "chainEnd" inherits everything from "chainMiddle" (and transitively "baseRadial")
+      but overrides the center point and radius.
+    -->
+    <radialGradient id="chainMiddle" xlink:href="#baseRadial" spreadMethod="reflect" gradientUnits="userSpaceOnUse"
+        cx="225" cy="75" r="55" />
+    <radialGradient id="chainEnd" xlink:href="#chainMiddle" cx="225" cy="75" r="40" fx="210" fy="65" />
+
+    <!--
+      === CASE 3: Cross-type href (radial → linear) ===
+      "radialFromLinear" is a radialGradient that inherits color stops
+      from a linearGradient definition.
+    -->
+    <linearGradient id="baseLinear">
+      <stop offset="0%" stop-color="#F9F871" />
+      <stop offset="33%" stop-color="#FF9671" />
+      <stop offset="66%" stop-color="#D65DB1" />
+      <stop offset="100%" stop-color="#2C73D2" />
+    </linearGradient>
+    <radialGradient id="radialFromLinear" xlink:href="#baseLinear" cx="375" cy="75" r="55" fx="360" fy="65"
+        gradientUnits="userSpaceOnUse" />
+
+    <!--
+      === CASE 4: href with local stop-opacity overrides ===
+      "baseOpaque" defines fully opaque stops.
+      "derivedTranslucent" inherits from "baseOpaque" but adds its own
+      stops that override with partial transparency.
+    -->
+    <radialGradient id="baseOpaque">
+      <stop offset="0%" stop-color="#00C9A7" />
+      <stop offset="100%" stop-color="#C34A36" />
+    </radialGradient>
+    <radialGradient id="derivedTranslucent" xlink:href="#baseOpaque" cx="75" cy="225" r="55"
+        gradientUnits="userSpaceOnUse">
+      <!-- Local stops should OVERRIDE inherited stops entirely -->
+      <stop offset="0%" stop-color="#00C9A7" stop-opacity="0.9" />
+      <stop offset="40%" stop-color="#FFC75F" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#C34A36" stop-opacity="0.3" />
+    </radialGradient>
+
+    <!--
+      === CASE 5: href with gradientTransform ===
+      "baseSimple" has stops. "transformedDerived" inherits stops
+      and applies a rotation + scale transform.
+    -->
+    <radialGradient id="baseSimple">
+      <stop offset="0%" stop-color="white" />
+      <stop offset="35%" stop-color="#A8E6CF" />
+      <stop offset="70%" stop-color="#3D5A80" />
+      <stop offset="100%" stop-color="#1B2838" />
+    </radialGradient>
+    <radialGradient id="transformedDerived" xlink:href="#baseSimple" cx="225" cy="225" r="55"
+        gradientUnits="userSpaceOnUse" gradientTransform="rotate(15, 225, 225) scale(1.2)" />
+
+    <!--
+      === CASE 6: href with objectBoundingBox units ===
+      "baseBBox" defines stops. "derivedBBox" inherits them and uses
+      fractional cx/cy/r in objectBoundingBox coordinate space.
+    -->
+    <radialGradient id="baseBBox">
+      <stop offset="0%" stop-color="#FFF1C1" />
+      <stop offset="25%" stop-color="#F7B267" />
+      <stop offset="50%" stop-color="#F25C54" />
+      <stop offset="75%" stop-color="#A12568" />
+      <stop offset="100%" stop-color="#30011E" />
+    </radialGradient>
+    <radialGradient id="derivedBBox" xlink:href="#baseBBox" gradientUnits="objectBoundingBox" cx="0.4" cy="0.4" r="0.6"
+        fx="0.3" fy="0.3" />
+
+    <!--
+      === CASE 7: Diamond href chain with shared base ===
+      Two different gradients both reference the same base, producing
+      different visual results from the same inherited stops.
+    -->
+    <radialGradient id="sharedBase">
+      <stop offset="0%" stop-color="#E0AAFF" />
+      <stop offset="50%" stop-color="#7B2FF7" />
+      <stop offset="100%" stop-color="#0A0A23" />
+    </radialGradient>
+    <radialGradient id="fanA" xlink:href="#sharedBase" cx="150" cy="350" r="45" fx="135" fy="340"
+        gradientUnits="userSpaceOnUse" spreadMethod="pad" />
+    <radialGradient id="fanB" xlink:href="#sharedBase" cx="250" cy="350" r="30" fx="265" fy="360"
+        gradientUnits="userSpaceOnUse" spreadMethod="reflect" />
+  </defs>
+
+  <!-- Row 1 -->
+  <circle cx="75" cy="75" r="60" fill="url(#derived1)" />
+  <circle cx="225" cy="75" r="60" fill="url(#chainEnd)" />
+  <circle cx="375" cy="75" r="60" fill="url(#radialFromLinear)" />
+
+  <!-- Row 2 -->
+  <circle cx="75" cy="225" r="60" fill="url(#derivedTranslucent)" />
+  <circle cx="225" cy="225" r="60" fill="url(#transformedDerived)" />
+  <rect x="315" y="165" width="120" height="120" rx="12" fill="url(#derivedBBox)" />
+
+  <!-- Row 3: diamond fan-out -->
+  <ellipse cx="150" cy="350" rx="55" ry="40" fill="url(#fanA)" />
+  <ellipse cx="250" cy="350" rx="55" ry="40" fill="url(#fanB)" />
+</svg>

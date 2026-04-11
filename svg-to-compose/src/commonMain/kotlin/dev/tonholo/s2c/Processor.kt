@@ -1,5 +1,6 @@
 package dev.tonholo.s2c
 
+import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.FormatConfig
@@ -28,7 +29,6 @@ import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.orDefault
-import dev.tonholo.s2c.config.BuildConfig
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
