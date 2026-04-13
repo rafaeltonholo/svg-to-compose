@@ -50,6 +50,9 @@ internal class DashboardWidgetMaker(
                 cell(Text(" "))
             }
             cell(statsWidget.withPadding { top = 1 })
+            currentState.updateNotification?.let { notification ->
+                cell(updateNotificationSection(state = notification))
+            }
         }.withPadding {
             vertical = VERTICAL_PADDING
             horizontal = HORIZONTAL_PADDING
