@@ -224,6 +224,8 @@ fn_main() {
     done
   fi
 
+  export S2C_WRAPPER=true
+
   if [[ $USE_JVM == true ]]; then
     command java -jar "$JAR_PATH" "${args[@]}"
   else
