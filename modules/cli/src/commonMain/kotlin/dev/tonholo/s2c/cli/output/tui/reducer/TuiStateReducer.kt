@@ -5,6 +5,7 @@ import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
+import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
@@ -116,3 +117,22 @@ internal fun reduceRecentFiles(state: RecentFilesState, event: ConversionEvent):
         is ConversionEvent.UpdateAvailable,
         -> state
     }
+
+internal fun reduceUpdateNotification(
+    state: UpdateNotificationState?,
+    event: ConversionEvent,
+): UpdateNotificationState? = when (event) {
+    is ConversionEvent.UpdateAvailable -> UpdateNotificationState(
+        currentVersion = event.current,
+        latestVersion = event.latest,
+        releaseUrl = event.releaseUrl,
+        isWrapper = event.isWrapper,
+    )
+
+    is ConversionEvent.RunStarted,
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.FileCompleted,
+    is ConversionEvent.RunCompleted,
+    -> state
+}
