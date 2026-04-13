@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.cli.inject
 
+import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.cli.logger.CliLogger
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
@@ -22,7 +23,10 @@ import okio.SYSTEM
  *
  * Created once per CLI invocation via [Factory.create].
  */
-@DependencyGraph(AppScope::class)
+@DependencyGraph(
+    scope = AppScope::class,
+    additionalScopes = [CliScope::class],
+)
 internal interface CliGraph {
     /** The Clikt command entry point, fully injected with all dependencies. */
     val client: Client
@@ -38,6 +42,10 @@ internal interface CliGraph {
     @Provides
     fun provideFileSystem(): FileSystem = FileSystem.SYSTEM
 
+    /** Provides a [Terminal] instance for TUI rendering and raw input handling. */
+    @Provides
+    fun provideTerminal(): Terminal = Terminal()
+
     /**
      * Factory for creating the [CliGraph].
      */
@@ -52,3 +60,5 @@ internal interface CliGraph {
         fun create(@Provides config: CliConfig): CliGraph
     }
 }
+
+internal abstract class CliScope

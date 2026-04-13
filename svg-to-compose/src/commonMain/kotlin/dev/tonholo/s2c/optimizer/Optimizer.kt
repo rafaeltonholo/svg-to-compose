@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.optimizer
 
 import com.rsicarelli.fakt.Fake
+import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.command.command
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.error.ErrorCode
@@ -42,7 +43,9 @@ interface OptimizerFactory {
     fun optimize(file: Path): Path
 }
 
-sealed class Optimizer(private val logger: Logger) {
+sealed class Optimizer(private val logger: Logger, private val context: SvgToComposeContext) {
+    private val config get() = context.configSnapshot
+
     /**
      * Represents the external command that will be used
      * for optimization.
@@ -129,6 +132,8 @@ sealed class Optimizer(private val logger: Logger) {
             command(program = command) {
                 args(*args)
                 trim = true
+                showStdout = !config.silent
+                showStderr = !config.silent
             }.also { (exitCode, output) ->
                 if (exitCode != 0) {
                     throw OptimizationException(
@@ -149,7 +154,11 @@ sealed class Optimizer(private val logger: Logger) {
      *
      * @see <a href="https://svgo.dev/">SVGO documentation</a>
      */
-    class SvgoOptimizer(private val logger: Logger, private val fileManager: FileManager) : Optimizer(logger) {
+    class SvgoOptimizer(
+        private val logger: Logger,
+        private val fileManager: FileManager,
+        context: SvgToComposeContext,
+    ) : Optimizer(logger, context) {
         override val command: String = "svgo"
         override val allowedExtension: String = FileType.Svg.extension
 
@@ -201,7 +210,7 @@ sealed class Optimizer(private val logger: Logger) {
      *
      * @see <a href="https://github.com/alexjlockwood/avocado">Avocado documentation</a>
      */
-    class AvocadoOptimizer(logger: Logger) : Optimizer(logger) {
+    class AvocadoOptimizer(logger: Logger, context: SvgToComposeContext) : Optimizer(logger, context) {
         override val command: String = "avocado"
         override val allowedExtension: String = FileType.Avg.extension
 
@@ -215,19 +224,20 @@ sealed class Optimizer(private val logger: Logger) {
     }
 
     @Inject
-    class Factory(private val logger: Logger, fileManager: FileManager) : OptimizerFactory {
+    class Factory(private val logger: Logger, fileManager: FileManager, context: SvgToComposeContext) :
+        OptimizerFactory {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */
         private val svgOptimizers: Set<Optimizer> = setOf(
-            SvgoOptimizer(logger, fileManager),
+            SvgoOptimizer(logger, fileManager, context),
         )
 
         /**
          * Set of optimizers that will be used specifically for AVG files.
          */
         private val avgOptimizers: Set<Optimizer> = setOf(
-            AvocadoOptimizer(logger),
+            AvocadoOptimizer(logger, context),
         )
 
         /**

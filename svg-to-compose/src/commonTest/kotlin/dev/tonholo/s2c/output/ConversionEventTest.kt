@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.output
 
 import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.output.ConversionEventTest.Companion.TEST_PARSER_CONFIG
 import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,6 +13,19 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class ConversionEventTest {
+    companion object {
+        val TEST_PARSER_CONFIG = ParserConfig(
+            pkg = "com.example",
+            theme = "TestTheme",
+            optimize = false,
+            receiverType = null,
+            addToMaterial = false,
+            kmpPreview = false,
+            noPreview = false,
+            makeInternal = false,
+            minified = false,
+        )
+    }
 
     // region RunConfig
     @Test
@@ -20,6 +34,7 @@ class ConversionEventTest {
         val config1 = RunConfig(
             inputPath = "/input",
             outputPath = "/output",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
             recursive = false,
@@ -27,6 +42,7 @@ class ConversionEventTest {
         val config2 = RunConfig(
             inputPath = "/input",
             outputPath = "/output",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
             recursive = false,
@@ -41,6 +57,7 @@ class ConversionEventTest {
         val config = RunConfig(
             inputPath = "/input",
             outputPath = "/output",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
             recursive = false,
@@ -58,6 +75,7 @@ class ConversionEventTest {
         val config = RunConfig(
             inputPath = "/input",
             outputPath = "/output",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
             recursive = false,
@@ -248,6 +266,7 @@ class ConversionEventTest {
         val config = RunConfig(
             inputPath = "/in",
             outputPath = "/out",
+            parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
             recursive = false,

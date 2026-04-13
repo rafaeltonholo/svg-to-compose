@@ -145,6 +145,7 @@ class Processor(
                     inputPath = path,
                     outputPath = output,
                     recursive = runRecursively,
+                    recursiveDepth = maxDepth,
                 ),
                 totalFiles = files.size,
                 version = BuildConfig.VERSION,
@@ -166,7 +167,7 @@ class Processor(
 
         val runDuration = runMark.elapsedNow()
         val errorCounts = errors
-            .mapNotNull { (_, exception) ->
+            .map { (_, exception) ->
                 when (exception) {
                     is ExitProgramException -> exception.errorCode
                     else -> ErrorCode.FailedToParseIconError

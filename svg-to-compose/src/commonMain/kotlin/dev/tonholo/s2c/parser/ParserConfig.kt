@@ -37,7 +37,6 @@ import dev.tonholo.s2c.parser.config.TemplateConfig
  * @property minified if `true`, minifies the output removing all generated comments and
  * inlining the path functions parameters
  * @property exclude regex to exclude some icons from the parsing
- * @property silent if `true`, no console output will be displayed.
  * @property keepTempFolder if `true`, the [dev.tonholo.s2c.Processor] won't request to
  * delete the temp folder. Useful when running parallel execution.
  * @property formatConfig optional formatting configuration for code emission.
@@ -59,7 +58,6 @@ data class ParserConfig(
     val makeInternal: Boolean,
     val minified: Boolean,
     val exclude: Regex? = null,
-    val silent: Boolean = false,
     val keepTempFolder: Boolean = false,
     val formatConfig: FormatConfig? = null,
     val formatOverrides: FormatConfig.Overrides? = null,

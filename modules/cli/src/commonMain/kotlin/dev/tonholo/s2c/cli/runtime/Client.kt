@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.cli.runtime
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
@@ -26,6 +26,7 @@ import dev.tonholo.s2c.emitter.FormatConfig
 import dev.tonholo.s2c.emitter.IndentStyle
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.logger.Logger
+import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.config.TemplateConfig
 import dev.tonholo.s2c.updateConfig
@@ -46,8 +47,8 @@ private const val MANUAL_LINE_BREAK = "\u0085"
 internal class Client(
     private val context: SvgToComposeContext,
     private val logger: Logger,
-    private val processorFactory: Processor.Factory,
-) : CliktCommand(name = "s2c") {
+    private val runner: CliRunner,
+) : SuspendingCliktCommand(name = "s2c") {
     init {
         eagerOption("-v", "--version", help = "Show this CLI version and exit") {
             throw PrintMessage("SVG to Compose version: ${BuildConfig.VERSION}")
@@ -198,6 +199,11 @@ internal class Client(
         help = "Disable auto-discovery of s2c.template.toml files.",
     ).flag()
 
+    private val noTui by option(
+        names = arrayOf("--no-tui"),
+        help = "Disable the TUI dashboard and use plain text output.",
+    ).flag(default = false)
+
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
         help = """Replace the icon's name first value of this parameter with the second.
@@ -219,7 +225,9 @@ internal class Client(
     private val effectiveDebug get() = verbose || debug
     private val effectiveStackTrace get() = stackTrace || effectiveDebug
 
-    override fun run() {
+    private val config get() = context.configSnapshot
+
+    override suspend fun run() {
         context.updateConfig<CliConfig> { config ->
             config.copy(
                 debug = effectiveDebug,
@@ -233,14 +241,22 @@ internal class Client(
 
         SvgToComposeContextProvider.initialize(context)
         try {
-            processorFactory.create(tempDirectory = null).run(
-                path = path,
-                output = output,
-                config = buildParserConfig(),
+            val runConfig = RunConfig(
+                inputPath = path,
+                outputPath = output,
+                packageName = pkg,
+                optimizationEnabled = optimize,
                 recursive = recursive,
-                maxDepth = recursiveDepth,
-                mapIconName = mapIconNameTo?.let { (from, to) ->
-                    { iconName -> iconName.replace(from, to) }
+                recursiveDepth = recursiveDepth,
+                noTui = noTui,
+                parserConfig = buildParserConfig(),
+            )
+            runner.run(
+                config = runConfig,
+                mapIconNameTo = { iconName ->
+                    mapIconNameTo?.let { (from, to) ->
+                        iconName.replace(from, to)
+                    } ?: iconName
                 },
             )
         } catch (e: ExitProgramException) {
@@ -276,7 +292,7 @@ internal class Client(
                 |   minified = $minified
                 |   recursive = $recursive
                 |   recursiveDepth = $recursiveDepth
-                |   silent = $silent
+                |   silent = ${config.silent}
                 |   exclude = $exclude
                 |   mapIconNameTo = $mapIconNameTo
                 |   indentSize = $indentSize
@@ -295,7 +311,6 @@ internal class Client(
         noPreview = noPreview,
         makeInternal = makeInternal,
         minified = minified,
-        silent = silent,
         kmpPreview = isKmp,
         exclude = exclude?.let(::Regex),
         formatConfig = buildFormatConfig(),

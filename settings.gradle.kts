@@ -31,9 +31,15 @@ include(
 includeBuild("website")
 includeBuild("modules/cli")
 
+val localProperties = file("local.properties")
+val linkPlaygrounds = if (localProperties.exists()) {
+    val properties = java.util.Properties()
+    localProperties.inputStream().use { properties.load(it) }
+    properties.getProperty("playground.enable", "true").toBoolean()
+} else true
 // Playground builds are only included when running as the root project
 // (not when included by another build like modules/cli) and not in CI.
-if (gradle.parent == null && System.getenv("CI") == null) {
+if (linkPlaygrounds && gradle.parent == null && System.getenv("CI") == null) {
     includeBuild("playground")
     includeBuild("playground-kmp")
 }
