@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.cli.runtime
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
@@ -48,7 +48,7 @@ internal class Client(
     private val context: SvgToComposeContext,
     private val logger: Logger,
     private val runner: CliRunner,
-) : CliktCommand(name = "s2c") {
+) : SuspendingCliktCommand(name = "s2c") {
     init {
         eagerOption("-v", "--version", help = "Show this CLI version and exit") {
             throw PrintMessage("SVG to Compose version: ${BuildConfig.VERSION}")
@@ -227,7 +227,7 @@ internal class Client(
 
     private val config get() = context.configSnapshot
 
-    override fun run() {
+    override suspend fun run() {
         context.updateConfig<CliConfig> { config ->
             config.copy(
                 debug = effectiveDebug,

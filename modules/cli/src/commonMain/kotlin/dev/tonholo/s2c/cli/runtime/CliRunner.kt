@@ -1,21 +1,32 @@
 package dev.tonholo.s2c.cli.runtime
 
-import com.github.ajalt.mordant.input.enterRawModeOrNull
+import com.github.ajalt.mordant.input.coroutines.receiveKeyEventsFlow
 import com.github.ajalt.mordant.input.isCtrlC
+import com.github.ajalt.mordant.platform.MultiplatformSystem.exitProcess
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
+import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.RunConfig
+import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.updateConfig
 import dev.zacsweers.metro.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+
+private const val SIGINT_EXIT_CODE = 130
 
 @Inject
 internal class CliRunner(
@@ -24,8 +35,10 @@ internal class CliRunner(
     private val context: SvgToComposeContext,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
+    @param:DefaultDispatcher
+    private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    fun run(config: RunConfig, mapIconNameTo: IconMapperFn) {
+    suspend fun run(config: RunConfig, mapIconNameTo: IconMapperFn) {
         val processor = processorFactory.create(tempDirectory = null)
         val useTui = terminal.terminalInfo.interactive && !config.noTui
 
@@ -40,45 +53,99 @@ internal class CliRunner(
         }
     }
 
-    private fun runWithTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+    private suspend fun runWithTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+        val previousSilent = context.configSnapshot.silent
         // Silence logger when TUI is active. The TUI renders all progress
         // info from ConversionEvents; logger output would break Mordant's
         // in-place animation redraw.
         context.updateConfig<CliConfig> { it.copy(silent = true) }
 
         val renderer = TuiRenderer(terminal = terminal)
+        var failedCount = 0
+        val scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
-        runBlocking {
-            val renderJob = launch { renderer.run() }
+        try {
+            scope.launch { renderer.run() }
 
-            val inputJob = launch(context = ioDispatcher) {
-                val rawMode = terminal.enterRawModeOrNull() ?: return@launch
-                rawMode.use { scope ->
-                    while (isActive) {
-                        val event = scope.readKeyOrNull(timeout = INPUT_POLL_INTERVAL) ?: continue
-                        if (event.key == "h") {
-                            renderer.toggleHeader()
-                        }
-                        if (event.isCtrlC) break
-                    }
-                }
-            }
+            with(renderer) { scope.launchInputHandler() }
 
-            val processorJob = launch(context = ioDispatcher) {
-                processor.runAsFlow(
-                    path = config.inputPath,
-                    output = config.outputPath,
-                    config = config.parserConfig,
-                    recursive = config.recursive,
-                    maxDepth = config.recursiveDepth,
-                    mapIconName = mapIconNameTo,
-                ).collect { event -> renderer.onEvent(event) }
+            val processorJob = with(renderer) {
+                scope.launchProcessor(
+                    processor = processor,
+                    config = config,
+                    mapIconNameTo = mapIconNameTo,
+                    onCompleted = { stats ->
+                        failedCount = stats.failed
+                    },
+                )
             }
 
             processorJob.join()
+        } finally {
             renderer.stop()
-            inputJob.cancel()
-            renderJob.cancel()
+            scope.cancel()
+            context.updateConfig<CliConfig> { it.copy(silent = previousSilent) }
+        }
+
+        if (failedCount > 0) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.FailedToParseIconError,
+                message = "Failure to parse ($failedCount) file(s). See TUI output for details.",
+            )
+        }
+    }
+
+    /**
+     * Launches a coroutine that listens for keyboard events via
+     * Mordant's [receiveKeyEventsFlow]. The flow handles raw mode
+     * setup/teardown internally and integrates with Mordant's
+     * signal handling.
+     *
+     * On Ctrl+C the TUI is stopped and the process exits immediately
+     * with code 130 (128 + SIGINT). A graceful coroutine cancellation
+     * is not possible here because [Processor.run] blocks the thread
+     * on native I/O and cannot be interrupted cooperatively.
+     */
+    context(renderer: TuiRenderer)
+    private fun CoroutineScope.launchInputHandler(): Job = launch {
+        val parent = this
+        terminal.receiveKeyEventsFlow()
+            .takeWhile { event ->
+                if (event.isCtrlC) {
+                    renderer.stop()
+                    exitProcess(SIGINT_EXIT_CODE)
+                }
+                true
+            }
+            .onCompletion {
+                parent.cancel()
+            }
+            .collect { event ->
+                when (event.key) {
+                    "h" -> renderer.toggleHeader()
+                }
+            }
+    }
+
+    context(renderer: TuiRenderer)
+    private fun CoroutineScope.launchProcessor(
+        processor: Processor,
+        config: RunConfig,
+        mapIconNameTo: IconMapperFn,
+        onCompleted: (RunStats) -> Unit,
+    ): Job = launch(context = ioDispatcher) {
+        processor.runAsFlow(
+            path = config.inputPath,
+            output = config.outputPath,
+            config = config.parserConfig,
+            recursive = config.recursive,
+            maxDepth = config.recursiveDepth,
+            mapIconName = mapIconNameTo,
+        ).collect { event ->
+            renderer.onEvent(event)
+            if (event is ConversionEvent.RunCompleted) {
+                onCompleted(event.stats)
+            }
         }
     }
 
@@ -91,9 +158,5 @@ internal class CliRunner(
             maxDepth = config.recursiveDepth,
             mapIconName = mapIconNameTo,
         )
-    }
-
-    companion object {
-        private val INPUT_POLL_INTERVAL = 100.milliseconds
     }
 }

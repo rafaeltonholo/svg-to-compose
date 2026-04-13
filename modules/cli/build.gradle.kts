@@ -24,6 +24,7 @@ kotlin {
             implementation(cliLibs.com.github.ajalt.clikt)
             implementation(cliLibs.com.github.ajalt.clikt.markdown)
             implementation(cliLibs.com.github.ajalt.mordant)
+            implementation(cliLibs.com.github.ajalt.mordant.coroutines)
             implementation(libs.com.squareup.okio)
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.json)

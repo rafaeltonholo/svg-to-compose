@@ -15,10 +15,13 @@ import platform.posix.stderr
 context(logger: Logger)
 actual fun executeCommand(command: Command): CommandResult {
     val baseCommand = command.commandToExecute
-    // When stderr display is suppressed, redirect it into stdout so popen
-    // captures both streams. Without this, stderr flows directly to the
-    // terminal, which breaks TUI animations.
-    val commandToExecute = if (!command.showStderr) "$baseCommand 2>&1" else baseCommand
+    // When both stdout and stderr display are suppressed, merge stderr into
+    // stdout so popen captures both streams silently. Without this, stderr
+    // flows directly to the terminal, which breaks TUI animations.
+    // Only merge when both are suppressed to avoid leaking stderr into
+    // stdout output when stdout is still being displayed.
+    val shouldCaptureSilently = !command.showStdout && !command.showStderr
+    val commandToExecute = if (shouldCaptureSilently) "$baseCommand 2>&1" else baseCommand
     logger.verbose("Command to execute: $baseCommand")
     val fp = popen(commandToExecute, "r") ?: error("Failed to run command: $command")
 

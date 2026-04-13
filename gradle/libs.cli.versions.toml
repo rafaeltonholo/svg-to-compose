@@ -8,3 +8,4 @@ dev-tonholo-s2c-svgToCompose = { module = "dev.tonholo.s2c:svg-to-compose", vers
 com-github-ajalt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 com-github-ajalt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markdown", version.ref = "clikt" }
 com-github-ajalt-mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
+com-github-ajalt-mordant-coroutines = { module = "com.github.ajalt.mordant:mordant-coroutines", version.ref = "mordant" }
