@@ -145,6 +145,7 @@ class Processor(
                     inputPath = path,
                     outputPath = output,
                     recursive = runRecursively,
+                    recursiveDepth = maxDepth,
                 ),
                 totalFiles = files.size,
                 version = BuildConfig.VERSION,

@@ -58,7 +58,7 @@ internal class ProgressBarLayouts(terminal: Terminal) {
         val prefix = if (isFinished || !isRunning) "" else "~"
         val style = TextStyle()
         val maxEta = 35_999.seconds // 9:59:59
-        val duration = if (eta != null && eta <= maxEta) eta else null
+        val duration = eta?.coerceAtMost(maxEta)
         Text(style(prefix + renderDuration(duration)), whitespace = Whitespace.PRE)
     }
 

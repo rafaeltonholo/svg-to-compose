@@ -34,7 +34,7 @@ includeBuild("modules/cli")
 val localProperties = file("local.properties")
 val linkPlaygrounds = if (localProperties.exists()) {
     val properties = java.util.Properties()
-    properties.load(localProperties.inputStream())
+    localProperties.inputStream().use { properties.load(it) }
     properties.getProperty("playground.enable", "true").toBoolean()
 } else true
 // Playground builds are only included when running as the root project

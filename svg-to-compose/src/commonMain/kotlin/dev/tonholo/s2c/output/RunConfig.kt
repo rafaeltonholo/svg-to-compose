@@ -40,15 +40,22 @@ data class RunConfig(
          * @param inputPath the source file or directory path.
          * @param outputPath the destination file or directory path.
          * @param recursive whether directory traversal is recursive.
+         * @param recursiveDepth the maximum depth for recursive directory traversal.
          */
-        fun from(config: ParserConfig, inputPath: String, outputPath: String, recursive: Boolean): RunConfig =
-            RunConfig(
-                inputPath = inputPath,
-                outputPath = outputPath,
-                parserConfig = config,
-                packageName = config.pkg,
-                optimizationEnabled = config.optimize,
-                recursive = recursive,
-            )
+        fun from(
+            config: ParserConfig,
+            inputPath: String,
+            outputPath: String,
+            recursive: Boolean,
+            recursiveDepth: Int = 0,
+        ): RunConfig = RunConfig(
+            inputPath = inputPath,
+            outputPath = outputPath,
+            parserConfig = config,
+            packageName = config.pkg,
+            optimizationEnabled = config.optimize,
+            recursive = recursive,
+            recursiveDepth = recursiveDepth,
+        )
     }
 }
