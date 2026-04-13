@@ -1,8 +1,12 @@
 package dev.tonholo.s2c.cli.output.tui.reducer
 
+import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
+import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
+import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
 import dev.tonholo.s2c.output.ConversionEvent
+import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
 
 internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderState = when (event) {
@@ -50,4 +54,50 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
     -> state ?: ProgressState()
+}
+
+internal fun reduceCurrentFile(
+    state: CurrentFileState?,
+    event: ConversionEvent,
+    optimizationEnabled: Boolean,
+): CurrentFileState? = when (event) {
+    is ConversionEvent.FileStarted -> {
+        val firstPhase = if (optimizationEnabled) ConversionPhase.Optimizing else ConversionPhase.Parsing
+        CurrentFileState(
+            fileName = event.fileName,
+            currentPhase = firstPhase,
+            optimizationEnabled = optimizationEnabled,
+        )
+    }
+
+    is ConversionEvent.FileStepChanged -> state?.let {
+        it.copy(
+            currentPhase = event.step,
+            completedPhases = it.completedPhases + it.currentPhase,
+        )
+    }
+
+    is ConversionEvent.FileCompleted -> null
+
+    is ConversionEvent.RunStarted,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
+}
+
+internal fun reduceRecentFiles(state: RecentFilesState, event: ConversionEvent): RecentFilesState = when (event) {
+    is ConversionEvent.FileCompleted -> state.addEntry(
+        entry = RecentFileEntry(
+            fileName = event.fileName,
+            result = event.result,
+            duration = event.duration,
+        ),
+    )
+
+    is ConversionEvent.RunStarted,
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
 }
