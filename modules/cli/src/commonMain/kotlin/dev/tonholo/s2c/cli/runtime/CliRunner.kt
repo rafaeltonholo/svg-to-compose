@@ -121,9 +121,7 @@ internal class CliRunner(
                 parent.cancel()
             }
             .collect { event ->
-                when (event.key) {
-                    "h" -> renderer.toggleHeader()
-                }
+                renderer.handleKeyEvent(event)
             }
     }
 

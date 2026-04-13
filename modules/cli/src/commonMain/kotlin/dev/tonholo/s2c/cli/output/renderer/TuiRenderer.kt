@@ -18,7 +18,6 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
         terminal = terminal,
         layouts = ProgressBarLayouts(terminal),
         state = state,
-        onKeyEvent = ::handleKeyEvent,
     )
 
     override fun onEvent(event: ConversionEvent) {

@@ -5,6 +5,5 @@ internal data class ProgressState(
     val pending: Long = 0,
     val completed: Long = 0,
     val failed: Long = 0,
-    val skipped: Long = 0,
     val errors: List<String> = emptyList(),
 )

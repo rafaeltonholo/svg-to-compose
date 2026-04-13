@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.cli.output.tui.animation
 
 import com.github.ajalt.mordant.animation.progress.MultiProgressBarAnimation
-import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.cli.output.tui.layout.ProgressBarLayouts
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
@@ -17,7 +16,6 @@ internal class AnimationController(
     terminal: Terminal,
     layouts: ProgressBarLayouts,
     private val state: StateFlow<TuiState>,
-    private val onKeyEvent: (KeyboardEvent) -> Unit,
 ) {
     private val animation = MultiProgressBarAnimation(
         terminal = terminal,
@@ -32,13 +30,23 @@ internal class AnimationController(
         )
     }
 
+    private var started = false
+
     fun sync(progress: ProgressState) {
         for (task in tasks) {
-            task.reset {
-                total = progress.total
-                completed = progress.completed
+            if (!started) {
+                task.reset {
+                    total = progress.total
+                    completed = progress.completed
+                }
+            } else {
+                task.update {
+                    total = progress.total
+                    completed = progress.completed
+                }
             }
         }
+        started = true
     }
 
     suspend fun run() {

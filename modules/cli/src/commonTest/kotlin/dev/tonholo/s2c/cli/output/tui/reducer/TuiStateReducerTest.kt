@@ -200,7 +200,6 @@ class TuiStateReducerTest {
         assertEquals(expected = 10L, actual = result.pending)
         assertEquals(expected = 0L, actual = result.completed)
         assertEquals(expected = 0L, actual = result.failed)
-        assertEquals(expected = 0L, actual = result.skipped)
         assertEquals(expected = emptyList(), actual = result.errors)
     }
 

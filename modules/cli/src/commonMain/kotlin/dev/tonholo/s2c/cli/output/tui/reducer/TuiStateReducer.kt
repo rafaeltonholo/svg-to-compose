@@ -5,10 +5,7 @@ import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.FileResult
 
-internal fun reduceHeader(
-    state: HeaderState,
-    event: ConversionEvent,
-): HeaderState = when (event) {
+internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderState = when (event) {
     is ConversionEvent.RunStarted -> state.copy(
         version = event.version,
         config = event.config,
