@@ -18,6 +18,7 @@ class OutputRendererTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
+            parallel = 1,
             recursive = false,
         )
         val event = ConversionEvent.RunStarted(
@@ -43,6 +44,7 @@ class OutputRendererTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
+            parallel = 1,
             recursive = false,
         )
         val events = listOf(

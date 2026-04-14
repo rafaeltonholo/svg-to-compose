@@ -37,6 +37,7 @@ class ConversionEventTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
+            parallel = 1,
             recursive = false,
         )
         val config2 = RunConfig(
@@ -45,6 +46,7 @@ class ConversionEventTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
+            parallel = 1,
             recursive = false,
         )
         // Act & Assert
@@ -60,6 +62,7 @@ class ConversionEventTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
+            parallel = 1,
             recursive = false,
         )
         // Act
@@ -78,6 +81,7 @@ class ConversionEventTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "com.example",
             optimizationEnabled = true,
+            parallel = 1,
             recursive = false,
         )
         // Act
@@ -269,6 +273,7 @@ class ConversionEventTest {
             parserConfig = TEST_PARSER_CONFIG,
             packageName = "pkg",
             optimizationEnabled = false,
+            parallel = 1,
             recursive = false,
         )
         // Act
