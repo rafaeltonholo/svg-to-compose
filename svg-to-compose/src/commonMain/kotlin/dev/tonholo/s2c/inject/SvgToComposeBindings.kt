@@ -20,6 +20,8 @@ import dev.tonholo.s2c.parser.ContentParser
 import dev.tonholo.s2c.parser.DefaultImageParser
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.SvgContentParser
+import dev.tonholo.s2c.dispatching.FileDispatcher
+import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.BindingContainer
@@ -66,6 +68,9 @@ interface SvgToComposeBindings {
         @Provides
         @SingleIn(AppScope::class)
         fun provideSvgToComposeContext(config: S2cConfig): SvgToComposeContext = SvgToComposeContextImpl(config)
+
+        @Provides
+        fun provideFileDispatcher(): FileDispatcher = SequentialFileDispatcher
 
         @Provides
         fun provideContentParsers(

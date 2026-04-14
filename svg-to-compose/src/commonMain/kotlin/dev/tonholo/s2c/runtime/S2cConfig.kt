@@ -16,4 +16,5 @@ interface S2cConfig {
     val verbose: Boolean
     val silent: Boolean
     val stackTrace: Boolean
+    val parallel: Int get() = 0
 }
