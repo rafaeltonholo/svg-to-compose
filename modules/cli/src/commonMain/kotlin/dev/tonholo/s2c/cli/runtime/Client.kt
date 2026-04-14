@@ -227,6 +227,19 @@ internal class Client(
         """.trimMargin(),
     ).pair()
 
+    private val parallelRunners by option(
+        names = arrayOf("--parallel-runners", "--parallel", "-p"),
+        help = "[EXPERIMENTAL] Enable parallel execution of tasks, speeding up the conversion process. " +
+            "The number of runners can be specified with this option. " +
+            "If no value is specified, the default value is ${CliConfig.PARALLEL_ENABLED_DEFAULT_RUNNERS_SIZE}. " +
+            "If the value is ${CliConfig.PARALLEL_CPU_CORES}, the number of runners will be equal to the number " +
+            "of CPU cores. If the value is ${CliConfig.PARALLEL_DISABLED}, parallel execution will be disabled.",
+    ).int(acceptsValueWithoutName = true).default(value = CliConfig.PARALLEL_CPU_CORES).validate {
+        if (it < 0 && it != CliConfig.PARALLEL_DISABLED && it != CliConfig.PARALLEL_CPU_CORES) {
+            fail("Parallel execution must be 1 or greater")
+        }
+    }
+
     private val effectiveDebug get() = verbose || debug
     private val effectiveStackTrace get() = stackTrace || effectiveDebug
 
@@ -252,6 +265,7 @@ internal class Client(
                 outputPath = output,
                 packageName = pkg,
                 optimizationEnabled = optimize,
+                parallel = parallelRunners,
                 recursive = recursive,
                 recursiveDepth = recursiveDepth,
                 noTui = noTui || json,
@@ -305,6 +319,8 @@ internal class Client(
                 |   indentSize = $indentSize
                 |   indentStyle = $indentStyle
                 |   noEditorConfig = $noEditorConfig
+                |   template = $template
+                |   parallelRunners = $parallelRunners
             """.trimMargin(),
         )
     }

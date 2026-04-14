@@ -37,6 +37,7 @@ class CurrentFileReducerTest {
         parserConfig = defaultParserConfig,
         packageName = "com.example.icons",
         optimizationEnabled = true,
+        parallel = 1,
         recursive = false,
     )
 
