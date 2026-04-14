@@ -2,6 +2,8 @@ package dev.tonholo.s2c.inject
 
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.SvgToComposeContextImpl
+import dev.tonholo.s2c.dispatching.FileDispatcher
+import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
@@ -20,8 +22,6 @@ import dev.tonholo.s2c.parser.ContentParser
 import dev.tonholo.s2c.parser.DefaultImageParser
 import dev.tonholo.s2c.parser.ImageParser
 import dev.tonholo.s2c.parser.SvgContentParser
-import dev.tonholo.s2c.dispatching.FileDispatcher
-import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.BindingContainer
