@@ -8,6 +8,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
+import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
 import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.error.ErrorCode
@@ -41,7 +42,7 @@ internal class CliRunner(
     @param:DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    suspend fun run(config: RunConfig, mapIconNameTo: IconMapperFn) {
+    suspend fun run(config: RunConfig, mapIconNameTo: IconMapperFn, outputFormat: OutputFormat = OutputFormat.Text) {
         val processor = processorFactory.create(tempDirectory = null)
         try {
             val useTui = terminal.terminalInfo.interactive && !config.noTui
@@ -53,7 +54,12 @@ internal class CliRunner(
                     mapIconNameTo = mapIconNameTo,
                 )
             } else {
-                runWithoutTui(processor = processor, config = config, mapIconNameTo = mapIconNameTo)
+                runWithoutTui(
+                    processor = processor,
+                    config = config,
+                    mapIconNameTo = mapIconNameTo,
+                    outputFormat = outputFormat,
+                )
             }
         } finally {
             processor.dispose()
@@ -154,9 +160,28 @@ internal class CliRunner(
         }
     }
 
-    private fun runWithoutTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+    private fun runWithoutTui(
+        processor: Processor,
+        config: RunConfig,
+        mapIconNameTo: IconMapperFn,
+        outputFormat: OutputFormat,
+    ) {
         val isSilent = context.configSnapshot.silent
-        val renderer = PlainTextRenderer()
+        val renderer = when (outputFormat) {
+            OutputFormat.Json -> JsonRenderer()
+            OutputFormat.Text -> PlainTextRenderer()
+        }
+
+        // Silence logger when JSON output is active. JSON events carry all
+        // progress information; logger text would break the JSONL stream.
+        // Silent is intentionally never restored: in JSON mode the process
+        // exits via exitProcess() after Client.run() handles the exception,
+        // so restoring would only re-enable plain-text output that
+        // contaminates the JSONL stream.
+        if (outputFormat == OutputFormat.Json) {
+            context.updateConfig<CliConfig> { it.copy(silent = true) }
+        }
+
         var failedCount = 0
         processor.run(
             path = config.inputPath,
@@ -166,7 +191,7 @@ internal class CliRunner(
             maxDepth = config.recursiveDepth,
             mapIconName = mapIconNameTo,
             onEvent = { event ->
-                if (!isSilent) {
+                if (outputFormat == OutputFormat.Json || !isSilent) {
                     renderer.onEvent(event)
                 }
                 if (event is ConversionEvent.RunCompleted) {
