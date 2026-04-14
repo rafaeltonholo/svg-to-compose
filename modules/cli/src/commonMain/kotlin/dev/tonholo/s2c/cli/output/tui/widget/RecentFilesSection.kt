@@ -21,4 +21,7 @@ internal fun recentFilesSection(state: RecentFilesState): Widget = verticalLayou
         val line = " $icon ${entry.fileName}  $duration"
         cell(Text(line))
     }
+    repeat(state.maxEntries - state.entries.size) {
+        cell(Text(" "))
+    }
 }

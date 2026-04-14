@@ -71,10 +71,14 @@ internal fun reduceCurrentFile(
     }
 
     is ConversionEvent.FileStepChanged -> state?.let {
-        it.copy(
-            currentPhase = event.step,
-            completedPhases = it.completedPhases + it.currentPhase,
-        )
+        if (event.step == it.currentPhase) {
+            it
+        } else {
+            it.copy(
+                currentPhase = event.step,
+                completedPhases = it.completedPhases + it.currentPhase,
+            )
+        }
     }
 
     is ConversionEvent.FileCompleted -> null

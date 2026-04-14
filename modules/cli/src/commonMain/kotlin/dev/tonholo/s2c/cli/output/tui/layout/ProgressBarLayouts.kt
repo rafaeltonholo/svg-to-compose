@@ -18,11 +18,15 @@ import com.github.ajalt.mordant.widgets.progress.progressBarLayout
 import com.github.ajalt.mordant.widgets.progress.speed
 import com.github.ajalt.mordant.widgets.progress.text
 import com.github.ajalt.mordant.widgets.progress.timeElapsed
-import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 private const val MAX_PROGRESS_BAR_WIDTH = 80
+
+// Space consumed by label ("Progress:"), spacing, completed count,
+// percentage, and outer horizontal padding on the same row.
+private const val PROGRESS_BAR_OVERHEAD = 35
+private const val MIN_PROGRESS_BAR_WIDTH = 20
 
 // s2c brand colors from logo hexagon faces
 private val S2C_GREEN = TextColors.rgb("#37bf6e")
@@ -33,7 +37,8 @@ internal class ProgressBarLayouts(terminal: Terminal) {
     private val barLayout = progressBarLayout(alignColumns = false, spacing = 1) {
         text(LABEL("Progress:"))
         progressBar(
-            width = min(MAX_PROGRESS_BAR_WIDTH, terminal.size.width),
+            width = (terminal.size.width - PROGRESS_BAR_OVERHEAD)
+                .coerceIn(MIN_PROGRESS_BAR_WIDTH, MAX_PROGRESS_BAR_WIDTH),
             completeStyle = S2C_GREEN,
             indeterminateStyle = S2C_GREEN,
         )
@@ -50,8 +55,14 @@ internal class ProgressBarLayouts(terminal: Terminal) {
         speed(" icons/s")
     }
 
+    val bar: List<ProgressBarDefinition<Unit>>
+        get() = listOf(barLayout)
+
+    val stats: List<ProgressBarDefinition<Unit>>
+        get() = listOf(statsLayout)
+
     val all: List<ProgressBarDefinition<Unit>>
-        get() = listOf(barLayout, statsLayout)
+        get() = bar + stats
 
     private fun ProgressLayoutScope<*>.customTimeRemaining() = cell {
         val eta = if (isRunning) calculateTimeRemaining(false) else null
