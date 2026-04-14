@@ -2,8 +2,6 @@ package dev.tonholo.s2c.inject
 
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.SvgToComposeContextImpl
-import dev.tonholo.s2c.dispatching.FileDispatcher
-import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
@@ -68,9 +66,6 @@ interface SvgToComposeBindings {
         @Provides
         @SingleIn(AppScope::class)
         fun provideSvgToComposeContext(config: S2cConfig): SvgToComposeContext = SvgToComposeContextImpl(config)
-
-        @Provides
-        fun provideFileDispatcher(): FileDispatcher = SequentialFileDispatcher
 
         @Provides
         fun provideContentParsers(
