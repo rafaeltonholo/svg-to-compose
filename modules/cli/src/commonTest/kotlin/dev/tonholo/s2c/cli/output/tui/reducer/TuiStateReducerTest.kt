@@ -2,12 +2,12 @@ package dev.tonholo.s2c.cli.output.tui.reducer
 
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
+import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
-import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals

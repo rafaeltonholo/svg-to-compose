@@ -1,16 +1,16 @@
 package dev.tonholo.s2c.cli.update
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import okio.Path
-import kotlinx.serialization.json.Json
-import okio.Path.Companion.toPath
-import okio.fakefilesystem.FakeFileSystem
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class VersionCheckerTest {
