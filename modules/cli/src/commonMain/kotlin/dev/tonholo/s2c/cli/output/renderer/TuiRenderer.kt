@@ -4,7 +4,7 @@ import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.cli.output.tui.animation.AnimationController
 import dev.tonholo.s2c.cli.output.tui.layout.ProgressBarLayouts
-import dev.tonholo.s2c.cli.output.tui.reducer.reduceCurrentFile
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceCurrentFiles
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceHeader
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceProgress
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceRecentFiles
@@ -28,8 +28,8 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
             current
                 .withHeader { reduceHeader(state = it, event = event) }
                 .withProgress { reduceProgress(state = it, event = event) }
-                .withCurrentFile {
-                    reduceCurrentFile(
+                .withCurrentFiles {
+                    reduceCurrentFiles(
                         state = it,
                         event = event,
                         optimizationEnabled = optimizationEnabled,

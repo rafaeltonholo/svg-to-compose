@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.cli.output.tui.reducer
 
 import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
+import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
 import dev.tonholo.s2c.error.ErrorCode
@@ -41,64 +42,75 @@ class CurrentFileReducerTest {
         recursive = false,
     )
 
-    // --- reduceCurrentFile tests ---
+    // --- reduceCurrentFiles tests ---
 
     @Test
-    fun `given no current file - when FileStarted received - then currentFile state created`() {
+    fun `given empty map - when FileStarted received - then file state created`() {
         // Arrange
         val event = ConversionEvent.FileStarted(fileName = "icon.svg", index = 0)
 
         // Act
-        val result = reduceCurrentFile(state = null, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(
+            state = linkedMapOf(),
+            event = event,
+            optimizationEnabled = true,
+        )
 
         // Assert
-        checkNotNull(result)
-        assertEquals(expected = "icon.svg", actual = result.fileName)
-        assertEquals(expected = ConversionPhase.Optimizing, actual = result.currentPhase)
-        assertTrue(result.completedPhases.isEmpty())
-        assertEquals(expected = true, actual = result.optimizationEnabled)
+        val fileState = result["icon.svg"]
+        checkNotNull(fileState)
+        assertEquals(expected = "icon.svg", actual = fileState.fileName)
+        assertEquals(expected = ConversionPhase.Optimizing, actual = fileState.currentPhase)
+        assertTrue(fileState.completedPhases.isEmpty())
+        assertEquals(expected = true, actual = fileState.optimizationEnabled)
     }
 
     @Test
-    fun `given no current file - when FileStarted received with optimization disabled - then starts at Parsing`() {
+    fun `given empty map - when FileStarted received with optimization disabled - then starts at Parsing`() {
         // Arrange
         val event = ConversionEvent.FileStarted(fileName = "icon.svg", index = 0)
 
         // Act
-        val result = reduceCurrentFile(state = null, event = event, optimizationEnabled = false)
+        val result = reduceCurrentFiles(
+            state = linkedMapOf(),
+            event = event,
+            optimizationEnabled = false,
+        )
 
         // Assert
-        assertEquals(expected = ConversionPhase.Parsing, actual = result?.currentPhase)
-        assertEquals(expected = false, actual = result?.optimizationEnabled)
+        assertEquals(expected = ConversionPhase.Parsing, actual = result["icon.svg"]?.currentPhase)
+        assertEquals(expected = false, actual = result["icon.svg"]?.optimizationEnabled)
     }
 
     @Test
-    fun `given current file at Optimizing - when FileStepChanged to Parsing - then phase updated and Optimizing completed`() {
+    fun `given file at Optimizing - when FileStepChanged to Parsing - then phase updated and Optimizing completed`() {
         // Arrange
-        val state = CurrentFileState(
+        val fileState = CurrentFileState(
             fileName = "icon.svg",
             currentPhase = ConversionPhase.Optimizing,
         )
+        val state = linkedMapOf("icon.svg" to fileState)
         val event = ConversionEvent.FileStepChanged(
             fileName = "icon.svg",
             step = ConversionPhase.Parsing,
         )
 
         // Act
-        val result = reduceCurrentFile(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
 
         // Assert
-        assertEquals(expected = ConversionPhase.Parsing, actual = result?.currentPhase)
-        assertTrue(result?.completedPhases?.contains(ConversionPhase.Optimizing) ?: false)
+        assertEquals(expected = ConversionPhase.Parsing, actual = result["icon.svg"]?.currentPhase)
+        assertTrue(result["icon.svg"]?.completedPhases?.contains(ConversionPhase.Optimizing) ?: false)
     }
 
     @Test
-    fun `given current file - when FileCompleted Success - then currentFile cleared`() {
+    fun `given file in map - when FileCompleted Success - then file removed from map`() {
         // Arrange
-        val state = CurrentFileState(
+        val fileState = CurrentFileState(
             fileName = "icon.svg",
             currentPhase = ConversionPhase.Writing,
         )
+        val state = linkedMapOf("icon.svg" to fileState)
         val event = ConversionEvent.FileCompleted(
             fileName = "icon.svg",
             duration = 100.milliseconds,
@@ -106,19 +118,20 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFile(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
 
         // Assert
-        assertNull(result)
+        assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `given current file - when FileCompleted Failed - then currentFile cleared`() {
+    fun `given file in map - when FileCompleted Failed - then file removed from map`() {
         // Arrange
-        val state = CurrentFileState(
+        val fileState = CurrentFileState(
             fileName = "icon.svg",
             currentPhase = ConversionPhase.Parsing,
         )
+        val state = linkedMapOf("icon.svg" to fileState)
         val event = ConversionEvent.FileCompleted(
             fileName = "icon.svg",
             duration = 50.milliseconds,
@@ -129,16 +142,17 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFile(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
 
         // Assert
-        assertNull(result)
+        assertTrue(result.isEmpty())
     }
 
     @Test
     fun `given any state - when RunStarted received - then state unchanged`() {
         // Arrange
-        val state = CurrentFileState(fileName = "icon.svg", currentPhase = ConversionPhase.Parsing)
+        val fileState = CurrentFileState(fileName = "icon.svg", currentPhase = ConversionPhase.Parsing)
+        val state = linkedMapOf("icon.svg" to fileState)
         val event = ConversionEvent.RunStarted(
             config = defaultRunConfig,
             totalFiles = 10,
@@ -146,10 +160,65 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFile(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = state, actual = result)
+    }
+
+    @Test
+    fun `given multiple files - when one completes - then only that file removed`() {
+        // Arrange
+        val state = linkedMapOf(
+            "a.svg" to CurrentFileState(fileName = "a.svg", currentPhase = ConversionPhase.Parsing),
+            "b.svg" to CurrentFileState(fileName = "b.svg", currentPhase = ConversionPhase.Writing),
+        )
+        val event = ConversionEvent.FileCompleted(
+            fileName = "a.svg",
+            duration = 100.milliseconds,
+            result = FileResult.Success,
+        )
+
+        // Act
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+
+        // Assert
+        assertEquals(expected = 1, actual = result.size)
+        assertNull(result["a.svg"])
+        assertEquals(expected = ConversionPhase.Writing, actual = result["b.svg"]?.currentPhase)
+    }
+
+    @Test
+    fun `given file in map - when FileStepChanged for different file - then original unchanged`() {
+        // Arrange
+        val fileState = CurrentFileState(fileName = "a.svg", currentPhase = ConversionPhase.Optimizing)
+        val state = linkedMapOf("a.svg" to fileState)
+        val event = ConversionEvent.FileStepChanged(
+            fileName = "b.svg",
+            step = ConversionPhase.Parsing,
+        )
+
+        // Act
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+
+        // Assert
+        assertEquals(expected = state, actual = result)
+    }
+
+    // --- reduceProgress tests ---
+
+    @Test
+    fun `given progress state - when FileStarted - then pending decremented`() {
+        // Arrange
+        val state = ProgressState(total = 10, pending = 10)
+        val event = ConversionEvent.FileStarted(fileName = "icon.svg", index = 0)
+
+        // Act
+        val result = reduceProgress(state = state, event = event)
+
+        // Assert
+        assertEquals(expected = 9, actual = result.pending)
+        assertEquals(expected = 0, actual = result.completed)
     }
 
     // --- reduceRecentFiles tests ---

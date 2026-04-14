@@ -30,58 +30,67 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
         pending = event.totalFiles.toLong(),
     )
 
+    is ConversionEvent.FileStarted -> {
+        val current = state ?: return ProgressState()
+        current.copy(pending = current.pending - 1)
+    }
+
     is ConversionEvent.FileCompleted -> {
         val current = state ?: return ProgressState()
         when (event.result) {
             is FileResult.Success -> current.copy(
                 completed = current.completed + 1,
-                pending = current.pending - 1,
             )
 
             is FileResult.Failed -> {
                 val failed = event.result as FileResult.Failed
                 current.copy(
                     failed = current.failed + 1,
-                    pending = current.pending - 1,
                     errors = current.errors + failed.message,
                 )
             }
         }
     }
 
-    is ConversionEvent.FileStarted,
     is ConversionEvent.FileStepChanged,
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
     -> state ?: ProgressState()
 }
 
-internal fun reduceCurrentFile(
-    state: CurrentFileState?,
+internal fun reduceCurrentFiles(
+    state: LinkedHashMap<String, CurrentFileState>,
     event: ConversionEvent,
     optimizationEnabled: Boolean,
-): CurrentFileState? = when (event) {
+): LinkedHashMap<String, CurrentFileState> = when (event) {
     is ConversionEvent.FileStarted -> {
         val firstPhase = if (optimizationEnabled) ConversionPhase.Optimizing else ConversionPhase.Parsing
-        CurrentFileState(
+        val updated = LinkedHashMap(state)
+        updated[event.fileName] = CurrentFileState(
             fileName = event.fileName,
             currentPhase = firstPhase,
             optimizationEnabled = optimizationEnabled,
         )
+        updated
     }
 
-    is ConversionEvent.FileStepChanged -> state?.let {
-        if (event.step == it.currentPhase) {
-            it
-        } else {
-            it.copy(
-                currentPhase = event.step,
-                completedPhases = it.completedPhases + it.currentPhase,
-            )
-        }
+    is ConversionEvent.FileStepChanged -> {
+        val existing = state[event.fileName] ?: return state
+        if (event.step == existing.currentPhase) return state
+        val updated = LinkedHashMap(state)
+        updated[event.fileName] = existing.copy(
+            currentPhase = event.step,
+            completedPhases = existing.completedPhases + existing.currentPhase,
+        )
+        updated
     }
 
-    is ConversionEvent.FileCompleted -> null
+    is ConversionEvent.FileCompleted -> {
+        if (event.fileName !in state) return state
+        val updated = LinkedHashMap(state)
+        updated.remove(event.fileName)
+        updated
+    }
 
     is ConversionEvent.RunStarted,
     is ConversionEvent.RunCompleted,
