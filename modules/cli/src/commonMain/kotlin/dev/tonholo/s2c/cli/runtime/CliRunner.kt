@@ -8,6 +8,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
+import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
 import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
@@ -19,6 +20,7 @@ import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.updateConfig
 import dev.zacsweers.metro.Inject
+import okio.Path
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -42,7 +44,12 @@ internal class CliRunner(
     @param:DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    suspend fun run(config: RunConfig, mapIconNameTo: IconMapperFn, outputFormat: OutputFormat = OutputFormat.Text) {
+    suspend fun run(
+        config: RunConfig,
+        mapIconNameTo: IconMapperFn,
+        outputFormat: OutputFormat = OutputFormat.Text,
+        logDir: Path = RunLogWriter.DEFAULT_LOG_DIR,
+    ) {
         val processor = processorFactory.create(tempDirectory = null)
         try {
             val useTui = terminal.terminalInfo.interactive && !config.noTui
@@ -52,6 +59,7 @@ internal class CliRunner(
                     processor = processor,
                     config = config,
                     mapIconNameTo = mapIconNameTo,
+                    logDir = logDir,
                 )
             } else {
                 runWithoutTui(
@@ -66,7 +74,12 @@ internal class CliRunner(
         }
     }
 
-    private suspend fun runWithTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+    private suspend fun runWithTui(
+        processor: Processor,
+        config: RunConfig,
+        mapIconNameTo: IconMapperFn,
+        logDir: Path,
+    ) {
         val previousSilent = context.configSnapshot.silent
         // Silence logger when TUI is active. The TUI renders all progress
         // info from ConversionEvents; logger output would break Mordant's

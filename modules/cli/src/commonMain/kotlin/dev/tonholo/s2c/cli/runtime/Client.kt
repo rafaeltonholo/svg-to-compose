@@ -209,6 +209,11 @@ internal class Client(
         help = "Output conversion progress as JSONL (one JSON object per line). Implies --no-tui.",
     ).flag(default = false)
 
+    private val logDir by option(
+        names = arrayOf("--log-dir"),
+        help = "Directory for run log files. Defaults to .s2c/logs.",
+    ).default(value = ".s2c/logs")
+
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
         help = """Replace the icon's name first value of this parameter with the second.
@@ -252,6 +257,7 @@ internal class Client(
                 verbose = verbose,
                 silent = silent,
                 stackTrace = effectiveStackTrace,
+                parallel = parallelRunners,
             )
         }
 
@@ -279,6 +285,7 @@ internal class Client(
                     } ?: iconName
                 },
                 outputFormat = outputFormat,
+                logDir = logDir.toPath(),
             )
         } catch (e: ExitProgramException) {
             logger.printEmpty()
@@ -321,6 +328,7 @@ internal class Client(
                 |   noEditorConfig = $noEditorConfig
                 |   template = $template
                 |   parallelRunners = $parallelRunners
+                |   logDir = $logDir
             """.trimMargin(),
         )
     }
