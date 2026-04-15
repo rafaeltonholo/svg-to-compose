@@ -8,13 +8,16 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
+import dev.tonholo.s2c.cli.output.log.FileCompletionEntry
 import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
 import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.output.ConversionEvent
+import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
@@ -39,6 +42,7 @@ internal class CliRunner(
     private val processorFactory: Processor.Factory,
     private val terminal: Terminal,
     private val context: SvgToComposeContext,
+    private val fileManager: FileManager,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
     @param:DefaultDispatcher
@@ -81,13 +85,11 @@ internal class CliRunner(
         logDir: Path,
     ) {
         val previousSilent = context.configSnapshot.silent
-        // Silence logger when TUI is active. The TUI renders all progress
-        // info from ConversionEvents; logger output would break Mordant's
-        // in-place animation redraw.
         context.updateConfig<CliConfig> { it.copy(silent = true) }
 
         val renderer = TuiRenderer(terminal = terminal)
-        var failedCount = 0
+        var stats: RunStats? = null
+        val completedFiles = mutableListOf<FileCompletionEntry>()
         val scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
         try {
@@ -95,15 +97,29 @@ internal class CliRunner(
 
             with(renderer) { scope.launchInputHandler() }
 
-            val processorDeferred = with(renderer) {
-                scope.asyncRunAsFlow(
-                    processor = processor,
-                    config = config,
-                    mapIconNameTo = mapIconNameTo,
-                    onCompleted = { stats ->
-                        failedCount = stats.failed
-                    },
-                )
+            val processorDeferred = scope.async(context = ioDispatcher) {
+                processor.runAsFlow(
+                    path = config.inputPath,
+                    output = config.outputPath,
+                    config = config.parserConfig,
+                    recursive = config.recursive,
+                    maxDepth = config.recursiveDepth,
+                    mapIconName = mapIconNameTo,
+                ).collect { event ->
+                    renderer.onEvent(event)
+                    if (event is ConversionEvent.FileCompleted) {
+                        completedFiles.add(
+                            FileCompletionEntry(
+                                fileName = event.fileName,
+                                duration = event.duration,
+                                result = event.result,
+                            ),
+                        )
+                    }
+                    if (event is ConversionEvent.RunCompleted) {
+                        stats = event.stats
+                    }
+                }
             }
 
             processorDeferred.await()
@@ -113,10 +129,35 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = previousSilent) }
         }
 
-        if (failedCount > 0) {
+        val runStats = stats ?: return
+        val failedEntries = completedFiles.filter { it.result is FileResult.Failed }
+
+        // Always write log file when there are completed files.
+        if (completedFiles.isNotEmpty()) {
+            val logWriter = RunLogWriter(fileManager = fileManager, logDir = logDir)
+            val logPath = logWriter.write(
+                config = config,
+                stats = runStats,
+                entries = completedFiles,
+            )
+
+            if (failedEntries.isNotEmpty()) {
+                terminal.println()
+                terminal.println("Failed:")
+                for (entry in failedEntries) {
+                    val result = entry.result as FileResult.Failed
+                    terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
+                }
+            }
+
+            terminal.println()
+            terminal.println("Full log: $logPath")
+        }
+
+        if (failedEntries.isNotEmpty()) {
             throw ExitProgramException(
                 errorCode = ErrorCode.FailedToParseIconError,
-                message = "Failure to parse ($failedCount) file(s). See TUI output for details.",
+                message = "Failure to parse (${failedEntries.size}) file(s). See log for details.",
             )
         }
     }
@@ -149,28 +190,6 @@ internal class CliRunner(
             .collect { event ->
                 renderer.handleKeyEvent(event)
             }
-    }
-
-    context(renderer: TuiRenderer)
-    private fun CoroutineScope.asyncRunAsFlow(
-        processor: Processor,
-        config: RunConfig,
-        mapIconNameTo: IconMapperFn,
-        onCompleted: (RunStats) -> Unit,
-    ): Deferred<Unit> = async(context = ioDispatcher) {
-        processor.runAsFlow(
-            path = config.inputPath,
-            output = config.outputPath,
-            config = config.parserConfig,
-            recursive = config.recursive,
-            maxDepth = config.recursiveDepth,
-            mapIconName = mapIconNameTo,
-        ).collect { event ->
-            renderer.onEvent(event)
-            if (event is ConversionEvent.RunCompleted) {
-                onCompleted(event.stats)
-            }
-        }
     }
 
     private fun runWithoutTui(
