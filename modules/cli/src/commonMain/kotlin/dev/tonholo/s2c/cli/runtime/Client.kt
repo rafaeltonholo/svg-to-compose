@@ -228,7 +228,7 @@ internal class Client(
     ).pair()
 
     private val parallelRunners by option(
-        names = arrayOf("--parallel-runners", "--parallel", "-p"),
+        names = arrayOf("--parallel-runners", "--parallel"),
         help = "[EXPERIMENTAL] Enable parallel execution of tasks, speeding up the conversion process. " +
             "The number of runners can be specified with this option. " +
             "If no value is specified, the default value is ${CliConfig.PARALLEL_ENABLED_DEFAULT_RUNNERS_SIZE}. " +
