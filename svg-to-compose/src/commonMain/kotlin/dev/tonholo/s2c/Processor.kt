@@ -389,6 +389,7 @@ class Processor(
                         result = FileResult.Failed(
                             errorCode = e.errorCode,
                             message = e.message ?: "Unknown error",
+                            stackTrace = e.stackTraceToString(),
                         ),
                     ),
                 )
@@ -405,6 +406,7 @@ class Processor(
                         result = FileResult.Failed(
                             errorCode = e.errorCode,
                             message = e.message ?: "Unknown error",
+                            stackTrace = e.stackTraceToString(),
                         ),
                     ),
                 )
@@ -421,6 +423,7 @@ class Processor(
                         result = FileResult.Failed(
                             errorCode = ErrorCode.FileNotFoundError,
                             message = e.message ?: "Unknown error",
+                            stackTrace = e.stackTraceToString(),
                         ),
                     ),
                 )
@@ -533,7 +536,7 @@ class Processor(
         )
 
         if (config.keepTempFolder.not()) {
-            tempFileWriter.clear()
+            tempFileWriter.clearFile(file)
         }
 
         return outputFile
