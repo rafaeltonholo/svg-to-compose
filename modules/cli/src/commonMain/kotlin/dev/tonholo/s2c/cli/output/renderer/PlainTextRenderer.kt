@@ -3,6 +3,7 @@ package dev.tonholo.s2c.cli.output.renderer
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.OutputRenderer
+import kotlin.math.round
 
 private const val MILLIS_PER_SECOND = 1000.0
 private const val SECONDS_PER_MINUTE = 60
@@ -33,6 +34,7 @@ internal class PlainTextRenderer(private val writer: (String) -> Unit = ::printl
     }
 
     private fun renderRunStarted(event: ConversionEvent.RunStarted) {
+        failedFiles.clear()
         writer("[INFO] svg-to-compose v${event.version}")
         val optimize = if (event.config.optimizationEnabled) "on" else "off"
         writer(
@@ -97,7 +99,7 @@ internal class PlainTextRenderer(private val writer: (String) -> Unit = ::printl
         if (seconds <= 0.0) return "0.0"
         val rate = succeeded.toDouble() / seconds
         // Round to 1 decimal place without String.format (unavailable in KMP common)
-        val rounded = (rate * ROUNDING_FACTOR).toLong() / ROUNDING_FACTOR
+        val rounded = round(rate * ROUNDING_FACTOR) / ROUNDING_FACTOR
         return rounded.toString()
     }
 

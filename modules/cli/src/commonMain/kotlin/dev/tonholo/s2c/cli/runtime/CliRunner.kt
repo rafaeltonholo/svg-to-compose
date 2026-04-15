@@ -155,6 +155,7 @@ internal class CliRunner(
     }
 
     private fun runWithoutTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+        val isSilent = context.configSnapshot.silent
         val renderer = PlainTextRenderer()
         var failedCount = 0
         processor.run(
@@ -165,7 +166,9 @@ internal class CliRunner(
             maxDepth = config.recursiveDepth,
             mapIconName = mapIconNameTo,
             onEvent = { event ->
-                renderer.onEvent(event)
+                if (!isSilent) {
+                    renderer.onEvent(event)
+                }
                 if (event is ConversionEvent.RunCompleted) {
                     failedCount = event.stats.failed
                 }
