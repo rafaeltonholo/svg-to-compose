@@ -8,6 +8,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
+import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
@@ -154,6 +155,9 @@ internal class CliRunner(
     }
 
     private fun runWithoutTui(processor: Processor, config: RunConfig, mapIconNameTo: IconMapperFn) {
+        val isSilent = context.configSnapshot.silent
+        val renderer = PlainTextRenderer()
+        var failedCount = 0
         processor.run(
             path = config.inputPath,
             output = config.outputPath,
@@ -161,6 +165,21 @@ internal class CliRunner(
             recursive = config.recursive,
             maxDepth = config.recursiveDepth,
             mapIconName = mapIconNameTo,
+            onEvent = { event ->
+                if (!isSilent) {
+                    renderer.onEvent(event)
+                }
+                if (event is ConversionEvent.RunCompleted) {
+                    failedCount = event.stats.failed
+                }
+            },
         )
+
+        if (failedCount > 0) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.FailedToParseIconError,
+                message = "Failure to parse ($failedCount) file(s). See output for details.",
+            )
+        }
     }
 }
