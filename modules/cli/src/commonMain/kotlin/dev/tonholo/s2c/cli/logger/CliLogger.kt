@@ -82,9 +82,11 @@ internal class CliLogger(private val context: SvgToComposeContext) : Logger {
     }
 
     override fun error(message: String, throwable: Throwable?) {
-        println("E: $message")
-        if (config.stackTrace) {
-            throwable?.printStackTrace()
+        if (!config.silent) {
+            println("E: $message")
+            if (config.stackTrace) {
+                throwable?.printStackTrace()
+            }
         }
     }
 
