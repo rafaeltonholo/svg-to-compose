@@ -6,8 +6,8 @@ import com.github.ajalt.mordant.platform.MultiplatformSystem.exitProcess
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
-import dev.tonholo.s2c.cli.inject.coroutine.DefaultDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
+import dev.tonholo.s2c.cli.inject.coroutine.MainDispatcher
 import dev.tonholo.s2c.cli.output.log.FileCompletionEntry
 import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
@@ -23,7 +23,6 @@ import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
 import dev.tonholo.s2c.updateConfig
 import dev.zacsweers.metro.Inject
-import okio.Path
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -33,6 +32,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import okio.Path
 
 private const val SIGINT_EXIT_CODE = 130
 
@@ -44,8 +44,8 @@ internal class CliRunner(
     private val fileManager: FileManager,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
-    @param:DefaultDispatcher
-    private val defaultDispatcher: CoroutineDispatcher,
+    @param:MainDispatcher
+    private val mainDispatcher: CoroutineDispatcher,
 ) {
     suspend fun run(
         config: RunConfig,
@@ -89,7 +89,7 @@ internal class CliRunner(
         val renderer = TuiRenderer(terminal = terminal)
         var stats: RunStats? = null
         val completedFiles = mutableListOf<FileCompletionEntry>()
-        val scope = CoroutineScope(SupervisorJob() + defaultDispatcher)
+        val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
 
         try {
             scope.launch { renderer.run() }
@@ -173,7 +173,7 @@ internal class CliRunner(
      * on native I/O and cannot be interrupted cooperatively.
      */
     context(renderer: TuiRenderer)
-    private fun CoroutineScope.launchInputHandler(): Job = launch {
+    private fun CoroutineScope.launchInputHandler(): Job = launch(ioDispatcher) {
         val parent = this
         terminal.receiveKeyEventsFlow()
             .takeWhile { event ->

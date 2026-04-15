@@ -21,6 +21,10 @@ internal object DispatchersBinding {
     @Provides
     @DefaultDispatcher
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @MainDispatcher
+    fun provideMainDispatcher(): CoroutineDispatcher = mainCoroutineDispatcher()
 }
 
 @Qualifier
@@ -28,3 +32,6 @@ annotation class IoDispatcher
 
 @Qualifier
 annotation class DefaultDispatcher
+
+@Qualifier
+annotation class MainDispatcher

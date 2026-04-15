@@ -3,6 +3,7 @@ package dev.tonholo.s2c.cli.inject
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.dispatching.DeferredFileDispatcher
+import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
@@ -14,6 +15,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
+import kotlinx.coroutines.CoroutineDispatcher
 import okio.FileSystem
 import okio.SYSTEM
 
@@ -60,8 +62,11 @@ internal interface CliGraph {
      * [dev.tonholo.s2c.inject.SvgToComposeBindings].
      */
     @Provides
-    fun provideFileDispatcher(context: SvgToComposeContext): FileDispatcher {
-        return DeferredFileDispatcher(context)
+    fun provideFileDispatcher(
+        context: SvgToComposeContext,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+    ): FileDispatcher {
+        return DeferredFileDispatcher(context, dispatcher)
     }
 
     /**

@@ -5,6 +5,7 @@ import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.dispatching.FileDispatcher
 import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.dispatching.availableProcessors
+import kotlinx.coroutines.CoroutineDispatcher
 import okio.Path
 
 /**
@@ -15,9 +16,13 @@ import okio.Path
  * sees the default (disabled). This wrapper reads the config snapshot at
  * dispatch time, after [dev.tonholo.s2c.cli.runtime.Client.run] has
  * updated the configuration.
+ *
+ * @param context shared context holding the current config snapshot.
+ * @param dispatcher coroutine dispatcher forwarded to [ParallelFileDispatcher].
  */
 internal class DeferredFileDispatcher(
     private val context: SvgToComposeContext,
+    private val dispatcher: CoroutineDispatcher,
 ) : FileDispatcher {
     override fun <R> dispatch(items: List<Path>, action: (Int, Path) -> R): List<R> {
         val config = context.configSnapshot
@@ -29,7 +34,7 @@ internal class DeferredFileDispatcher(
         val delegate = if (parallelism <= 1) {
             SequentialFileDispatcher
         } else {
-            ParallelFileDispatcher(parallelism)
+            ParallelFileDispatcher(parallelism, dispatcher.limitedParallelism(parallelism))
         }
         return delegate.dispatch(items, action)
     }
