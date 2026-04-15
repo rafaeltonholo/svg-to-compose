@@ -204,6 +204,11 @@ internal class Client(
         help = "Disable the TUI dashboard and use plain text output.",
     ).flag(default = false)
 
+    private val json by option(
+        names = arrayOf("--json"),
+        help = "Output conversion progress as JSONL (one JSON object per line). Implies --no-tui.",
+    ).flag(default = false)
+
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
         help = """Replace the icon's name first value of this parameter with the second.
@@ -241,6 +246,7 @@ internal class Client(
 
         SvgToComposeContextProvider.initialize(context)
         try {
+            val outputFormat = if (json) OutputFormat.Json else OutputFormat.Text
             val runConfig = RunConfig(
                 inputPath = path,
                 outputPath = output,
@@ -248,7 +254,7 @@ internal class Client(
                 optimizationEnabled = optimize,
                 recursive = recursive,
                 recursiveDepth = recursiveDepth,
-                noTui = noTui,
+                noTui = noTui || json,
                 parserConfig = buildParserConfig(),
             )
             runner.run(
@@ -258,6 +264,7 @@ internal class Client(
                         iconName.replace(from, to)
                     } ?: iconName
                 },
+                outputFormat = outputFormat,
             )
         } catch (e: ExitProgramException) {
             logger.printEmpty()
