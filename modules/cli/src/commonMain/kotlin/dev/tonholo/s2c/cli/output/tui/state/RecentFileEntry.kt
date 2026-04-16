@@ -10,4 +10,8 @@ import kotlin.time.Duration
  * @property result the conversion outcome (success or failure).
  * @property duration how long processing took.
  */
-internal data class RecentFileEntry(val fileName: String, val result: FileResult, val duration: Duration)
+internal data class RecentFileEntry(
+    val fileName: String,
+    val result: FileResult,
+    val duration: Duration,
+)
