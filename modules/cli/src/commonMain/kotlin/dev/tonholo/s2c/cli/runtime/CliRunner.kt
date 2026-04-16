@@ -32,6 +32,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import okio.IOException
 import okio.Path
 
 private const val SIGINT_EXIT_CODE = 130
@@ -70,6 +71,7 @@ internal class CliRunner(
                     config = config,
                     mapIconNameTo = mapIconNameTo,
                     outputFormat = outputFormat,
+                    logDir = logDir,
                 )
             }
         } finally {
@@ -84,6 +86,8 @@ internal class CliRunner(
         logDir: Path,
     ) {
         val previousSilent = context.configSnapshot.silent
+
+        // Avoiding logger leaking info to the TUI by silencing it here.
         context.updateConfig<CliConfig> { it.copy(silent = true) }
 
         val renderer = TuiRenderer(terminal = terminal)
@@ -128,37 +132,18 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = previousSilent) }
         }
 
+        // `stats == null` means the processor never emitted `RunCompleted`.
+        // The only path that reaches here today is `Processor.run` returning
+        // early when the single-file input matches `--exclude`. Treating it
+        // as a no-op is correct: no files processed, no log to write.
         val runStats = stats ?: return
-        val failedEntries = completedFiles.filter { it.result is FileResult.Failed }
-
-        // Always write log file when there are completed files.
-        if (completedFiles.isNotEmpty()) {
-            val logWriter = RunLogWriter(fileManager = fileManager, logDir = logDir)
-            val logPath = logWriter.write(
-                config = config,
-                stats = runStats,
-                entries = completedFiles,
-            )
-
-            if (failedEntries.isNotEmpty()) {
-                terminal.println()
-                terminal.println("Failed:")
-                for (entry in failedEntries) {
-                    val result = entry.result as FileResult.Failed
-                    terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
-                }
-            }
-
-            terminal.println()
-            terminal.println("Full log: $logPath")
-        }
-
-        if (failedEntries.isNotEmpty()) {
-            throw ExitProgramException(
-                errorCode = ErrorCode.FailedToParseIconError,
-                message = "Failure to parse (${failedEntries.size}) file(s). See log for details.",
-            )
-        }
+        finalizeRun(
+            config = config,
+            stats = runStats,
+            completedFiles = completedFiles,
+            logDir = logDir,
+            printSummary = true,
+        )
     }
 
     /**
@@ -196,6 +181,7 @@ internal class CliRunner(
         config: RunConfig,
         mapIconNameTo: IconMapperFn,
         outputFormat: OutputFormat,
+        logDir: Path,
     ) {
         val isSilent = context.configSnapshot.silent
         val renderer = when (outputFormat) {
@@ -213,7 +199,8 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = true) }
         }
 
-        var failedCount = 0
+        var stats: RunStats? = null
+        val completedFiles = mutableListOf<FileCompletionEntry>()
         processor.run(
             path = config.inputPath,
             output = config.outputPath,
@@ -225,16 +212,110 @@ internal class CliRunner(
                 if (outputFormat == OutputFormat.Json || !isSilent) {
                     renderer.onEvent(event)
                 }
+                if (event is ConversionEvent.FileCompleted) {
+                    completedFiles.add(
+                        FileCompletionEntry(
+                            fileName = event.fileName,
+                            duration = event.duration,
+                            result = event.result,
+                        ),
+                    )
+                }
                 if (event is ConversionEvent.RunCompleted) {
-                    failedCount = event.stats.failed
+                    stats = event.stats
                 }
             },
         )
 
+        val runStats = stats
+        if (runStats != null) {
+            // In JSON mode the failure summary would contaminate the JSONL
+            // stream, so the log file is still written but no extra lines
+            // are printed to the terminal.
+            finalizeRun(
+                config = config,
+                stats = runStats,
+                completedFiles = completedFiles,
+                logDir = logDir,
+                printSummary = outputFormat != OutputFormat.Json,
+            )
+        }
+
+        val failedCount = runStats?.failed ?: 0
         if (failedCount > 0) {
             throw ExitProgramException(
                 errorCode = ErrorCode.FailedToParseIconError,
                 message = "Failure to parse ($failedCount) file(s). See output for details.",
+            )
+        }
+    }
+
+    /**
+     * Writes the run log to [logDir] and, when [printSummary] is true,
+     * prints a failure summary + log path to the terminal.
+     *
+     * Log-write failures are intentionally non-fatal: they are reported to
+     * the terminal as a warning, but the failure summary and the
+     * [ExitProgramException] path still run so the user always sees why the
+     * run failed. This mirrors the TUI path's expectations.
+     */
+    private fun finalizeRun(
+        config: RunConfig,
+        stats: RunStats,
+        completedFiles: List<FileCompletionEntry>,
+        logDir: Path,
+        printSummary: Boolean,
+    ) {
+        if (completedFiles.isEmpty()) {
+            if (printSummary) {
+                maybePrintFailureSummary(completedFiles = completedFiles, logPath = null)
+            }
+            maybeThrowFailure(stats = stats)
+            return
+        }
+
+        val logWriter = RunLogWriter(fileManager = fileManager, logDir = logDir)
+        val logPath = try {
+            logWriter.write(config = config, stats = stats, entries = completedFiles)
+        } catch (e: IOException) {
+            if (printSummary) {
+                terminal.println()
+                terminal.println("Warning: could not write run log to $logDir: ${e.message}")
+            }
+            null
+        }
+
+        if (printSummary) {
+            maybePrintFailureSummary(completedFiles = completedFiles, logPath = logPath)
+        }
+
+        maybeThrowFailure(stats = stats)
+    }
+
+    private fun maybePrintFailureSummary(
+        completedFiles: List<FileCompletionEntry>,
+        logPath: Path?,
+    ) {
+        val failedEntries = completedFiles.filter { it.result is FileResult.Failed }
+        if (failedEntries.isNotEmpty()) {
+            terminal.println()
+            terminal.println("Failed:")
+            for (entry in failedEntries) {
+                val result = entry.result as FileResult.Failed
+                terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
+            }
+        }
+        if (logPath != null) {
+            terminal.println()
+            terminal.println("Full log: $logPath")
+        }
+    }
+
+    private fun maybeThrowFailure(stats: RunStats) {
+        if (stats.failed > 0) {
+            throw ExitProgramException(
+                errorCode = ErrorCode.FailedToParseIconError,
+                message = "Failure to parse (${stats.failed}) file(s). See log for details.",
             )
         }
     }
