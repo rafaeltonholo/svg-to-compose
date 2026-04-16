@@ -22,7 +22,7 @@ internal class AnimationController(
         maker = DashboardWidgetMaker(
             state = { state.value },
             barRowCount = layouts.bar.size,
-            terminalWidth = terminal.size.width,
+            terminalWidth = { terminal.size.width },
         ),
     )
 

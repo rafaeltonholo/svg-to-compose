@@ -7,7 +7,6 @@ import com.github.ajalt.mordant.widgets.progress.MultiProgressBarWidgetMaker
 import com.github.ajalt.mordant.widgets.progress.ProgressBarMakerRow
 import com.github.ajalt.mordant.widgets.progress.ProgressBarWidgetMaker
 import com.github.ajalt.mordant.widgets.withPadding
-import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 
 private const val HORIZONTAL_PADDING = 2
@@ -19,11 +18,13 @@ private const val VERTICAL_PADDING = 2
  *
  * Mordant calls [build] on every animation frame, so the header
  * is re-read from the supplier each time the terminal redraws.
+ * [terminalWidth] is a lambda so the layout adapts when the user
+ * resizes the terminal mid-run.
  */
 internal class DashboardWidgetMaker(
     private val state: () -> TuiState,
     private val barRowCount: Int,
-    private val terminalWidth: Int,
+    private val terminalWidth: () -> Int,
 ) : ProgressBarWidgetMaker {
     override fun build(rows: List<ProgressBarMakerRow<*>>): Widget {
         val currentState = state()
@@ -32,7 +33,7 @@ internal class DashboardWidgetMaker(
         val progressWidget = MultiProgressBarWidgetMaker.build(barRows)
         val statsWidget = MultiProgressBarWidgetMaker.build(statsRows)
         return verticalLayout {
-            val contentWidth = terminalWidth - HORIZONTAL_PADDING * 2
+            val contentWidth = terminalWidth() - HORIZONTAL_PADDING * 2
             cell(headerSection(state = currentState, contentWidth = contentWidth))
             cell(progressWidget)
             cell(currentFilesSection(files = currentState.currentFiles))
