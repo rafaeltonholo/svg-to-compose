@@ -23,8 +23,15 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val MAX_PROGRESS_BAR_WIDTH = 80
 
-// Space consumed by label ("Progress:"), spacing, completed count,
-// percentage, and outer horizontal padding on the same row.
+// Space consumed on the same row as the progress bar. Breakdown:
+//   "Progress:"              = 9 chars
+//   spacing around bar       = 2 chars (1 before, 1 after the bar)
+//   completed count "9999/9999" = 9 chars (worst case)
+//   spacing                  = 1 char
+//   percentage " 100%"       = 5 chars
+//   outer horizontal padding = 4 chars (2 * HORIZONTAL_PADDING on dashboard)
+//   safety margin for glyphs = 5 chars
+// Total: 9 + 2 + 9 + 1 + 5 + 4 + 5 = 35
 private const val PROGRESS_BAR_OVERHEAD = 35
 private const val MIN_PROGRESS_BAR_WIDTH = 20
 
