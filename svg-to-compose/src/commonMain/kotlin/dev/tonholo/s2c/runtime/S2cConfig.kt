@@ -16,5 +16,13 @@ interface S2cConfig {
     val verbose: Boolean
     val silent: Boolean
     val stackTrace: Boolean
-    val parallel: Int get() = 0
+    val parallel: Int get() = PARALLEL_DISABLED
+
+    companion object {
+        /** Sentinel value for [parallel] meaning parallel execution is disabled. */
+        const val PARALLEL_DISABLED: Int = 0
+
+        /** Sentinel value for [parallel] meaning parallelism equals available CPU cores. */
+        const val PARALLEL_CPU_CORES: Int = -1
+    }
 }
