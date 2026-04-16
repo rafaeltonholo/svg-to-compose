@@ -382,61 +382,81 @@ class Processor(
                 )
                 FileProcessingResult.Success(processedFile)
             } catch (e: ExitProgramException) {
-                onEvent(
-                    ConversionEvent.FileCompleted(
-                        fileName = file.name,
-                        duration = fileMark.elapsedNow(),
-                        result = FileResult.Failed(
-                            errorCode = e.errorCode,
-                            message = e.message ?: "Unknown error",
-                            stackTrace = e.stackTraceToString(),
-                        ),
-                    ),
-                )
-                logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
-                if (this.config.stackTrace) {
-                    logger.output(e.stackTraceToString())
-                }
-                FileProcessingResult.Failed(file, e)
+                handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
             } catch (e: OptimizationException) {
-                onEvent(
-                    ConversionEvent.FileCompleted(
-                        fileName = file.name,
-                        duration = fileMark.elapsedNow(),
-                        result = FileResult.Failed(
-                            errorCode = e.errorCode,
-                            message = e.message ?: "Unknown error",
-                            stackTrace = e.stackTraceToString(),
-                        ),
-                    ),
-                )
-                logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
-                if (this.config.stackTrace) {
-                    logger.output(e.stackTraceToString())
-                }
-                FileProcessingResult.Failed(file, e)
+                handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
             } catch (e: okio.IOException) {
-                onEvent(
-                    ConversionEvent.FileCompleted(
-                        fileName = file.name,
-                        duration = fileMark.elapsedNow(),
-                        result = FileResult.Failed(
-                            errorCode = ErrorCode.FileNotFoundError,
-                            message = e.message ?: "Unknown error",
-                            stackTrace = e.stackTraceToString(),
-                        ),
-                    ),
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FileNotFoundError,
+                    onEvent = onEvent,
                 )
-                logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
-                if (this.config.stackTrace) {
-                    logger.output(e.stackTraceToString())
-                }
-                FileProcessingResult.Failed(file, e)
+            } catch (e: NumberFormatException) {
+                // Parsers throw NumberFormatException for malformed SVG
+                // width/height/viewBox attributes. Convert to a per-file
+                // failure so a single bad file does not abort the batch.
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
+                )
+            } catch (e: IllegalArgumentException) {
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
+                )
+            } catch (e: IllegalStateException) {
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
+                )
             }
         }
         val processedFiles = results.filterIsInstance<FileProcessingResult.Success>().map { it.path }
         val errors = results.filterIsInstance<FileProcessingResult.Failed>().map { it.file to it.error }
         return processedFiles to errors
+    }
+
+    /**
+     * Emits a [ConversionEvent.FileCompleted] failure event, logs the error, and
+     * returns a [FileProcessingResult.Failed] for the dispatcher to aggregate.
+     *
+     * Extracted to a single helper so every caught exception type produces the
+     * same user-facing failure shape without duplicating 14 lines of boilerplate.
+     */
+    private fun handleFailure(
+        file: Path,
+        fileMark: TimeSource.Monotonic.ValueTimeMark,
+        error: Exception,
+        errorCode: ErrorCode,
+        onEvent: (ConversionEvent) -> Unit,
+    ): FileProcessingResult.Failed {
+        onEvent(
+            ConversionEvent.FileCompleted(
+                fileName = file.name,
+                duration = fileMark.elapsedNow(),
+                result = FileResult.Failed(
+                    errorCode = errorCode,
+                    message = error.message ?: "Unknown error",
+                    stackTrace = error.stackTraceToString(),
+                ),
+            ),
+        )
+        logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${error.message}", error)
+        if (this.config.stackTrace) {
+            logger.output(error.stackTraceToString())
+        }
+        return FileProcessingResult.Failed(file, error)
     }
 
     /**
