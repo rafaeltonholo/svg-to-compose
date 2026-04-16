@@ -1,11 +1,14 @@
 package dev.tonholo.s2c.cli.output.log
 
+import dev.tonholo.s2c.dispatching.availableProcessors
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
+import dev.tonholo.s2c.runtime.S2cConfig
+import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.TimeSource
+import kotlin.time.ExperimentalTime
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -31,7 +34,7 @@ internal class RunLogWriter(
             writeUtf8("  Output:   ${config.outputPath}\n")
             writeUtf8("  Package:  ${config.packageName}\n")
             writeUtf8("  Optimize: ${config.optimizationEnabled}\n")
-            writeUtf8("  Parallel: ${config.parallel}\n")
+            writeUtf8("  Parallel: ${formatParallel(config.parallel)}\n")
             writeUtf8("\n")
 
             writeUtf8("Results: ${stats.succeeded} succeeded, ${stats.failed} failed, ${stats.totalFiles} total\n")
@@ -76,15 +79,23 @@ internal class RunLogWriter(
     companion object {
         val DEFAULT_LOG_DIR: Path = ".s2c/logs".toPath()
 
-        private const val NANOS_PER_MILLI = 1_000_000
+        /**
+         * Epoch milliseconds as a sortable, wall-clock file-name timestamp.
+         * Epoch millis are chronologically ordered across processes and can
+         * be round-tripped to a local time via `Instant.fromEpochMilliseconds`,
+         * which lets users correlate logs with other artifacts.
+         */
+        @OptIn(ExperimentalTime::class)
+        private fun formatTimestamp(): String =
+            Clock.System.now().toEpochMilliseconds().toString()
 
-        // Captured at class load; elapsed nanos from this mark produce
-        // unique, monotonically increasing timestamps within a process.
-        private val epoch = TimeSource.Monotonic.markNow()
-
-        private fun formatTimestamp(): String {
-            return epoch.elapsedNow().inWholeNanoseconds.toString()
+        private fun formatParallel(parallel: Int): String = when (parallel) {
+            S2cConfig.PARALLEL_DISABLED -> "disabled"
+            S2cConfig.PARALLEL_CPU_CORES -> "CPU cores (${availableProcessors()})"
+            else -> parallel.toString()
         }
+
+        private const val NANOS_PER_MILLI = 1_000_000
 
         internal fun formatDuration(duration: Duration): String =
             duration.toComponents { hours, minutes, seconds, nanoseconds ->
