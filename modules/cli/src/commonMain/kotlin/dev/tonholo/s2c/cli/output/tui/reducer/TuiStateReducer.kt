@@ -59,10 +59,10 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 }
 
 internal fun reduceCurrentFiles(
-    state: LinkedHashMap<String, CurrentFileState>,
+    state: Map<String, CurrentFileState>,
     event: ConversionEvent,
     optimizationEnabled: Boolean,
-): LinkedHashMap<String, CurrentFileState> = when (event) {
+): Map<String, CurrentFileState> = when (event) {
     is ConversionEvent.FileStarted -> {
         val firstPhase = if (optimizationEnabled) ConversionPhase.Optimizing else ConversionPhase.Parsing
         val updated = LinkedHashMap(state)

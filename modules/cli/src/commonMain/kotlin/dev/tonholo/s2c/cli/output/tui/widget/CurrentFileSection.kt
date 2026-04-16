@@ -11,7 +11,7 @@ import dev.tonholo.s2c.output.ConversionPhase
 
 private const val MAX_VISIBLE_FILES = 5
 
-internal fun currentFilesSection(files: LinkedHashMap<String, CurrentFileState>): Widget {
+internal fun currentFilesSection(files: Map<String, CurrentFileState>): Widget {
     val entries = files.values.toList()
     val visible = entries.take(MAX_VISIBLE_FILES)
     val overflow = entries.size - visible.size
@@ -24,7 +24,8 @@ internal fun currentFilesSection(files: LinkedHashMap<String, CurrentFileState>)
         if (overflow > 0) {
             cell(Text("  +$overflow more..."))
         }
-        // Pad to stable height: header + MAX_VISIBLE_FILES + overflow line
+        // Pad to stable height: MAX_VISIBLE_FILES file rows + 1 overflow indicator slot.
+        // The bold "Processing" header is always rendered and is not part of totalSlots.
         val renderedLines = visible.size + (if (overflow > 0) 1 else 0)
         val totalSlots = MAX_VISIBLE_FILES + 1
         repeat(totalSlots - renderedLines) {
