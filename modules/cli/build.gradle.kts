@@ -29,9 +29,6 @@ kotlin {
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(libs.org.jetbrains.kotlinx.serialization.json)
         }
-        jvmMain.dependencies {
-            implementation(libs.org.jetbrains.kotlinx.coroutines.swing)
-        }
         commonTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
             implementation(libs.org.jetbrains.kotlinx.coroutines.test)
