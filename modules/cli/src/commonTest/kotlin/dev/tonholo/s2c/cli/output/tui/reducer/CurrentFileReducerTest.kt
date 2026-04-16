@@ -205,6 +205,25 @@ class CurrentFileReducerTest {
         assertEquals(expected = state, actual = result)
     }
 
+    @Test
+    fun `given file at Parsing - when FileStepChanged to same phase - then state unchanged`() {
+        // Arrange
+        val fileState = CurrentFileState(fileName = "icon.svg", currentPhase = ConversionPhase.Parsing)
+        val state = linkedMapOf("icon.svg" to fileState)
+        val event = ConversionEvent.FileStepChanged(
+            fileName = "icon.svg",
+            step = ConversionPhase.Parsing,
+        )
+
+        // Act
+        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+
+        // Assert
+        assertEquals(expected = state, actual = result)
+        assertEquals(expected = ConversionPhase.Parsing, actual = result["icon.svg"]?.currentPhase)
+        assertTrue(result["icon.svg"]?.completedPhases?.isEmpty() ?: false)
+    }
+
     // --- reduceProgress tests ---
 
     @Test
@@ -261,6 +280,32 @@ class CurrentFileReducerTest {
         // Assert
         assertEquals(expected = 1, actual = result.entries.size)
         assertTrue(result.entries.first().result is FileResult.Failed)
+    }
+
+    @Test
+    fun `given recent files one below capacity - when FileCompleted arrives - then entry appended without eviction`() {
+        // Arrange
+        val entries = (1..2).map { i ->
+            RecentFileEntry(
+                fileName = "file$i.svg",
+                result = FileResult.Success,
+                duration = (i * 10).milliseconds,
+            )
+        }
+        val state = RecentFilesState(entries = entries, maxEntries = 3)
+        val event = ConversionEvent.FileCompleted(
+            fileName = "file3.svg",
+            duration = 30.milliseconds,
+            result = FileResult.Success,
+        )
+
+        // Act
+        val result = reduceRecentFiles(state = state, event = event)
+
+        // Assert
+        assertEquals(expected = 3, actual = result.entries.size)
+        assertEquals(expected = "file1.svg", actual = result.entries.first().fileName)
+        assertEquals(expected = "file3.svg", actual = result.entries.last().fileName)
     }
 
     @Test
