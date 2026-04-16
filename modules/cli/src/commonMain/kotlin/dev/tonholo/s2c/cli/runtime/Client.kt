@@ -235,13 +235,15 @@ internal class Client(
     private val parallelRunners by option(
         names = arrayOf("--parallel-runners", "--parallel"),
         help = "[EXPERIMENTAL] Enable parallel execution of tasks, speeding up the conversion process. " +
-            "The number of runners can be specified with this option. " +
-            "If no value is specified, the default value is ${CliConfig.PARALLEL_ENABLED_DEFAULT_RUNNERS_SIZE}. " +
-            "If the value is ${CliConfig.PARALLEL_CPU_CORES}, the number of runners will be equal to the number " +
-            "of CPU cores. If the value is ${CliConfig.PARALLEL_DISABLED}, parallel execution will be disabled.",
+            "Defaults to the number of available CPU cores. " +
+            "Pass ${CliConfig.PARALLEL_CPU_CORES} to explicitly request CPU-core parallelism. " +
+            "Pass ${CliConfig.PARALLEL_DISABLED} to disable parallel execution. " +
+            "Otherwise, pass a value between 1 and ${CliConfig.PARALLEL_MAX}.",
     ).int(acceptsValueWithoutName = true).default(value = CliConfig.PARALLEL_CPU_CORES).validate {
-        if (it < 0 && it != CliConfig.PARALLEL_DISABLED && it != CliConfig.PARALLEL_CPU_CORES) {
-            fail("Parallel execution must be 1 or greater")
+        when {
+            it == CliConfig.PARALLEL_DISABLED || it == CliConfig.PARALLEL_CPU_CORES -> Unit
+            it < 1 -> fail("Parallel execution must be 1 or greater")
+            it > CliConfig.PARALLEL_MAX -> fail("Parallel execution must not exceed ${CliConfig.PARALLEL_MAX}")
         }
     }
 
