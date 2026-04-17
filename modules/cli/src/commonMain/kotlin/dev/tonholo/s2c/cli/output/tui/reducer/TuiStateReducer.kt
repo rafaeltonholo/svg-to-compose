@@ -32,7 +32,7 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 
     is ConversionEvent.FileStarted -> {
         val current = state ?: return ProgressState()
-        current.copy(pending = current.pending - 1)
+        current.copy(pending = (current.pending - 1).coerceAtLeast(0))
     }
 
     is ConversionEvent.FileCompleted -> {
