@@ -36,9 +36,12 @@ internal class DashboardWidgetMaker(
             val contentWidth = terminalWidth() - HORIZONTAL_PADDING * 2
             cell(headerSection(state = currentState, contentWidth = contentWidth))
             cell(progressWidget)
-            cell(currentFilesSection(files = currentState.currentFiles))
+            cell(currentFilesSection(files = currentState.currentFiles, contentWidth = contentWidth))
             cell(
-                recentFilesSection(state = currentState.recentFiles).withPadding { top = 1 },
+                recentFilesSection(
+                    state = currentState.recentFiles,
+                    contentWidth = contentWidth,
+                ).withPadding { top = 1 },
             )
             val progress = currentState.progress
             if (progress != null) {

@@ -35,12 +35,7 @@ private fun collapsedHeader(state: HeaderState, versionLine: Widget, contentWidt
             append("  files: ${state.totalFiles}")
             append("  optimize: ${if (config.optimizationEnabled) "on" else "off"}")
         }
-        val truncated = if (summaryStr.length > maxTextWidth) {
-            summaryStr.take(maxTextWidth - 1) + "\u2026"
-        } else {
-            summaryStr
-        }
-        Text(truncated).withPadding {
+        Text(truncateWithEllipsis(text = summaryStr, maxWidth = maxTextWidth)).withPadding {
             horizontal = SUMMARY_INNER_PADDING
         }
     } else {
