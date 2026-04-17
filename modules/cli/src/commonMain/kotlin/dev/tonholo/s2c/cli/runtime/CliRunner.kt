@@ -179,7 +179,7 @@ internal class CliRunner(
             }
     }
 
-    private fun runWithoutTui(
+    private suspend fun runWithoutTui(
         processor: Processor,
         config: RunConfig,
         mapIconNameTo: IconMapperFn,
@@ -192,26 +192,22 @@ internal class CliRunner(
             OutputFormat.Text -> PlainTextRenderer()
         }
 
-        // Silence logger when JSON output is active. JSON events carry all
-        // progress information; logger text would break the JSONL stream.
-        // Silent is intentionally never restored: in JSON mode the process
-        // exits via exitProcess() after Client.run() handles the exception,
-        // so restoring would only re-enable plain-text output that
-        // contaminates the JSONL stream.
         if (outputFormat == OutputFormat.Json) {
             context.updateConfig<CliConfig> { it.copy(silent = true) }
         }
 
         var stats: RunStats? = null
         val completedFiles = mutableListOf<FileCompletionEntry>()
-        processor.run(
+        processor.runAsFlow(
             path = config.inputPath,
             output = config.outputPath,
             config = config.parserConfig,
             recursive = config.recursive,
             maxDepth = config.recursiveDepth,
             mapIconName = mapIconNameTo,
-            onEvent = { event ->
+        )
+            .flowOn(ioDispatcher)
+            .collect { event ->
                 if (outputFormat == OutputFormat.Json || !isSilent) {
                     renderer.onEvent(event)
                 }
@@ -227,15 +223,10 @@ internal class CliRunner(
                 if (event is ConversionEvent.RunCompleted) {
                     stats = event.stats
                 }
-            },
-        )
+            }
 
         val runStats = stats
         if (runStats != null) {
-            // In JSON mode the failure summary would contaminate the JSONL
-            // stream, so the log file is still written but no extra lines
-            // are printed to the terminal. `finalizeRun` is the single
-            // failure-throwing site for both TUI and non-TUI paths.
             finalizeRun(
                 config = config,
                 stats = runStats,
