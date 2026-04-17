@@ -58,8 +58,8 @@ internal interface CliGraph {
      * time, so it observes the [S2cConfig.parallel] flag after [Client.run]
      * updates the configuration.
      *
-     * Overrides the default [SequentialFileDispatcher] binding contributed by
-     * [dev.tonholo.s2c.inject.SvgToComposeBindings].
+     * Overrides the default [dev.tonholo.s2c.dispatching.SequentialFileDispatcher] binding
+     * contributed by [dev.tonholo.s2c.inject.FileDispatcherBindings].
      */
     @Provides
     fun provideFileDispatcher(
