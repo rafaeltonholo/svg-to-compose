@@ -39,6 +39,7 @@ import dev.zacsweers.metro.AssistedInject
 import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.time.TimeSource
+import okio.IOException
 
 @Suppress("LongParameterList")
 @AssistedInject
@@ -101,7 +102,7 @@ class Processor(
         var outputPath = output.toPath()
         val isDirectory = try {
             fileManager.isDirectory(filePath)
-        } catch (e: okio.IOException) {
+        } catch (e: IOException) {
             throw ExitProgramException(
                 errorCode = ErrorCode.FileNotFoundError,
                 message = """
@@ -385,7 +386,7 @@ class Processor(
                 handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
             } catch (e: OptimizationException) {
                 handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
-            } catch (e: okio.IOException) {
+            } catch (e: IOException) {
                 handleFailure(
                     file = file,
                     fileMark = fileMark,
@@ -452,7 +453,7 @@ class Processor(
                 ),
             ),
         )
-        logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${error.message}", error)
+        logger.error("Failed to process $file. Error message: ${error.message}", error)
         if (this.config.stackTrace) {
             logger.output(error.stackTraceToString())
         }
