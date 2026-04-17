@@ -36,10 +36,10 @@ import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.time.TimeSource
-import okio.IOException
 
 @Suppress("LongParameterList")
 @AssistedInject
