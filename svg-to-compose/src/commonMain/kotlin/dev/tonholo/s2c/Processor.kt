@@ -454,9 +454,6 @@ class Processor(
             ),
         )
         logger.error("Failed to process $file. Error message: ${error.message}", error)
-        if (this.config.stackTrace) {
-            logger.output(error.stackTraceToString())
-        }
         return FileProcessingResult.Failed(file, error)
     }
 
