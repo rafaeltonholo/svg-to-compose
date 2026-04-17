@@ -5,40 +5,36 @@ import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.ajalt.mordant.rendering.Widget
 import com.github.ajalt.mordant.table.verticalLayout
 import com.github.ajalt.mordant.widgets.Text
+import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
 import dev.tonholo.s2c.output.FileResult
 
-/**
- * Fixed-width column for the right-aligned duration / FAILED label so the recent-files log
- * lines up even when names have different lengths.
- */
 private const val DURATION_COLUMN_WIDTH = 8
-
-/**
- * Row prefix is `" <icon> "` (3 cells) plus the gap between name and duration (2 cells);
- * subtract both when sizing the file name.
- */
-private const val RECENT_ROW_FIXED_OVERHEAD = 3 + 2
-
-/** Minimum legible file name width before truncation collapses to an ellipsis. */
-private const val MIN_RECENT_FILENAME_WIDTH = 8
+private const val ROW_PREFIX_AND_GAP = 5
+private const val MIN_NAME_WIDTH = 8
 
 internal fun recentFilesSection(state: RecentFilesState, contentWidth: Int): Widget = verticalLayout {
     cell(Text(TextStyles.bold("Recent")))
-    val available = contentWidth - RECENT_ROW_FIXED_OVERHEAD - DURATION_COLUMN_WIDTH
-    val nameBudget = available.coerceAtLeast(MIN_RECENT_FILENAME_WIDTH)
+    val nameBudget = (contentWidth - DURATION_COLUMN_WIDTH - ROW_PREFIX_AND_GAP)
+        .coerceAtLeast(MIN_NAME_WIDTH)
     for (entry in state.entries) {
-        val isSuccess = entry.result is FileResult.Success
-        val icon = if (isSuccess) TuiIcons.success else TuiIcons.failure
-        val rawDuration = if (isSuccess) "${entry.duration.inWholeMilliseconds}ms" else "FAILED"
-        val truncatedName = truncateWithEllipsis(text = entry.fileName, maxWidth = nameBudget)
-        val padding = (nameBudget - truncatedName.length).coerceAtLeast(0)
-        val paddedName = truncatedName + " ".repeat(padding)
-        val durationCell = rawDuration.padStart(DURATION_COLUMN_WIDTH)
-        val colouredDuration = if (isSuccess) durationCell else TextColors.red(durationCell)
-        cell(Text(" $icon $paddedName  $colouredDuration"))
+        cell(recentFileRow(entry = entry, nameBudget = nameBudget))
     }
-    repeat(state.maxEntries - state.entries.size) {
+    repeat((state.maxEntries - state.entries.size).coerceAtLeast(0)) {
         cell(Text(" "))
     }
+}
+
+private fun recentFileRow(entry: RecentFileEntry, nameBudget: Int): Widget {
+    val isSuccess = entry.result is FileResult.Success
+    val icon = if (isSuccess) TuiIcons.success else TuiIcons.failure
+    val name = truncateWithEllipsis(text = entry.fileName, maxWidth = nameBudget).padEnd(nameBudget)
+    val duration = durationCell(entry = entry, isSuccess = isSuccess)
+    return Text(" $icon $name  $duration")
+}
+
+private fun durationCell(entry: RecentFileEntry, isSuccess: Boolean): String {
+    val raw = if (isSuccess) "${entry.duration.inWholeMilliseconds}ms" else "FAILED"
+    val cell = raw.take(DURATION_COLUMN_WIDTH).padStart(DURATION_COLUMN_WIDTH)
+    return if (isSuccess) cell else TextColors.red(cell)
 }
