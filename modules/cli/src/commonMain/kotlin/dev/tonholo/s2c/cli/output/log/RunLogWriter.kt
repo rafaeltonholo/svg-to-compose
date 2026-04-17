@@ -6,9 +6,9 @@ import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.runtime.S2cConfig
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -79,15 +79,18 @@ internal class RunLogWriter(
     companion object {
         val DEFAULT_LOG_DIR: Path = ".s2c/logs".toPath()
 
-        /**
-         * Epoch milliseconds as a sortable, wall-clock file-name timestamp.
-         * Epoch millis are chronologically ordered across processes and can
-         * be round-tripped to a local time via `Instant.fromEpochMilliseconds`,
-         * which lets users correlate logs with other artifacts.
-         */
-        @OptIn(ExperimentalTime::class)
-        private fun formatTimestamp(): String =
-            Clock.System.now().toEpochMilliseconds().toString()
+        private const val SUFFIX_HEX_DIGITS = 4
+        private const val SUFFIX_BITS = SUFFIX_HEX_DIGITS * 4
+        private const val SUFFIX_MASK = (1 shl SUFFIX_BITS) - 1
+
+        private fun formatTimestamp(): String {
+            val millis = Clock.System.now().toEpochMilliseconds()
+            val suffix = Random.nextInt()
+                .and(SUFFIX_MASK)
+                .toString(radix = 16)
+                .padStart(length = SUFFIX_HEX_DIGITS, padChar = '0')
+            return "$millis-$suffix"
+        }
 
         private fun formatParallel(parallel: Int): String = when (parallel) {
             S2cConfig.PARALLEL_DISABLED -> "disabled"
