@@ -240,6 +240,19 @@ class CurrentFileReducerTest {
         assertEquals(expected = 0, actual = result.completed)
     }
 
+    @Test
+    fun `given pending zero - when FileStarted - then pending clamped at zero`() {
+        // Arrange
+        val state = ProgressState(total = 5L, pending = 0L)
+        val event = ConversionEvent.FileStarted(fileName = "extra.svg", index = 6)
+
+        // Act
+        val result = reduceProgress(state = state, event = event)
+
+        // Assert
+        assertEquals(expected = 0L, actual = result.pending)
+    }
+
     // --- reduceRecentFiles tests ---
 
     @Test

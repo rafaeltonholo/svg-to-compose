@@ -5,13 +5,15 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.decrementAndFetch
 import kotlin.concurrent.atomics.incrementAndFetch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.TimeSource
 
-@OptIn(ExperimentalAtomicApi::class)
+@OptIn(ExperimentalAtomicApi::class, ExperimentalCoroutinesApi::class)
 class ParallelFileDispatcherTest {
     @Test
     fun `given 20 files and parallelism 4 - when dispatch is called - then all files are processed in order`() {
@@ -70,7 +72,8 @@ class ParallelFileDispatcherTest {
     fun `given parallelism 4 - when actions block - then at least 2 actions run concurrently`() {
         // Arrange
         val files = (1..8).map { "$it.svg".toPath() }
-        val dispatcher = ParallelFileDispatcher(parallelism = 4, dispatcher = Dispatchers.Default)
+        val executionDispatcher = Dispatchers.Default.limitedParallelism(parallelism = 4)
+        val dispatcher = ParallelFileDispatcher(parallelism = 4, dispatcher = executionDispatcher)
         val running = AtomicInt(0)
         val maxObserved = AtomicInt(0)
 
@@ -80,7 +83,7 @@ class ParallelFileDispatcherTest {
             updateMax(maxObserved, now)
             // Busy-wait briefly to force overlap without relying on a
             // cross-platform sleep primitive.
-            val mark = kotlin.time.TimeSource.Monotonic.markNow()
+            val mark = TimeSource.Monotonic.markNow()
             while (mark.elapsedNow().inWholeMilliseconds < CONCURRENCY_HOLD_MS) {
                 // spin
             }
