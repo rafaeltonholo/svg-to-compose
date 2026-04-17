@@ -12,15 +12,21 @@ import kotlinx.coroutines.IO
 
 @BindingContainer
 @ContributesTo(CliScope::class)
-@SingleIn(CliScope::class)
 internal object DispatchersBinding {
     @Provides
+    @SingleIn(CliScope::class)
     @IoDispatcher
     fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
+    @SingleIn(CliScope::class)
     @DefaultDispatcher
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @SingleIn(CliScope::class)
+    @MainDispatcher
+    fun provideMainDispatcher(): CoroutineDispatcher = mainCoroutineDispatcher()
 }
 
 @Qualifier
@@ -28,3 +34,6 @@ annotation class IoDispatcher
 
 @Qualifier
 annotation class DefaultDispatcher
+
+@Qualifier
+annotation class MainDispatcher

@@ -25,6 +25,7 @@ data class RunConfig(
     val parserConfig: ParserConfig,
     val packageName: String,
     val optimizationEnabled: Boolean,
+    val parallel: Int,
     val recursive: Boolean,
     val recursiveDepth: Int = 0,
     val noTui: Boolean = false,
@@ -48,6 +49,7 @@ data class RunConfig(
             outputPath: String,
             recursive: Boolean,
             recursiveDepth: Int = 0,
+            parallel: Int = 1,
         ): RunConfig = RunConfig(
             inputPath = inputPath,
             outputPath = outputPath,
@@ -56,6 +58,7 @@ data class RunConfig(
             optimizationEnabled = config.optimize,
             recursive = recursive,
             recursiveDepth = recursiveDepth,
+            parallel = parallel,
         )
     }
 }

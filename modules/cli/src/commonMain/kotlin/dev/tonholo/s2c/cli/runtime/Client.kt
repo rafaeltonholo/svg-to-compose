@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.options.validate
@@ -209,6 +210,11 @@ internal class Client(
         help = "Output conversion progress as JSONL (one JSON object per line). Implies --no-tui.",
     ).flag(default = false)
 
+    private val logDir by option(
+        names = arrayOf("--log-dir"),
+        help = "Directory for run log files. Defaults to .s2c/logs.",
+    ).default(value = ".s2c/logs")
+
     private val mapIconNameTo by option(
         names = arrayOf("--map-icon-name-from-to", "--from-to", "--rename"),
         help = """Replace the icon's name first value of this parameter with the second.
@@ -227,6 +233,28 @@ internal class Client(
         """.trimMargin(),
     ).pair()
 
+    private val parallelRunners by option(
+        names = arrayOf("--parallel-runners", "--parallel"),
+        help = "[EXPERIMENTAL] Enable parallel execution of tasks, speeding up the conversion process. " +
+            "Defaults to the number of available CPU cores. " +
+            "Pass ${CliConfig.PARALLEL_CPU_CORES} to explicitly request CPU-core parallelism. " +
+            "Pass ${CliConfig.PARALLEL_DISABLED} to disable parallel execution. " +
+            "Otherwise, pass a value between 1 and ${CliConfig.PARALLEL_MAX}.",
+    ).int()
+        .optionalValue(default = CliConfig.PARALLEL_CPU_CORES)
+        .default(value = CliConfig.PARALLEL_CPU_CORES)
+        .validate {
+            when {
+                it == CliConfig.PARALLEL_DISABLED || it == CliConfig.PARALLEL_CPU_CORES -> Unit
+                it < 1 -> fail(
+                    "Parallel execution must be 1..${CliConfig.PARALLEL_MAX}, " +
+                        "${CliConfig.PARALLEL_DISABLED} (disabled), or " +
+                        "${CliConfig.PARALLEL_CPU_CORES} (CPU cores)",
+                )
+                it > CliConfig.PARALLEL_MAX -> fail("Parallel execution must not exceed ${CliConfig.PARALLEL_MAX}")
+            }
+        }
+
     private val effectiveDebug get() = verbose || debug
     private val effectiveStackTrace get() = stackTrace || effectiveDebug
 
@@ -239,6 +267,7 @@ internal class Client(
                 verbose = verbose,
                 silent = silent,
                 stackTrace = effectiveStackTrace,
+                parallel = parallelRunners,
             )
         }
 
@@ -252,6 +281,7 @@ internal class Client(
                 outputPath = output,
                 packageName = pkg,
                 optimizationEnabled = optimize,
+                parallel = parallelRunners,
                 recursive = recursive,
                 recursiveDepth = recursiveDepth,
                 noTui = noTui || json,
@@ -265,6 +295,7 @@ internal class Client(
                     } ?: iconName
                 },
                 outputFormat = outputFormat,
+                logDir = logDir.toPath(),
             )
         } catch (e: ExitProgramException) {
             logger.printEmpty()
@@ -305,6 +336,9 @@ internal class Client(
                 |   indentSize = $indentSize
                 |   indentStyle = $indentStyle
                 |   noEditorConfig = $noEditorConfig
+                |   template = $template
+                |   parallelRunners = $parallelRunners
+                |   logDir = $logDir
             """.trimMargin(),
         )
     }

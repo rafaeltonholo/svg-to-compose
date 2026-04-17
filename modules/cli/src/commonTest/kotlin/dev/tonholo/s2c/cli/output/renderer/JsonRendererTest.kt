@@ -41,6 +41,7 @@ class JsonRendererTest {
         parserConfig = defaultParserConfig,
         packageName = "com.example.icons",
         optimizationEnabled = true,
+        parallel = 0,
         recursive = false,
     )
 

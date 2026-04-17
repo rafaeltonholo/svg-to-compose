@@ -42,6 +42,7 @@ class ProcessorFlowExtTest {
                         ),
                         packageName = "com.test",
                         optimizationEnabled = false,
+                        parallel = 1,
                         recursive = false,
                     ),
                     totalFiles = 1,

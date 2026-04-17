@@ -4,8 +4,10 @@ import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.cli.output.tui.animation.AnimationController
 import dev.tonholo.s2c.cli.output.tui.layout.ProgressBarLayouts
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceCurrentFiles
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceHeader
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceProgress
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceRecentFiles
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.OutputRenderer
@@ -22,9 +24,18 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
 
     override fun onEvent(event: ConversionEvent) {
         state.update { current ->
+            val optimizationEnabled = current.header.config?.optimizationEnabled ?: true
             current
                 .withHeader { reduceHeader(state = it, event = event) }
                 .withProgress { reduceProgress(state = it, event = event) }
+                .withCurrentFiles {
+                    reduceCurrentFiles(
+                        state = it,
+                        event = event,
+                        optimizationEnabled = optimizationEnabled,
+                    )
+                }
+                .withRecentFiles { reduceRecentFiles(state = it, event = event) }
         }
         state.value.progress?.let { controller.sync(it) }
     }

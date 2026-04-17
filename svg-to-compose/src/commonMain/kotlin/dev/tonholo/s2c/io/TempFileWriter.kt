@@ -9,6 +9,17 @@ import okio.Path.Companion.toPath
 @Fake
 interface TempFileWriter {
     fun create(file: Path): Path
+
+    /**
+     * Deletes only the temp subdirectory for [file], leaving other
+     * files' temp data intact. Safe to call from parallel workers.
+     */
+    fun clearFile(file: Path)
+
+    /**
+     * Deletes the entire temp folder. Use only during final cleanup
+     * (e.g. [dev.tonholo.s2c.Processor.dispose]).
+     */
     fun clear()
 
     companion object {
@@ -32,6 +43,13 @@ class DefaultTempFileWriter(
         fileManager.copy(file, targetFile)
 
         return@debugSection targetFile
+    }
+
+    override fun clearFile(file: Path) {
+        logger.debugSection("Deleting temp file for ${file.name}") {
+            val tempDir = tempFolder / file.encodeToMd5()
+            fileManager.deleteRecursively(tempDir)
+        }
     }
 
     override fun clear() {

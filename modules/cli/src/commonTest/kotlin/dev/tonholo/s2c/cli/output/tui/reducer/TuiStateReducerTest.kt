@@ -34,6 +34,7 @@ class TuiStateReducerTest {
         parserConfig = defaultParserConfig,
         packageName = "com.example.icons",
         optimizationEnabled = true,
+        parallel = 1,
         recursive = false,
     )
 
@@ -204,9 +205,9 @@ class TuiStateReducerTest {
     }
 
     @Test
-    fun `given active state - when FileCompleted with Success - then completed incremented and pending decremented`() {
+    fun `given active state - when FileCompleted with Success - then completed incremented`() {
         // Arrange
-        val state = ProgressState(total = 5, pending = 3, completed = 2)
+        val state = ProgressState(total = 5, pending = 1, completed = 2)
         val event = ConversionEvent.FileCompleted(
             fileName = "icon.svg",
             duration = 100.milliseconds,
@@ -218,14 +219,14 @@ class TuiStateReducerTest {
 
         // Assert
         assertEquals(expected = 3L, actual = result.completed)
-        assertEquals(expected = 2L, actual = result.pending)
+        assertEquals(expected = 1L, actual = result.pending)
         assertEquals(expected = 0L, actual = result.failed)
     }
 
     @Test
     fun `given active state - when FileCompleted with Failed - then failed incremented and error appended`() {
         // Arrange
-        val state = ProgressState(total = 5, pending = 3, completed = 2)
+        val state = ProgressState(total = 5, pending = 1, completed = 2)
         val event = ConversionEvent.FileCompleted(
             fileName = "broken.svg",
             duration = 50.milliseconds,
@@ -240,12 +241,12 @@ class TuiStateReducerTest {
 
         // Assert
         assertEquals(expected = 1L, actual = result.failed)
-        assertEquals(expected = 2L, actual = result.pending)
+        assertEquals(expected = 1L, actual = result.pending)
         assertEquals(expected = listOf("Invalid path data"), actual = result.errors)
     }
 
     @Test
-    fun `given active state - when FileStarted received - then state unchanged`() {
+    fun `given active state - when FileStarted received - then pending decremented`() {
         // Arrange
         val state = ProgressState(total = 10, pending = 8, completed = 2)
         val event = ConversionEvent.FileStarted(fileName = "icon.svg", index = 3)
@@ -254,7 +255,8 @@ class TuiStateReducerTest {
         val result = reduceProgress(state = state, event = event)
 
         // Assert
-        assertEquals(expected = state, actual = result)
+        assertEquals(expected = 7L, actual = result.pending)
+        assertEquals(expected = 2L, actual = result.completed)
     }
 
     @Test
@@ -313,7 +315,7 @@ class TuiStateReducerTest {
     @Test
     fun `given active state - when multiple failures - then errors accumulate`() {
         // Arrange
-        var state: ProgressState? = ProgressState(total = 3, pending = 3)
+        var state: ProgressState? = ProgressState(total = 3, pending = 1)
 
         val events = listOf(
             ConversionEvent.FileCompleted(

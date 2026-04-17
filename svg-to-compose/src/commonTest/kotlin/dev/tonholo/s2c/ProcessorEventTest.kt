@@ -1,11 +1,14 @@
 package dev.tonholo.s2c
 
+import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
 import dev.tonholo.s2c.domain.IconFileContents
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.emitter.CodeEmitter
 import dev.tonholo.s2c.emitter.editorconfig.fakeEditorConfigReader
 import dev.tonholo.s2c.emitter.fakeCodeEmitterFactory
 import dev.tonholo.s2c.emitter.template.config.fakeTemplateConfigReader
+import dev.tonholo.s2c.error.ErrorCode
+import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.fakeFileManager
 import dev.tonholo.s2c.io.fakeIconWriter
 import dev.tonholo.s2c.logger.fakeLogger
@@ -120,6 +123,7 @@ class ProcessorEventTest {
             codeEmitterFactory = codeEmitterFactory,
             editorConfigReader = editorConfigReader,
             templateConfigReader = templateConfigReader,
+            fileDispatcher = SequentialFileDispatcher,
         )
     }
 
@@ -216,7 +220,12 @@ class ProcessorEventTest {
     fun `given file that fails to parse - when run is called - then emits FileCompleted with Failed result`() {
         // Arrange
         val processor = createProcessor(
-            parseResult = { _, _, _ -> throw RuntimeException("parse error") },
+            parseResult = { _, _, _ ->
+                throw ExitProgramException(
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    message = "parse error",
+                )
+            },
         )
 
         // Act
@@ -248,7 +257,12 @@ class ProcessorEventTest {
             filesToProcess = listOf("/input/icon1.svg", "/input/icon2.svg"),
             parseResult = { _, _, _ ->
                 callCount++
-                if (callCount == 2) throw RuntimeException("parse error")
+                if (callCount == 2) {
+                    throw ExitProgramException(
+                        errorCode = ErrorCode.FailedToParseIconError,
+                        message = "parse error",
+                    )
+                }
                 minimalIconFileContents()
             },
         )

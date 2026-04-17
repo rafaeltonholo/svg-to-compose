@@ -1,15 +1,21 @@
 package dev.tonholo.s2c.cli.inject
 
 import com.github.ajalt.mordant.terminal.Terminal
+import dev.tonholo.s2c.SvgToComposeContext
+import dev.tonholo.s2c.cli.dispatching.DeferredFileDispatcher
+import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
+import dev.tonholo.s2c.dispatching.FileDispatcher
+import dev.tonholo.s2c.inject.FileDispatcherBindings
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
+import kotlinx.coroutines.CoroutineDispatcher
 import okio.FileSystem
 import okio.SYSTEM
 
@@ -26,6 +32,7 @@ import okio.SYSTEM
 @DependencyGraph(
     scope = AppScope::class,
     additionalScopes = [CliScope::class],
+    excludes = [FileDispatcherBindings::class],
 )
 internal interface CliGraph {
     /** The Clikt command entry point, fully injected with all dependencies. */
@@ -45,6 +52,22 @@ internal interface CliGraph {
     /** Provides a [Terminal] instance for TUI rendering and raw input handling. */
     @Provides
     fun provideTerminal(): Terminal = Terminal()
+
+    /**
+     * Provides a [FileDispatcher] that defers strategy selection until dispatch
+     * time, so it observes the [S2cConfig.parallel] flag after [Client.run]
+     * updates the configuration.
+     *
+     * Overrides the default [dev.tonholo.s2c.dispatching.SequentialFileDispatcher] binding
+     * contributed by [dev.tonholo.s2c.inject.FileDispatcherBindings].
+     */
+    @Provides
+    fun provideFileDispatcher(
+        context: SvgToComposeContext,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+    ): FileDispatcher {
+        return DeferredFileDispatcher(context, dispatcher)
+    }
 
     /**
      * Factory for creating the [CliGraph].

@@ -1,6 +1,8 @@
 package dev.tonholo.s2c
 
 import dev.tonholo.s2c.config.BuildConfig
+import dev.tonholo.s2c.dispatching.FileDispatcher
+import dev.tonholo.s2c.dispatching.FileProcessingResult
 import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.FormatConfig
@@ -9,6 +11,7 @@ import dev.tonholo.s2c.emitter.editorconfig.EditorConfigReader
 import dev.tonholo.s2c.emitter.template.config.TemplateConfigReader
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
+import dev.tonholo.s2c.error.OptimizationException
 import dev.tonholo.s2c.extensions.extension
 import dev.tonholo.s2c.extensions.isDirectory
 import dev.tonholo.s2c.extensions.isFile
@@ -33,10 +36,12 @@ import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import okio.IOException
 import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.time.TimeSource
 
+@Suppress("LongParameterList")
 @AssistedInject
 class Processor(
     private val config: S2cConfig,
@@ -49,6 +54,7 @@ class Processor(
     private val codeEmitterFactory: CodeEmitterFactory,
     private val editorConfigReader: EditorConfigReader,
     private val templateConfigReader: TemplateConfigReader,
+    private val fileDispatcher: FileDispatcher,
 ) {
     private val tempFileWriter: TempFileWriter = DefaultTempFileWriter(logger, fileManager, tempDirectory)
 
@@ -96,7 +102,7 @@ class Processor(
         var outputPath = output.toPath()
         val isDirectory = try {
             fileManager.isDirectory(filePath)
-        } catch (e: okio.IOException) {
+        } catch (e: IOException) {
             throw ExitProgramException(
                 errorCode = ErrorCode.FileNotFoundError,
                 message = """
@@ -146,21 +152,20 @@ class Processor(
                     outputPath = output,
                     recursive = runRecursively,
                     recursiveDepth = maxDepth,
+                    parallel = this.config.parallel,
                 ),
                 totalFiles = files.size,
                 version = BuildConfig.VERSION,
             ),
         )
 
-        val errors = mutableListOf<Pair<Path, Exception>>()
-        val processedFiles = processFiles(
+        val (processedFiles, errors) = processFiles(
             files = files,
             optimizers = optimizers,
             outputPath = outputPath,
             parserConfig = config,
             runRecursively = runRecursively,
             filePath = filePath,
-            errors = errors,
             mapIconName = mapIconName.orDefault(),
             onEvent = emitEvent,
         )
@@ -170,6 +175,7 @@ class Processor(
             .map { (_, exception) ->
                 when (exception) {
                     is ExitProgramException -> exception.errorCode
+                    is OptimizationException -> exception.errorCode
                     else -> ErrorCode.FailedToParseIconError
                 }
             }
@@ -340,7 +346,9 @@ class Processor(
      * @param parserConfig The parser configuration.
      * @param runRecursively Whether to run recursively.
      * @param filePath The file path.
-     * @param errors The list of errors.
+     * @param mapIconName The icon name mapper function.
+     * @param onEvent The event callback.
+     * @return A pair of successfully processed file paths and failed file-error pairs.
      */
     private fun processFiles(
         files: List<Path>,
@@ -349,12 +357,10 @@ class Processor(
         parserConfig: ParserConfig,
         runRecursively: Boolean,
         filePath: Path,
-        errors: MutableList<Pair<Path, Exception>>,
         mapIconName: IconMapperFn,
         onEvent: (ConversionEvent) -> Unit,
-    ): List<Path> {
-        val processedFiles = mutableListOf<Path>()
-        for ((index, file) in files.withIndex()) {
+    ): Pair<List<Path>, List<Pair<Path, Exception>>> {
+        val results = fileDispatcher.dispatch(files) { index, file ->
             val fileMark = TimeSource.Monotonic.markNow()
             onEvent(ConversionEvent.FileStarted(fileName = file.name, index = index))
             try {
@@ -368,7 +374,6 @@ class Processor(
                     mapIconName = mapIconName,
                     onEvent = onEvent,
                 )
-                processedFiles += processedFile
                 onEvent(
                     ConversionEvent.FileCompleted(
                         fileName = file.name,
@@ -376,44 +381,80 @@ class Processor(
                         result = FileResult.Success,
                     ),
                 )
-                logger.printEmpty()
+                FileProcessingResult.Success(processedFile)
             } catch (e: ExitProgramException) {
-                onEvent(
-                    ConversionEvent.FileCompleted(
-                        fileName = file.name,
-                        duration = fileMark.elapsedNow(),
-                        result = FileResult.Failed(
-                            errorCode = e.errorCode,
-                            message = e.message ?: "Unknown error",
-                        ),
-                    ),
+                handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
+            } catch (e: OptimizationException) {
+                handleFailure(file = file, fileMark = fileMark, error = e, errorCode = e.errorCode, onEvent = onEvent)
+            } catch (e: IOException) {
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FileNotFoundError,
+                    onEvent = onEvent,
                 )
-                throw e
-            } catch (
-                e:
-                @Suppress("TooGenericExceptionCaught")
-                Exception,
-            ) {
-                onEvent(
-                    ConversionEvent.FileCompleted(
-                        fileName = file.name,
-                        duration = fileMark.elapsedNow(),
-                        result = FileResult.Failed(
-                            errorCode = ErrorCode.FailedToParseIconError,
-                            message = e.message ?: "Unknown error",
-                        ),
-                    ),
+            } catch (e: NumberFormatException) {
+                // Parsers throw NumberFormatException for malformed SVG
+                // width/height/viewBox attributes. Convert to a per-file
+                // failure so a single bad file does not abort the batch.
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
                 )
-                logger.printEmpty()
-                logger.error("Failed to parse $file to Jetpack Compose Icon. Error message: ${e.message}", e)
-                if (config.stackTrace) {
-                    logger.output(e.stackTraceToString())
-                }
-                logger.printEmpty()
-                errors.add(file to e)
+            } catch (e: IllegalArgumentException) {
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
+                )
+            } catch (e: IllegalStateException) {
+                handleFailure(
+                    file = file,
+                    fileMark = fileMark,
+                    error = e,
+                    errorCode = ErrorCode.FailedToParseIconError,
+                    onEvent = onEvent,
+                )
             }
         }
-        return processedFiles
+        val processedFiles = results.filterIsInstance<FileProcessingResult.Success>().map { it.path }
+        val errors = results.filterIsInstance<FileProcessingResult.Failed>().map { it.file to it.error }
+        return processedFiles to errors
+    }
+
+    /**
+     * Emits a [ConversionEvent.FileCompleted] failure event, logs the error, and
+     * returns a [FileProcessingResult.Failed] for the dispatcher to aggregate.
+     *
+     * Extracted to a single helper so every caught exception type produces the
+     * same user-facing failure shape without duplicating 14 lines of boilerplate.
+     */
+    private fun handleFailure(
+        file: Path,
+        fileMark: TimeSource.Monotonic.ValueTimeMark,
+        error: Exception,
+        errorCode: ErrorCode,
+        onEvent: (ConversionEvent) -> Unit,
+    ): FileProcessingResult.Failed {
+        onEvent(
+            ConversionEvent.FileCompleted(
+                fileName = file.name,
+                duration = fileMark.elapsedNow(),
+                result = FileResult.Failed(
+                    errorCode = errorCode,
+                    message = error.message ?: "Unknown error",
+                    stackTrace = error.stackTraceToString(),
+                ),
+            ),
+        )
+        logger.error("Failed to process $file. Error message: ${error.message}", error)
+        return FileProcessingResult.Failed(file, error)
     }
 
     /**
@@ -513,7 +554,7 @@ class Processor(
         )
 
         if (config.keepTempFolder.not()) {
-            tempFileWriter.clear()
+            tempFileWriter.clearFile(file)
         }
 
         return outputFile

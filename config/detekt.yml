@@ -703,7 +703,7 @@ style:
   RangeUntilInsteadOfRangeTo:
     active: false
   UnusedImport:
-    active: false
+    active: true
   UnusedParameter:
     active: true
     allowedNames: 'ignored|expected'

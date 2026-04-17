@@ -16,4 +16,13 @@ internal data class CliConfig(
     override val verbose: Boolean = false,
     override val silent: Boolean = false,
     override val stackTrace: Boolean = false,
-) : S2cConfig
+    override val parallel: Int = PARALLEL_DISABLED,
+) : S2cConfig {
+    companion object {
+        const val PARALLEL_DISABLED: Int = S2cConfig.PARALLEL_DISABLED
+        const val PARALLEL_CPU_CORES: Int = S2cConfig.PARALLEL_CPU_CORES
+
+        /** Upper bound for user-specified parallel runners. */
+        const val PARALLEL_MAX: Int = 1024
+    }
+}

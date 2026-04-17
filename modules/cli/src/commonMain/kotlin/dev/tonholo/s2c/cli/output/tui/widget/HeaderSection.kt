@@ -10,32 +10,42 @@ import com.github.ajalt.mordant.widgets.withPadding
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 
-internal fun headerSection(state: TuiState): Widget {
+internal fun headerSection(state: TuiState, contentWidth: Int): Widget {
     val versionLine = Text(
         TextStyles.bold("svg-to-compose") + " " + TextColors.cyan("v${state.header.version}"),
     )
 
     val headerState = state.header
     if (!headerState.expanded) {
-        return collapsedHeader(state = headerState, versionLine = versionLine)
+        return collapsedHeader(state = headerState, versionLine = versionLine, contentWidth = contentWidth)
     }
 
     return expandedHeader(state = headerState, versionLine = versionLine)
 }
 
-private fun collapsedHeader(state: HeaderState, versionLine: Widget): Widget {
-    val config = state.config ?: return versionLine
-    val summary = Text(
-        buildString {
+private const val SUMMARY_INNER_PADDING = 1
+
+private fun collapsedHeader(state: HeaderState, versionLine: Widget, contentWidth: Int): Widget {
+    val config = state.config
+    val summary = if (config != null) {
+        val maxTextWidth = contentWidth - SUMMARY_INNER_PADDING * 2
+        val summaryStr = buildString {
             append("input: ${config.inputPath}")
             append("  output: ${config.outputPath}")
             append("  files: ${state.totalFiles}")
             append("  optimize: ${if (config.optimizationEnabled) "on" else "off"}")
-        },
-    ).withPadding {
-        horizontal = 1
+        }
+        Text(truncateWithEllipsis(text = summaryStr, maxWidth = maxTextWidth)).withPadding {
+            horizontal = SUMMARY_INNER_PADDING
+        }
+    } else {
+        Text(" ")
     }
-    val hint = Text(TextColors.gray("Press [h] to expand header details"))
+    val hint = if (config != null) {
+        Text(TextColors.gray("Press [h] to expand header details"))
+    } else {
+        Text(" ")
+    }
 
     return verticalLayout {
         cell(versionLine)

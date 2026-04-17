@@ -19,7 +19,11 @@ internal class AnimationController(
 ) {
     private val animation = MultiProgressBarAnimation(
         terminal = terminal,
-        maker = DashboardWidgetMaker(state = { state.value }),
+        maker = DashboardWidgetMaker(
+            state = { state.value },
+            barRowCount = layouts.bar.size,
+            terminalWidth = { terminal.size.width },
+        ),
     )
 
     private val tasks = layouts.all.map { layout ->
