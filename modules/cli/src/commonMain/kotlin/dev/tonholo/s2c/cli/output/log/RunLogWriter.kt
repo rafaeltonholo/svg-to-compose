@@ -115,7 +115,7 @@ internal class RunLogWriter(
     }
 }
 
-data class FileCompletionEntry(
+internal data class FileCompletionEntry(
     val fileName: String,
     val duration: Duration,
     val result: FileResult,
