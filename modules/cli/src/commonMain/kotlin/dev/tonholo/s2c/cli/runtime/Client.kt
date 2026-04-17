@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.options.validate
@@ -239,13 +240,20 @@ internal class Client(
             "Pass ${CliConfig.PARALLEL_CPU_CORES} to explicitly request CPU-core parallelism. " +
             "Pass ${CliConfig.PARALLEL_DISABLED} to disable parallel execution. " +
             "Otherwise, pass a value between 1 and ${CliConfig.PARALLEL_MAX}.",
-    ).int(acceptsValueWithoutName = true).default(value = CliConfig.PARALLEL_CPU_CORES).validate {
-        when {
-            it == CliConfig.PARALLEL_DISABLED || it == CliConfig.PARALLEL_CPU_CORES -> Unit
-            it < 1 -> fail("Parallel execution must be 1 or greater")
-            it > CliConfig.PARALLEL_MAX -> fail("Parallel execution must not exceed ${CliConfig.PARALLEL_MAX}")
+    ).int()
+        .optionalValue(default = CliConfig.PARALLEL_CPU_CORES)
+        .default(value = CliConfig.PARALLEL_CPU_CORES)
+        .validate {
+            when {
+                it == CliConfig.PARALLEL_DISABLED || it == CliConfig.PARALLEL_CPU_CORES -> Unit
+                it < 1 -> fail(
+                    "Parallel execution must be 1..${CliConfig.PARALLEL_MAX}, " +
+                        "${CliConfig.PARALLEL_DISABLED} (disabled), or " +
+                        "${CliConfig.PARALLEL_CPU_CORES} (CPU cores)",
+                )
+                it > CliConfig.PARALLEL_MAX -> fail("Parallel execution must not exceed ${CliConfig.PARALLEL_MAX}")
+            }
         }
-    }
 
     private val effectiveDebug get() = verbose || debug
     private val effectiveStackTrace get() = stackTrace || effectiveDebug
