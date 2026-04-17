@@ -29,6 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -100,7 +101,7 @@ internal class CliRunner(
 
             with(renderer) { scope.launchInputHandler() }
 
-            val processorDeferred = scope.async(context = ioDispatcher) {
+            val processorDeferred = scope.async {
                 processor.runAsFlow(
                     path = config.inputPath,
                     output = config.outputPath,
@@ -108,21 +109,23 @@ internal class CliRunner(
                     recursive = config.recursive,
                     maxDepth = config.recursiveDepth,
                     mapIconName = mapIconNameTo,
-                ).collect { event ->
-                    renderer.onEvent(event)
-                    if (event is ConversionEvent.FileCompleted) {
-                        completedFiles.add(
-                            FileCompletionEntry(
-                                fileName = event.fileName,
-                                duration = event.duration,
-                                result = event.result,
-                            ),
-                        )
+                )
+                    .flowOn(ioDispatcher)
+                    .collect { event ->
+                        renderer.onEvent(event)
+                        if (event is ConversionEvent.FileCompleted) {
+                            completedFiles.add(
+                                FileCompletionEntry(
+                                    fileName = event.fileName,
+                                    duration = event.duration,
+                                    result = event.result,
+                                ),
+                            )
+                        }
+                        if (event is ConversionEvent.RunCompleted) {
+                            stats = event.stats
+                        }
                     }
-                    if (event is ConversionEvent.RunCompleted) {
-                        stats = event.stats
-                    }
-                }
             }
 
             processorDeferred.await()
@@ -231,21 +234,14 @@ internal class CliRunner(
         if (runStats != null) {
             // In JSON mode the failure summary would contaminate the JSONL
             // stream, so the log file is still written but no extra lines
-            // are printed to the terminal.
+            // are printed to the terminal. `finalizeRun` is the single
+            // failure-throwing site for both TUI and non-TUI paths.
             finalizeRun(
                 config = config,
                 stats = runStats,
                 completedFiles = completedFiles,
                 logDir = logDir,
                 printSummary = outputFormat != OutputFormat.Json,
-            )
-        }
-
-        val failedCount = runStats?.failed ?: 0
-        if (failedCount > 0) {
-            throw ExitProgramException(
-                errorCode = ErrorCode.FailedToParseIconError,
-                message = "Failure to parse ($failedCount) file(s). See output for details.",
             )
         }
     }
@@ -270,7 +266,7 @@ internal class CliRunner(
             if (printSummary) {
                 maybePrintFailureSummary(completedFiles = completedFiles, logPath = null)
             }
-            maybeThrowFailure(stats = stats)
+            maybeThrowFailure(stats = stats, logPath = null)
             return
         }
 
@@ -289,7 +285,7 @@ internal class CliRunner(
             maybePrintFailureSummary(completedFiles = completedFiles, logPath = logPath)
         }
 
-        maybeThrowFailure(stats = stats)
+        maybeThrowFailure(stats = stats, logPath = logPath)
     }
 
     private fun maybePrintFailureSummary(
@@ -311,11 +307,12 @@ internal class CliRunner(
         }
     }
 
-    private fun maybeThrowFailure(stats: RunStats) {
+    private fun maybeThrowFailure(stats: RunStats, logPath: Path?) {
         if (stats.failed > 0) {
+            val detail = if (logPath != null) "See log for details." else "See output for details."
             throw ExitProgramException(
                 errorCode = ErrorCode.FailedToParseIconError,
-                message = "Failure to parse (${stats.failed}) file(s). See log for details.",
+                message = "Failure to parse (${stats.failed}) file(s). $detail",
             )
         }
     }
