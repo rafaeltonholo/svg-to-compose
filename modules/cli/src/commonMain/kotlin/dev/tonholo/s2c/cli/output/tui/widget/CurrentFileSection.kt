@@ -10,22 +10,7 @@ import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
 import dev.tonholo.s2c.output.ConversionPhase
 
 private const val MAX_VISIBLE_FILES = 5
-
-/**
- * The reserved column size for the file name.
- *
- * A single row renders `  <spinner> <filename>  ` followed by one cell per phase (`<icon> <phase-name>  `).
- * The longest phase name is "Optimizing" (10 chars) + icon (1) + separator (3) = ~14 cells per phase.
- * With 4 phases that reserve ~56 cells for status. Everything else is the file name.
- */
 private const val FILENAME_RESERVED_COLUMNS = 56
-
-/**
- * The minimum legible file name width before truncation collapses to an ellipsis.
- *
- * Floor for the file name column. Below this, truncation produces unreadable output;
- * let the row overflow gracefully instead.
- */
 private const val MIN_FILENAME_WIDTH = 8
 
 internal fun currentFilesSection(files: Map<String, CurrentFileState>, contentWidth: Int): Widget {
