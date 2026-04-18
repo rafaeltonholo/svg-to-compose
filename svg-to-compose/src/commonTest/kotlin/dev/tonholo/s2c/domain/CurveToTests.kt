@@ -25,7 +25,7 @@ class CurveToTests {
             |
         """.trimMargin()
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 
     @Test
@@ -48,7 +48,7 @@ class CurveToTests {
             |
         """.trimMargin()
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 
     @Test
@@ -72,7 +72,7 @@ class CurveToTests {
             |
         """.trimMargin()
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 
     @Test
@@ -96,7 +96,7 @@ class CurveToTests {
             |
         """.trimMargin()
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 
     @Test
@@ -108,7 +108,7 @@ class CurveToTests {
         )
         val expected = "curveTo(x1 = 10.0f, y1 = 20.0f, x2 = 30.0f, y2 = 40.0f, x3 = 50.0f, y3 = 60.0f)"
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 
     @Test
@@ -123,6 +123,6 @@ class CurveToTests {
             append("close()")
         }
 
-        assertEquals(expected, curveTo.materialize())
+        assertEquals(expected, curveTo.emit())
     }
 }
