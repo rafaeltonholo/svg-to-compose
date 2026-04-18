@@ -122,7 +122,7 @@ internal fun reduceUpdateNotification(
     state: UpdateNotificationState?,
     event: ConversionEvent,
 ): UpdateNotificationState? = when (event) {
-    is ConversionEvent.UpdateAvailable -> UpdateNotificationState(
+    is ConversionEvent.UpdateAvailable -> state ?: UpdateNotificationState(
         currentVersion = event.current,
         latestVersion = event.latest,
         releaseUrl = event.releaseUrl,

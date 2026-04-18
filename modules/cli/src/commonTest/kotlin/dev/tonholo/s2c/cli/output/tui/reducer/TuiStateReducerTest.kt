@@ -433,4 +433,27 @@ class TuiStateReducerTest {
         // Assert
         assertEquals(expected = currentState, actual = result)
     }
+
+    @Test
+    fun `given existing notification - when second UpdateAvailable received - then first notification is kept`() {
+        // Arrange
+        val currentState = UpdateNotificationState(
+            currentVersion = "2.2.0",
+            latestVersion = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            isWrapper = true,
+        )
+        val event = ConversionEvent.UpdateAvailable(
+            current = "2.2.0",
+            latest = "2.4.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.4.0",
+            isWrapper = false,
+        )
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertEquals(expected = currentState, actual = result)
+    }
 }
