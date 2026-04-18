@@ -165,13 +165,16 @@ private fun MutableList<PathNodes>.addDashOnTheEdge(
     }
 }
 
-private fun calculatePartialDashLength(direction: StrokeDashDrawDirection, dashOrGap: Float, diff: Float) =
-    when (direction) {
-        StrokeDashDrawDirection.DOWN -> dashOrGap - diff
-        StrokeDashDrawDirection.LEFT -> dashOrGap - diff
-        StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
-        else -> -(dashOrGap - diff)
-    }
+private fun calculatePartialDashLength(
+    direction: StrokeDashDrawDirection,
+    dashOrGap: Float,
+    diff: Float,
+) = when (direction) {
+    StrokeDashDrawDirection.DOWN -> dashOrGap - diff
+    StrokeDashDrawDirection.LEFT -> dashOrGap - diff
+    StrokeDashDrawDirection.UP -> -(dashOrGap - diff)
+    else -> -(dashOrGap - diff)
+}
 
 private fun MutableList<PathNodes>.addDashWithinEdges(
     direction: StrokeDashDrawDirection,

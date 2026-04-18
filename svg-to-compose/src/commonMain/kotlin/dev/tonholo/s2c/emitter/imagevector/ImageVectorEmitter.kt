@@ -22,38 +22,41 @@ private const val EXTRA_CONTENT_PLACEHOLDER = "[EXTRA_CONTENT_PLACEHOLDER]"
  * @property logger The logger instance for diagnostic output.
  * @property formatConfig The formatting configuration to use.
  */
-class ImageVectorEmitter(private val logger: Logger, private val formatConfig: FormatConfig = FormatConfig()) :
-    CodeEmitter {
+class ImageVectorEmitter(
+    private val logger: Logger,
+    private val formatConfig: FormatConfig = FormatConfig(),
+) : CodeEmitter {
     private val nodeEmitter = ImageVectorNodeEmitter(formatConfig)
     private val chunker = NodeChunker(logger)
 
     /** Single indent level derived from [formatConfig]. */
     private val indent: String get() = formatConfig.indentUnit
 
-    override fun emit(contents: IconFileContents): String = logger.verboseSection("Generating file") {
-        logParameters(contents)
+    override fun emit(contents: IconFileContents): String =
+        logger.verboseSection("Generating file") {
+            logParameters(contents)
 
-        val iconPropertyName = buildIconPropertyName(contents)
-        val (nodes, chunkFunctions) = chunker.chunkIfNeeded(contents) { iconContents, index ->
-            "${iconContents.iconName.camelCase()}Chunk$index"
-        }
-        val chunkFunctionsContent = buildChunkFunctionsContent(chunkFunctions)
+            val iconPropertyName = buildIconPropertyName(contents)
+            val (nodes, chunkFunctions) = chunker.chunkIfNeeded(contents) { iconContents, index ->
+                "${iconContents.iconName.camelCase()}Chunk$index"
+            }
+            val chunkFunctionsContent = buildChunkFunctionsContent(chunkFunctions)
 
-        // Path nodes sit inside: val > get() > Builder.apply { ... } — 3 indent levels.
-        val pathNodesIndent = indent.repeat(3)
-        val pathNodes = nodes
-            .joinToString("\n") { nodeEmitter.emit(it) }
-            .prependIndent(pathNodesIndent)
+            // Path nodes sit inside: val > get() > Builder.apply { ... } — 3 indent levels.
+            val pathNodesIndent = indent.repeat(3)
+            val pathNodes = nodes
+                .joinToString("\n") { nodeEmitter.emit(it) }
+                .prependIndent(pathNodesIndent)
 
-        val preview = buildPreview(contents, iconPropertyName)
-        val extraContent = buildExtraContent(chunkFunctionsContent, preview)
-        val visibilityModifier = if (contents.makeInternal) "internal " else ""
+            val preview = buildPreview(contents, iconPropertyName)
+            val extraContent = buildExtraContent(chunkFunctionsContent, preview)
+            val visibilityModifier = if (contents.makeInternal) "internal " else ""
 
-        val level1 = indent // 1 level
-        val level2 = indent.repeat(2) // 2 levels
-        val level3 = indent.repeat(3) // 3 levels
+            val level1 = indent // 1 level
+            val level2 = indent.repeat(2) // 2 levels
+            val level3 = indent.repeat(3) // 3 levels
 
-        return@verboseSection """
+            return@verboseSection """
             |package ${contents.pkg}
             |
             |${contents.imports.sorted().joinToString("\n") { "import $it" }}
@@ -78,8 +81,8 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
             |private var _${contents.iconName.camelCase()}: ImageVector? = null
             |
         """.replace(EXTRA_CONTENT_PLACEHOLDER, extraContent)
-            .trimMargin()
-    }
+                .trimMargin()
+        }
 
     private fun logParameters(contents: IconFileContents) {
         logger.verbose(
@@ -125,15 +128,16 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
         return buildPreview(contents, iconPropertyName).trimMargin().trim()
     }
 
-    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String = if (contents.noPreview) {
-        ""
-    } else {
-        val level1 = indent
-        val level2 = indent.repeat(2)
-        val level3 = indent.repeat(3)
-        val level4 = indent.repeat(4)
-        val level5 = indent.repeat(5)
-        """
+    private fun buildPreview(contents: IconFileContents, iconPropertyName: String): String =
+        if (contents.noPreview) {
+            ""
+        } else {
+            val level1 = indent
+            val level2 = indent.repeat(2)
+            val level3 = indent.repeat(3)
+            val level4 = indent.repeat(4)
+            val level5 = indent.repeat(5)
+            """
             |
             |@Preview
             |@Composable
@@ -154,25 +158,27 @@ class ImageVectorEmitter(private val logger: Logger, private val formatConfig: F
             |$level1}
             |}
             """
-    }
+        }
 
-    private fun buildChunkFunctionsContent(chunkFunctions: List<ImageVectorNode.ChunkFunction>?): String =
-        if (!chunkFunctions.isNullOrEmpty()) {
-            """|
+    private fun buildChunkFunctionsContent(
+        chunkFunctions: List<ImageVectorNode.ChunkFunction>?,
+    ): String = if (!chunkFunctions.isNullOrEmpty()) {
+        """|
            |${chunkFunctions.joinToString("\n\n") { nodeEmitter.emitChunkFunctionDefinition(it) }}
            """
-        } else {
-            ""
-        }
-
-    private fun buildExtraContent(chunkFunctionsContent: String, preview: String): String = buildString {
-        if (chunkFunctionsContent.isNotEmpty()) {
-            appendLine(chunkFunctionsContent.trimMargin())
-        }
-        if (preview.isNotEmpty()) {
-            appendLine(preview.trimMargin())
-        }
+    } else {
+        ""
     }
+
+    private fun buildExtraContent(chunkFunctionsContent: String, preview: String): String =
+        buildString {
+            if (chunkFunctionsContent.isNotEmpty()) {
+                appendLine(chunkFunctionsContent.trimMargin())
+            }
+            if (preview.isNotEmpty()) {
+                appendLine(preview.trimMargin())
+            }
+        }
 
     internal companion object {
         /** Imports required by the default preview snippet. */

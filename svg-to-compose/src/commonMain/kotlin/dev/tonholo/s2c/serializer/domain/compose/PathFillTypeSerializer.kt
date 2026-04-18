@@ -10,7 +10,8 @@ import kotlinx.serialization.encoding.Encoder
 /** String-based [KSerializer] for [PathFillType]. */
 internal object PathFillTypeSerializer : KSerializer<PathFillType> {
     override val descriptor = PrimitiveSerialDescriptor("PathFillType", PrimitiveKind.STRING)
-    override fun serialize(encoder: Encoder, value: PathFillType) = encoder.encodeString(value.value)
+    override fun serialize(encoder: Encoder, value: PathFillType) =
+        encoder.encodeString(value.value)
     override fun deserialize(decoder: Decoder): PathFillType =
         PathFillType(decoder.decodeString()) ?: error("Invalid PathFillType")
 }

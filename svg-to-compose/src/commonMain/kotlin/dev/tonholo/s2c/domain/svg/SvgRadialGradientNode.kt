@@ -72,7 +72,10 @@ class SvgRadialGradientNode(
      *  transformation part (top-left 2x2 submatrix) is used for the approximation
      * @return the approximated radius after transformation
      */
-    private fun approximateCircleRadius(gradientRadius: Double, matrix: AffineTransformation.Matrix): Double {
+    private fun approximateCircleRadius(
+        gradientRadius: Double,
+        matrix: AffineTransformation.Matrix,
+    ): Double {
         val a = matrix[0][0]
         val b = matrix[1][0]
         val c = matrix[0][1]

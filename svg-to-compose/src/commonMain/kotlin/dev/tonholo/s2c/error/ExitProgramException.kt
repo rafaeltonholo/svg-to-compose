@@ -18,8 +18,11 @@ package dev.tonholo.s2c.error
  *  subsequent ones added as suppressed exceptions.
  * @param message A descriptive message explaining why the program needs to exit.
  */
-open class ExitProgramException(val errorCode: ErrorCode, message: String, private vararg val causes: Throwable?) :
-    Exception(message, causes.singleOrNull()) {
+open class ExitProgramException(
+    val errorCode: ErrorCode,
+    message: String,
+    private vararg val causes: Throwable?,
+) : Exception(message, causes.singleOrNull()) {
     init {
         causes
             .filterNotNull()
@@ -58,9 +61,12 @@ open class ExitProgramException(val errorCode: ErrorCode, message: String, priva
  * @param throwable The optional underlying cause of this exception. If null, the exception will have no causes.
  * @return A new [ExitProgramException] instance configured with the provided parameters.
  */
-fun ExitProgramException(errorCode: ErrorCode, message: String, throwable: Throwable? = null): ExitProgramException =
-    ExitProgramException(
-        errorCode,
-        message,
-        causes = if (throwable == null) arrayOf() else arrayOf(throwable),
-    )
+fun ExitProgramException(
+    errorCode: ErrorCode,
+    message: String,
+    throwable: Throwable? = null,
+): ExitProgramException = ExitProgramException(
+    errorCode,
+    message,
+    causes = if (throwable == null) arrayOf() else arrayOf(throwable),
+)

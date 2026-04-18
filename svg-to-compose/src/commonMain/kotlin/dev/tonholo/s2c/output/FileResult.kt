@@ -18,5 +18,9 @@ sealed interface FileResult {
      * @property message a human-readable description of what went wrong.
      * @property stackTrace the exception stack trace, if available.
      */
-    data class Failed(val errorCode: ErrorCode, val message: String, val stackTrace: String? = null) : FileResult
+    data class Failed(
+        val errorCode: ErrorCode,
+        val message: String,
+        val stackTrace: String? = null,
+    ) : FileResult
 }

@@ -40,7 +40,11 @@ interface ImageParser {
      * @throws ExitProgramException if the file extension is not supported.
      * @return the parsed [IconFileContents].
      */
-    fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents
+    fun parseToModel(
+        file: Path,
+        iconName: String,
+        config: ParserConfig,
+    ): IconFileContents
 }
 
 @Inject
@@ -48,7 +52,11 @@ class DefaultImageParser(
     private val fileManager: FileManager,
     private val contentParsers: Map<FileType, ContentParser>,
 ) : ImageParser {
-    override fun parseToModel(file: Path, iconName: String, config: ParserConfig): IconFileContents {
+    override fun parseToModel(
+        file: Path,
+        iconName: String,
+        config: ParserConfig,
+    ): IconFileContents {
         val extension = file.extension
         val fileType = FileType.entries.find { it.extension == extension }
         val parser = fileType?.let(contentParsers::get)
@@ -61,12 +69,13 @@ class DefaultImageParser(
     }
 }
 
-internal fun createIconImports(nodes: List<ImageVectorNode>, config: ParserConfig): Set<String> = buildSet {
-    addAll(defaultImports)
-    addAll(previewImportsFor(config))
-    if (config.addToMaterial) addAll(materialReceiverTypeImport)
-    addAll(collectNodeImports(nodes))
-}
+internal fun createIconImports(nodes: List<ImageVectorNode>, config: ParserConfig): Set<String> =
+    buildSet {
+        addAll(defaultImports)
+        addAll(previewImportsFor(config))
+        if (config.addToMaterial) addAll(materialReceiverTypeImport)
+        addAll(collectNodeImports(nodes))
+    }
 
 private fun previewImportsFor(config: ParserConfig): Set<String> = when {
     config.noPreview -> emptySet()

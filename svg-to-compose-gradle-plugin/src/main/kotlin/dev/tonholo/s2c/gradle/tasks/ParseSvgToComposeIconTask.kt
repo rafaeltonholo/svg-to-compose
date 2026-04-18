@@ -65,8 +65,9 @@ internal const val COMMON_CONFIGURATION_NAME = "common"
 
 @CacheableTask
 @HasMemberInjections
-internal abstract class ParseSvgToComposeIconTask @Inject constructor(private val projectLayout: ProjectLayout) :
-    DefaultTask() {
+internal abstract class ParseSvgToComposeIconTask @Inject constructor(
+    private val projectLayout: ProjectLayout,
+) : DefaultTask() {
     @get:Inject
     protected abstract val workerExecutor: WorkerExecutor
 
@@ -439,16 +440,20 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         }
     }
 
-    private fun buildOutput(configuration: ProcessorConfiguration, recursive: Boolean, path: Path, parent: Path): Path =
-        requireNotNull(outputDirectories[configuration.name])
-            .toOkioPath()
-            .let { output ->
-                if (recursive && path.parent != parent) {
-                    (output / path.relativeTo(parent)).parent
-                } else {
-                    null
-                } ?: output
-            }
+    private fun buildOutput(
+        configuration: ProcessorConfiguration,
+        recursive: Boolean,
+        path: Path,
+        parent: Path,
+    ): Path = requireNotNull(outputDirectories[configuration.name])
+        .toOkioPath()
+        .let { output ->
+            if (recursive && path.parent != parent) {
+                (output / path.relativeTo(parent)).parent
+            } else {
+                null
+            } ?: output
+        }
 
     private fun buildDestinationPackage(
         configuration: ProcessorConfiguration,
@@ -463,7 +468,10 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         }
     }
 
-    private fun findAllFiles(configuration: ProcessorConfiguration, fileManager: FileManager): List<Path> {
+    private fun findAllFiles(
+        configuration: ProcessorConfiguration,
+        fileManager: FileManager,
+    ): List<Path> {
         val iconConfiguration = configuration.iconConfiguration.get()
         return fileManager.findFilesToProcess(
             from = configuration.origin.get().asFile.toOkioPath(),

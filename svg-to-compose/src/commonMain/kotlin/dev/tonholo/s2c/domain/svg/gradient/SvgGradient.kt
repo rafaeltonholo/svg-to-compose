@@ -70,15 +70,17 @@ sealed class SvgGradient<out T>(
      *  [gradientUnits] is `"objectBoundingBox"`, defaults to an empty list
      * @return the calculated X coordinate value as a [Double] in the appropriate coordinate system
      */
-    internal fun calculateGradientXCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Double =
-        calculateGradientAxisCoordinate(
-            getViewportAxis = { viewportX },
-            getViewportDimension = { viewportWidth },
-            getBoundingBoxAxis = { x },
-            getBoundingBoxDimension = { width },
-            length = length,
-            target = target,
-        )
+    internal fun calculateGradientXCoordinate(
+        length: SvgLength,
+        target: List<PathNodes> = emptyList(),
+    ): Double = calculateGradientAxisCoordinate(
+        getViewportAxis = { viewportX },
+        getViewportDimension = { viewportWidth },
+        getBoundingBoxAxis = { x },
+        getBoundingBoxDimension = { width },
+        length = length,
+        target = target,
+    )
 
     /**
      * Calculates the Y coordinate for gradient positioning based on the SVG length and
@@ -90,15 +92,17 @@ sealed class SvgGradient<out T>(
      *  [gradientUnits] is `"objectBoundingBox"`, defaults to an empty list
      * @return the calculated Y coordinate value as a [Double] in the appropriate coordinate system
      */
-    internal fun calculateGradientYCoordinate(length: SvgLength, target: List<PathNodes> = emptyList()): Double =
-        calculateGradientAxisCoordinate(
-            getViewportAxis = { viewportY },
-            getViewportDimension = { viewportHeight },
-            getBoundingBoxAxis = { y },
-            getBoundingBoxDimension = { height },
-            length = length,
-            target = target,
-        )
+    internal fun calculateGradientYCoordinate(
+        length: SvgLength,
+        target: List<PathNodes> = emptyList(),
+    ): Double = calculateGradientAxisCoordinate(
+        getViewportAxis = { viewportY },
+        getViewportDimension = { viewportHeight },
+        getBoundingBoxAxis = { y },
+        getBoundingBoxDimension = { height },
+        length = length,
+        target = target,
+    )
 
     /**
      * Calculates a single axis coordinate for gradient positioning based on the SVG length and
@@ -303,7 +307,10 @@ sealed class SvgGradient<out T>(
      * Resolves stop children: if the referencing gradient has its own stops, use them.
      * Otherwise, walk the href chain to find inherited stops.
      */
-    private fun resolveChildren(referencedGradient: SvgGradient<*>, visited: MutableSet<String>): MutableSet<XmlNode> {
+    private fun resolveChildren(
+        referencedGradient: SvgGradient<*>,
+        visited: MutableSet<String>,
+    ): MutableSet<XmlNode> {
         val localStops = children.filterIsInstance<SvgGradientStopNode>()
         if (localStops.isNotEmpty()) {
             return children.toMutableSet()

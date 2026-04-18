@@ -28,8 +28,9 @@ abstract class SvgChildNode<out T>(parent: XmlParentNode) :
         }
     }
 
-    open fun copy(parent: XmlParentNode? = null, attributes: Map<String, String>? = null): T = constructor(
-        parent ?: this.parent,
-        (attributes ?: this.attributes).toMutableMap(),
-    )
+    open fun copy(parent: XmlParentNode? = null, attributes: Map<String, String>? = null): T =
+        constructor(
+            parent ?: this.parent,
+            (attributes ?: this.attributes).toMutableMap(),
+        )
 }

@@ -45,21 +45,22 @@ private fun SvgPolylineNode.buildNormalizedPath(): String = buildString {
     append("/>")
 }
 
-private fun SvgPolylineNode.createSimplePolylineNodes(minified: Boolean): List<PathNodes> = buildList {
-    val points = points.toMutableList()
-    val first = points.removeFirst()
-    add(
-        pathNode(command = PathCommand.MoveTo) {
-            args(first.x, first.y)
-            this.minified = minified
-        },
-    )
-    points.forEach { (x, y) ->
+private fun SvgPolylineNode.createSimplePolylineNodes(minified: Boolean): List<PathNodes> =
+    buildList {
+        val points = points.toMutableList()
+        val first = points.removeFirst()
         add(
-            pathNode(command = PathCommand.LineTo) {
-                args(x, y)
+            pathNode(command = PathCommand.MoveTo) {
+                args(first.x, first.y)
                 this.minified = minified
             },
         )
+        points.forEach { (x, y) ->
+            add(
+                pathNode(command = PathCommand.LineTo) {
+                    args(x, y)
+                    this.minified = minified
+                },
+            )
+        }
     }
-}

@@ -128,7 +128,8 @@ sealed class PathNodes(
             )
         }
 
-        override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
+        override fun toString(): String =
+            "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of this [MoveTo] with the given properties.
@@ -510,7 +511,8 @@ sealed class PathNodes(
             )
         }
 
-        override fun toString(): String = "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
+        override fun toString(): String =
+            "$realCommand ${x.toFloat()} ${y.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [LineTo] command with the specified changes.
@@ -884,7 +886,8 @@ sealed class PathNodes(
             )
         }
 
-        override fun toString(): String = "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
+        override fun toString(): String =
+            "$realCommand ${x1.toFloat()} ${y1.toFloat()}" + super.toString()
 
         /**
          * Creates a copy of the [ReflectiveQuadTo] command with the

@@ -13,7 +13,11 @@ import dev.zacsweers.metro.Inject
  */
 @Inject
 class AvgContentParser(private val logger: Logger) : ContentParser {
-    override fun parse(content: String, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
+    override fun parse(
+        content: String,
+        iconName: String,
+        config: ParserConfig,
+    ): IconFileContents = with(logger) {
         val root = XmlParser.parse(content = content, fileType = FileType.Avg)
         val avg = root.children.single { it is AvgRootNode } as AvgRootNode
         val nodes = avg.asNodes(minified = config.minified)

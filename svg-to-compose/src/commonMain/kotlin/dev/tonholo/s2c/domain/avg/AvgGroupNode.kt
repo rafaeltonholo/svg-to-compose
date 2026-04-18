@@ -7,8 +7,11 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.logger.Logger
 
-class AvgGroupNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
-    AvgElementNode(parent, children, attributes, tagName = TAG_NAME),
+class AvgGroupNode(
+    parent: XmlParentNode,
+    children: MutableSet<XmlNode>,
+    attributes: MutableMap<String, String>,
+) : AvgElementNode(parent, children, attributes, tagName = TAG_NAME),
     AvgNode {
     val clipPath: AvgClipPath?
         get() = children.firstOrNull { it is AvgClipPath } as? AvgClipPath

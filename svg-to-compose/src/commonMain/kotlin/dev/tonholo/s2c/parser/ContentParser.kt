@@ -16,5 +16,9 @@ fun interface ContentParser {
      * @param iconName Name used for the generated icon composable.
      * @param config Parser configuration controlling output options.
      */
-    fun parse(content: String, iconName: String, config: ParserConfig): IconFileContents
+    fun parse(
+        content: String,
+        iconName: String,
+        config: ParserConfig,
+    ): IconFileContents
 }

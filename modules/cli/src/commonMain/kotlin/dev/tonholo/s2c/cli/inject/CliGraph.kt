@@ -65,9 +65,7 @@ internal interface CliGraph {
     fun provideFileDispatcher(
         context: SvgToComposeContext,
         @IoDispatcher dispatcher: CoroutineDispatcher,
-    ): FileDispatcher {
-        return DeferredFileDispatcher(context, dispatcher)
-    }
+    ): FileDispatcher = DeferredFileDispatcher(context, dispatcher)
 
     /**
      * Factory for creating the [CliGraph].

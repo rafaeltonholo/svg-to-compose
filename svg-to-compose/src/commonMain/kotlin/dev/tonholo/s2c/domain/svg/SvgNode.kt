@@ -48,7 +48,8 @@ sealed interface SvgNode : XmlNode {
          */
         fun String.normalizedId(): String = normalizeId(this)
 
-        private fun normalizeId(id: String): String = id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
+        private fun normalizeId(id: String): String =
+            id.removePrefix("#").removePrefix("url(#").removeSuffix(")")
     }
 
     fun resolveAttributesFromStyle(computedRules: List<ComputedRule>) {
@@ -142,8 +143,11 @@ fun SvgNode.stackedTransform(parent: XmlParentNode): SvgTransform? {
     return stacked?.let(::SvgTransform)
 }
 
-data class ComputedRule(val selector: String, val specificity: CssSpecificity, val declarations: List<Declaration>) :
-    Comparable<ComputedRule> {
+data class ComputedRule(
+    val selector: String,
+    val specificity: CssSpecificity,
+    val declarations: List<Declaration>,
+) : Comparable<ComputedRule> {
     override fun compareTo(other: ComputedRule): Int = specificity.compareTo(other.specificity)
 }
 

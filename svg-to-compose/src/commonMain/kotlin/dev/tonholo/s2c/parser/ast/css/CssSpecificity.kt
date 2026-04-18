@@ -21,7 +21,8 @@ import dev.tonholo.s2c.parser.ast.css.syntax.node.SelectorListItem
  * @property b The number of class selectors, attribute selectors, and pseudo-classes.
  * @property c The number of type selectors and pseudo-elements.
  */
-data class CssSpecificity(val a: Int = 0, val b: Int = 0, val c: Int = 0) : Comparable<CssSpecificity> {
+data class CssSpecificity(val a: Int = 0, val b: Int = 0, val c: Int = 0) :
+    Comparable<CssSpecificity> {
     operator fun get(index: Int): Int = when (index) {
         0 -> a
         1 -> b
@@ -57,12 +58,13 @@ data class CssSpecificity(val a: Int = 0, val b: Int = 0, val c: Int = 0) : Comp
  * @return A map where the keys are the selector list items and the values
  * are the [CssSpecificity] of each selector in the rule's prelude.
  */
-fun calculateSelectorsSpecificity(prelude: Prelude.Selector): Map<SelectorListItem, CssSpecificity> =
-    prelude.components.associateWith { selector ->
-        selector.selectors.fold(CssSpecificity()) { selectorSpecificity, simpleSelector ->
-            selectorSpecificity + simpleSelector.calculateSpecificity()
-        }
+fun calculateSelectorsSpecificity(
+    prelude: Prelude.Selector,
+): Map<SelectorListItem, CssSpecificity> = prelude.components.associateWith { selector ->
+    selector.selectors.fold(CssSpecificity()) { selectorSpecificity, simpleSelector ->
+        selectorSpecificity + simpleSelector.calculateSpecificity()
     }
+}
 
 private fun Selector.calculateSpecificity(): CssSpecificity {
     var a = 0

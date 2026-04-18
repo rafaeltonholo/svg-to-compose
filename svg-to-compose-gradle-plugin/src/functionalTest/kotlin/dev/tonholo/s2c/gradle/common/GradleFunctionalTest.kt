@@ -74,18 +74,19 @@ abstract class GradleFunctionalTest {
      *             incremental behavior via task log output).
      * @return The [BuildResult] containing task outcomes and build output.
      */
-    protected fun runGradle(vararg args: String, info: Boolean = false): BuildResult = GradleRunner.create()
-        .withProjectDir(projectDir)
-        .withPluginClasspath()
-        .withArguments(
-            buildList {
-                addAll(args)
-                add("--stacktrace")
-                if (info) add("--info")
-            },
-        )
-        .forwardOutput()
-        .build()
+    protected fun runGradle(vararg args: String, info: Boolean = false): BuildResult =
+        GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withPluginClasspath()
+            .withArguments(
+                buildList {
+                    addAll(args)
+                    add("--stacktrace")
+                    if (info) add("--info")
+                },
+            )
+            .forwardOutput()
+            .build()
 
     /**
      * Asserts that a task in the build result has the [expected] outcome.
@@ -94,7 +95,11 @@ abstract class GradleFunctionalTest {
      * @param taskPath The fully qualified task path (e.g. `:parseSvgToComposeIcon`).
      * @param expected The expected [TaskOutcome].
      */
-    protected fun assertTaskOutcome(result: BuildResult, taskPath: String, expected: TaskOutcome) {
+    protected fun assertTaskOutcome(
+        result: BuildResult,
+        taskPath: String,
+        expected: TaskOutcome,
+    ) {
         val task = result.task(taskPath)
         assertNotNull(task, "Task $taskPath was not found in the build")
         assertEquals(
@@ -132,7 +137,11 @@ abstract class GradleFunctionalTest {
      * @param fileName The file name (e.g. `"icon-a.svg"`).
      * @param content The SVG/XML content to write.
      */
-    protected fun writeSvg(dirName: String, fileName: String, content: String) {
+    protected fun writeSvg(
+        dirName: String,
+        fileName: String,
+        content: String,
+    ) {
         val iconsDir = projectDir.resolve(dirName)
         iconsDir.mkdirs()
         iconsDir.resolve(fileName).writeText(content)

@@ -14,8 +14,11 @@ import dev.tonholo.s2c.domain.xml.XmlNode
 import dev.tonholo.s2c.domain.xml.XmlParentNode
 import dev.tonholo.s2c.logger.NoOpLogger
 
-class AvgGradientNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
-    AvgElementNode(parent, children, attributes, tagName = AvgGradient.TAG_NAME),
+class AvgGradientNode(
+    parent: XmlParentNode,
+    children: MutableSet<XmlNode>,
+    attributes: MutableMap<String, String>,
+) : AvgElementNode(parent, children, attributes, tagName = AvgGradient.TAG_NAME),
     AvgNode,
     AvgLinearGradient,
     AvgRadianGradient,

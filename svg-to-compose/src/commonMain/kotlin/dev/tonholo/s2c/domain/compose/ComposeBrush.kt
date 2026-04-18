@@ -207,7 +207,11 @@ sealed interface ComposeBrush :
     }
 }
 
-private fun StringBuilder.appendColors(stops: List<Float>?, colors: List<ComposeColor>, indent: Int) {
+private fun StringBuilder.appendColors(
+    stops: List<Float>?,
+    colors: List<ComposeColor>,
+    indent: Int,
+) {
     if (stops.isNullOrEmpty()) {
         appendLine("colors = listOf(".indented(indent))
         colors

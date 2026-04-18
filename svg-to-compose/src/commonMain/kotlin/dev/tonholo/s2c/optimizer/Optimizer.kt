@@ -210,7 +210,8 @@ sealed class Optimizer(private val logger: Logger, private val context: SvgToCom
      *
      * @see <a href="https://github.com/alexjlockwood/avocado">Avocado documentation</a>
      */
-    class AvocadoOptimizer(logger: Logger, context: SvgToComposeContext) : Optimizer(logger, context) {
+    class AvocadoOptimizer(logger: Logger, context: SvgToComposeContext) :
+        Optimizer(logger, context) {
         override val command: String = "avocado"
         override val allowedExtension: String = FileType.Avg.extension
 
@@ -224,8 +225,11 @@ sealed class Optimizer(private val logger: Logger, private val context: SvgToCom
     }
 
     @Inject
-    class Factory(private val logger: Logger, fileManager: FileManager, context: SvgToComposeContext) :
-        OptimizerFactory {
+    class Factory(
+        private val logger: Logger,
+        fileManager: FileManager,
+        context: SvgToComposeContext,
+    ) : OptimizerFactory {
         /**
          * Set of optimizers that will be used specifically for SVG files.
          */

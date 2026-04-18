@@ -13,8 +13,10 @@ sealed class Block<T : CssNode>(open val children: List<T>) : CssComponentValueN
      * A simple block with a location and children.
      * @param T The type of the children nodes.
      */
-    data class SimpleBlock<T : CssNode>(override val location: CssLocation, override val children: List<T>) :
-        Block<T>(children) {
+    data class SimpleBlock<T : CssNode>(
+        override val location: CssLocation,
+        override val children: List<T>,
+    ) : Block<T>(children) {
         override fun toString(): String = buildString {
             appendLine("SimpleBlock(")
             appendLine("location = $location,".prependIndent(indentSize = 2))

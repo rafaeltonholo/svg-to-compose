@@ -18,7 +18,8 @@ private const val ROUNDING_FACTOR = 10.0
  * @param writer function that receives each output line.
  *               Defaults to [println] for stdout output.
  */
-internal class PlainTextRenderer(private val writer: (String) -> Unit = ::println) : OutputRenderer {
+internal class PlainTextRenderer(private val writer: (String) -> Unit = ::println) :
+    OutputRenderer {
 
     private val failedFiles = mutableListOf<FailedFileEntry>()
 
@@ -103,5 +104,9 @@ internal class PlainTextRenderer(private val writer: (String) -> Unit = ::printl
         return rounded.toString()
     }
 
-    private data class FailedFileEntry(val fileName: String, val errorCode: String, val message: String)
+    private data class FailedFileEntry(
+        val fileName: String,
+        val errorCode: String,
+        val message: String,
+    )
 }

@@ -14,7 +14,8 @@ import dev.tonholo.s2c.extensions.prependIndent
  * @property location The location of the prelude in the CSS source code.
  * @property value The string value of the prelude.
  */
-data class AtRulePrelude(override val location: CssLocation, val value: String) : CssComponentValueNode {
+data class AtRulePrelude(override val location: CssLocation, val value: String) :
+    CssComponentValueNode {
     override fun toString(indent: Int): String = value
 
     override fun toString(): String = buildString {

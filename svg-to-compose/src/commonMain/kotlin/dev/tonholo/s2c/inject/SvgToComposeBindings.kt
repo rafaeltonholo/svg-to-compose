@@ -61,11 +61,13 @@ interface SvgToComposeBindings {
     companion object {
         @Provides
         @SingleIn(AppScope::class)
-        fun provideFileManager(fileSystem: FileSystem, logger: Logger): FileManager = FileManager(fileSystem, logger)
+        fun provideFileManager(fileSystem: FileSystem, logger: Logger): FileManager =
+            FileManager(fileSystem, logger)
 
         @Provides
         @SingleIn(AppScope::class)
-        fun provideSvgToComposeContext(config: S2cConfig): SvgToComposeContext = SvgToComposeContextImpl(config)
+        fun provideSvgToComposeContext(config: S2cConfig): SvgToComposeContext =
+            SvgToComposeContextImpl(config)
 
         @Provides
         fun provideContentParsers(

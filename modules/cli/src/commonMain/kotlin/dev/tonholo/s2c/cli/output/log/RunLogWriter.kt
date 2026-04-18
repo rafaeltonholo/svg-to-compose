@@ -6,16 +6,14 @@ import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.runtime.S2cConfig
+import okio.BufferedSink
+import okio.Path
+import okio.Path.Companion.toPath
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration
-import okio.Path
-import okio.Path.Companion.toPath
 
-internal class RunLogWriter(
-    private val fileManager: FileManager,
-    private val logDir: Path,
-) {
+internal class RunLogWriter(private val fileManager: FileManager, private val logDir: Path) {
     fun write(
         config: RunConfig,
         stats: RunStats,
@@ -29,51 +27,64 @@ internal class RunLogWriter(
             writeUtf8("svg-to-compose Run Log\n")
             writeUtf8("=====================\n\n")
 
-            writeUtf8("Configuration:\n")
-            writeUtf8("  Input:    ${config.inputPath}\n")
-            writeUtf8("  Output:   ${config.outputPath}\n")
-            writeUtf8("  Package:  ${config.packageName}\n")
-            writeUtf8("  Optimize: ${config.optimizationEnabled}\n")
-            writeUtf8("  Parallel: ${formatParallel(config.parallel)}\n")
-            writeUtf8("\n")
-
-            writeUtf8("Results: ${stats.succeeded} succeeded, ${stats.failed} failed, ${stats.totalFiles} total\n")
-            writeUtf8("Duration: ${formatDuration(stats.totalDuration)}\n")
-            writeUtf8("\n")
-
-            if (entries.any { it.result is FileResult.Failed }) {
-                writeUtf8("Failed Files\n")
-                writeUtf8("------------\n")
-                for (entry in entries) {
-                    val result = entry.result
-                    if (result is FileResult.Failed) {
-                        writeUtf8("\n")
-                        writeUtf8("  ${entry.fileName}: ${result.errorCode.name}\n")
-                        writeUtf8("  Message: ${result.message}\n")
-                        val stackTrace = result.stackTrace
-                        if (stackTrace != null) {
-                            writeUtf8("  Stacktrace:\n")
-                            for (line in stackTrace.lines()) {
-                                writeUtf8("    $line\n")
-                            }
-                        }
-                    }
-                }
-                writeUtf8("\n")
-            }
-
-            writeUtf8("All Files\n")
-            writeUtf8("---------\n")
-            for (entry in entries) {
-                val status = when (entry.result) {
-                    is FileResult.Success -> "[OK]   ${entry.duration.inWholeMilliseconds}ms"
-                    is FileResult.Failed -> "[FAIL] ${entry.result.errorCode.name}"
-                }
-                writeUtf8("  $status  ${entry.fileName}\n")
-            }
+            writeConfiguration(config)
+            writeResults(stats)
+            writeFailures(entries)
+            writeSummary(entries)
         }
 
         return logFile
+    }
+
+    private fun BufferedSink.writeResults(stats: RunStats) {
+        writeUtf8("Results: ${stats.succeeded} succeeded, ${stats.failed} failed, ${stats.totalFiles} total\n")
+        writeUtf8("Duration: ${formatDuration(stats.totalDuration)}\n")
+        writeUtf8("\n")
+    }
+
+    private fun BufferedSink.writeSummary(entries: List<FileCompletionEntry>) {
+        writeUtf8("All Files\n")
+        writeUtf8("---------\n")
+        for (entry in entries) {
+            val status = when (entry.result) {
+                is FileResult.Success -> "[OK]   ${entry.duration.inWholeMilliseconds}ms"
+                is FileResult.Failed -> "[FAIL] ${entry.result.errorCode.name}"
+            }
+            writeUtf8("  $status  ${entry.fileName}\n")
+        }
+    }
+
+    private fun BufferedSink.writeFailures(entries: List<FileCompletionEntry>) {
+        if (entries.any { it.result is FileResult.Failed }) {
+            writeUtf8("Failed Files\n")
+            writeUtf8("------------\n")
+            for (entry in entries) {
+                val result = entry.result
+                if (result is FileResult.Failed) {
+                    writeUtf8("\n")
+                    writeUtf8("  ${entry.fileName}: ${result.errorCode.name}\n")
+                    writeUtf8("  Message: ${result.message}\n")
+                    val stackTrace = result.stackTrace
+                    if (stackTrace != null) {
+                        writeUtf8("  Stacktrace:\n")
+                        for (line in stackTrace.lines()) {
+                            writeUtf8("    $line\n")
+                        }
+                    }
+                }
+            }
+            writeUtf8("\n")
+        }
+    }
+
+    private fun BufferedSink.writeConfiguration(config: RunConfig) {
+        writeUtf8("Configuration:\n")
+        writeUtf8("  Input:    ${config.inputPath}\n")
+        writeUtf8("  Output:   ${config.outputPath}\n")
+        writeUtf8("  Package:  ${config.packageName}\n")
+        writeUtf8("  Optimize: ${config.optimizationEnabled}\n")
+        writeUtf8("  Parallel: ${formatParallel(config.parallel)}\n")
+        writeUtf8("\n")
     }
 
     companion object {

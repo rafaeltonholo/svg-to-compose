@@ -13,8 +13,10 @@ package dev.tonholo.s2c.extensions
  * @param childrenOf returns the children of a node, or `null`/empty if the node
  *   is a leaf.
  */
-internal fun <T> depthFirstSequence(seeds: Iterable<T>, childrenOf: (T) -> Iterable<T>?): Sequence<T> =
-    Sequence { DepthFirstIterator(seeds, childrenOf) }
+internal fun <T> depthFirstSequence(
+    seeds: Iterable<T>,
+    childrenOf: (T) -> Iterable<T>?,
+): Sequence<T> = Sequence { DepthFirstIterator(seeds, childrenOf) }
 
 /**
  * Stack-based iterator that yields nodes in depth-first pre-order.
@@ -28,7 +30,10 @@ internal fun <T> depthFirstSequence(seeds: Iterable<T>, childrenOf: (T) -> Itera
  * each consumer obtains its own iterator. Sharing a single iterator across
  * threads will corrupt the internal stack.
  */
-private class DepthFirstIterator<T>(seeds: Iterable<T>, private val childrenOf: (T) -> Iterable<T>?) : Iterator<T> {
+private class DepthFirstIterator<T>(
+    seeds: Iterable<T>,
+    private val childrenOf: (T) -> Iterable<T>?,
+) : Iterator<T> {
     private val stack = ArrayDeque<Iterator<T>>()
 
     init {

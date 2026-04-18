@@ -32,8 +32,10 @@ internal val selectorTokens = setOf(
  * @param content The entire CSS content string.
  * @param simpleSelectorConsumer A consumer responsible for consuming individual selectors.
  */
-internal class SelectorListItemConsumer(content: String, private val simpleSelectorConsumer: Consumer<Selector>) :
-    Consumer<SelectorListItem>(content) {
+internal class SelectorListItemConsumer(
+    content: String,
+    private val simpleSelectorConsumer: Consumer<Selector>,
+) : Consumer<SelectorListItem>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): SelectorListItem {
         val current = iterator.expectToken(selectorTokens)
         val location = CssLocation.Undefined

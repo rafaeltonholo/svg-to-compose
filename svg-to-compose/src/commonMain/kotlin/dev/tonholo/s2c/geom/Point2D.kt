@@ -89,7 +89,8 @@ data class Point2D(val x: Double, val y: Double) {
  * @param other the [Point2D] whose coordinates will be appended to this array
  * @return a new [DoubleArray] containing all elements of this array followed by the x and y coordinates of the point
  */
-infix fun DoubleArray.combineWith(other: Point2D): DoubleArray = this + doubleArrayOf(other.x, other.y)
+infix fun DoubleArray.combineWith(other: Point2D): DoubleArray =
+    this + doubleArrayOf(other.x, other.y)
 
 /**
  * Transforms this point by applying the given affine transformation matrix.

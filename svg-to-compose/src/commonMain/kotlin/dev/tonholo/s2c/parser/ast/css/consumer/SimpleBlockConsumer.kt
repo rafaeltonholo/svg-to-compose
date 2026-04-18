@@ -23,8 +23,10 @@ private val blockOpeningTokens = mapOf(
  * object.
  * @param T The type of the children of the block.
  */
-internal open class SimpleBlockConsumer<T : CssNode>(content: String, private val consumer: Consumer<T>) :
-    Consumer<Block.SimpleBlock<T>>(content) {
+internal open class SimpleBlockConsumer<T : CssNode>(
+    content: String,
+    private val consumer: Consumer<T>,
+) : Consumer<Block.SimpleBlock<T>>(content) {
     override fun consume(iterator: AstParserIterator<CssTokenKind>): Block.SimpleBlock<T> {
         val prev = iterator.peek(steps = -1)
         iterator.parserCheckNotNull(value = prev, content = content) {
@@ -79,8 +81,10 @@ internal class SimpleRuleBlockConsumer(content: String, qualifiedRuleConsumer: C
  *
  * E.g.: `selector { declaration1; declaration2; }`
  */
-internal class SimpleDeclarationBlockConsumer(content: String, declarationConsumer: Consumer<Declaration>) :
-    SimpleBlockConsumer<Declaration>(
-        content = content,
-        consumer = declarationConsumer,
-    )
+internal class SimpleDeclarationBlockConsumer(
+    content: String,
+    declarationConsumer: Consumer<Declaration>,
+) : SimpleBlockConsumer<Declaration>(
+    content = content,
+    consumer = declarationConsumer,
+)

@@ -32,7 +32,9 @@ abstract class SvgToComposeExtension {
      *
      * @param action An action to configure the common properties.
      */
-    fun NamedDomainObjectContainer<ProcessorConfiguration>.common(action: Action<ProcessorConfiguration>) {
+    fun NamedDomainObjectContainer<ProcessorConfiguration>.common(
+        action: Action<ProcessorConfiguration>,
+    ) {
         create("common") {
             action.execute(this)
         }

@@ -15,7 +15,11 @@ import dev.zacsweers.metro.Inject
  */
 @Inject
 class SvgContentParser(private val logger: Logger) : ContentParser {
-    override fun parse(content: String, iconName: String, config: ParserConfig): IconFileContents = with(logger) {
+    override fun parse(
+        content: String,
+        iconName: String,
+        config: ParserConfig,
+    ): IconFileContents = with(logger) {
         val root = XmlParser.parse(content = content, fileType = FileType.Svg)
         val svg = root.children.single { it is SvgRootNode } as SvgRootNode
         svg.resolveUseNodes()

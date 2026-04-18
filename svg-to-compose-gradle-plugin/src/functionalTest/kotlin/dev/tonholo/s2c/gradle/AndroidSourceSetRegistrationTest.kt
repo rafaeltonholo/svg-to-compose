@@ -310,11 +310,14 @@ class AndroidSourceSetRegistrationTest {
      * Generates a complete build script. Uses `buildscript { classpath }` to
      * inject both AGP and the plugin-under-test into the same classloader.
      */
-    private fun buildScript(config: AgpTestConfig, dsl: BuildScriptDsl, buildDirOverride: String? = null): String =
-        when (dsl) {
-            BuildScriptDsl.GROOVY -> groovyBuildScript(config, buildDirOverride)
-            BuildScriptDsl.KOTLIN_DSL -> kotlinDslBuildScript(config, buildDirOverride)
-        }
+    private fun buildScript(
+        config: AgpTestConfig,
+        dsl: BuildScriptDsl,
+        buildDirOverride: String? = null,
+    ): String = when (dsl) {
+        BuildScriptDsl.GROOVY -> groovyBuildScript(config, buildDirOverride)
+        BuildScriptDsl.KOTLIN_DSL -> kotlinDslBuildScript(config, buildDirOverride)
+    }
 
     // -------------------------------------------------------------------------
     // Groovy build script

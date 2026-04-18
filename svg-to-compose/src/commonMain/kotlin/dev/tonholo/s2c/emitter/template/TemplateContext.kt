@@ -66,7 +66,11 @@ internal class TemplateContext(
         /**
          * Builds a [TemplateContext] for icon-level template resolution.
          */
-        fun forIcon(contents: IconFileContents, config: TemplateEmitterConfig, iconBody: String): TemplateContext {
+        fun forIcon(
+            contents: IconFileContents,
+            config: TemplateEmitterConfig,
+            iconBody: String,
+        ): TemplateContext {
             val receiverName = config.definitions.receiver?.name
             val iconPropertyName = when {
                 !contents.receiverType.isNullOrEmpty() -> {

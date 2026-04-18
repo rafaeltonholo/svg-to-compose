@@ -16,7 +16,8 @@ sealed interface ConversionEvent {
      * @property totalFiles the number of files that will be processed.
      * @property version the current version of the tool.
      */
-    data class RunStarted(val config: RunConfig, val totalFiles: Int, val version: String) : ConversionEvent
+    data class RunStarted(val config: RunConfig, val totalFiles: Int, val version: String) :
+        ConversionEvent
 
     /**
      * Emitted when an individual file begins processing.
@@ -41,7 +42,8 @@ sealed interface ConversionEvent {
      * @property duration how long processing took.
      * @property result the outcome of the conversion.
      */
-    data class FileCompleted(val fileName: String, val duration: Duration, val result: FileResult) : ConversionEvent
+    data class FileCompleted(val fileName: String, val duration: Duration, val result: FileResult) :
+        ConversionEvent
 
     /**
      * Emitted once at the end of a conversion run with aggregate statistics.

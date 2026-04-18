@@ -12,7 +12,10 @@ package dev.tonholo.s2c.optimizer.svgo
  * @property js2svg output formatting options.
  * @property plugins ordered list of SVGO plugins to apply.
  */
-data class SvgoPluginConfig(val js2svg: Js2SvgConfig = Js2SvgConfig(), val plugins: List<SvgoPlugin>) {
+data class SvgoPluginConfig(
+    val js2svg: Js2SvgConfig = Js2SvgConfig(),
+    val plugins: List<SvgoPlugin>,
+) {
     data class Js2SvgConfig(val pretty: Boolean = true)
 }
 
@@ -68,7 +71,8 @@ sealed interface SvgoPlugin {
      * @property convertArcs whether to convert arc commands.
      * @property floatPrecision decimal precision for coordinates.
      */
-    data class OverrideConvertShapeToPath(val convertArcs: Boolean, val floatPrecision: Int) : SvgoPlugin {
+    data class OverrideConvertShapeToPath(val convertArcs: Boolean, val floatPrecision: Int) :
+        SvgoPlugin {
         override val name: String = "convertShapeToPath"
         val description: String =
             "Overrides the convertShapeToPath plugin by ignoring elements with stroke-dasharray"

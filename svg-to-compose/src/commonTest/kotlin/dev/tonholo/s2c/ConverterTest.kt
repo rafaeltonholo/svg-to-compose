@@ -42,29 +42,30 @@ class ConverterTest {
     )
 
     @Test
-    fun `ensure convert emits Parsing then Generating then Complete for SVG without optimizer`() = runTest {
-        // Arrange
-        val svgContent = """<svg viewBox="0 0 24 24"><path d="M10 10L20 20"/></svg>"""
+    fun `ensure convert emits Parsing then Generating then Complete for SVG without optimizer`() =
+        runTest {
+            // Arrange
+            val svgContent = """<svg viewBox="0 0 24 24"><path d="M10 10L20 20"/></svg>"""
 
-        // Act
-        val steps = converter.convert(
-            content = svgContent,
-            iconName = "TestIcon",
-            config = testConfig,
-            fileType = FileType.Svg,
-            optimizer = null,
-        ).toList()
+            // Act
+            val steps = converter.convert(
+                content = svgContent,
+                iconName = "TestIcon",
+                config = testConfig,
+                fileType = FileType.Svg,
+                optimizer = null,
+            ).toList()
 
-        // Assert
-        assertEquals(expected = 3, actual = steps.size)
-        assertIs<ConversionStep.Parsing>(steps[0])
-        assertIs<ConversionStep.Generating>(steps[1])
-        val complete = assertIs<ConversionStep.Complete>(steps[2])
-        assertTrue(
-            complete.result.kotlinCode.isNotEmpty(),
-            "Expected generated Kotlin code to be non-empty",
-        )
-    }
+            // Assert
+            assertEquals(expected = 3, actual = steps.size)
+            assertIs<ConversionStep.Parsing>(steps[0])
+            assertIs<ConversionStep.Generating>(steps[1])
+            val complete = assertIs<ConversionStep.Complete>(steps[2])
+            assertTrue(
+                complete.result.kotlinCode.isNotEmpty(),
+                "Expected generated Kotlin code to be non-empty",
+            )
+        }
 
     @Test
     fun `ensure convert emits Optimizing step when optimizer is provided`() = runTest {

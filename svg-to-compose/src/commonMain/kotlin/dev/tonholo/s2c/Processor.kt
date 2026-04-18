@@ -240,7 +240,11 @@ class Processor(
      * @param outputPath The intended output path.
      * @return The validated output path with a guaranteed Kotlin file extension (.kt).
      */
-    private fun ensureKotlinFileExtension(outputPath: Path, inputPath: Path, mapIconName: IconMapperFn): Path = when {
+    private fun ensureKotlinFileExtension(
+        outputPath: Path,
+        inputPath: Path,
+        mapIconName: IconMapperFn,
+    ): Path = when {
         outputPath.isDirectory -> {
             val filename = inputPath
                 .name
@@ -560,20 +564,24 @@ class Processor(
         return outputFile
     }
 
-    private fun buildRelativePackage(recursive: Boolean, file: Path, basePath: Path, parent: Path?) =
-        if (recursive.not() || file == basePath) {
-            ""
-        } else {
-            buildString {
-                val stack = mutableListOf<String>()
-                var currentParent = parent
-                while (currentParent != null && currentParent != basePath) {
-                    stack += currentParent.name
-                    currentParent = currentParent.parent
-                }
-                while (stack.isNotEmpty()) {
-                    append(".${stack.removeLast()}")
-                }
+    private fun buildRelativePackage(
+        recursive: Boolean,
+        file: Path,
+        basePath: Path,
+        parent: Path?,
+    ) = if (recursive.not() || file == basePath) {
+        ""
+    } else {
+        buildString {
+            val stack = mutableListOf<String>()
+            var currentParent = parent
+            while (currentParent != null && currentParent != basePath) {
+                stack += currentParent.name
+                currentParent = currentParent.parent
+            }
+            while (stack.isNotEmpty()) {
+                append(".${stack.removeLast()}")
             }
         }
+    }
 }

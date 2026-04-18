@@ -24,39 +24,40 @@ internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderSta
     -> state
 }
 
-internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): ProgressState = when (event) {
-    is ConversionEvent.RunStarted -> ProgressState(
-        total = event.totalFiles.toLong(),
-        pending = event.totalFiles.toLong(),
-    )
+internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): ProgressState =
+    when (event) {
+        is ConversionEvent.RunStarted -> ProgressState(
+            total = event.totalFiles.toLong(),
+            pending = event.totalFiles.toLong(),
+        )
 
-    is ConversionEvent.FileStarted -> {
-        val current = state ?: return ProgressState()
-        current.copy(pending = (current.pending - 1).coerceAtLeast(0))
-    }
+        is ConversionEvent.FileStarted -> {
+            val current = state ?: return ProgressState()
+            current.copy(pending = (current.pending - 1).coerceAtLeast(0))
+        }
 
-    is ConversionEvent.FileCompleted -> {
-        val current = state ?: return ProgressState()
-        when (event.result) {
-            is FileResult.Success -> current.copy(
-                completed = current.completed + 1,
-            )
-
-            is FileResult.Failed -> {
-                val failed = event.result as FileResult.Failed
-                current.copy(
-                    failed = current.failed + 1,
-                    errors = current.errors + failed.message,
+        is ConversionEvent.FileCompleted -> {
+            val current = state ?: return ProgressState()
+            when (event.result) {
+                is FileResult.Success -> current.copy(
+                    completed = current.completed + 1,
                 )
+
+                is FileResult.Failed -> {
+                    val failed = event.result as FileResult.Failed
+                    current.copy(
+                        failed = current.failed + 1,
+                        errors = current.errors + failed.message,
+                    )
+                }
             }
         }
-    }
 
-    is ConversionEvent.FileStepChanged,
-    is ConversionEvent.RunCompleted,
-    is ConversionEvent.UpdateAvailable,
-    -> state ?: ProgressState()
-}
+        is ConversionEvent.FileStepChanged,
+        is ConversionEvent.RunCompleted,
+        is ConversionEvent.UpdateAvailable,
+        -> state ?: ProgressState()
+    }
 
 internal fun reduceCurrentFiles(
     state: Map<String, CurrentFileState>,
@@ -98,19 +99,20 @@ internal fun reduceCurrentFiles(
     -> state
 }
 
-internal fun reduceRecentFiles(state: RecentFilesState, event: ConversionEvent): RecentFilesState = when (event) {
-    is ConversionEvent.FileCompleted -> state.addEntry(
-        entry = RecentFileEntry(
-            fileName = event.fileName,
-            result = event.result,
-            duration = event.duration,
-        ),
-    )
+internal fun reduceRecentFiles(state: RecentFilesState, event: ConversionEvent): RecentFilesState =
+    when (event) {
+        is ConversionEvent.FileCompleted -> state.addEntry(
+            entry = RecentFileEntry(
+                fileName = event.fileName,
+                result = event.result,
+                duration = event.duration,
+            ),
+        )
 
-    is ConversionEvent.RunStarted,
-    is ConversionEvent.FileStarted,
-    is ConversionEvent.FileStepChanged,
-    is ConversionEvent.RunCompleted,
-    is ConversionEvent.UpdateAvailable,
-    -> state
-}
+        is ConversionEvent.RunStarted,
+        is ConversionEvent.FileStarted,
+        is ConversionEvent.FileStepChanged,
+        is ConversionEvent.RunCompleted,
+        is ConversionEvent.UpdateAvailable,
+        -> state
+    }

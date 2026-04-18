@@ -824,7 +824,9 @@ class CssTokenizerTest {
 
     @Test
     @Burst
-    fun `given a dimension - when creating tokens - then should create a Dimension token`(param: DimensionsParam) {
+    fun `given a dimension - when creating tokens - then should create a Dimension token`(
+        param: DimensionsParam,
+    ) {
         // Arrange
         val content = "div { margin: $param; }"
         val valueStartOffset = 14
