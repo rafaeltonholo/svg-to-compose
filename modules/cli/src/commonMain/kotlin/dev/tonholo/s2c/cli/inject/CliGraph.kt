@@ -9,6 +9,7 @@ import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
+import dev.tonholo.s2c.cli.update.CacheDirResolver
 import dev.tonholo.s2c.cli.update.GitHubReleaseFetcher
 import dev.tonholo.s2c.cli.update.UpdateCache
 import dev.tonholo.s2c.cli.update.VersionChecker
@@ -25,7 +26,6 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 import okio.FileSystem
-import okio.Path.Companion.toPath
 import okio.SYSTEM
 import kotlin.time.Clock
 
@@ -103,18 +103,32 @@ internal interface CliGraph {
     }
 
     /**
-     * Provides the [UpdateCache] rooted at [DEFAULT_CACHE_DIR]. I/O runs on the
-     * injected [IoDispatcher] to keep file access off the main thread.
+     * Provides a [CacheDirResolver] that reads cache-location environment
+     * variables (XDG, HOME, USERPROFILE) through Mordant's cross-platform
+     * system helper so the update cache lives under the user's home rather
+     * than the current working directory.
+     */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideCacheDirResolver(): CacheDirResolver = CacheDirResolver(
+        envReader = { MultiplatformSystem.readEnvironmentVariable(it) },
+    )
+
+    /**
+     * Provides the [UpdateCache] rooted at the absolute path resolved by
+     * [CacheDirResolver]. I/O runs on the injected [IoDispatcher] to keep
+     * file access off the main thread.
      */
     @Provides
     @SingleIn(CliScope::class)
     fun provideUpdateCache(
         fileSystem: FileSystem,
         json: Json,
+        cacheDirResolver: CacheDirResolver,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): UpdateCache = UpdateCache(
         fileSystem = fileSystem,
-        cacheDir = DEFAULT_CACHE_DIR.toPath(),
+        cacheDir = cacheDirResolver.resolve(),
         json = json,
         ioDispatcher = ioDispatcher,
     )
@@ -124,6 +138,7 @@ internal interface CliGraph {
      * from [BuildConfig] and a wall-clock time source.
      */
     @Provides
+    @SingleIn(CliScope::class)
     fun provideVersionChecker(cache: UpdateCache, fetcher: GitHubReleaseFetcher): VersionChecker =
         VersionChecker(
             currentVersion = BuildConfig.VERSION,
@@ -148,5 +163,3 @@ internal interface CliGraph {
 }
 
 internal abstract class CliScope
-
-private const val DEFAULT_CACHE_DIR = ".s2c/cache"
