@@ -5,10 +5,57 @@ import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
+import dev.tonholo.s2c.cli.output.tui.state.SingleFileCompletion
+import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
+
+private const val SINGLE_FILE_THRESHOLD = 1
+
+internal fun reduceMode(state: TuiMode, event: ConversionEvent): TuiMode = when (event) {
+    is ConversionEvent.RunStarted ->
+        if (event.totalFiles == SINGLE_FILE_THRESHOLD) TuiMode.Single else TuiMode.Batch
+
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.FileCompleted,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
+}
+
+internal fun reduceSingleFileCompletion(
+    state: SingleFileCompletion?,
+    mode: TuiMode,
+    event: ConversionEvent,
+): SingleFileCompletion? = when (event) {
+    is ConversionEvent.RunStarted -> null
+
+    is ConversionEvent.FileCompleted -> {
+        if (mode != TuiMode.Single) {
+            state
+        } else {
+            when (val outcome = event.result) {
+                is FileResult.Success -> SingleFileCompletion.Success(
+                    elapsedMs = event.duration.inWholeMilliseconds,
+                )
+
+                is FileResult.Failed -> SingleFileCompletion.Failure(
+                    errorCode = outcome.errorCode,
+                    message = outcome.message.substringBefore(delimiter = '\n'),
+                )
+            }
+        }
+    }
+
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
+}
 
 internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderState = when (event) {
     is ConversionEvent.RunStarted -> state.copy(
