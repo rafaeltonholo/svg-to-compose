@@ -37,10 +37,7 @@ abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
         var currentParent = parent
         do {
             current = currentParent as XmlChildNode
-            currentParent = when (currentParent) {
-                is XmlRootNode -> break
-                else -> current.parent
-            }
+            currentParent = current.parent
         } while (currentParent !is XmlRootNode)
 
         // XmlRootNode is the Document itself and not an actual node.
