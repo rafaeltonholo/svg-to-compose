@@ -5,6 +5,7 @@ import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 import kotlin.test.Test
 import kotlin.test.assertContains
+import kotlin.test.assertFalse
 
 class UpdateNotificationSectionTest {
 
@@ -68,6 +69,10 @@ class UpdateNotificationSectionTest {
 
         // Assert
         assertContains(rendered, "s2c --upgrade")
+        assertFalse(
+            actual = rendered.contains(other = "Download:"),
+            message = "wrapper branch should not render the Download label, got:\n$rendered",
+        )
     }
 
     @Test
@@ -85,6 +90,10 @@ class UpdateNotificationSectionTest {
         val rendered = terminal.render(widget)
 
         // Assert
-        assertContains(rendered, "Download")
+        assertContains(rendered, "Download:")
+        assertFalse(
+            actual = rendered.contains(other = "s2c --upgrade"),
+            message = "non-wrapper branch should not render the upgrade command, got:\n$rendered",
+        )
     }
 }

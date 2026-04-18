@@ -9,6 +9,7 @@ import com.github.ajalt.mordant.widgets.withPadding
 import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 
 private const val PANEL_HORIZONTAL_PADDING = 2
+private const val UPGRADE_COMMAND = "s2c --upgrade"
 
 /**
  * Builds a TUI widget that notifies the user about an available update.
@@ -25,9 +26,9 @@ internal fun updateNotificationSection(state: UpdateNotificationState): Widget {
                 TextColors.green(state.latestVersion),
         )
         if (state.isWrapper) {
-            appendLine("Run '${TextStyles.bold("s2c --upgrade")}' to update")
+            appendLine("Run '${TextStyles.bold(UPGRADE_COMMAND)}' to update")
         } else {
-            append("Download: ")
+            appendLine("Download:")
         }
         append(TextColors.cyan(state.releaseUrl))
     }
