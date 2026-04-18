@@ -40,6 +40,22 @@ import okio.Path
 
 private const val SIGINT_EXIT_CODE = 130
 
+/**
+ * Controls how much of the end-of-run summary the non-renderer finalizer prints.
+ *
+ * - [Full] prints the "Failed:" breakdown followed by the log path. Used by
+ *   plain-text and TUI-off runs.
+ * - [LogPathOnly] only prints the log path suffix. Used by the TUI path, which
+ *   already renders its own completion summary through the TUI renderer.
+ * - [None] prints nothing structured but still surfaces log-write warnings. Used
+ *   by JSON output where the renderer owns the protocol.
+ */
+private enum class SummaryMode {
+    Full,
+    LogPathOnly,
+    None,
+}
+
 @Inject
 internal class CliRunner(
     private val processorFactory: Processor.Factory,
@@ -94,7 +110,10 @@ internal class CliRunner(
         // Avoiding logger leaking info to the TUI by silencing it here.
         context.updateConfig<CliConfig> { it.copy(silent = true) }
 
-        val renderer = TuiRenderer(terminal = terminal)
+        val renderer = TuiRenderer(
+            terminal = terminal,
+            stackTraceEnabled = context.configSnapshot.stackTrace,
+        )
         var stats: RunStats? = null
         val completedFiles = mutableListOf<FileCompletionEntry>()
         val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
@@ -149,7 +168,9 @@ internal class CliRunner(
             stats = runStats,
             completedFiles = completedFiles,
             logDir = logDir,
-            printSummary = true,
+            // The TUI completion section already renders the failure breakdown;
+            // only the log path remains to be surfaced after it.
+            summaryMode = SummaryMode.LogPathOnly,
         )
     }
 
@@ -237,14 +258,14 @@ internal class CliRunner(
                 stats = runStats,
                 completedFiles = completedFiles,
                 logDir = logDir,
-                printSummary = outputFormat != OutputFormat.Json,
+                summaryMode = if (outputFormat == OutputFormat.Json) SummaryMode.None else SummaryMode.Full,
             )
         }
     }
 
     /**
-     * Writes the run log to [logDir] and, when [printSummary] is true,
-     * prints a failure summary + log path to the terminal.
+     * Writes the run log to [logDir] and, depending on [summaryMode], surfaces the
+     * failure summary and log path on the terminal.
      *
      * Log-write failures are intentionally non-fatal: they are reported to
      * the terminal as a warning, but the failure summary and the
@@ -256,10 +277,10 @@ internal class CliRunner(
         stats: RunStats,
         completedFiles: List<FileCompletionEntry>,
         logDir: Path,
-        printSummary: Boolean,
+        summaryMode: SummaryMode,
     ) {
         if (completedFiles.isEmpty()) {
-            if (printSummary) {
+            if (summaryMode == SummaryMode.Full) {
                 maybePrintFailureSummary(completedFiles = completedFiles, logPath = null)
             }
             maybeThrowFailure(stats = stats, logPath = null)
@@ -270,15 +291,22 @@ internal class CliRunner(
         val logPath = try {
             logWriter.write(config = config, stats = stats, entries = completedFiles)
         } catch (e: IOException) {
-            if (printSummary) {
+            if (summaryMode != SummaryMode.None) {
                 terminal.println()
                 terminal.println("Warning: could not write run log to $logDir: ${e.message}")
             }
             null
         }
 
-        if (printSummary) {
-            maybePrintFailureSummary(completedFiles = completedFiles, logPath = logPath)
+        when (summaryMode) {
+            SummaryMode.Full -> maybePrintFailureSummary(
+                completedFiles = completedFiles,
+                logPath = logPath,
+            )
+
+            SummaryMode.LogPathOnly -> printLogPath(logPath = logPath)
+
+            SummaryMode.None -> Unit
         }
 
         maybeThrowFailure(stats = stats, logPath = logPath)
@@ -297,6 +325,10 @@ internal class CliRunner(
                 terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
             }
         }
+        printLogPath(logPath = logPath)
+    }
+
+    private fun printLogPath(logPath: Path?) {
         if (logPath != null) {
             terminal.println()
             terminal.println("Full log: $logPath")
