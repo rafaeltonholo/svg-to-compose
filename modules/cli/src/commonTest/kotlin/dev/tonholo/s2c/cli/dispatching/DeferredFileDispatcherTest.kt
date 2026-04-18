@@ -3,11 +3,11 @@ package dev.tonholo.s2c.cli.dispatching
 import dev.tonholo.s2c.SvgToComposeContextImpl
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.dispatching.availableProcessors
+import kotlinx.coroutines.Dispatchers
+import okio.Path.Companion.toPath
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
-import kotlinx.coroutines.Dispatchers
-import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

@@ -21,12 +21,13 @@ class UpdateCacheTest {
         prettyPrint = true
     }
 
-    private fun createCache(fs: FakeFileSystem = fileSystem, dir: okio.Path = cacheDir) = UpdateCache(
-        fileSystem = fs,
-        cacheDir = dir,
-        json = json,
-        ioDispatcher = UnconfinedTestDispatcher(),
-    )
+    private fun createCache(fs: FakeFileSystem = fileSystem, dir: okio.Path = cacheDir) =
+        UpdateCache(
+            fileSystem = fs,
+            cacheDir = dir,
+            json = json,
+            ioDispatcher = UnconfinedTestDispatcher(),
+        )
 
     @AfterTest
     fun tearDown() {
@@ -118,59 +119,62 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given fresh cache within 24h - when readIfFresh is called - then returns entry`() = runTest {
-        // Arrange
-        val cache = createCache()
-        val entry = UpdateCacheEntry(
-            latestVersion = "2.3.0",
-            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
-            checkedAtEpochMillis = BASE_TIME - ONE_HOUR_MILLIS,
-        )
-        cache.write(entry)
+    fun `given fresh cache within 24h - when readIfFresh is called - then returns entry`() =
+        runTest {
+            // Arrange
+            val cache = createCache()
+            val entry = UpdateCacheEntry(
+                latestVersion = "2.3.0",
+                releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
+                checkedAtEpochMillis = BASE_TIME - ONE_HOUR_MILLIS,
+            )
+            cache.write(entry)
 
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
+            // Act
+            val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
 
-        // Assert
-        assertEquals(expected = entry.latestVersion, actual = result?.latestVersion)
-    }
-
-    @Test
-    fun `given cache dir does not exist - when write is called - then creates directory and file`() = runTest {
-        // Arrange
-        val nonExistentDir = "/home/user/.s2c-new".toPath()
-        val cache = createCache(dir = nonExistentDir)
-        val entry = UpdateCacheEntry(
-            latestVersion = "1.0.0",
-            releaseUrl = "https://example.com",
-            checkedAtEpochMillis = BASE_TIME,
-        )
-
-        // Act
-        cache.write(entry)
-
-        // Assert
-        assertTrue(fileSystem.exists(nonExistentDir))
-        assertTrue(fileSystem.exists(nonExistentDir / UpdateCache.CACHE_FILE_NAME))
-    }
+            // Assert
+            assertEquals(expected = entry.latestVersion, actual = result?.latestVersion)
+        }
 
     @Test
-    fun `given cache checked exactly 24h ago - when readIfFresh is called - then returns null`() = runTest {
-        // Arrange
-        val cache = createCache()
-        val entry = UpdateCacheEntry(
-            latestVersion = "2.3.0",
-            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
-            checkedAtEpochMillis = BASE_TIME - UpdateCache.TTL_MILLIS,
-        )
-        cache.write(entry)
+    fun `given cache dir does not exist - when write is called - then creates directory and file`() =
+        runTest {
+            // Arrange
+            val nonExistentDir = "/home/user/.s2c-new".toPath()
+            val cache = createCache(dir = nonExistentDir)
+            val entry = UpdateCacheEntry(
+                latestVersion = "1.0.0",
+                releaseUrl = "https://example.com",
+                checkedAtEpochMillis = BASE_TIME,
+            )
 
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
+            // Act
+            cache.write(entry)
 
-        // Assert
-        assertNull(result)
-    }
+            // Assert
+            assertTrue(fileSystem.exists(nonExistentDir))
+            assertTrue(fileSystem.exists(nonExistentDir / UpdateCache.CACHE_FILE_NAME))
+        }
+
+    @Test
+    fun `given cache checked exactly 24h ago - when readIfFresh is called - then returns null`() =
+        runTest {
+            // Arrange
+            val cache = createCache()
+            val entry = UpdateCacheEntry(
+                latestVersion = "2.3.0",
+                releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
+                checkedAtEpochMillis = BASE_TIME - UpdateCache.TTL_MILLIS,
+            )
+            cache.write(entry)
+
+            // Act
+            val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
+
+            // Assert
+            assertNull(result)
+        }
 
     @Test
     fun `given write failure - when write is called - then does not throw`() = runTest {
@@ -193,22 +197,23 @@ class UpdateCacheTest {
     }
 
     @Test
-    fun `given cache with future timestamp - when readIfFresh is called - then returns null`() = runTest {
-        // Arrange
-        val cache = createCache()
-        val entry = UpdateCacheEntry(
-            latestVersion = "2.3.0",
-            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
-            checkedAtEpochMillis = BASE_TIME + ONE_HOUR_MILLIS,
-        )
-        cache.write(entry)
+    fun `given cache with future timestamp - when readIfFresh is called - then returns null`() =
+        runTest {
+            // Arrange
+            val cache = createCache()
+            val entry = UpdateCacheEntry(
+                latestVersion = "2.3.0",
+                releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/tag/v2.3.0",
+                checkedAtEpochMillis = BASE_TIME + ONE_HOUR_MILLIS,
+            )
+            cache.write(entry)
 
-        // Act
-        val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
+            // Act
+            val result = cache.readIfFresh(nowEpochMillis = BASE_TIME)
 
-        // Assert
-        assertNull(result)
-    }
+            // Assert
+            assertNull(result)
+        }
 
     private companion object {
         private const val BASE_TIME = 1_712_160_600_000L // 2024-04-03T14:30:00 UTC approx
