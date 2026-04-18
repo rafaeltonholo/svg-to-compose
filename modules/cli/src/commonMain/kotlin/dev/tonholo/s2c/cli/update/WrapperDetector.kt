@@ -17,7 +17,7 @@ class WrapperDetector(private val envReader: () -> String?) {
      */
     fun isRunningFromWrapper(): Boolean {
         val value = envReader() ?: return false
-        return value.equals(other = "true", ignoreCase = true)
+        return value.trim().equals(other = "true", ignoreCase = true)
     }
 
     companion object {

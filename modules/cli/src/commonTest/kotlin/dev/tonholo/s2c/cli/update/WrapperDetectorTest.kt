@@ -65,4 +65,40 @@ class WrapperDetectorTest {
         // Assert
         assertTrue(result)
     }
+
+    @Test
+    fun `given S2C_WRAPPER env var is padded with whitespace - when detect called - then returns true`() {
+        // Arrange
+        val detector = WrapperDetector(envReader = { " true " })
+
+        // Act
+        val result = detector.isRunningFromWrapper()
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given S2C_WRAPPER env var is padded uppercase - when detect called - then returns true`() {
+        // Arrange
+        val detector = WrapperDetector(envReader = { "\tTRUE\n" })
+
+        // Act
+        val result = detector.isRunningFromWrapper()
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given S2C_WRAPPER env var is whitespace only - when detect called - then returns false`() {
+        // Arrange
+        val detector = WrapperDetector(envReader = { "   " })
+
+        // Act
+        val result = detector.isRunningFromWrapper()
+
+        // Assert
+        assertFalse(result)
+    }
 }
