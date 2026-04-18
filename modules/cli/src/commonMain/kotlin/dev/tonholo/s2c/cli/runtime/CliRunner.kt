@@ -13,11 +13,13 @@ import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
 import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
+import dev.tonholo.s2c.cli.update.UpdateNotifier
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.FileResult
+import dev.tonholo.s2c.output.OutputRenderer
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.IconMapperFn
@@ -44,6 +46,7 @@ internal class CliRunner(
     private val terminal: Terminal,
     private val context: SvgToComposeContext,
     private val fileManager: FileManager,
+    private val updateNotifier: UpdateNotifier,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
     @param:MainDispatcher
@@ -129,6 +132,7 @@ internal class CliRunner(
             }
 
             processorDeferred.await()
+            updateNotifier.notifyIfUpdateAvailable(renderer = renderer)
         } finally {
             scope.cancel()
             renderer.stop()
@@ -198,6 +202,8 @@ internal class CliRunner(
 
         var stats: RunStats? = null
         val completedFiles = mutableListOf<FileCompletionEntry>()
+        val emitToRenderer = outputFormat == OutputFormat.Json || !isSilent
+        val eventSink: OutputRenderer = if (emitToRenderer) renderer else OutputRenderer { }
         processor.runAsFlow(
             path = config.inputPath,
             output = config.outputPath,
@@ -208,9 +214,7 @@ internal class CliRunner(
         )
             .flowOn(ioDispatcher)
             .collect { event ->
-                if (outputFormat == OutputFormat.Json || !isSilent) {
-                    renderer.onEvent(event)
-                }
+                eventSink.onEvent(event)
                 if (event is ConversionEvent.FileCompleted) {
                     completedFiles.add(
                         FileCompletionEntry(
@@ -224,6 +228,7 @@ internal class CliRunner(
                     stats = event.stats
                 }
             }
+        updateNotifier.notifyIfUpdateAvailable(renderer = eventSink)
 
         val runStats = stats
         if (runStats != null) {

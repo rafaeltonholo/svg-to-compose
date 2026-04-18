@@ -1,7 +1,5 @@
 package dev.tonholo.s2c.cli.update
 
-// TODO(#304): Wire VersionChecker into CLI startup via CliGraph and emit UpdateAvailable event after RunCompleted
-
 /**
  * Orchestrates the version update check by reading from cache,
  * fetching from the remote when the cache is stale, and comparing
