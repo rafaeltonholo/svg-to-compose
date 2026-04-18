@@ -1,6 +1,8 @@
 package dev.tonholo.s2c.cli.output.tui.reducer
 
+import dev.tonholo.s2c.cli.output.tui.state.CompletionState
 import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
+import dev.tonholo.s2c.cli.output.tui.state.FailedFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
@@ -191,3 +193,43 @@ internal fun reduceUpdateNotification(
     is ConversionEvent.RunCompleted,
     -> state
 }
+
+/**
+ * Folds [ConversionEvent]s into the [CompletionState] consumed by the TUI completion summary.
+ *
+ * Semantics:
+ *  - [ConversionEvent.RunStarted] captures the header metadata and resets any prior
+ *    accumulated failures or stats so consecutive runs inside the same process do not leak state.
+ *  - [ConversionEvent.FileCompleted] appends a [FailedFileEntry] only when the result is
+ *    [FileResult.Failed]; successes are ignored (aggregate counts come from [ConversionEvent.RunCompleted]).
+ *  - [ConversionEvent.RunCompleted] attaches the aggregate [dev.tonholo.s2c.output.RunStats] to
+ *    the snapshot; the renderer treats this as the trigger to stop the live animation.
+ */
+internal fun reduceCompletion(state: CompletionState, event: ConversionEvent): CompletionState =
+    when (event) {
+        is ConversionEvent.RunStarted -> CompletionState(
+            version = event.version,
+            config = event.config,
+            totalFiles = event.totalFiles,
+        )
+
+        is ConversionEvent.FileCompleted -> when (val result = event.result) {
+            is FileResult.Success -> state
+
+            is FileResult.Failed -> state.copy(
+                failedFiles = state.failedFiles + FailedFileEntry(
+                    fileName = event.fileName,
+                    errorCode = result.errorCode,
+                    message = result.message,
+                    stackTrace = result.stackTrace,
+                ),
+            )
+        }
+
+        is ConversionEvent.RunCompleted -> state.copy(stats = event.stats)
+
+        is ConversionEvent.FileStarted,
+        is ConversionEvent.FileStepChanged,
+        is ConversionEvent.UpdateAvailable,
+        -> state
+    }
