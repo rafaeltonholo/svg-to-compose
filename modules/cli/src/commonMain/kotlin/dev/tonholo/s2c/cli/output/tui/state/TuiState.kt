@@ -9,8 +9,7 @@ internal data class TuiState(
     val updateNotification: UpdateNotificationState? = null,
     val singleFileCompletion: SingleFileCompletion? = null,
 ) {
-    fun withMode(transform: (TuiMode) -> TuiMode): TuiState =
-        copy(mode = transform(mode))
+    fun withMode(transform: (TuiMode) -> TuiMode): TuiState = copy(mode = transform(mode))
 
     fun withHeader(transform: (HeaderState) -> HeaderState): TuiState =
         copy(header = transform(header))

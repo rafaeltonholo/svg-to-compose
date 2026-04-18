@@ -7,6 +7,7 @@ import com.github.ajalt.mordant.widgets.progress.MultiProgressBarWidgetMaker
 import com.github.ajalt.mordant.widgets.progress.ProgressBarMakerRow
 import com.github.ajalt.mordant.widgets.progress.ProgressBarWidgetMaker
 import com.github.ajalt.mordant.widgets.withPadding
+import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 
 private const val HORIZONTAL_PADDING = 2
@@ -28,34 +29,51 @@ internal class DashboardWidgetMaker(
 ) : ProgressBarWidgetMaker {
     override fun build(rows: List<ProgressBarMakerRow<*>>): Widget {
         val currentState = state()
+        val contentWidth = terminalWidth() - HORIZONTAL_PADDING * 2
+        val body = when (currentState.mode) {
+            TuiMode.Single -> singleFileLayout(state = currentState, contentWidth = contentWidth)
+
+            TuiMode.Batch -> batchLayout(
+                state = currentState,
+                rows = rows,
+                contentWidth = contentWidth,
+            )
+        }
+        return body.withPadding {
+            vertical = VERTICAL_PADDING
+            horizontal = HORIZONTAL_PADDING
+        }
+    }
+
+    private fun batchLayout(
+        state: TuiState,
+        rows: List<ProgressBarMakerRow<*>>,
+        contentWidth: Int,
+    ): Widget {
         val barRows = rows.take(barRowCount)
         val statsRows = rows.drop(barRowCount)
         val progressWidget = MultiProgressBarWidgetMaker.build(barRows)
         val statsWidget = MultiProgressBarWidgetMaker.build(statsRows)
         return verticalLayout {
-            val contentWidth = terminalWidth() - HORIZONTAL_PADDING * 2
-            cell(headerSection(state = currentState, contentWidth = contentWidth))
+            cell(headerSection(state = state, contentWidth = contentWidth))
             cell(progressWidget)
-            cell(currentFilesSection(files = currentState.currentFiles, contentWidth = contentWidth))
+            cell(currentFilesSection(files = state.currentFiles, contentWidth = contentWidth))
             cell(
                 recentFilesSection(
-                    state = currentState.recentFiles,
+                    state = state.recentFiles,
                     contentWidth = contentWidth,
                 ).withPadding { top = 1 },
             )
-            val progress = currentState.progress
+            val progress = state.progress
             if (progress != null) {
                 cell(summaryCountersSection(state = progress))
             } else {
                 cell(Text(" "))
             }
             cell(statsWidget.withPadding { top = 1 })
-            currentState.updateNotification?.let { notification ->
+            state.updateNotification?.let { notification ->
                 cell(updateNotificationSection(state = notification))
             }
-        }.withPadding {
-            vertical = VERTICAL_PADDING
-            horizontal = HORIZONTAL_PADDING
         }
     }
 }
