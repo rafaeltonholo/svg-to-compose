@@ -11,7 +11,9 @@ import kotlin.contracts.contract
  *
  * @param TTokenKind The type of token kind.
  */
-open class AstParserIterator<TTokenKind : TokenKind>(internal val tokens: List<Token<out TTokenKind>>) {
+open class AstParserIterator<TTokenKind : TokenKind>(
+    internal val tokens: List<Token<out TTokenKind>>,
+) {
     internal var offset = 0
         private set
 

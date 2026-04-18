@@ -2,6 +2,7 @@ package dev.tonholo.s2c.domain.svg
 
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
+import dev.tonholo.s2c.domain.emit
 import dev.tonholo.s2c.extensions.removeTrailingZero
 import dev.tonholo.s2c.extensions.toStringConsistent
 import kotlin.test.Test
@@ -67,7 +68,7 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
         )
         // Act
         val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
-        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+        val materialized = node.wrapper.nodes.map { it.emit() }.toTypedArray()
 
         // Assert
         with(nonRelative) {
@@ -107,7 +108,7 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
         )
         // Act
         val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
-        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+        val materialized = node.wrapper.nodes.map { it.emit() }.toTypedArray()
 
         // Assert
         with(nonRelative) {
@@ -149,7 +150,7 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
         )
         // Act
         val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
-        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+        val materialized = node.wrapper.nodes.map { it.emit() }.toTypedArray()
 
         // Assert
         with(nonRelative) {
@@ -181,7 +182,7 @@ class SvgPathVerticalLineToTests : BaseSvgTest() {
         )
         // Act
         val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
-        val materialized = node.wrapper.nodes.map { it.materialize() }.toTypedArray()
+        val materialized = node.wrapper.nodes.map { it.emit() }.toTypedArray()
 
         // Assert
         with(nonRelative) {

@@ -49,7 +49,8 @@ enum class PathCommand(
  * @return A new string with the PathCommand's character value removed from
  *  the end, or the original string if it doesn't end with that character
  */
-internal fun String.removeSuffix(pathCommand: PathCommand): String = removeSuffix(pathCommand.value.toString())
+internal fun String.removeSuffix(pathCommand: PathCommand): String =
+    removeSuffix(pathCommand.value.toString())
 
 /**
  * Converts a Char to its corresponding PathCommand enum value.

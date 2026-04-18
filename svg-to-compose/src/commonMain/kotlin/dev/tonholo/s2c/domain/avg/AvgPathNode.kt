@@ -14,8 +14,11 @@ import dev.tonholo.s2c.extensions.firstInstanceOfOrNull
 import dev.tonholo.s2c.extensions.toLengthFloat
 import dev.tonholo.s2c.logger.Logger
 
-class AvgPathNode(parent: XmlParentNode, children: MutableSet<XmlNode>, attributes: MutableMap<String, String>) :
-    AvgElementNode(parent, children, attributes, TAG_NAME),
+class AvgPathNode(
+    parent: XmlParentNode,
+    children: MutableSet<XmlNode>,
+    attributes: MutableMap<String, String>,
+) : AvgElementNode(parent, children, attributes, TAG_NAME),
     AvgNode {
     val pathData: String by attribute(namespace = AvgNode.NAMESPACE)
 

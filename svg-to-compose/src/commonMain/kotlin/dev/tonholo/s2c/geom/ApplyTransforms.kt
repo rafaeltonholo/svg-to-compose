@@ -116,7 +116,9 @@ sealed class AffineTransformation(vararg matrix: DoubleArray) {
         )
 }
 
-fun List<PathNodes>.applyTransformations(vararg transformations: AffineTransformation): Sequence<PathNodes> {
+fun List<PathNodes>.applyTransformations(
+    vararg transformations: AffineTransformation,
+): Sequence<PathNodes> {
     if (transformations.isEmpty()) return asSequence()
     val combinedMatrix = transformations.reduce { acc, current -> (acc * current) }
     return applyTransformation(combinedMatrix)
@@ -164,15 +166,18 @@ fun List<PathNodes>.applyTransformation(transformation: AffineTransformation): S
     }
 }
 
-private fun PathNodes.transform(cursor: DoubleArray, start: DoubleArray, transformation: AffineTransformation) =
-    when (this) {
-        is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.HorizontalLineTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.VerticalLineTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.LineTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.CurveTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.ReflectiveCurveTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.QuadTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.ReflectiveQuadTo -> applyTransformation(cursor, start, transformation)
-        is PathNodes.ArcTo -> applyTransformation(cursor, start, transformation)
-    }
+private fun PathNodes.transform(
+    cursor: DoubleArray,
+    start: DoubleArray,
+    transformation: AffineTransformation,
+) = when (this) {
+    is PathNodes.MoveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.HorizontalLineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.VerticalLineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.LineTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.CurveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ReflectiveCurveTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.QuadTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ReflectiveQuadTo -> applyTransformation(cursor, start, transformation)
+    is PathNodes.ArcTo -> applyTransformation(cursor, start, transformation)
+}

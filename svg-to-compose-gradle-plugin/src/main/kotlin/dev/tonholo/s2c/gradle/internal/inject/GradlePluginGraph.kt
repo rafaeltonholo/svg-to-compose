@@ -37,7 +37,9 @@ internal interface GradlePluginGraph {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun providePersistentOutputRegistry(@BuildDirectory buildDirectory: DirectoryProperty): PersistentOutputRegistry {
+    fun providePersistentOutputRegistry(
+        @BuildDirectory buildDirectory: DirectoryProperty,
+    ): PersistentOutputRegistry {
         val registryFile = buildDirectory
             .file(PERSISTENT_REGISTRY_PATH)
             .get()

@@ -107,5 +107,6 @@ internal abstract class TokenIterator<out T : TokenKind> {
      * @param end The end index of the substring.
      * @return The substring from start to end index.
      */
-    fun partialContent(start: Int, end: Int): String = content.substring(start, end.coerceAtMost(content.length))
+    fun partialContent(start: Int, end: Int): String =
+        content.substring(start, end.coerceAtMost(content.length))
 }

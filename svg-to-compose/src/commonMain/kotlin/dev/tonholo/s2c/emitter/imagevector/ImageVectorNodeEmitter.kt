@@ -38,9 +38,10 @@ internal class ImageVectorNodeEmitter(
      * @param path The path node whose commands to emit.
      * @return The emitted path command strings, one per line.
      */
-    fun emitPathCommands(path: ImageVectorNode.Path): String = path.wrapper.nodes.joinToString("\n") {
-        pathNodeEmitter.emit(it).trimEnd()
-    }
+    fun emitPathCommands(path: ImageVectorNode.Path): String =
+        path.wrapper.nodes.joinToString("\n") {
+            pathNodeEmitter.emit(it).trimEnd()
+        }
 
     /**
      * Emits a `PathData { ... }` block for a clip path.
@@ -152,57 +153,60 @@ internal class ImageVectorNodeEmitter(
         return "group$groupParamsString"
     }
 
-    private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String = "${chunk.functionName}()"
+    private fun emitChunkFunctionCall(chunk: ImageVectorNode.ChunkFunction): String =
+        "${chunk.functionName}()"
 
-    private fun buildPathParameterList(path: ImageVectorNode.Path): List<Pair<String, String>> = buildList {
-        with(path.params) {
-            fill?.let { brush ->
-                brush.toCompose()?.let { add("fill" to it) }
-            }
-            fillAlpha?.let {
-                add("fillAlpha" to "${it.toStringConsistent()}f")
-            }
-            pathFillType?.let {
-                add("pathFillType" to "${it.toCompose()}")
-            }
-            stroke?.let { stroke ->
-                stroke.toCompose()?.let { add("stroke" to it) }
-            }
-            strokeAlpha?.let {
-                add("strokeAlpha" to "${it.toStringConsistent()}f")
-            }
-            strokeLineCap?.let {
-                add("strokeLineCap" to "${it.toCompose()}")
-            }
-            strokeLineJoin?.let {
-                add("strokeLineJoin" to "${it.toCompose()}")
-            }
-            strokeMiterLimit?.let {
-                add("strokeLineMiter" to "${it.toStringConsistent()}f")
-            }
-            strokeLineWidth?.let {
-                add("strokeLineWidth" to "${it.toStringConsistent()}f")
-            }
+    private fun buildPathParameterList(path: ImageVectorNode.Path): List<Pair<String, String>> =
+        buildList {
+            with(path.params) {
+                fill?.let { brush ->
+                    brush.toCompose()?.let { add("fill" to it) }
+                }
+                fillAlpha?.let {
+                    add("fillAlpha" to "${it.toStringConsistent()}f")
+                }
+                pathFillType?.let {
+                    add("pathFillType" to "${it.toCompose()}")
+                }
+                stroke?.let { stroke ->
+                    stroke.toCompose()?.let { add("stroke" to it) }
+                }
+                strokeAlpha?.let {
+                    add("strokeAlpha" to "${it.toStringConsistent()}f")
+                }
+                strokeLineCap?.let {
+                    add("strokeLineCap" to "${it.toCompose()}")
+                }
+                strokeLineJoin?.let {
+                    add("strokeLineJoin" to "${it.toCompose()}")
+                }
+                strokeMiterLimit?.let {
+                    add("strokeLineMiter" to "${it.toStringConsistent()}f")
+                }
+                strokeLineWidth?.let {
+                    add("strokeLineWidth" to "${it.toStringConsistent()}f")
+                }
 
-            if (fill == null && stroke == null) {
-                add("fill" to requireNotNull(SvgColor.Default.toBrush().toCompose()))
+                if (fill == null && stroke == null) {
+                    add("fill" to requireNotNull(SvgColor.Default.toBrush().toCompose()))
+                }
             }
         }
-    }
 
     @Suppress("CyclomaticComplexMethod")
-    private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> = with(group.params) {
-        buildSet {
-            emitClipPathData(clipPath)?.let { add(CLIP_PATH_PARAM_NAME to it) }
-            rotate?.let { add(ROTATE_PARAM_NAME to "${rotate.toStringConsistent()}f") }
-            pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX.toStringConsistent()}f") }
-            pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY.toStringConsistent()}f") }
-            scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX.toStringConsistent()}f") }
-            scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY.toStringConsistent()}f") }
-            translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX.toStringConsistent()}f") }
-            translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY.toStringConsistent()}f") }
+    private fun buildGroupParameters(group: ImageVectorNode.Group): Set<Pair<String, String>> =
+        with(group.params) {
+            buildSet {
+                emitClipPathData(clipPath)?.let { add(CLIP_PATH_PARAM_NAME to it) }
+                rotate?.let { add(ROTATE_PARAM_NAME to "${rotate.toStringConsistent()}f") }
+                pivotX?.let { add(PIVOT_X_PARAM_NAME to "${pivotX.toStringConsistent()}f") }
+                pivotY?.let { add(PIVOT_Y_PARAM_NAME to "${pivotY.toStringConsistent()}f") }
+                scaleX?.let { add(SCALE_X_PARAM_NAME to "${scaleX.toStringConsistent()}f") }
+                scaleY?.let { add(SCALE_Y_PARAM_NAME to "${scaleY.toStringConsistent()}f") }
+                translationX?.let { add(TRANSLATION_X_PARAM_NAME to "${translationX.toStringConsistent()}f") }
+                translationY?.let { add(TRANSLATION_Y_PARAM_NAME to "${translationY.toStringConsistent()}f") }
+            }
         }
-    }
 
     private companion object {
         const val CLIP_PATH_PARAM_NAME = "clipPathData"

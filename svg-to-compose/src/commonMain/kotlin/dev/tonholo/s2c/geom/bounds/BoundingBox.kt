@@ -80,17 +80,21 @@ sealed class BoundingBox private constructor(
          * @return A [BoundingBox] instance if the coordinates are valid, or
          * [NoBoundingBox] if any of the coordinates are [Double.NaN].
          */
-        operator fun invoke(minX: Double, minY: Double, maxX: Double, maxY: Double): BoundingBox =
-            if (minX.isNaN() || minY.isNaN() || maxX.isNaN() || maxY.isNaN()) {
-                NoBoundingBox
-            } else {
-                BoundingBoxImpl(
-                    minX = minX,
-                    minY = minY,
-                    maxX = maxX,
-                    maxY = maxY,
-                )
-            }
+        operator fun invoke(
+            minX: Double,
+            minY: Double,
+            maxX: Double,
+            maxY: Double,
+        ): BoundingBox = if (minX.isNaN() || minY.isNaN() || maxX.isNaN() || maxY.isNaN()) {
+            NoBoundingBox
+        } else {
+            BoundingBoxImpl(
+                minX = minX,
+                minY = minY,
+                maxX = maxX,
+                maxY = maxY,
+            )
+        }
     }
 }
 
@@ -158,76 +162,79 @@ fun List<PathNodes>.boundingBox(): BoundingBox {
     }
 }
 
-private fun PathNodes.calculateBoundingBox(boundingBox: BoundingBox, currentX: Double, currentY: Double): BoundingBox =
-    when (this) {
-        is PathNodes.ArcTo -> ArcBoundingBoxCalculator(
-            boundingBox = boundingBox,
-            current = Point2D(x = currentX, y = currentY),
-            x = x,
-            y = y,
-            rx = a,
-            ry = b,
-            phi = theta,
-            largeArcFlag = isMoreThanHalf,
-            sweepFlag = isPositiveArc,
+private fun PathNodes.calculateBoundingBox(
+    boundingBox: BoundingBox,
+    currentX: Double,
+    currentY: Double,
+): BoundingBox = when (this) {
+    is PathNodes.ArcTo -> ArcBoundingBoxCalculator(
+        boundingBox = boundingBox,
+        current = Point2D(x = currentX, y = currentY),
+        x = x,
+        y = y,
+        rx = a,
+        ry = b,
+        phi = theta,
+        largeArcFlag = isMoreThanHalf,
+        sweepFlag = isPositiveArc,
+    ).calculate()
+
+    is PathNodes.CurveTo -> {
+        BezierBoundingBoxCalculator(
+            initialBoundingBox = boundingBox,
+            currentX = currentX,
+            currentY = currentY,
+            controlPoint1x = x1,
+            controlPoint1y = y1,
+            controlPoint2x = x2,
+            controlPoint2y = y2,
+            endX = x3,
+            endY = y3,
         ).calculate()
-
-        is PathNodes.CurveTo -> {
-            BezierBoundingBoxCalculator(
-                initialBoundingBox = boundingBox,
-                currentX = currentX,
-                currentY = currentY,
-                controlPoint1x = x1,
-                controlPoint1y = y1,
-                controlPoint2x = x2,
-                controlPoint2y = y2,
-                endX = x3,
-                endY = y3,
-            ).calculate()
-        }
-
-        is PathNodes.HorizontalLineTo -> boundingBox.copy(
-            minX = min(boundingBox.minX, x),
-            maxX = max(boundingBox.maxX, x),
-        )
-
-        is PathNodes.LineTo, is PathNodes.MoveTo -> boundingBox.copy(
-            minX = min(boundingBox.minX, x),
-            minY = min(boundingBox.minY, y),
-            maxX = max(boundingBox.maxX, x),
-            maxY = max(boundingBox.maxY, y),
-        )
-
-        is PathNodes.QuadTo -> {
-            // CP1 = QP0 + 2/3 * (QP1 - QP0)
-            val controlPoint1 = doubleArrayOf(
-                currentX + 2.0 / 3.0 * (x1 - currentX),
-                currentY + 2.0 / 3.0 * (y1 - currentY),
-            )
-            // CP2 = CP1 + 1/3 * (QP2 - QP0)
-            val controlPoint2 = doubleArrayOf(
-                currentX + 1.0 / 3.0 * (x2 - currentX),
-                currentY + 1.0 / 3.0 * (y2 - currentY),
-            )
-
-            BezierBoundingBoxCalculator(
-                initialBoundingBox = boundingBox,
-                currentX = currentX,
-                currentY = currentY,
-                controlPoint1x = controlPoint1[0],
-                controlPoint1y = controlPoint1[1],
-                controlPoint2x = controlPoint2[0],
-                controlPoint2y = controlPoint2[1],
-                endX = x2,
-                endY = y2,
-            ).calculate()
-        }
-
-        is PathNodes.VerticalLineTo -> boundingBox.copy(
-            minY = min(boundingBox.minY, y),
-            maxY = max(boundingBox.maxY, y),
-        )
-
-        // Ignore ReflectiveCurveTo and ReflectiveQuadTo since they were removed.
-        else -> error("Unexpected node type = $command")
     }
+
+    is PathNodes.HorizontalLineTo -> boundingBox.copy(
+        minX = min(boundingBox.minX, x),
+        maxX = max(boundingBox.maxX, x),
+    )
+
+    is PathNodes.LineTo, is PathNodes.MoveTo -> boundingBox.copy(
+        minX = min(boundingBox.minX, x),
+        minY = min(boundingBox.minY, y),
+        maxX = max(boundingBox.maxX, x),
+        maxY = max(boundingBox.maxY, y),
+    )
+
+    is PathNodes.QuadTo -> {
+        // CP1 = QP0 + 2/3 * (QP1 - QP0)
+        val controlPoint1 = doubleArrayOf(
+            currentX + 2.0 / 3.0 * (x1 - currentX),
+            currentY + 2.0 / 3.0 * (y1 - currentY),
+        )
+        // CP2 = CP1 + 1/3 * (QP2 - QP0)
+        val controlPoint2 = doubleArrayOf(
+            currentX + 1.0 / 3.0 * (x2 - currentX),
+            currentY + 1.0 / 3.0 * (y2 - currentY),
+        )
+
+        BezierBoundingBoxCalculator(
+            initialBoundingBox = boundingBox,
+            currentX = currentX,
+            currentY = currentY,
+            controlPoint1x = controlPoint1[0],
+            controlPoint1y = controlPoint1[1],
+            controlPoint2x = controlPoint2[0],
+            controlPoint2y = controlPoint2[1],
+            endX = x2,
+            endY = y2,
+        ).calculate()
+    }
+
+    is PathNodes.VerticalLineTo -> boundingBox.copy(
+        minY = min(boundingBox.minY, y),
+        maxY = max(boundingBox.maxY, y),
+    )
+
+    // Ignore ReflectiveCurveTo and ReflectiveQuadTo since they were removed.
+    else -> error("Unexpected node type = $command")
+}

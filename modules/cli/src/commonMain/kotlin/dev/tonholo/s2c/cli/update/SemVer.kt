@@ -27,7 +27,8 @@ data class SemVer(val major: Int, val minor: Int, val patch: Int) : Comparable<S
          * Returns true if the version string contains a pre-release suffix
          * (e.g. `-SNAPSHOT`, `-rc.1`) or build metadata (e.g. `+build.456`).
          */
-        fun isPreRelease(version: String): Boolean = PRE_RELEASE_REGEX.containsMatchIn(version.trim())
+        fun isPreRelease(version: String): Boolean =
+            PRE_RELEASE_REGEX.containsMatchIn(version.trim())
 
         /**
          * Parses a version string in `vX.Y.Z` or `X.Y.Z` format.

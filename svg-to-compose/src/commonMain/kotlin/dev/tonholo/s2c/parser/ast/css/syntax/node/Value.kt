@@ -35,8 +35,11 @@ sealed interface Value : CssComponentValueNode {
     /**
      * Represents a dimension value.
      */
-    data class Dimension(override val location: CssLocation, val value: kotlin.String, val unit: kotlin.String) :
-        Value {
+    data class Dimension(
+        override val location: CssLocation,
+        val value: kotlin.String,
+        val unit: kotlin.String,
+    ) : Value {
         override fun toString(indent: Int): kotlin.String = value + unit
     }
 
@@ -50,8 +53,11 @@ sealed interface Value : CssComponentValueNode {
     /**
      * Represents a function value.
      */
-    data class Function(override val location: CssLocation, val name: kotlin.String, val arguments: List<Value>) :
-        Value {
+    data class Function(
+        override val location: CssLocation,
+        val name: kotlin.String,
+        val arguments: List<Value>,
+    ) : Value {
         override fun toString(indent: Int): kotlin.String =
             "$name(${arguments.joinToString(", ") { it.toString(indent = 0) }})"
     }

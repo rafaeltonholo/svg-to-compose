@@ -9,12 +9,21 @@ import okio.Path
 
 @Fake
 interface IconWriter {
-    fun write(iconName: String, fileContents: String, output: Path): Path
+    fun write(
+        iconName: String,
+        fileContents: String,
+        output: Path,
+    ): Path
 }
 
 @Inject
-class DefaultIconWriter(private val logger: Logger, private val fileManager: FileManager) : IconWriter {
-    override fun write(iconName: String, fileContents: String, output: Path): Path {
+class DefaultIconWriter(private val logger: Logger, private val fileManager: FileManager) :
+    IconWriter {
+    override fun write(
+        iconName: String,
+        fileContents: String,
+        output: Path,
+    ): Path {
         logger.printEmpty()
         logger.output("📝 Writing icon file on $output")
         return logger.debugSection("Writing document") {

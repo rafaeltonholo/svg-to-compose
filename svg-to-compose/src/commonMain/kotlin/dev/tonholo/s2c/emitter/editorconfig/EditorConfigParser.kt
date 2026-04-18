@@ -129,12 +129,13 @@ internal object EditorConfigParser {
      * Converts parsed properties to a [FormatConfig], using defaults for
      * any unspecified values.
      */
-    fun ParsedConfig.toFormatConfig(defaults: FormatConfig = FormatConfig()): FormatConfig = FormatConfig(
-        indentSize = indentSize ?: defaults.indentSize,
-        maxLineLength = maxLineLength ?: defaults.maxLineLength,
-        indentStyle = indentStyle ?: defaults.indentStyle,
-        insertFinalNewline = insertFinalNewline ?: defaults.insertFinalNewline,
-    )
+    fun ParsedConfig.toFormatConfig(defaults: FormatConfig = FormatConfig()): FormatConfig =
+        FormatConfig(
+            indentSize = indentSize ?: defaults.indentSize,
+            maxLineLength = maxLineLength ?: defaults.maxLineLength,
+            indentStyle = indentStyle ?: defaults.indentStyle,
+            insertFinalNewline = insertFinalNewline ?: defaults.insertFinalNewline,
+        )
 
     /**
      * Checks whether a section pattern applies to `*.kt` files.

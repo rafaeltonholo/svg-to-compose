@@ -6,9 +6,11 @@ internal data class TuiState(
     val currentFiles: Map<String, CurrentFileState> = emptyMap(),
     val recentFiles: RecentFilesState = RecentFilesState(),
 ) {
-    fun withHeader(transform: (HeaderState) -> HeaderState): TuiState = copy(header = transform(header))
+    fun withHeader(transform: (HeaderState) -> HeaderState): TuiState =
+        copy(header = transform(header))
 
-    fun withProgress(transform: (ProgressState?) -> ProgressState): TuiState = copy(progress = transform(progress))
+    fun withProgress(transform: (ProgressState?) -> ProgressState): TuiState =
+        copy(progress = transform(progress))
 
     fun withCurrentFiles(
         transform: (Map<String, CurrentFileState>) -> Map<String, CurrentFileState>,

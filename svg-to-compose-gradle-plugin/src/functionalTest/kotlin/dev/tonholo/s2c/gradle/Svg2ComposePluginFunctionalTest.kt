@@ -112,7 +112,11 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
      * On the first run, if no expected file exists yet (bootstrap), the generated
      * content is written as the new expected baseline and the check passes.
      */
-    private fun assertAllOutputsMatchExpected(pkg: String, fileType: String, optimized: Boolean) {
+    private fun assertAllOutputsMatchExpected(
+        pkg: String,
+        fileType: String,
+        optimized: Boolean,
+    ) {
         val suffix = if (optimized) "optimized" else "nonoptimized"
         val generatedDir = generatedBuildDir(pkg)
         assertTrue(generatedDir.exists(), "Generated directory does not exist: $generatedDir")

@@ -1,6 +1,6 @@
 package dev.tonholo.s2c.domain.compose
 
-import dev.tonholo.s2c.extensions.indented
+import dev.tonholo.s2c.extensions.prependIndent
 import dev.tonholo.s2c.parser.method.MethodSizeAccountable
 import dev.tonholo.s2c.serializer.domain.compose.ComposeBrushSerializer
 import kotlinx.serialization.Serializable
@@ -119,16 +119,16 @@ sealed interface ComposeBrush :
                 appendColors(stops, colors, INDENT_SIZE)
                 start.toCompose().let {
                     if (it != ComposeOffset.ZERO) {
-                        appendLine("start = $it,".indented(INDENT_SIZE))
+                        appendLine("start = $it,".prependIndent(INDENT_SIZE))
                     }
                 }
                 end.toCompose().let {
                     if (it != ComposeOffset.INFINITE) {
-                        appendLine("end = $it,".indented(INDENT_SIZE))
+                        appendLine("end = $it,".prependIndent(INDENT_SIZE))
                     }
                 }
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
-                    appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
+                    appendLine("tileMode = ${tileMode.toCompose()},".prependIndent(INDENT_SIZE))
                 }
                 append(")")
             }
@@ -162,13 +162,13 @@ sealed interface ComposeBrush :
                 appendLine(".radialGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
                 if (center != null && center != ComposeOffset.Infinite) {
-                    appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
+                    appendLine("center = ${center.toCompose()},".prependIndent(INDENT_SIZE))
                 }
                 if (radius != null) {
-                    appendLine("radius = ${radius}f,".indented(INDENT_SIZE))
+                    appendLine("radius = ${radius}f,".prependIndent(INDENT_SIZE))
                 }
                 if (tileMode != null && tileMode != GradientTileMode.Clamp) {
-                    appendLine("tileMode = ${tileMode.toCompose()},".indented(INDENT_SIZE))
+                    appendLine("tileMode = ${tileMode.toCompose()},".prependIndent(INDENT_SIZE))
                 }
                 append(")")
             }
@@ -199,7 +199,7 @@ sealed interface ComposeBrush :
                 appendLine(".sweepGradient(")
                 appendColors(stops, colors, INDENT_SIZE)
                 if (center != null) {
-                    appendLine("center = ${center.toCompose()},".indented(INDENT_SIZE))
+                    appendLine("center = ${center.toCompose()},".prependIndent(INDENT_SIZE))
                 }
                 append(")")
             }
@@ -207,17 +207,21 @@ sealed interface ComposeBrush :
     }
 }
 
-private fun StringBuilder.appendColors(stops: List<Float>?, colors: List<ComposeColor>, indent: Int) {
+private fun StringBuilder.appendColors(
+    stops: List<Float>?,
+    colors: List<ComposeColor>,
+    indent: Int,
+) {
     if (stops.isNullOrEmpty()) {
-        appendLine("colors = listOf(".indented(indent))
+        appendLine("colors = listOf(".prependIndent(indent))
         colors
             .asSequence()
             // filter not valid Compose colors
             .mapNotNull { it.toCompose() }
             // add indentation
-            .map { "$it,".indented(indent * 2) }
+            .map { "$it,".prependIndent(indent * 2) }
             .forEach(::appendLine)
-        appendLine("),".indented(indent))
+        appendLine("),".prependIndent(indent))
     } else {
         stops
             .zip(colors)
@@ -228,7 +232,7 @@ private fun StringBuilder.appendColors(stops: List<Float>?, colors: List<Compose
             }
             .map { (stop, color) ->
                 // map to vararg arguments
-                "${stop}f to $color,".indented(indent)
+                "${stop}f to $color,".prependIndent(indent)
             }
             .forEach(::appendLine)
     }

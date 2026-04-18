@@ -40,48 +40,51 @@ internal class AvgParser(logger: Logger = NoOpLogger) : XmlParser(logger) {
      * @param parent The parent node of the AVG element.
      * @return The created [XmlNode].
      */
-    private fun createAvgElement(nodeName: String, attributes: Attributes, parent: XmlParentNode): XmlNode =
-        when (nodeName) {
-            AvgRootNode.TAG_NAME -> AvgRootNode(
-                parent = parent,
-                children = mutableSetOf(),
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+    private fun createAvgElement(
+        nodeName: String,
+        attributes: Attributes,
+        parent: XmlParentNode,
+    ): XmlNode = when (nodeName) {
+        AvgRootNode.TAG_NAME -> AvgRootNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgPathNode.TAG_NAME -> AvgPathNode(
-                parent = parent,
-                children = mutableSetOf(),
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgPathNode.TAG_NAME -> AvgPathNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgClipPath.TAG_NAME -> AvgClipPath(
-                parent = parent,
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgClipPath.TAG_NAME -> AvgClipPath(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgGroupNode.TAG_NAME -> AvgGroupNode(
-                parent = parent,
-                children = mutableSetOf(),
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgGroupNode.TAG_NAME -> AvgGroupNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgAttrNode.TAG_NAME -> AvgAttrNode(
-                parent = parent,
-                children = mutableSetOf(),
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgAttrNode.TAG_NAME -> AvgAttrNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgGradient.TAG_NAME -> AvgGradientNode(
-                parent = parent,
-                children = mutableSetOf(),
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgGradient.TAG_NAME -> AvgGradientNode(
+            parent = parent,
+            children = mutableSetOf(),
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            AvgGradientItemNode.TAG_NAME -> AvgGradientItemNode(
-                parent = parent,
-                attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            )
+        AvgGradientItemNode.TAG_NAME -> AvgGradientItemNode(
+            parent = parent,
+            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        )
 
-            else -> createDefaultElement(nodeName, attributes, parent)
-        }
+        else -> createDefaultElement(nodeName, attributes, parent)
+    }
 }

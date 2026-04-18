@@ -246,11 +246,13 @@ internal class Client(
         .validate {
             when {
                 it == CliConfig.PARALLEL_DISABLED || it == CliConfig.PARALLEL_CPU_CORES -> Unit
+
                 it < 1 -> fail(
                     "Parallel execution must be 1..${CliConfig.PARALLEL_MAX}, " +
                         "${CliConfig.PARALLEL_DISABLED} (disabled), or " +
                         "${CliConfig.PARALLEL_CPU_CORES} (CPU cores)",
                 )
+
                 it > CliConfig.PARALLEL_MAX -> fail("Parallel execution must not exceed ${CliConfig.PARALLEL_MAX}")
             }
         }

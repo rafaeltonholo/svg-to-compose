@@ -37,10 +37,7 @@ abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
         var currentParent = parent
         do {
             current = currentParent as XmlChildNode
-            currentParent = when (currentParent) {
-                is XmlRootNode -> break
-                else -> current.parent
-            }
+            currentParent = current.parent
         } while (currentParent !is XmlRootNode)
 
         // XmlRootNode is the Document itself and not an actual node.
@@ -114,13 +111,16 @@ class XmlTextNode(parent: XmlParentNode, val content: String) : XmlChildNode(par
     }
 }
 
-data class XmlRootNode(override val tagName: String = "#root", override val children: MutableSet<XmlNode>) :
-    XmlParentNode {
+data class XmlRootNode(
+    override val tagName: String = "#root",
+    override val children: MutableSet<XmlNode>,
+) : XmlParentNode {
     override val id: String? = null
     override val className: String? = null
     override val style: String? = null
     override val attributes: MutableMap<String, String> = mutableMapOf()
-    override fun toString(): String = "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
+    override fun toString(): String =
+        "{\"name\":\"$tagName\", \"children\": ${children.toJsString()}}"
 }
 
 open class XmlElementNode(
@@ -141,6 +141,7 @@ open class XmlElementNode(
     }
 }
 
-fun Map<String, String>.toJsString() = "[${map { "{\"${it.key}\":\"${it.value}\"}" }.joinToString(",")}]"
+fun Map<String, String>.toJsString() =
+    "[${map { "{\"${it.key}\":\"${it.value}\"}" }.joinToString(",")}]"
 
 fun Set<*>.toJsString() = "[${joinToString(",")}]"

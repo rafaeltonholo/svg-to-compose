@@ -87,7 +87,11 @@ class EditorConfigFunctionalTest : GradleFunctionalTest() {
      * @param indentSize The expected number of characters per indent level.
      * @param useTabs Whether indentation should be tabs (true) or spaces (false).
      */
-    private fun assertIndentation(content: String, indentSize: Int, useTabs: Boolean) {
+    private fun assertIndentation(
+        content: String,
+        indentSize: Int,
+        useTabs: Boolean,
+    ) {
         val lines = content.lines()
         for ((index, line) in lines.withIndex()) {
             if (line.isBlank()) continue

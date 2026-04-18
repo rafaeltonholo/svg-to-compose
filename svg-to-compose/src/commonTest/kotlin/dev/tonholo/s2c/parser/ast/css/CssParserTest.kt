@@ -1708,7 +1708,11 @@ class CssParserTest {
         assertContains(message, "Invalid at-rule: @invalid-rule")
     }
 
-    private fun assert(content: String, tokens: List<Token<out CssTokenKind>>, expected: StyleSheet) {
+    private fun assert(
+        content: String,
+        tokens: List<Token<out CssTokenKind>>,
+        expected: StyleSheet,
+    ) {
         val astParser = CssParser(consumers = CssConsumers(content))
         val actual = astParser.parse(tokens)
         assertEquals(expected, actual)

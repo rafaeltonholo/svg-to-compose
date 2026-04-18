@@ -25,7 +25,11 @@ internal fun headerSection(state: TuiState, contentWidth: Int): Widget {
 
 private const val SUMMARY_INNER_PADDING = 1
 
-private fun collapsedHeader(state: HeaderState, versionLine: Widget, contentWidth: Int): Widget {
+private fun collapsedHeader(
+    state: HeaderState,
+    versionLine: Widget,
+    contentWidth: Int,
+): Widget {
     val config = state.config
     val summary = if (config != null) {
         val maxTextWidth = contentWidth - SUMMARY_INNER_PADDING * 2

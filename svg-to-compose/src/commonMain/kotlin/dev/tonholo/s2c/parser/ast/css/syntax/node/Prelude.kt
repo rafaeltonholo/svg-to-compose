@@ -19,7 +19,8 @@ sealed interface Prelude<T : CssComponentValueNode> {
     /**
      * Represents a selector list prelude.
      */
-    data class Selector(override val components: List<SelectorListItem>) : Prelude<SelectorListItem> {
+    data class Selector(override val components: List<SelectorListItem>) :
+        Prelude<SelectorListItem> {
         val specificities: Map<SelectorListItem, CssSpecificity> by lazy {
             calculateSelectorsSpecificity(this)
         }

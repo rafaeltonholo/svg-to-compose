@@ -10,7 +10,9 @@ import kotlin.test.assertIs
 
 class SvgRadialGradientNodeTest : BaseSvgTest() {
 
-    private fun createGradientWithStops(attributes: MutableMap<String, String>): SvgRadialGradientNode {
+    private fun createGradientWithStops(
+        attributes: MutableMap<String, String>,
+    ): SvgRadialGradientNode {
         val gradient = SvgRadialGradientNode(
             parent = root,
             children = mutableSetOf(),
@@ -825,7 +827,12 @@ class SvgRadialGradientNodeTest : BaseSvgTest() {
      * Creates a list of absolute path nodes forming a rectangle,
      * used as target for objectBoundingBox gradient calculations.
      */
-    private fun createRectTarget(x: Double, y: Double, width: Double, height: Double): List<PathNodes> = listOf(
+    private fun createRectTarget(
+        x: Double,
+        y: Double,
+        width: Double,
+        height: Double,
+    ): List<PathNodes> = listOf(
         PathNodes.MoveTo(values = listOf("$x", "$y"), isRelative = false, minified = false),
         PathNodes.LineTo(values = listOf("${x + width}", "$y"), isRelative = false, minified = false),
         PathNodes.LineTo(values = listOf("${x + width}", "${y + height}"), isRelative = false, minified = false),

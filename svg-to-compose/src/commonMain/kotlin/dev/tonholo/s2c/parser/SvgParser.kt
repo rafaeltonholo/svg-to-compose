@@ -55,14 +55,15 @@ class SvgParser(logger: Logger = NoOpLogger) : XmlParser(logger) {
 
     override fun XmlNode.isRootNode(): Boolean = this is SvgRootNode
 
-    override fun getPreProcessedElement(node: Node, parent: XmlParentNode): XmlNode? = elementsPendingParent
-        .find { it.id == node.attributes()["id"] }
-        ?.apply {
-            if (this is XmlChildNode) {
-                attachParentIfNeeded(parent)
-                elementsPendingParent.remove(this)
+    override fun getPreProcessedElement(node: Node, parent: XmlParentNode): XmlNode? =
+        elementsPendingParent
+            .find { it.id == node.attributes()["id"] }
+            ?.apply {
+                if (this is XmlChildNode) {
+                    attachParentIfNeeded(parent)
+                    elementsPendingParent.remove(this)
+                }
             }
-        }
 
     /**
      * Creates an [XmlNode] from the given SVG element.

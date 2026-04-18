@@ -70,22 +70,23 @@ private fun SvgPolygonNode.buildNormalizedPath(): String = buildString {
     append("/>")
 }
 
-private fun SvgPolygonNode.createSimplePolygonNodes(minified: Boolean): List<PathNodes> = buildList {
-    val points = points.toMutableList()
-    val first = points.removeFirst()
-    add(
-        pathNode(command = PathCommand.MoveTo) {
-            args(first.x, first.y)
-            this.minified = minified
-        },
-    )
-    points.forEachIndexed { index, (x, y) ->
+private fun SvgPolygonNode.createSimplePolygonNodes(minified: Boolean): List<PathNodes> =
+    buildList {
+        val points = points.toMutableList()
+        val first = points.removeFirst()
         add(
-            pathNode(command = PathCommand.LineTo) {
-                args(x, y)
+            pathNode(command = PathCommand.MoveTo) {
+                args(first.x, first.y)
                 this.minified = minified
-                close = index == points.lastIndex
             },
         )
+        points.forEachIndexed { index, (x, y) ->
+            add(
+                pathNode(command = PathCommand.LineTo) {
+                    args(x, y)
+                    this.minified = minified
+                    close = index == points.lastIndex
+                },
+            )
+        }
     }
-}

@@ -11,5 +11,6 @@ import kotlinx.serialization.encoding.Encoder
 internal object PathCommandSerializer : KSerializer<PathCommand> {
     override val descriptor = PrimitiveSerialDescriptor("PathCommand", PrimitiveKind.STRING)
     override fun serialize(encoder: Encoder, value: PathCommand) = encoder.encodeString(value.name)
-    override fun deserialize(decoder: Decoder): PathCommand = PathCommand.valueOf(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): PathCommand =
+        PathCommand.valueOf(decoder.decodeString())
 }

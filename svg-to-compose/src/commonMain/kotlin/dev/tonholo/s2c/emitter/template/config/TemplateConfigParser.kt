@@ -63,7 +63,11 @@ object TemplateConfigParser {
      *
      * @return The next line index to process.
      */
-    private fun processSectionBlock(lines: List<String>, start: Int, result: MutableList<String>): Int {
+    private fun processSectionBlock(
+        lines: List<String>,
+        start: Int,
+        result: MutableList<String>,
+    ): Int {
         val block = mutableListOf(lines[start])
         var j = start + 1
         while (j < lines.size && isCommentOrBlank(lines[j])) {

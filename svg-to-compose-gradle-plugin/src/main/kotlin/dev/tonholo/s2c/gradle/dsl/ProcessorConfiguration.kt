@@ -20,8 +20,9 @@ import org.gradle.kotlin.dsl.property
 import org.gradle.work.Incremental
 import javax.inject.Inject
 
-abstract class ProcessorConfiguration @Inject constructor(private val objectFactory: ObjectFactory) :
-    SourceConfiguration {
+abstract class ProcessorConfiguration @Inject constructor(
+    private val objectFactory: ObjectFactory,
+) : SourceConfiguration {
     // Gradle does not inherit annotations from interfaces. These overrides exist solely
     // to attach @Internal so Gradle doesn't treat Named/Configuration properties as task inputs.
     @get:Internal

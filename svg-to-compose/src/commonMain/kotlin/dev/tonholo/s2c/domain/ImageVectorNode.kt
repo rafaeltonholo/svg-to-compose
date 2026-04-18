@@ -212,7 +212,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
      * A Chunk function wrapper to separate the icon instructions in smaller pieces.
      */
     @Serializable
-    data class ChunkFunction(val functionName: String, val nodes: List<ImageVectorNode>) : ImageVectorNode {
+    data class ChunkFunction(val functionName: String, val nodes: List<ImageVectorNode>) :
+        ImageVectorNode {
         override val transformations: List<AffineTransformation>
             get() = error("Transformation should be applied before creating chunk functions.")
         override val imports: Set<String> = emptySet()
@@ -234,7 +235,8 @@ sealed interface ImageVectorNode : MethodSizeAccountable {
                 imports = ["dev.tonholo.s2c.emitter.imagevector.ImageVectorNodeEmitter"],
             ),
         )
-        fun createChunkFunction(): String = ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)
+        fun createChunkFunction(): String =
+            ImageVectorNodeEmitter().emitChunkFunctionDefinition(this)
 
         @Deprecated(
             "Use ImageVectorNodeEmitter.emit() instead.",
@@ -312,9 +314,10 @@ internal fun String.asNodeWrapper(minified: Boolean): ImageVectorNode.NodeWrappe
  * @return `true` in case the command is lowercased and it is not the very
  *  first move to command, which should be absolute
  */
-private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean = command.isLowerCase() && (
-    node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
-    )
+private fun isRelativeCommand(node: List<PathNodes>, command: Char): Boolean =
+    command.isLowerCase() && (
+        node.isNotEmpty() || !command.equals(PathCommand.MoveTo.value, ignoreCase = true)
+        )
 
 context(logger: Logger)
 private fun createNode(
@@ -366,7 +369,11 @@ private fun createNode(
 
 private fun resetDotCount(current: Char): Int = if (current == '.') 1 else 0
 
-private fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int = if (char == '.') {
+private fun calculateDotCount(
+    char: Char,
+    dotCount: Int,
+    lastChar: Char,
+): Int = if (char == '.') {
     dotCount + 1
 } else if ((lastChar.isDigit() && char.isWhitespace()) || lastChar.isWhitespace()) {
     resetDotCount(current = char)
@@ -374,11 +381,12 @@ private fun calculateDotCount(char: Char, dotCount: Int, lastChar: Char): Int = 
     dotCount
 }
 
-private fun StringBuilder.trimWhitespaceBeforeClose(lastChar: Char, current: Char): StringBuilder = apply {
-    if (lastChar == ' ' && current == 'z') {
-        setLength(length - 1)
+private fun StringBuilder.trimWhitespaceBeforeClose(lastChar: Char, current: Char): StringBuilder =
+    apply {
+        if (lastChar == ' ' && current == 'z') {
+            setLength(length - 1)
+        }
     }
-}
 
 context(logger: Logger)
 private fun normalizePath(path: String): String {
@@ -443,16 +451,20 @@ private fun normalizePath(path: String): String {
     return parsedPath.toString().trimStart()
 }
 
-private fun calculateArcCommandPosition(command: PathCommand, position: Int, current: Char, lastChar: Char): Int =
-    when {
-        command != PathCommand.ArcTo -> -1
+private fun calculateArcCommandPosition(
+    command: PathCommand,
+    position: Int,
+    current: Char,
+    lastChar: Char,
+): Int = when {
+    command != PathCommand.ArcTo -> -1
 
-        lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
+    lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
 
-        position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
-            lastChar.isDigit() -> position + 1
+    position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
+        lastChar.isDigit() -> position + 1
 
-        lastChar.isWhitespace() && (current.isDigit() || current == '-') -> position + 1
+    lastChar.isWhitespace() && (current.isDigit() || current == '-') -> position + 1
 
-        else -> position
-    }
+    else -> position
+}

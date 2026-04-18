@@ -13,5 +13,10 @@ interface FileFinder {
      *
      * @return A list of Path objects representing the files found to process.
      */
-    fun findFilesToProcess(from: Path, recursive: Boolean, maxDepth: Int?, exclude: Regex?): List<Path>
+    fun findFilesToProcess(
+        from: Path,
+        recursive: Boolean,
+        maxDepth: Int?,
+        exclude: Regex?,
+    ): List<Path>
 }

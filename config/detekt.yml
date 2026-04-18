@@ -608,7 +608,16 @@ style:
     maxChainedCalls: 5
   MaxLineLength:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/functionalTest/**']
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
+      - '**/commonTest/**'
+      - '**/jvmTest/**'
+      - '**/androidUnitTest/**'
+      - '**/androidInstrumentedTest/**'
+      - '**/jsTest/**'
+      - '**/iosTest/**'
+      - '**/functionalTest/**'
     maxLineLength: 120
     excludePackageStatements: true
     excludeImportStatements: true
@@ -763,9 +772,24 @@ style:
 
 ktlint:
   MaximumLineLength:
-    excludes: ['**/test/**', '**/commonTest/**', '**/jvmTest/**', '**/functionalTest/**']
+    excludes:
+      - '**/test/**'
+      - '**/commonTest/**'
+      - '**/jvmTest/**'
+      - '**/functionalTest/**'
   EnumEntryNameCase:
-    excludes: ['**/test/**', '**/commonTest/**', '**/jvmTest/**', '**/functionalTest/**']
+    excludes:
+      - '**/test/**'
+      - '**/commonTest/**'
+      - '**/jvmTest/**'
+      - '**/functionalTest/**'
+  ClassSignature:
+    maxLineLength: 100
+  FunctionSignature:
+    forceMultilineWhenParameterCountGreaterOrEqualThan: 3
+    maxLineLength: 100
+  BinaryExpressionWrapping:
+    active: false
 
 Compose:
   ComposableAnnotationNaming:

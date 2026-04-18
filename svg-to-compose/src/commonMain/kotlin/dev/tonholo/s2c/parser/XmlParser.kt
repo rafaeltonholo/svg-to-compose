@@ -102,13 +102,16 @@ abstract class XmlParser(protected val logger: Logger = NoOpLogger) {
      * @param parent The parent node of the XML element.
      * @return A new [XmlElementNode] instance.
      */
-    protected fun createDefaultElement(nodeName: String, attributes: Attributes, parent: XmlParentNode) =
-        XmlElementNode(
-            parent = parent,
-            children = mutableSetOf(),
-            attributes = attributes.associate { it.key to it.value }.toMutableMap(),
-            tagName = nodeName,
-        )
+    protected fun createDefaultElement(
+        nodeName: String,
+        attributes: Attributes,
+        parent: XmlParentNode,
+    ) = XmlElementNode(
+        parent = parent,
+        children = mutableSetOf(),
+        attributes = attributes.associate { it.key to it.value }.toMutableMap(),
+        tagName = nodeName,
+    )
 
     /**
      * Creates an [XmlNode] instance with the given parameters.

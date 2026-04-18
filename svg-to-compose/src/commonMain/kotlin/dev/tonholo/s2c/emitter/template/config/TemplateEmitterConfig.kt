@@ -85,4 +85,8 @@ data class PreviewConfig(val template: String? = null)
  * @property value The hex color value to match (e.g., `0xFF121212`).
  */
 @Serializable
-data class ColorMappingDefinition(val name: String, @SerialName("import") val importPackage: String, val value: String)
+data class ColorMappingDefinition(
+    val name: String,
+    @SerialName("import") val importPackage: String,
+    val value: String,
+)

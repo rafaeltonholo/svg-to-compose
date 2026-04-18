@@ -18,7 +18,8 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
     private val defaultValue: TTransform? = null,
     private val transform: (TAttribute) -> TTransform = { it as TTransform },
 ) {
-    private fun key(property: KProperty<*>): String = namespace?.let { "$it:" }.orEmpty() + (name ?: property.name)
+    private fun key(property: KProperty<*>): String =
+        namespace?.let { "$it:" }.orEmpty() + (name ?: property.name)
 
     operator fun getValue(element: XmlChildNode, property: KProperty<*>): TTransform {
         val key = key(property)
@@ -62,7 +63,11 @@ class AttributeDelegate<in TAttribute : Any?, out TTransform : Any?>(
      * Sets the value of the attribute represented by this delegate on the given XML element.
      * The value is converted to a string and stored in the element's attributes' map.
      */
-    operator fun setValue(element: XmlChildNode, property: KProperty<*>, value: Any?) {
+    operator fun setValue(
+        element: XmlChildNode,
+        property: KProperty<*>,
+        value: Any?,
+    ) {
         val key = key(property)
         element.attributes[key] = value.toString()
     }

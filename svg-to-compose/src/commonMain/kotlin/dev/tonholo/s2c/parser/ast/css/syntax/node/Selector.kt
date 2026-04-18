@@ -146,7 +146,8 @@ sealed interface Selector : CssNode {
  */
 data class SelectorListItem(override val location: CssLocation, val selectors: List<Selector>) :
     CssComponentValueNode {
-    override fun toString(indent: Int): String = selectors.joinToString("") { it.toString(indent = 0) }
+    override fun toString(indent: Int): String =
+        selectors.joinToString("") { it.toString(indent = 0) }
 
     override fun toString(): String = buildString {
         appendLine("SelectorListItem(")

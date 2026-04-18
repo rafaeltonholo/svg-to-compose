@@ -8,7 +8,9 @@ import kotlin.test.assertIs
 
 class SvgLinearGradientNodeTest : BaseSvgTest() {
 
-    private fun createGradientWithStops(attributes: MutableMap<String, String>): SvgLinearGradientNode {
+    private fun createGradientWithStops(
+        attributes: MutableMap<String, String>,
+    ): SvgLinearGradientNode {
         val gradient = SvgLinearGradientNode(
             parent = root,
             children = mutableSetOf(),

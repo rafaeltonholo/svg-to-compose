@@ -107,7 +107,11 @@ private fun SvgRectNode.createDashedRect(
     )
 }
 
-private fun SvgRectNode.createRegularRect(x: Float, y: Float, isMinified: Boolean) = listOf(
+private fun SvgRectNode.createRegularRect(
+    x: Float,
+    y: Float,
+    isMinified: Boolean,
+) = listOf(
     pathNode(command = PathCommand.MoveTo) {
         args(x, y)
         minified = isMinified

@@ -45,11 +45,12 @@ class SvgUseNode(
         append("\"replacement\": $replacement")
     }
 
-    override fun copy(parent: XmlParentNode?, attributes: Map<String, String>?): SvgUseNode = SvgUseNode(
-        parent = parent ?: this.parent,
-        attributes = attributes?.toMutableMap() ?: this.attributes.toMutableMap(),
-        replacement = replacement,
-    )
+    override fun copy(parent: XmlParentNode?, attributes: Map<String, String>?): SvgUseNode =
+        SvgUseNode(
+            parent = parent ?: this.parent,
+            attributes = attributes?.toMutableMap() ?: this.attributes.toMutableMap(),
+            replacement = replacement,
+        )
 
     fun resolve(): SvgGroupNode {
         val parent = parent

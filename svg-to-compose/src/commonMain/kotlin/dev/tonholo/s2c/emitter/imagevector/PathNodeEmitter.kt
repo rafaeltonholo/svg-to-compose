@@ -34,7 +34,11 @@ internal class PathNodeEmitter(private val formatConfig: FormatConfig = FormatCo
         return emitPathCommand(node, fnName, forceInline)
     }
 
-    private fun emitPathCommand(node: PathNodes, fnName: String, forceInline: Boolean): String {
+    private fun emitPathCommand(
+        node: PathNodes,
+        fnName: String,
+        forceInline: Boolean,
+    ): String {
         val params = node.buildParameters()
         val paramsString = params.toParameters(node.minified, forceInline)
         val relativeSuffix = if (node.isRelative) "Relative" else ""

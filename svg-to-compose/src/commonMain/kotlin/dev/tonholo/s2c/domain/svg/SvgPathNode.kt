@@ -57,7 +57,10 @@ class SvgPathNode(parent: XmlParentNode, attributes: MutableMap<String, String>)
 }
 
 context(logger: Logger)
-fun SvgPathNode.asNode(computedRules: List<ComputedRule> = emptyList(), minified: Boolean = false): ImageVectorNode {
+fun SvgPathNode.asNode(
+    computedRules: List<ComputedRule> = emptyList(),
+    minified: Boolean = false,
+): ImageVectorNode {
     val path = ImageVectorNode.Path(
         params = ImageVectorNode.Path.Params(
             fill = fillBrush,

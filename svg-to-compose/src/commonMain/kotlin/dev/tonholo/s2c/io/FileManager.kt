@@ -68,11 +68,20 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
 
     override fun exists(path: Path): Boolean = fileSystem.exists(path)
 
-    override fun write(file: Path, mustCreate: Boolean, writerAction: BufferedSink.() -> Unit) {
+    override fun write(
+        file: Path,
+        mustCreate: Boolean,
+        writerAction: BufferedSink.() -> Unit,
+    ) {
         fileSystem.write(file, mustCreate, writerAction)
     }
 
-    override fun findFilesToProcess(from: Path, recursive: Boolean, maxDepth: Int?, exclude: Regex?): List<Path> {
+    override fun findFilesToProcess(
+        from: Path,
+        recursive: Boolean,
+        maxDepth: Int?,
+        exclude: Regex?,
+    ): List<Path> {
         val depth = if (recursive) {
             logger.debug("Recursive directory search is enabled. Verifying all directories until depth $maxDepth")
             maxDepth
