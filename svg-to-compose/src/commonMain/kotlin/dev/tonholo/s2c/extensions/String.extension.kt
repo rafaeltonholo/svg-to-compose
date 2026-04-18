@@ -97,4 +97,4 @@ fun String.toPercentage(): Float {
 /**
  * Removes trailing zeros from a string representing a number.
  */
-inline fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
+fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
