@@ -1,104 +1,34 @@
 package dev.tonholo.s2c.cli.update
 
+import app.cash.burst.Burst
+import app.cash.burst.burstValues
 import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 
 class WrapperDetectorTest {
 
     @Test
-    fun `given S2C_WRAPPER env var is true - when detect called - then returns true`() {
+    @Burst
+    fun `given S2C_WRAPPER env var - when detect called - then returns expected result`(
+        params: Pair<String?, Boolean> = burstValues(
+            null to false,
+            "" to false,
+            "   " to false,
+            "false" to false,
+            "true" to true,
+            "TRUE" to true,
+            " true " to true,
+            "\tTRUE\n" to true,
+        ),
+    ) {
         // Arrange
-        val detector = WrapperDetector(envReader = { "true" })
+        val (envValue, expected) = params
+        val detector = WrapperDetector(envReader = { envValue })
 
         // Act
-        val result = detector.isRunningFromWrapper()
+        val actual = detector.isRunningFromWrapper()
 
         // Assert
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is absent - when detect called - then returns false`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { null })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertFalse(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is empty string - when detect called - then returns false`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { "" })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertFalse(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is false - when detect called - then returns false`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { "false" })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertFalse(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is TRUE uppercase - when detect called - then returns true`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { "TRUE" })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is padded with whitespace - when detect called - then returns true`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { " true " })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is padded uppercase - when detect called - then returns true`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { "\tTRUE\n" })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given S2C_WRAPPER env var is whitespace only - when detect called - then returns false`() {
-        // Arrange
-        val detector = WrapperDetector(envReader = { "   " })
-
-        // Act
-        val result = detector.isRunningFromWrapper()
-
-        // Assert
-        assertFalse(result)
+        assertEquals(expected = expected, actual = actual)
     }
 }
