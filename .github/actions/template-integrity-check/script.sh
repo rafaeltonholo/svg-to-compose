@@ -83,6 +83,7 @@ process_file() {
         -p "$package" \
         --theme "" \
         --no-preview \
+        --json \
         --template "$template_file" \
         ${rebuild_arg:+"$rebuild_arg"} \
         "$root_directory/$input"; then

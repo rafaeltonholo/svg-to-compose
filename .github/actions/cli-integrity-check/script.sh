@@ -104,6 +104,7 @@ for input in "$root_directory/samples/${type}"/*."${ext}"; do
         --no-preview \
         -opt="$optimize" \
         --debug \
+        --json \
         ${rebuild_arg:+"$rebuild_arg"} \
         "$input"; then
     echo "Failed to execute CLI integrity check for $stem."
