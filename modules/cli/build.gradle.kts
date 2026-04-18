@@ -3,6 +3,7 @@ import dev.tonholo.s2c.conventions.kmp.targets.configureNativeExecutable
 plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
+    alias(libs.plugins.app.cash.burst)
     alias(libs.plugins.com.gradleup.shadow)
     alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }

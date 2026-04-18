@@ -1,12 +1,19 @@
 package dev.tonholo.s2c.cli.inject
 
+import com.github.ajalt.mordant.platform.MultiplatformSystem
 import com.github.ajalt.mordant.terminal.Terminal
 import dev.tonholo.s2c.SvgToComposeContext
+import dev.tonholo.s2c.cli.config.BuildConfig
 import dev.tonholo.s2c.cli.dispatching.DeferredFileDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
+import dev.tonholo.s2c.cli.update.CacheDirResolver
+import dev.tonholo.s2c.cli.update.GitHubReleaseFetcher
+import dev.tonholo.s2c.cli.update.UpdateCache
+import dev.tonholo.s2c.cli.update.VersionChecker
+import dev.tonholo.s2c.cli.update.WrapperDetector
 import dev.tonholo.s2c.dispatching.FileDispatcher
 import dev.tonholo.s2c.inject.FileDispatcherBindings
 import dev.tonholo.s2c.logger.Logger
@@ -15,9 +22,12 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.SYSTEM
+import kotlin.time.Clock
 
 /**
  * Root dependency graph for the CLI application.
@@ -66,6 +76,76 @@ internal interface CliGraph {
         context: SvgToComposeContext,
         @IoDispatcher dispatcher: CoroutineDispatcher,
     ): FileDispatcher = DeferredFileDispatcher(context, dispatcher)
+
+    /**
+     * Provides a [WrapperDetector] that reads the [WrapperDetector.ENV_VAR_NAME]
+     * environment variable through Mordant's cross-platform system helper.
+     */
+    @Provides
+    fun provideWrapperDetector(): WrapperDetector = WrapperDetector(
+        envReader = { MultiplatformSystem.readEnvironmentVariable(WrapperDetector.ENV_VAR_NAME) },
+    )
+
+    /**
+     * Provides a no-op [GitHubReleaseFetcher]. Replace this binding with a real
+     * HTTP-backed implementation to activate update checks end-to-end.
+     */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideGitHubReleaseFetcher(): GitHubReleaseFetcher = GitHubReleaseFetcher { null }
+
+    /** Shared [Json] configuration for the update-check cache. */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideUpdateJson(): Json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
+
+    /**
+     * Provides a [CacheDirResolver] that reads cache-location environment
+     * variables (XDG, HOME, USERPROFILE) through Mordant's cross-platform
+     * system helper so the update cache lives under the user's home rather
+     * than the current working directory.
+     */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideCacheDirResolver(): CacheDirResolver = CacheDirResolver(
+        envReader = { MultiplatformSystem.readEnvironmentVariable(it) },
+    )
+
+    /**
+     * Provides the [UpdateCache] rooted at the absolute path resolved by
+     * [CacheDirResolver]. I/O runs on the injected [IoDispatcher] to keep
+     * file access off the main thread.
+     */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideUpdateCache(
+        fileSystem: FileSystem,
+        json: Json,
+        cacheDirResolver: CacheDirResolver,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): UpdateCache = UpdateCache(
+        fileSystem = fileSystem,
+        cacheDir = cacheDirResolver.resolve(),
+        json = json,
+        ioDispatcher = ioDispatcher,
+    )
+
+    /**
+     * Provides the [VersionChecker] configured with the running CLI version
+     * from [BuildConfig] and a wall-clock time source.
+     */
+    @Provides
+    @SingleIn(CliScope::class)
+    fun provideVersionChecker(cache: UpdateCache, fetcher: GitHubReleaseFetcher): VersionChecker =
+        VersionChecker(
+            currentVersion = BuildConfig.VERSION,
+            cache = cache,
+            fetcher = fetcher,
+            nowEpochMillis = { Clock.System.now().toEpochMilliseconds() },
+        )
 
     /**
      * Factory for creating the [CliGraph].

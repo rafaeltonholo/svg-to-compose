@@ -8,6 +8,7 @@ import dev.tonholo.s2c.cli.output.tui.reducer.reduceCurrentFiles
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceHeader
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceProgress
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceRecentFiles
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceUpdateNotification
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.OutputRenderer
@@ -36,6 +37,7 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
                     )
                 }
                 .withRecentFiles { reduceRecentFiles(state = it, event = event) }
+                .withUpdateNotification { reduceUpdateNotification(state = it, event = event) }
         }
         state.value.progress?.let { controller.sync(it) }
     }

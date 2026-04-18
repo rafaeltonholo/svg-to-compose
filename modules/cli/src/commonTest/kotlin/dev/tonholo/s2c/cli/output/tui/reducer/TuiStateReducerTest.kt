@@ -2,6 +2,7 @@ package dev.tonholo.s2c.cli.output.tui.reducer
 
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
+import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
@@ -11,6 +12,8 @@ import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -342,5 +345,115 @@ class TuiStateReducerTest {
             expected = listOf("Bad path in a", "Bad path in b"),
             actual = state.errors,
         )
+    }
+
+    // --- reduceUpdateNotification tests ---
+
+    @Test
+    fun `given no notification - when UpdateAvailable with isWrapper true - then state has wrapper info`() {
+        // Arrange
+        val currentState: UpdateNotificationState? = null
+        val event = ConversionEvent.UpdateAvailable(
+            current = "2.2.0",
+            latest = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            isWrapper = true,
+        )
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertNotNull(result)
+        assertEquals(expected = "2.2.0", actual = result.currentVersion)
+        assertEquals(expected = "2.3.0", actual = result.latestVersion)
+        assertEquals(
+            expected = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            actual = result.releaseUrl,
+        )
+        assertEquals(expected = true, actual = result.isWrapper)
+    }
+
+    @Test
+    fun `given no notification - when UpdateAvailable with isWrapper false - then state has download info`() {
+        // Arrange
+        val currentState: UpdateNotificationState? = null
+        val event = ConversionEvent.UpdateAvailable(
+            current = "2.2.0",
+            latest = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            isWrapper = false,
+        )
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertNotNull(result)
+        assertEquals(expected = "2.2.0", actual = result.currentVersion)
+        assertEquals(expected = "2.3.0", actual = result.latestVersion)
+        assertEquals(
+            expected = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            actual = result.releaseUrl,
+        )
+        assertEquals(expected = false, actual = result.isWrapper)
+    }
+
+    @Test
+    fun `given any state - when non-UpdateAvailable event received - then notification state unchanged`() {
+        // Arrange
+        val currentState: UpdateNotificationState? = null
+        val event = ConversionEvent.RunStarted(
+            config = defaultRunConfig,
+            totalFiles = 10,
+            version = "2.2.0",
+        )
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertNull(result)
+    }
+
+    @Test
+    fun `given existing notification - when non-UpdateAvailable event received - then notification preserved`() {
+        // Arrange
+        val currentState = UpdateNotificationState(
+            currentVersion = "2.2.0",
+            latestVersion = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            isWrapper = true,
+        )
+        val event = ConversionEvent.FileStarted(fileName = "icon.svg", index = 0)
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertEquals(expected = currentState, actual = result)
+    }
+
+    @Test
+    fun `given existing notification - when second UpdateAvailable received - then first notification is kept`() {
+        // Arrange
+        val currentState = UpdateNotificationState(
+            currentVersion = "2.2.0",
+            latestVersion = "2.3.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.3.0",
+            isWrapper = true,
+        )
+        val event = ConversionEvent.UpdateAvailable(
+            current = "2.2.0",
+            latest = "2.4.0",
+            releaseUrl = "https://github.com/rafaeltonholo/svg-to-compose/releases/v2.4.0",
+            isWrapper = false,
+        )
+
+        // Act
+        val result = reduceUpdateNotification(state = currentState, event = event)
+
+        // Assert
+        assertEquals(expected = currentState, actual = result)
     }
 }
