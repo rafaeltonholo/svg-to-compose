@@ -15,6 +15,7 @@ import dev.tonholo.s2c.output.ConversionPhase
 
 private const val RULE_CHARACTER = "-"
 private const val PATH_LABEL_WIDTH = 7
+private const val BLANK_LINE = " "
 
 /**
  * Builds the simplified layout used when converting a single file.
@@ -31,13 +32,15 @@ internal fun singleFileLayout(state: TuiState, contentWidth: Int): Widget = vert
     cell(HorizontalRule(ruleCharacter = RULE_CHARACTER))
     cell(singleFilePhaseRow(state = state))
     cell(HorizontalRule(ruleCharacter = RULE_CHARACTER))
-    cell(Text(" "))
+    cell(Text(BLANK_LINE))
     cell(completionLine(completion = state.singleFileCompletion))
 }
 
-private fun versionLine(state: TuiState): Widget = Text(
-    TextStyles.bold("svg-to-compose") + " " + TextColors.cyan("v${state.header.version}"),
-)
+private fun versionLine(state: TuiState): Widget {
+    val version = state.header.version
+    val suffix = if (version.isNotEmpty()) " " + TextColors.cyan("v$version") else ""
+    return Text(TextStyles.bold("svg-to-compose") + suffix)
+}
 
 private fun pathLine(
     label: String,
@@ -53,14 +56,15 @@ private fun pathLine(
 private fun singleFilePhaseRow(state: TuiState): Widget {
     val fileState = state.currentFiles.values.firstOrNull()
     val optimizationEnabled = fileState?.optimizationEnabled
-        ?: (state.header.config?.optimizationEnabled ?: true)
+        ?: state.header.config?.optimizationEnabled
+        ?: true
     val phases = if (optimizationEnabled) {
         ConversionPhase.entries
     } else {
         ConversionPhase.entries.filter { it != ConversionPhase.Optimizing }
     }
     return horizontalLayout {
-        cell(Text(" "))
+        cell(Text(BLANK_LINE))
         for (phase in phases) {
             cell(Text("${iconForPhase(phase = phase, fileState = fileState)} ${phase.name}  "))
         }
@@ -75,7 +79,7 @@ private fun iconForPhase(phase: ConversionPhase, fileState: CurrentFileState?): 
 }
 
 private fun completionLine(completion: SingleFileCompletion?): Widget = when (completion) {
-    null -> Text(" ")
+    null -> Text(BLANK_LINE)
 
     is SingleFileCompletion.Success -> Text(
         "${TuiIcons.success} ${TextColors.green("Done")} (${completion.elapsedMs}ms)",

@@ -2,6 +2,7 @@ package dev.tonholo.s2c.cli.output.tui.widget
 
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
+import dev.tonholo.s2c.cli.output.tui.TuiTestFixtures
 import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
 import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.SingleFileCompletion
@@ -9,10 +10,7 @@ import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionPhase
-import dev.tonholo.s2c.output.RunConfig
-import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -25,36 +23,17 @@ class SingleFileSectionTest {
         interactive = false,
     )
 
-    private val defaultParserConfig = ParserConfig(
-        pkg = "com.example.icons",
-        theme = "AppTheme",
-        optimize = true,
-        receiverType = null,
-        addToMaterial = false,
-        kmpPreview = false,
-        noPreview = false,
-        makeInternal = false,
-        minified = false,
-    )
-
-    private val defaultRunConfig = RunConfig(
-        inputPath = "./ic_home.svg",
-        outputPath = "./IcHome.kt",
-        parserConfig = defaultParserConfig,
-        packageName = "com.example.icons",
-        optimizationEnabled = true,
-        parallel = 1,
-        recursive = false,
-    )
+    private val defaultRunConfig = TuiTestFixtures.defaultRunConfig
 
     private fun singleModeState(
         currentFiles: Map<String, CurrentFileState> = emptyMap(),
         completion: SingleFileCompletion? = null,
+        optimizationEnabled: Boolean = true,
     ): TuiState = TuiState(
         mode = TuiMode.Single,
         header = HeaderState(
             version = "2.2.0",
-            config = defaultRunConfig,
+            config = defaultRunConfig.copy(optimizationEnabled = optimizationEnabled),
             totalFiles = 1,
         ),
         currentFiles = currentFiles,
@@ -154,7 +133,10 @@ class SingleFileSectionTest {
             currentPhase = ConversionPhase.Parsing,
             optimizationEnabled = false,
         )
-        val state = singleModeState(currentFiles = mapOf("ic_home.svg" to fileState))
+        val state = singleModeState(
+            currentFiles = mapOf("ic_home.svg" to fileState),
+            optimizationEnabled = false,
+        )
 
         // Act
         val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
@@ -163,6 +145,22 @@ class SingleFileSectionTest {
         assertFalse(
             actual = rendered.contains(other = "Optimizing"),
             message = "Expected no Optimizing phase when disabled, got: $rendered",
+        )
+        assertTrue(actual = rendered.contains(other = "Parsing"))
+    }
+
+    @Test
+    fun `given config opt disabled with no file started - when singleFileLayout rendered - then Optimizing phase not shown`() {
+        // Arrange
+        val state = singleModeState(optimizationEnabled = false)
+
+        // Act
+        val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
+
+        // Assert
+        assertFalse(
+            actual = rendered.contains(other = "Optimizing"),
+            message = "Expected no Optimizing phase when config disables it, got: $rendered",
         )
         assertTrue(actual = rendered.contains(other = "Parsing"))
     }
@@ -280,13 +278,21 @@ class SingleFileSectionTest {
         val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
 
         // Assert
-        // All four phase names still rendered regardless of state.
-        assertEquals(
-            expected = true,
-            actual = rendered.contains(other = "Optimizing") &&
-                rendered.contains(other = "Parsing") &&
-                rendered.contains(other = "Generating") &&
-                rendered.contains(other = "Writing"),
+        assertTrue(
+            actual = rendered.contains(other = "Optimizing"),
+            message = "Expected Optimizing phase, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "Parsing"),
+            message = "Expected Parsing phase, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "Generating"),
+            message = "Expected Generating phase, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "Writing"),
+            message = "Expected Writing phase, got: $rendered",
         )
     }
 }
