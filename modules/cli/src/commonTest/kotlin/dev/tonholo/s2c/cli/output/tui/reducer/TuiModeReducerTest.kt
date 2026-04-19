@@ -1,14 +1,13 @@
 package dev.tonholo.s2c.cli.output.tui.reducer
 
+import dev.tonholo.s2c.cli.output.tui.TuiTestFixtures
 import dev.tonholo.s2c.cli.output.tui.state.SingleFileCompletion
 import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
-import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
-import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -17,27 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class TuiModeReducerTest {
 
-    private val defaultParserConfig = ParserConfig(
-        pkg = "com.example.icons",
-        theme = "AppTheme",
-        optimize = true,
-        receiverType = null,
-        addToMaterial = false,
-        kmpPreview = false,
-        noPreview = false,
-        makeInternal = false,
-        minified = false,
-    )
-
-    private val defaultRunConfig = RunConfig(
-        inputPath = "./ic_home.svg",
-        outputPath = "./IcHome.kt",
-        parserConfig = defaultParserConfig,
-        packageName = "com.example.icons",
-        optimizationEnabled = true,
-        parallel = 1,
-        recursive = false,
-    )
+    private val defaultRunConfig = TuiTestFixtures.defaultRunConfig
 
     // --- reduceMode tests ---
 
@@ -230,6 +209,27 @@ class TuiModeReducerTest {
             ),
             actual = result,
         )
+    }
+
+    @Test
+    fun `given batch mode with stale completion - when FileCompleted received - then completion cleared to null`() {
+        // Arrange
+        val stale = SingleFileCompletion.Success(elapsedMs = 999)
+        val event = ConversionEvent.FileCompleted(
+            fileName = "icon.svg",
+            duration = 120.milliseconds,
+            result = FileResult.Success,
+        )
+
+        // Act
+        val result = reduceSingleFileCompletion(
+            state = stale,
+            mode = TuiMode.Batch,
+            event = event,
+        )
+
+        // Assert
+        assertNull(result)
     }
 
     @Test

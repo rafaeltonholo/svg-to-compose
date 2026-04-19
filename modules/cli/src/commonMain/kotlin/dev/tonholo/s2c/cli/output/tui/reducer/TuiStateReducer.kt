@@ -35,7 +35,7 @@ internal fun reduceSingleFileCompletion(
 
     is ConversionEvent.FileCompleted -> {
         if (mode != TuiMode.Single) {
-            state
+            null
         } else {
             when (val outcome = event.result) {
                 is FileResult.Success -> SingleFileCompletion.Success(
@@ -86,18 +86,15 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 
         is ConversionEvent.FileCompleted -> {
             val current = state ?: return ProgressState()
-            when (event.result) {
+            when (val outcome = event.result) {
                 is FileResult.Success -> current.copy(
                     completed = current.completed + 1,
                 )
 
-                is FileResult.Failed -> {
-                    val failed = event.result as FileResult.Failed
-                    current.copy(
-                        failed = current.failed + 1,
-                        errors = current.errors + failed.message,
-                    )
-                }
+                is FileResult.Failed -> current.copy(
+                    failed = current.failed + 1,
+                    errors = current.errors + outcome.message,
+                )
             }
         }
 
