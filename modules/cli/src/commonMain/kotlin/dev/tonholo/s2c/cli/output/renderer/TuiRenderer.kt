@@ -28,24 +28,24 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
 
     override fun onEvent(event: ConversionEvent) {
         state.update { current ->
+            val nextMode = reduceMode(state = current.mode, event = event)
             val optimizationEnabled = current.header.config?.optimizationEnabled ?: true
             current
-                .withMode { reduceMode(state = it, event = event) }
+                .withMode { nextMode }
                 .withHeader { reduceHeader(state = it, event = event) }
                 .withProgress { reduceProgress(state = it, event = event) }
                 .withCurrentFiles {
                     reduceCurrentFiles(
                         state = it,
                         event = event,
+                        mode = nextMode,
                         optimizationEnabled = optimizationEnabled,
                     )
                 }
                 .withRecentFiles { reduceRecentFiles(state = it, event = event) }
                 .withUpdateNotification { reduceUpdateNotification(state = it, event = event) }
-                .let { updated ->
-                    updated.withSingleFileCompletion {
-                        reduceSingleFileCompletion(state = it, mode = updated.mode, event = event)
-                    }
+                .withSingleFileCompletion {
+                    reduceSingleFileCompletion(state = it, mode = nextMode, event = event)
                 }
         }
         state.value.progress?.let { controller.sync(it) }

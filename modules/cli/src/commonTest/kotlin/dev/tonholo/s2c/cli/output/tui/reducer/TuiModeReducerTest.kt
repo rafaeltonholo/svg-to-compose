@@ -183,6 +183,35 @@ class TuiModeReducerTest {
     }
 
     @Test
+    fun `given single mode - when FileCompleted Failed with CRLF message - then carriage return stripped`() {
+        // Arrange
+        val event = ConversionEvent.FileCompleted(
+            fileName = "ic_broken.svg",
+            duration = 50.milliseconds,
+            result = FileResult.Failed(
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Unsupported gradient type: mesh-gradient\r\nStack trace follows",
+            ),
+        )
+
+        // Act
+        val result = reduceSingleFileCompletion(
+            state = null,
+            mode = TuiMode.Single,
+            event = event,
+        )
+
+        // Assert
+        assertEquals(
+            expected = SingleFileCompletion.Failure(
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Unsupported gradient type: mesh-gradient",
+            ),
+            actual = result,
+        )
+    }
+
+    @Test
     fun `given single mode - when FileCompleted Failed with multiline message - then only first line retained`() {
         // Arrange
         val event = ConversionEvent.FileCompleted(

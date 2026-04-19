@@ -4,6 +4,7 @@ import dev.tonholo.s2c.cli.output.tui.state.CurrentFileState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
+import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
@@ -53,6 +54,7 @@ class CurrentFileReducerTest {
         val result = reduceCurrentFiles(
             state = linkedMapOf(),
             event = event,
+            mode = TuiMode.Batch,
             optimizationEnabled = true,
         )
 
@@ -74,6 +76,7 @@ class CurrentFileReducerTest {
         val result = reduceCurrentFiles(
             state = linkedMapOf(),
             event = event,
+            mode = TuiMode.Batch,
             optimizationEnabled = false,
         )
 
@@ -96,7 +99,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = ConversionPhase.Parsing, actual = result["icon.svg"]?.currentPhase)
@@ -118,7 +121,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertTrue(result.isEmpty())
@@ -142,10 +145,64 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `given file in map in Single mode - when FileCompleted Success - then entry retained with phase marked completed`() {
+        // Arrange
+        val fileState = CurrentFileState(
+            fileName = "icon.svg",
+            currentPhase = ConversionPhase.Writing,
+            completedPhases = setOf(
+                ConversionPhase.Optimizing,
+                ConversionPhase.Parsing,
+                ConversionPhase.Generating,
+            ),
+        )
+        val state = linkedMapOf("icon.svg" to fileState)
+        val event = ConversionEvent.FileCompleted(
+            fileName = "icon.svg",
+            duration = 100.milliseconds,
+            result = FileResult.Success,
+        )
+
+        // Act
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Single, optimizationEnabled = true)
+
+        // Assert
+        val retained = result["icon.svg"]
+        checkNotNull(retained)
+        assertEquals(expected = ConversionPhase.Writing, actual = retained.currentPhase)
+        assertTrue(retained.completedPhases.contains(ConversionPhase.Writing))
+    }
+
+    @Test
+    fun `given file in map in Single mode - when FileCompleted Failed - then entry retained unchanged`() {
+        // Arrange
+        val fileState = CurrentFileState(
+            fileName = "icon.svg",
+            currentPhase = ConversionPhase.Generating,
+            completedPhases = setOf(ConversionPhase.Optimizing, ConversionPhase.Parsing),
+        )
+        val state = linkedMapOf("icon.svg" to fileState)
+        val event = ConversionEvent.FileCompleted(
+            fileName = "icon.svg",
+            duration = 50.milliseconds,
+            result = FileResult.Failed(
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Bad path",
+            ),
+        )
+
+        // Act
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Single, optimizationEnabled = true)
+
+        // Assert
+        assertEquals(expected = fileState, actual = result["icon.svg"])
     }
 
     @Test
@@ -160,7 +217,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = state, actual = result)
@@ -180,7 +237,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = 1, actual = result.size)
@@ -199,7 +256,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = state, actual = result)
@@ -216,7 +273,7 @@ class CurrentFileReducerTest {
         )
 
         // Act
-        val result = reduceCurrentFiles(state = state, event = event, optimizationEnabled = true)
+        val result = reduceCurrentFiles(state = state, event = event, mode = TuiMode.Batch, optimizationEnabled = true)
 
         // Assert
         assertEquals(expected = state, actual = result)

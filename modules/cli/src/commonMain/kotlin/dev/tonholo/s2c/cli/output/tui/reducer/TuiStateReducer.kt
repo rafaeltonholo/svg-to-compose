@@ -44,7 +44,7 @@ internal fun reduceSingleFileCompletion(
 
                 is FileResult.Failed -> SingleFileCompletion.Failure(
                     errorCode = outcome.errorCode,
-                    message = outcome.message.substringBefore(delimiter = '\n'),
+                    message = outcome.message.lineSequence().firstOrNull().orEmpty(),
                 )
             }
         }
@@ -107,6 +107,7 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 internal fun reduceCurrentFiles(
     state: Map<String, CurrentFileState>,
     event: ConversionEvent,
+    mode: TuiMode,
     optimizationEnabled: Boolean,
 ): Map<String, CurrentFileState> = when (event) {
     is ConversionEvent.FileStarted -> {
@@ -132,9 +133,19 @@ internal fun reduceCurrentFiles(
     }
 
     is ConversionEvent.FileCompleted -> {
-        if (event.fileName !in state) return state
+        val existing = state[event.fileName] ?: return state
         val updated = LinkedHashMap(state)
-        updated.remove(event.fileName)
+        if (mode == TuiMode.Single) {
+            updated[event.fileName] = when (event.result) {
+                is FileResult.Success -> existing.copy(
+                    completedPhases = existing.completedPhases + existing.currentPhase,
+                )
+
+                is FileResult.Failed -> existing
+            }
+        } else {
+            updated.remove(event.fileName)
+        }
         updated
     }
 
