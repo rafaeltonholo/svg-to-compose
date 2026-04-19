@@ -1,12 +1,8 @@
 package dev.tonholo.s2c.cli.output.tui.widget
 
 import com.github.ajalt.mordant.rendering.TextColors
-import com.github.ajalt.mordant.rendering.Widget
-import com.github.ajalt.mordant.table.verticalLayout
-import com.github.ajalt.mordant.widgets.Text
 import dev.tonholo.s2c.cli.output.tui.state.CompletionState
 import dev.tonholo.s2c.cli.output.tui.state.FailedFileEntry
-import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import kotlin.math.round
@@ -21,60 +17,44 @@ private const val PERCENT_SCALE = 100
 private const val SINGLE_FAILED_FILE = 1
 
 /**
- * Builds the plain-text lines that make up the completion summary.
+ * Builds the plain-text completion summary printed after the live animation stops.
  *
- * Keeping the rendering logic in a pure list-of-strings function makes the
- * output trivially unit-testable; [completionSection] wraps these lines in a
- * Mordant [Widget] when displayed as part of the TUI. The function returns an
- * empty list when the snapshot has not yet received a [dev.tonholo.s2c.output.ConversionEvent.RunCompleted] event.
+ * Returns an empty string when the snapshot has not yet received a
+ * [dev.tonholo.s2c.output.ConversionEvent.RunCompleted] event; otherwise the returned string
+ * is ready to hand to `Terminal.println` (or any other newline-aware sink).
  *
  * @param state the accumulated [CompletionState].
  * @param stackTraceEnabled when true, full stack traces are included under each failed file.
  */
-internal fun buildCompletionLines(
-    state: CompletionState,
-    stackTraceEnabled: Boolean,
-): List<String> {
-    val stats = state.stats ?: return emptyList()
-    val config = state.config
-    val lines = mutableListOf<String>()
-
-    lines += headerLine(
-        version = state.version,
-        config = config,
-        totalFiles = state.totalFiles,
-    )
-    lines += divider()
-    lines += progressLine(stats = stats)
-    lines += statsLine(stats = stats)
-    lines += divider()
-    lines += ""
-    lines += countersLine(stats = stats)
-    lines += ""
-
-    if (stats.failed > 0 && state.failedFiles.isNotEmpty()) {
-        lines += divider()
-        lines += "Failed files (${stats.failed}):"
-        lines += ""
-        lines += buildFailedGroups(
-            entries = state.failedFiles,
-            stackTraceEnabled = stackTraceEnabled,
+internal fun buildCompletionSummary(state: CompletionState, stackTraceEnabled: Boolean): String {
+    val stats = state.stats ?: return ""
+    return buildString {
+        appendLine(
+            headerLine(
+                version = state.version,
+                config = state.config,
+                totalFiles = state.totalFiles,
+            ),
         )
-    }
+        appendLine(divider())
+        appendLine(progressLine(stats = stats))
+        appendLine(statsLine(stats = stats))
+        appendLine(divider())
+        appendLine()
+        appendLine(countersLine(stats = stats))
 
-    return lines
-}
-
-/**
- * Renders [state] as a vertical [Widget] suitable for printing after the live
- * animation has stopped. See [buildCompletionLines] for the line contents.
- */
-internal fun completionSection(state: CompletionState, stackTraceEnabled: Boolean): Widget =
-    verticalLayout {
-        for (line in buildCompletionLines(state = state, stackTraceEnabled = stackTraceEnabled)) {
-            cell(Text(line))
+        if (stats.failed > 0 && state.failedFiles.isNotEmpty()) {
+            appendLine()
+            appendLine(divider())
+            appendLine("Failed files (${stats.failed}):")
+            appendLine()
+            appendFailedGroups(
+                entries = state.failedFiles,
+                stackTraceEnabled = stackTraceEnabled,
+            )
         }
-    }
+    }.trimEnd()
+}
 
 private fun headerLine(
     version: String,
@@ -135,50 +115,34 @@ private fun countersLine(stats: RunStats): String = buildString {
     append(" failed")
 }
 
-private fun buildFailedGroups(
+private fun StringBuilder.appendFailedGroups(
     entries: List<FailedFileEntry>,
     stackTraceEnabled: Boolean,
-): List<String> {
-    val groups = groupByErrorCode(entries = entries)
-    val out = mutableListOf<String>()
+) {
+    val groups = entries.groupBy { it.errorCode }
     for ((errorCode, group) in groups) {
         val label = if (group.size == SINGLE_FAILED_FILE) "file" else "files"
-        out += "  ${errorCode.name} (${group.size} $label)"
+        appendLine("  ${errorCode.name} (${group.size} $label)")
         for (entry in group) {
-            out += renderFailedEntry(entry = entry, stackTraceEnabled = stackTraceEnabled)
+            appendFailedEntry(entry = entry, stackTraceEnabled = stackTraceEnabled)
         }
-        out += ""
+        appendLine()
     }
-    return out
 }
 
-private fun groupByErrorCode(
-    entries: List<FailedFileEntry>,
-): Map<ErrorCode, List<FailedFileEntry>> {
-    val groups = LinkedHashMap<ErrorCode, MutableList<FailedFileEntry>>()
-    for (entry in entries) {
-        groups.getOrPut(entry.errorCode) { mutableListOf() } += entry
-    }
-    return groups
-}
-
-private fun renderFailedEntry(entry: FailedFileEntry, stackTraceEnabled: Boolean): String {
+private fun StringBuilder.appendFailedEntry(entry: FailedFileEntry, stackTraceEnabled: Boolean) {
+    appendLine("    ${TuiIcons.failure} ${entry.fileName}")
     val firstMessageLine = entry.message.lineSequence().firstOrNull().orEmpty()
-    val header = "    ${TuiIcons.failure} ${entry.fileName}"
-    val body = if (firstMessageLine.isNotEmpty()) "\n      $firstMessageLine" else ""
-    val trace = if (stackTraceEnabled && !entry.stackTrace.isNullOrBlank()) {
-        buildString {
-            append("\n")
-            for ((index, line) in entry.stackTrace.lines().withIndex()) {
-                if (index > 0) append("\n")
-                append("      ")
-                append(line)
-            }
-        }
-    } else {
-        ""
+    if (firstMessageLine.isNotEmpty()) {
+        appendLine("      $firstMessageLine")
     }
-    return header + body + trace
+    if (stackTraceEnabled && !entry.stackTrace.isNullOrBlank()) {
+        // `trimEnd()` drops a trailing newline so `lineSequence()` does not emit
+        // a stray empty line rendered as six spaces at the bottom of the trace.
+        for (line in entry.stackTrace.trimEnd().lineSequence()) {
+            appendLine("      $line")
+        }
+    }
 }
 
 private fun formatDuration(durationMs: Long): String {

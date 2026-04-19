@@ -14,7 +14,7 @@ import dev.tonholo.s2c.cli.output.tui.reducer.reduceSingleFileCompletion
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceUpdateNotification
 import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
-import dev.tonholo.s2c.cli.output.tui.widget.completionSection
+import dev.tonholo.s2c.cli.output.tui.widget.buildCompletionSummary
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.OutputRenderer
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,7 +88,7 @@ internal class TuiRenderer(
         completionPrinted = true
         controller.stop()
         terminal.println(
-            completionSection(
+            buildCompletionSummary(
                 state = state.value.completion,
                 stackTraceEnabled = stackTraceEnabled,
             ),

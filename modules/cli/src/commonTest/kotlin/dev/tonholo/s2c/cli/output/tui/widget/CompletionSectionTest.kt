@@ -38,7 +38,7 @@ class CompletionSectionTest {
     )
 
     @Test
-    fun `given completed run with successes only - when buildCompletionLines - then omits failed section`() {
+    fun `given completed run with successes only - when buildCompletionSummary - then omits failed section`() {
         // Arrange
         val state = CompletionState(
             version = "2.2.0",
@@ -55,26 +55,25 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("svg-to-compose v2.2.0"))
-        assertTrue(joined.contains("input: ./icons"))
-        assertTrue(joined.contains("output: ./generated"))
-        assertTrue(joined.contains("files: 847"))
-        assertTrue(joined.contains("optimize: on"))
-        assertTrue(joined.contains("847/847"))
-        assertTrue(joined.contains("100%"))
-        assertTrue(joined.contains("Completed in 2m 49s"))
-        assertTrue(joined.contains("5.0 icons/sec"))
-        assertTrue(joined.contains("847 succeeded"))
-        assertTrue(joined.contains("0 failed"))
-        assertFalse(actual = joined.contains("Failed files"))
+        assertTrue(summary.contains("svg-to-compose v2.2.0"))
+        assertTrue(summary.contains("input: ./icons"))
+        assertTrue(summary.contains("output: ./generated"))
+        assertTrue(summary.contains("files: 847"))
+        assertTrue(summary.contains("optimize: on"))
+        assertTrue(summary.contains("847/847"))
+        assertTrue(summary.contains("100%"))
+        assertTrue(summary.contains("Completed in 2m 49s"))
+        assertTrue(summary.contains("5.0 icons/sec"))
+        assertTrue(summary.contains("847 succeeded"))
+        assertTrue(summary.contains("0 failed"))
+        assertFalse(actual = summary.contains("Failed files"))
     }
 
     @Test
-    fun `given run with zero failures - when buildCompletionLines - then omits failed section header`() {
+    fun `given run with zero failures - when buildCompletionSummary - then omits failed section header`() {
         // Arrange
         val state = CompletionState(
             version = "2.2.0",
@@ -91,14 +90,14 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(lines.none { it.contains("Failed files") })
+        assertFalse(actual = summary.contains("Failed files"))
     }
 
     @Test
-    fun `given run with grouped failures - when buildCompletionLines - then groups by ErrorCode with counts`() {
+    fun `given run with grouped failures - when buildCompletionSummary - then groups by ErrorCode with counts`() {
         // Arrange
         val failures = listOf(
             FailedFileEntry(
@@ -135,21 +134,20 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("Failed files (3)"))
-        assertTrue(joined.contains("ParseSvgError (2 files)"))
-        assertTrue(joined.contains("SvgoOptimizationError (1 file)"))
-        assertTrue(joined.contains("ic_broken_gradient.svg"))
-        assertTrue(joined.contains("Unsupported gradient type: mesh-gradient"))
-        assertTrue(joined.contains("ic_invalid_path.svg"))
-        assertTrue(joined.contains("ic_huge_icon.svg"))
+        assertTrue(summary.contains("Failed files (3)"))
+        assertTrue(summary.contains("ParseSvgError (2 files)"))
+        assertTrue(summary.contains("SvgoOptimizationError (1 file)"))
+        assertTrue(summary.contains("ic_broken_gradient.svg"))
+        assertTrue(summary.contains("Unsupported gradient type: mesh-gradient"))
+        assertTrue(summary.contains("ic_invalid_path.svg"))
+        assertTrue(summary.contains("ic_huge_icon.svg"))
     }
 
     @Test
-    fun `given failure with multi-line message - when buildCompletionLines - then shows only first line`() {
+    fun `given failure with multi-line message - when buildCompletionSummary - then shows only first line`() {
         // Arrange
         val failure = FailedFileEntry(
             fileName = "broken.svg",
@@ -171,13 +169,12 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("First line"))
-        assertFalse(actual = joined.contains("Second line should not appear"))
-        assertFalse(actual = joined.contains("Third line"))
+        assertTrue(summary.contains("First line"))
+        assertFalse(actual = summary.contains("Second line should not appear"))
+        assertFalse(actual = summary.contains("Third line"))
     }
 
     @Test
@@ -204,12 +201,44 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = true)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = true)
 
         // Assert
-        assertTrue(joined.contains("java.lang.RuntimeException: boom"))
-        assertTrue(joined.contains("at foo.Bar.baz(Bar.kt:42)"))
+        assertTrue(summary.contains("java.lang.RuntimeException: boom"))
+        assertTrue(summary.contains("at foo.Bar.baz(Bar.kt:42)"))
+    }
+
+    @Test
+    fun `given stackTrace ending with newline - when stackTraceEnabled - then omits trailing blank line`() {
+        // Arrange
+        val failure = FailedFileEntry(
+            fileName = "broken.svg",
+            errorCode = ErrorCode.ParseSvgError,
+            message = "Invalid path",
+            stackTrace = "java.lang.RuntimeException: boom\n  at foo.Bar.baz(Bar.kt:42)\n",
+        )
+        val state = CompletionState(
+            version = "2.2.0",
+            config = defaultRunConfig,
+            totalFiles = 1,
+            failedFiles = listOf(failure),
+            stats = RunStats(
+                totalFiles = 1,
+                succeeded = 0,
+                failed = 1,
+                totalDuration = 1.seconds,
+                errorCounts = mapOf(ErrorCode.ParseSvgError to 1),
+            ),
+        )
+
+        // Act
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = true)
+
+        // Assert
+        // The blank separator between groups (empty line) may legitimately appear,
+        // but we must never emit `"      "` (six spaces on their own line) from
+        // splitting a trace that ended in `\n`.
+        assertFalse(actual = summary.lines().any { it == "      " })
     }
 
     @Test
@@ -236,16 +265,15 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertFalse(actual = joined.contains("java.lang.RuntimeException"))
-        assertFalse(actual = joined.contains("at foo.Bar.baz"))
+        assertFalse(actual = summary.contains("java.lang.RuntimeException"))
+        assertFalse(actual = summary.contains("at foo.Bar.baz"))
     }
 
     @Test
-    fun `given throughput with sub-second duration - when buildCompletionLines - then computes safe throughput`() {
+    fun `given throughput with sub-second duration - when buildCompletionSummary - then computes safe throughput`() {
         // Arrange
         val state = CompletionState(
             version = "2.2.0",
@@ -262,17 +290,16 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("Completed in 0s"))
+        assertTrue(summary.contains("Completed in 0s"))
         // Sub-second throughput falls back to 0.0 to avoid divide-by-zero noise.
-        assertTrue(joined.contains("0.0 icons/sec"))
+        assertTrue(summary.contains("0.0 icons/sec"))
     }
 
     @Test
-    fun `given incomplete state - when buildCompletionLines - then returns empty list`() {
+    fun `given incomplete state - when buildCompletionSummary - then returns empty string`() {
         // Arrange
         val state = CompletionState(
             version = "2.2.0",
@@ -283,14 +310,14 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertEquals(expected = emptyList(), actual = lines)
+        assertEquals(expected = "", actual = summary)
     }
 
     @Test
-    fun `given optimization disabled - when buildCompletionLines - then optimize shows off`() {
+    fun `given optimization disabled - when buildCompletionSummary - then optimize shows off`() {
         // Arrange
         val config = defaultRunConfig.copy(optimizationEnabled = false)
         val state = CompletionState(
@@ -308,15 +335,14 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("optimize: off"))
+        assertTrue(summary.contains("optimize: off"))
     }
 
     @Test
-    fun `given failed counts above 1 and 1 file - when buildCompletionLines - then uses files or file label correctly`() {
+    fun `given failed counts above 1 and 1 file - when buildCompletionSummary - then uses files or file label correctly`() {
         // Arrange
         val failures = listOf(
             FailedFileEntry(
@@ -353,11 +379,10 @@ class CompletionSectionTest {
         )
 
         // Act
-        val lines = buildCompletionLines(state = state, stackTraceEnabled = false)
-        val joined = lines.joinToString(separator = "\n")
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(joined.contains("ParseSvgError (2 files)"))
-        assertTrue(joined.contains("SvgoOptimizationError (1 file)"))
+        assertTrue(summary.contains("ParseSvgError (2 files)"))
+        assertTrue(summary.contains("SvgoOptimizationError (1 file)"))
     }
 }
