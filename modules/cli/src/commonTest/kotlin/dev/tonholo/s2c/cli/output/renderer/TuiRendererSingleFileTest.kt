@@ -3,17 +3,16 @@ package dev.tonholo.s2c.cli.output.renderer
 import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
+import dev.tonholo.s2c.cli.output.tui.TuiTestFixtures
 import dev.tonholo.s2c.cli.output.tui.state.SingleFileCompletion
 import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.FileResult
-import dev.tonholo.s2c.output.RunConfig
-import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
 class TuiRendererSingleFileTest {
@@ -25,27 +24,7 @@ class TuiRendererSingleFileTest {
         interactive = false,
     )
 
-    private val defaultParserConfig = ParserConfig(
-        pkg = "com.example.icons",
-        theme = "AppTheme",
-        optimize = true,
-        receiverType = null,
-        addToMaterial = false,
-        kmpPreview = false,
-        noPreview = false,
-        makeInternal = false,
-        minified = false,
-    )
-
-    private val defaultRunConfig = RunConfig(
-        inputPath = "./ic_home.svg",
-        outputPath = "./IcHome.kt",
-        parserConfig = defaultParserConfig,
-        packageName = "com.example.icons",
-        optimizationEnabled = true,
-        parallel = 1,
-        recursive = false,
-    )
+    private val defaultRunConfig = TuiTestFixtures.defaultRunConfig
 
     @Test
     fun `given fresh renderer - when RunStarted with totalFiles equals 1 - then mode becomes Single`() {
@@ -177,8 +156,9 @@ class TuiRendererSingleFileTest {
         )
 
         // Assert
-        val completion = renderer.snapshotState().singleFileCompletion
-        assertTrue(actual = completion is SingleFileCompletion.Failure)
+        val completion = assertIs<SingleFileCompletion.Failure>(
+            value = renderer.snapshotState().singleFileCompletion,
+        )
         assertEquals(expected = ErrorCode.ParseSvgError, actual = completion.errorCode)
         assertEquals(expected = "Unsupported gradient type: mesh-gradient", actual = completion.message)
     }
