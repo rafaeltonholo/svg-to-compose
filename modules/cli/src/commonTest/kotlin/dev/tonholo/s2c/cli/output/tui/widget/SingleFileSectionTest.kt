@@ -279,20 +279,126 @@ class SingleFileSectionTest {
 
         // Assert
         assertTrue(
-            actual = rendered.contains(other = "Optimizing"),
-            message = "Expected Optimizing phase, got: $rendered",
+            actual = rendered.contains(other = "$ICON_SUCCESS Optimizing"),
+            message = "Expected Optimizing marked success, got: $rendered",
         )
         assertTrue(
-            actual = rendered.contains(other = "Parsing"),
-            message = "Expected Parsing phase, got: $rendered",
+            actual = rendered.contains(other = "$ICON_SUCCESS Parsing"),
+            message = "Expected Parsing marked success, got: $rendered",
         )
         assertTrue(
-            actual = rendered.contains(other = "Generating"),
-            message = "Expected Generating phase, got: $rendered",
+            actual = rendered.contains(other = "$ICON_IN_PROGRESS Generating"),
+            message = "Expected Generating marked in-progress, got: $rendered",
         )
         assertTrue(
-            actual = rendered.contains(other = "Writing"),
-            message = "Expected Writing phase, got: $rendered",
+            actual = rendered.contains(other = "$ICON_PENDING Writing"),
+            message = "Expected Writing marked pending, got: $rendered",
         )
+    }
+
+    @Test
+    fun `given success completion with retained file state - when singleFileLayout rendered - then all phases show success icon`() {
+        // Arrange
+        val fileState = CurrentFileState(
+            fileName = "ic_home.svg",
+            currentPhase = ConversionPhase.Writing,
+            completedPhases = setOf(
+                ConversionPhase.Optimizing,
+                ConversionPhase.Parsing,
+                ConversionPhase.Generating,
+                ConversionPhase.Writing,
+            ),
+        )
+        val state = singleModeState(
+            currentFiles = mapOf("ic_home.svg" to fileState),
+            completion = SingleFileCompletion.Success(elapsedMs = 312),
+        )
+
+        // Act
+        val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
+
+        // Assert
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_SUCCESS Optimizing"),
+            message = "Expected Optimizing success icon, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_SUCCESS Parsing"),
+            message = "Expected Parsing success icon, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_SUCCESS Generating"),
+            message = "Expected Generating success icon, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_SUCCESS Writing"),
+            message = "Expected Writing success icon, got: $rendered",
+        )
+    }
+
+    @Test
+    fun `given failure completion on Generating phase - when singleFileLayout rendered - then Generating shows failure icon`() {
+        // Arrange
+        val fileState = CurrentFileState(
+            fileName = "ic_home.svg",
+            currentPhase = ConversionPhase.Generating,
+            completedPhases = setOf(ConversionPhase.Optimizing, ConversionPhase.Parsing),
+        )
+        val state = singleModeState(
+            currentFiles = mapOf("ic_home.svg" to fileState),
+            completion = SingleFileCompletion.Failure(
+                errorCode = ErrorCode.ParseSvgError,
+                message = "broken",
+            ),
+        )
+
+        // Act
+        val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
+
+        // Assert
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_SUCCESS Optimizing"),
+            message = "Expected Optimizing success icon, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_FAILURE Generating"),
+            message = "Expected Generating failure icon, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "$ICON_PENDING Writing"),
+            message = "Expected Writing still pending, got: $rendered",
+        )
+    }
+
+    @Test
+    fun `given failure completion with long message - when singleFileLayout rendered - then message truncated with ellipsis`() {
+        // Arrange
+        val longMessage = "x".repeat(200)
+        val state = singleModeState(
+            completion = SingleFileCompletion.Failure(
+                errorCode = ErrorCode.ParseSvgError,
+                message = longMessage,
+            ),
+        )
+
+        // Act
+        val rendered = testTerminal.render(widget = singleFileLayout(state = state, contentWidth = 76))
+
+        // Assert
+        assertFalse(
+            actual = rendered.contains(other = longMessage),
+            message = "Expected full long message to be truncated, got: $rendered",
+        )
+        assertTrue(
+            actual = rendered.contains(other = "\u2026"),
+            message = "Expected ellipsis in truncated message, got: $rendered",
+        )
+    }
+
+    private companion object {
+        const val ICON_SUCCESS = "\u2714"
+        const val ICON_FAILURE = "\u2718"
+        const val ICON_IN_PROGRESS = "\u25CF"
+        const val ICON_PENDING = "\u25CB"
     }
 }

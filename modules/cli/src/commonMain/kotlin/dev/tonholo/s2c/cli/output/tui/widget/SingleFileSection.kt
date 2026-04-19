@@ -16,6 +16,7 @@ import dev.tonholo.s2c.output.ConversionPhase
 private const val RULE_CHARACTER = "-"
 private const val PATH_LABEL_WIDTH = 7
 private const val BLANK_LINE = " "
+private const val FAILURE_PREFIX_PLAIN_WIDTH = "x Failed: ".length + " - ".length
 
 /**
  * Builds the simplified layout used when converting a single file.
@@ -33,7 +34,7 @@ internal fun singleFileLayout(state: TuiState, contentWidth: Int): Widget = vert
     cell(singleFilePhaseRow(state = state))
     cell(HorizontalRule(ruleCharacter = RULE_CHARACTER))
     cell(Text(BLANK_LINE))
-    cell(completionLine(completion = state.singleFileCompletion))
+    cell(completionLine(completion = state.singleFileCompletion, contentWidth = contentWidth))
 }
 
 private fun versionLine(state: TuiState): Widget {
@@ -63,29 +64,40 @@ private fun singleFilePhaseRow(state: TuiState): Widget {
     } else {
         ConversionPhase.entries.filter { it != ConversionPhase.Optimizing }
     }
+    val completion = state.singleFileCompletion
     return horizontalLayout {
         cell(Text(BLANK_LINE))
         for (phase in phases) {
-            cell(Text("${iconForPhase(phase = phase, fileState = fileState)} ${phase.name}  "))
+            val icon = iconForPhase(phase = phase, fileState = fileState, completion = completion)
+            cell(Text("$icon ${phase.name}  "))
         }
     }
 }
 
-private fun iconForPhase(phase: ConversionPhase, fileState: CurrentFileState?): String = when {
+private fun iconForPhase(
+    phase: ConversionPhase,
+    fileState: CurrentFileState?,
+    completion: SingleFileCompletion?,
+): String = when {
     fileState == null -> TuiIcons.pending
     phase in fileState.completedPhases -> TuiIcons.success
+    completion is SingleFileCompletion.Failure && phase == fileState.currentPhase -> TuiIcons.failure
     phase == fileState.currentPhase -> TuiIcons.inProgress
     else -> TuiIcons.pending
 }
 
-private fun completionLine(completion: SingleFileCompletion?): Widget = when (completion) {
-    null -> Text(BLANK_LINE)
+private fun completionLine(completion: SingleFileCompletion?, contentWidth: Int): Widget =
+    when (completion) {
+        null -> Text(BLANK_LINE)
 
-    is SingleFileCompletion.Success -> Text(
-        "${TuiIcons.success} ${TextColors.green("Done")} (${completion.elapsedMs}ms)",
-    )
+        is SingleFileCompletion.Success -> Text(
+            "${TuiIcons.success} ${TextColors.green("Done")} (${completion.elapsedMs}ms)",
+        )
 
-    is SingleFileCompletion.Failure -> Text(
-        "${TuiIcons.failure} ${TextColors.red("Failed")}: ${completion.errorCode.name} - ${completion.message}",
-    )
-}
+        is SingleFileCompletion.Failure -> {
+            val prefix = "${TuiIcons.failure} ${TextColors.red("Failed")}: ${completion.errorCode.name} - "
+            val plainPrefixWidth = FAILURE_PREFIX_PLAIN_WIDTH + completion.errorCode.name.length
+            val budget = (contentWidth - plainPrefixWidth).coerceAtLeast(minimumValue = 1)
+            Text(prefix + truncateWithEllipsis(text = completion.message, maxWidth = budget))
+        }
+    }
