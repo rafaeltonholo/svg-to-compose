@@ -13,7 +13,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -181,7 +180,6 @@ class CompletionReducerTest {
         assertNotNull(actual = result.stats)
         assertEquals(expected = stats, actual = result.stats)
         assertEquals(expected = listOf(failedEntry), actual = result.failedFiles)
-        assertTrue(actual = result.isCompleted)
     }
 
     @Test

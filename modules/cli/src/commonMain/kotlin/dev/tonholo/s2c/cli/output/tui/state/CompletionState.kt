@@ -45,6 +45,4 @@ internal data class CompletionState(
     val totalFiles: Int = 0,
     val failedFiles: List<FailedFileEntry> = emptyList(),
     val stats: RunStats? = null,
-) {
-    val isCompleted: Boolean get() = stats != null
-}
+)
