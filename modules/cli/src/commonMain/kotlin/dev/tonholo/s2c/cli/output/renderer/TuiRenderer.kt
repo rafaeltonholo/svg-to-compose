@@ -17,6 +17,7 @@ import dev.tonholo.s2c.cli.output.tui.state.TuiState
 import dev.tonholo.s2c.cli.output.tui.widget.buildCompletionSummary
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.OutputRenderer
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -31,6 +32,7 @@ internal class TuiRenderer(
         state = state,
     )
 
+    @Volatile
     private var completionPrinted = false
 
     override fun onEvent(event: ConversionEvent) {
