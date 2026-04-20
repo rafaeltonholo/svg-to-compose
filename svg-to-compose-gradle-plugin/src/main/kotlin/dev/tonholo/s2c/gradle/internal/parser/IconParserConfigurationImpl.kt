@@ -72,6 +72,14 @@ internal class IconParserConfigurationImpl(
     val excludePattern: String?
         get() = exclude.orNull?.pattern
 
+    @get:Internal
+    internal val excludeDir: Property<Regex> = objectFactory.property<Regex>()
+
+    @get:Input
+    @get:Optional
+    val excludeDirPattern: String?
+        get() = excludeDir.orNull?.pattern
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:Optional
@@ -128,6 +136,17 @@ internal class IconParserConfigurationImpl(
         )
     }
 
+    override fun excludeDir(vararg patterns: Regex) {
+        require(patterns.isNotEmpty()) { "excludeDir requires at least one pattern" }
+        excludeDir.set(
+            if (patterns.size > 1) {
+                Regex(patterns.joinToString("|") { "(?>${it.pattern})" })
+            } else {
+                patterns.single()
+            },
+        )
+    }
+
     override fun templateFile(path: RegularFile) {
         templateFile.set(path)
     }
@@ -167,6 +186,7 @@ internal class IconParserConfigurationImpl(
         theme.setIfNotPresent(provider = common.theme, defaultValue = "")
         mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo)
         exclude.setIfNotPresent(provider = common.exclude)
+        excludeDir.setIfNotPresent(provider = common.excludeDir)
         if (!templateFile.isPresent && common.templateFile.isPresent) {
             templateFile.set(common.templateFile)
         }
@@ -183,6 +203,7 @@ internal class IconParserConfigurationImpl(
         appendLine("  theme='${theme.orNull}', ")
         appendLine("  mapIconNameTo=${mapIconNameTo.takeIf { it.isPresent }?.let { "lambda" } ?: "null"}, ")
         appendLine("  exclude=${exclude.orNull}, ")
+        appendLine("  excludeDir=${excludeDir.orNull}, ")
         appendLine("  templateFile=${templateFile.orNull?.asFile?.absolutePath}, ")
         append(")")
     }
