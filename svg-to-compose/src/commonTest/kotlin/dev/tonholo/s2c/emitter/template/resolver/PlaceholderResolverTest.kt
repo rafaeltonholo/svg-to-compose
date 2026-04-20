@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.emitter.template.resolver
 
+import dev.tonholo.s2c.emitter.template.TemplateConstants
 import dev.tonholo.s2c.emitter.template.TemplateContext
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -66,7 +67,7 @@ class PlaceholderResolverTest {
     fun `resolves template namespace with fragment`() {
         val ctx = createContext(
             iconVars = mapOf("name" to "TestIcon"),
-            fragments = mapOf("icon_builder" to $$"Builder(name = ${icon:name})"),
+            fragments = mapOf(TemplateConstants.Fragment.ICON_BUILDER to $$"Builder(name = ${icon:name})"),
         )
         val result = PlaceholderResolver.resolve($$"${template:icon_builder}", ctx)
         assertEquals("Builder(name = TestIcon)", result)
