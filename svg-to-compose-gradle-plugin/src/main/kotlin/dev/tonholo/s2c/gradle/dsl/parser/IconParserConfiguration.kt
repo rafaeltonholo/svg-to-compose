@@ -122,6 +122,34 @@ interface IconParserConfiguration {
     fun exclude(vararg patterns: Regex)
 
     /**
+     * Excludes files whose path contains a directory matching the given patterns.
+     *
+     * Considering the following plugin configuration:
+     * ```kotlin
+     * svgToCompose {
+     *     processor {
+     *         val flat by creating {
+     *              val themePackage = "my.awesome.app.theme"
+     *              from(rootProject.layout.projectDirectory.dir("assets/icons"))
+     *              destinationPackage("$themePackage.icons.flat")
+     *              optimize(false)
+     *              icons {
+     *                  theme("$themePackage.MyAwesomeAppTheme")
+     *                  excludeDir("outline".toRegex(), "rounded".toRegex())
+     *              }
+     *         }
+     *     }
+     * }
+     * ```
+     * In this example, any SVG or XML file inside directories named `outline` or
+     * `rounded` will be excluded from the generation process.
+     *
+     * @param patterns Regex patterns matched against directory names in a file's
+     * path. Files inside matching directories are excluded.
+     */
+    fun excludeDir(vararg patterns: Regex)
+
+    /**
      * Sets the path to an `s2c.template.toml` file for output customization.
      *
      * The template file allows users to control the generated Kotlin code shape —

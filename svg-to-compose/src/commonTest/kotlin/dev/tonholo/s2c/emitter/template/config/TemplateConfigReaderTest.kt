@@ -137,6 +137,7 @@ class TemplateConfigReaderTest {
             recursive: Boolean,
             maxDepth: Int?,
             exclude: Regex?,
+            excludeDir: Regex?,
         ): List<Path> = emptyList()
 
         override fun copy(source: Path, target: Path) = Unit

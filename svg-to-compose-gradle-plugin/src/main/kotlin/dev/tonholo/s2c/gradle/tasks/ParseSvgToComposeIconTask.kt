@@ -432,6 +432,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             noPreview.set(iconConfiguration.noPreview.get())
             makeInternal.set(iconConfiguration.iconVisibility.get() == IconVisibility.Internal)
             excludePattern.set(iconConfiguration.exclude.orNull?.pattern)
+            excludeDirPattern.set(iconConfiguration.excludeDir.orNull?.pattern)
             kmpPreview.set(kmp.get())
             templateFilePath.set(iconConfiguration.templateFile.orNull?.asFile)
             resultFilePath.set(resultFile.absolutePath)
@@ -478,6 +479,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             recursive = configuration.recursive.get(),
             maxDepth = configuration.maxDepth.orNull,
             exclude = iconConfiguration.exclude.orNull,
+            excludeDir = iconConfiguration.excludeDir.orNull,
         )
     }
 

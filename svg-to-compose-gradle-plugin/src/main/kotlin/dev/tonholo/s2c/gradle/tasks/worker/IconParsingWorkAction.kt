@@ -76,6 +76,7 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         noPreview = noPreview.get(),
         makeInternal = makeInternal.get(),
         exclude = excludePattern.orNull?.toRegex(),
+        excludeDir = excludeDirPattern.orNull?.toRegex(),
         kmpPreview = kmpPreview.get(),
         keepTempFolder = true,
         template = TemplateConfig(
