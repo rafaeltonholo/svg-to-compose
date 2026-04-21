@@ -83,7 +83,7 @@ class ProcessorEventTest {
                 if (path == inputPath) isDirectory else path.name.contains('.').not()
             }
             exists { existsResult }
-            findFilesToProcess { _, _, _, _ ->
+            findFilesToProcess { _, _, _, _, _ ->
                 filesToProcess.map { it.toPath() }
             }
             copy { _, _ -> }

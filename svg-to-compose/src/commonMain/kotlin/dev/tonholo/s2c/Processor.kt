@@ -124,6 +124,7 @@ class Processor(
                 recursive = recursive,
                 maxDepth = maxDepth,
                 exclude = config.exclude,
+                excludeDir = config.excludeDir,
             )
         } else {
             val isExcluded = config.exclude?.let(filePath.name::matches) ?: false
@@ -201,26 +202,7 @@ class Processor(
                 }.forEach { logger.debug(it) }
             }
 
-            if (onEvent == null) {
-                throw ExitProgramException(
-                    errorCode = ErrorCode.FailedToParseIconError,
-                    message = """
-                        |Failure to parse (${errors.size}) SVG(s)/Android Vector Drawable(s) to Jetpack Compose.
-                        |Please see the logs for more information.
-                        |
-                        |Files failed to parse:
-                        |${
-                        errors.joinToString("\n") { (failedPath, exception) ->
-                            buildString {
-                                appendLine("    - $failedPath")
-                                appendLine("      Cause: ${exception.message}")
-                            }
-                        }
-                    }
-                    """.trimMargin(),
-                    causes = errors.map { it.second }.toTypedArray(),
-                )
-            }
+            if (onEvent == null) throw buildParseFailure(errors)
         }
 
         return processedFiles
@@ -228,6 +210,26 @@ class Processor(
 
     fun dispose() {
         tempFileWriter.clear()
+    }
+
+    private fun buildParseFailure(errors: List<Pair<Path, Throwable>>): ExitProgramException {
+        val fileList = errors.joinToString("\n") { (failedPath, exception) ->
+            buildString {
+                appendLine("    - $failedPath")
+                appendLine("      Cause: ${exception.message}")
+            }
+        }
+        return ExitProgramException(
+            errorCode = ErrorCode.FailedToParseIconError,
+            message = """
+                |Failure to parse (${errors.size}) SVG(s)/Android Vector Drawable(s) to Jetpack Compose.
+                |Please see the logs for more information.
+                |
+                |Files failed to parse:
+                |$fileList
+            """.trimMargin(),
+            causes = errors.map { it.second }.toTypedArray(),
+        )
     }
 
     /**
@@ -290,6 +292,7 @@ class Processor(
         recursive: Boolean,
         maxDepth: Int,
         exclude: Regex? = null,
+        excludeDir: Regex? = null,
     ): List<Path> = buildList {
         if (outputPath.isDirectory.not()) {
             logger.printEmpty()
@@ -310,6 +313,7 @@ class Processor(
             recursive = recursive,
             maxDepth = maxDepth,
             exclude = exclude,
+            excludeDir = excludeDir,
         )
 
         logger.verbose("svg/xml files = $imageFiles")

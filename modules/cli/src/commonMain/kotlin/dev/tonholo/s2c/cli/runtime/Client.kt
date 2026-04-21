@@ -172,6 +172,18 @@ internal class Client(
         }
     }
 
+    private val excludeDir by option(
+        names = arrayOf("--exclude-dir"),
+        help = "A regex matched against directory names in a file's path. " +
+            "Files inside matching directories are excluded from parsing.",
+    ).validate { pattern ->
+        try {
+            Regex(pattern)
+        } catch (e: IllegalArgumentException) {
+            fail("Invalid regex pattern: \"$pattern\". ${e.message}")
+        }
+    }
+
     private val indentSize by option(
         names = arrayOf("--indent-size"),
         help = "Number of indent characters per level in generated code. " +
@@ -334,6 +346,7 @@ internal class Client(
                 |   recursiveDepth = $recursiveDepth
                 |   silent = ${config.silent}
                 |   exclude = $exclude
+                |   excludeDir = $excludeDir
                 |   mapIconNameTo = $mapIconNameTo
                 |   indentSize = $indentSize
                 |   indentStyle = $indentStyle
@@ -356,6 +369,7 @@ internal class Client(
         minified = minified,
         kmpPreview = isKmp,
         exclude = exclude?.let(::Regex),
+        excludeDir = excludeDir?.let(::Regex),
         formatConfig = buildFormatConfig(),
         formatOverrides = buildFormatOverrides(),
         template = template?.let { TemplateConfig(configPath = it.toPath(), noDiscovery = noTemplate) },

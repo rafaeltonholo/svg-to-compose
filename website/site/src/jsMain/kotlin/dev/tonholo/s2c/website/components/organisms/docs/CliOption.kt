@@ -45,6 +45,11 @@ internal data class CliOption(val flag: String, val type: String, val descriptio
                 description = "Regex pattern to exclude icons from processing",
             ),
             CliOption(
+                flag = "--exclude-dir",
+                type = "String",
+                description = "Regex pattern matched against directory names to exclude files inside matching directories",
+            ),
+            CliOption(
                 flag = "--map-icon-name-from-to",
                 type = "Pair...",
                 description = "Replace icon name pattern (old to new)",

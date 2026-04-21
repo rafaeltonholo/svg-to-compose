@@ -81,6 +81,7 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
         recursive: Boolean,
         maxDepth: Int?,
         exclude: Regex?,
+        excludeDir: Regex?,
     ): List<Path> {
         val depth = if (recursive) {
             logger.debug("Recursive directory search is enabled. Verifying all directories until depth $maxDepth")
@@ -92,10 +93,23 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
             .listRecursively(from, maxDepth = depth)
             .filter { path ->
                 val isNotExcluded = exclude == null || !path.name.matches(exclude)
-                isNotExcluded &&
+                val isNotInExcludedDir = excludeDir == null || !isDirExcluded(path, from, excludeDir)
+                isNotExcluded && isNotInExcludedDir &&
                     (path.name.endsWith(FileType.Svg.extension) || path.name.endsWith(FileType.Avg.extension))
             }
             .toList()
+    }
+
+    /**
+     * Checks whether any directory segment in [path] relative to [root] matches the [excludeDir] regex.
+     */
+    private fun isDirExcluded(path: Path, root: Path, excludeDir: Regex): Boolean {
+        var current = path.parent
+        while (current != null && current != root) {
+            if (current.name.matches(excludeDir)) return true
+            current = current.parent
+        }
+        return false
     }
 
     override fun readContent(file: Path): String = fileSystem.read(file) {

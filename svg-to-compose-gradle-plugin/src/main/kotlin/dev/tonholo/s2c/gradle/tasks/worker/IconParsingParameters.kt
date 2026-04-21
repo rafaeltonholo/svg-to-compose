@@ -22,6 +22,7 @@ internal interface IconParsingParameters : WorkParameters {
     val noPreview: Property<Boolean>
     val makeInternal: Property<Boolean>
     val excludePattern: Property<String>
+    val excludeDirPattern: Property<String>
     val kmpPreview: Property<Boolean>
     val recursive: Property<Boolean>
     val maxDepth: Property<Int>
