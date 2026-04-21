@@ -5,10 +5,57 @@ import dev.tonholo.s2c.cli.output.tui.state.HeaderState
 import dev.tonholo.s2c.cli.output.tui.state.ProgressState
 import dev.tonholo.s2c.cli.output.tui.state.RecentFileEntry
 import dev.tonholo.s2c.cli.output.tui.state.RecentFilesState
+import dev.tonholo.s2c.cli.output.tui.state.SingleFileCompletion
+import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.UpdateNotificationState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.ConversionPhase
 import dev.tonholo.s2c.output.FileResult
+
+private const val SINGLE_FILE_THRESHOLD = 1
+
+internal fun reduceMode(state: TuiMode, event: ConversionEvent): TuiMode = when (event) {
+    is ConversionEvent.RunStarted ->
+        if (event.totalFiles == SINGLE_FILE_THRESHOLD) TuiMode.Single else TuiMode.Batch
+
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.FileCompleted,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
+}
+
+internal fun reduceSingleFileCompletion(
+    state: SingleFileCompletion?,
+    mode: TuiMode,
+    event: ConversionEvent,
+): SingleFileCompletion? = when (event) {
+    is ConversionEvent.RunStarted -> null
+
+    is ConversionEvent.FileCompleted -> {
+        if (mode != TuiMode.Single) {
+            null
+        } else {
+            when (val outcome = event.result) {
+                is FileResult.Success -> SingleFileCompletion.Success(
+                    elapsedMs = event.duration.inWholeMilliseconds,
+                )
+
+                is FileResult.Failed -> SingleFileCompletion.Failure(
+                    errorCode = outcome.errorCode,
+                    message = outcome.message.lineSequence().firstOrNull().orEmpty(),
+                )
+            }
+        }
+    }
+
+    is ConversionEvent.FileStarted,
+    is ConversionEvent.FileStepChanged,
+    is ConversionEvent.RunCompleted,
+    is ConversionEvent.UpdateAvailable,
+    -> state
+}
 
 internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderState = when (event) {
     is ConversionEvent.RunStarted -> state.copy(
@@ -39,18 +86,15 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 
         is ConversionEvent.FileCompleted -> {
             val current = state ?: return ProgressState()
-            when (event.result) {
+            when (val outcome = event.result) {
                 is FileResult.Success -> current.copy(
                     completed = current.completed + 1,
                 )
 
-                is FileResult.Failed -> {
-                    val failed = event.result as FileResult.Failed
-                    current.copy(
-                        failed = current.failed + 1,
-                        errors = current.errors + failed.message,
-                    )
-                }
+                is FileResult.Failed -> current.copy(
+                    failed = current.failed + 1,
+                    errors = current.errors + outcome.message,
+                )
             }
         }
 
@@ -63,6 +107,7 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
 internal fun reduceCurrentFiles(
     state: Map<String, CurrentFileState>,
     event: ConversionEvent,
+    mode: TuiMode,
     optimizationEnabled: Boolean,
 ): Map<String, CurrentFileState> = when (event) {
     is ConversionEvent.FileStarted -> {
@@ -88,9 +133,19 @@ internal fun reduceCurrentFiles(
     }
 
     is ConversionEvent.FileCompleted -> {
-        if (event.fileName !in state) return state
+        val existing = state[event.fileName] ?: return state
         val updated = LinkedHashMap(state)
-        updated.remove(event.fileName)
+        if (mode == TuiMode.Single) {
+            updated[event.fileName] = when (event.result) {
+                is FileResult.Success -> existing.copy(
+                    completedPhases = existing.completedPhases + existing.currentPhase,
+                )
+
+                is FileResult.Failed -> existing
+            }
+        } else {
+            updated.remove(event.fileName)
+        }
         updated
     }
 

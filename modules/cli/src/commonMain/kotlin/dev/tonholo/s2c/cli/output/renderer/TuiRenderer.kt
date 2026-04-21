@@ -6,9 +6,12 @@ import dev.tonholo.s2c.cli.output.tui.animation.AnimationController
 import dev.tonholo.s2c.cli.output.tui.layout.ProgressBarLayouts
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceCurrentFiles
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceHeader
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceMode
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceProgress
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceRecentFiles
+import dev.tonholo.s2c.cli.output.tui.reducer.reduceSingleFileCompletion
 import dev.tonholo.s2c.cli.output.tui.reducer.reduceUpdateNotification
+import dev.tonholo.s2c.cli.output.tui.state.TuiMode
 import dev.tonholo.s2c.cli.output.tui.state.TuiState
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.OutputRenderer
@@ -25,29 +28,39 @@ internal class TuiRenderer(terminal: Terminal) : OutputRenderer {
 
     override fun onEvent(event: ConversionEvent) {
         state.update { current ->
+            val nextMode = reduceMode(state = current.mode, event = event)
             val optimizationEnabled = current.header.config?.optimizationEnabled ?: true
             current
+                .withMode { nextMode }
                 .withHeader { reduceHeader(state = it, event = event) }
                 .withProgress { reduceProgress(state = it, event = event) }
                 .withCurrentFiles {
                     reduceCurrentFiles(
                         state = it,
                         event = event,
+                        mode = nextMode,
                         optimizationEnabled = optimizationEnabled,
                     )
                 }
                 .withRecentFiles { reduceRecentFiles(state = it, event = event) }
                 .withUpdateNotification { reduceUpdateNotification(state = it, event = event) }
+                .withSingleFileCompletion {
+                    reduceSingleFileCompletion(state = it, mode = nextMode, event = event)
+                }
         }
         state.value.progress?.let { controller.sync(it) }
     }
 
     internal fun handleKeyEvent(event: KeyboardEvent) {
         when {
-            event.key == "h" -> state.update { it.withHeader { h -> h.copy(expanded = !h.expanded) } }
+            event.key == "h" && state.value.mode == TuiMode.Batch ->
+                state.update { it.withHeader { h -> h.copy(expanded = !h.expanded) } }
+
             event.ctrl && event.key == "c" -> stop()
         }
     }
+
+    internal fun snapshotState(): TuiState = state.value
 
     suspend fun run() = controller.run()
 
