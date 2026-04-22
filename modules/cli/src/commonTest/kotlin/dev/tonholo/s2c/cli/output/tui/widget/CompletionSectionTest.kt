@@ -273,7 +273,7 @@ class CompletionSectionTest {
     }
 
     @Test
-    fun `given throughput with sub-second duration - when buildCompletionSummary - then computes safe throughput`() {
+    fun `given sub-second duration - when buildCompletionSummary - then shows millisecond duration and fractional throughput`() {
         // Arrange
         val state = CompletionState(
             version = "2.2.0",
@@ -293,8 +293,32 @@ class CompletionSectionTest {
         val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
 
         // Assert
-        assertTrue(summary.contains("Completed in 0s"))
-        // Sub-second throughput falls back to 0.0 to avoid divide-by-zero noise.
+        assertTrue(summary.contains("Completed in 100ms"))
+        assertTrue(summary.contains("50.0 icons/sec"))
+    }
+
+    @Test
+    fun `given zero duration - when buildCompletionSummary - then throughput falls back to zero`() {
+        // Arrange
+        val state = CompletionState(
+            version = "2.2.0",
+            config = defaultRunConfig,
+            totalFiles = 1,
+            failedFiles = emptyList(),
+            stats = RunStats(
+                totalFiles = 1,
+                succeeded = 1,
+                failed = 0,
+                totalDuration = 0.milliseconds,
+                errorCounts = emptyMap(),
+            ),
+        )
+
+        // Act
+        val summary = buildCompletionSummary(state = state, stackTraceEnabled = false)
+
+        // Assert
+        assertTrue(summary.contains("Completed in 0ms"))
         assertTrue(summary.contains("0.0 icons/sec"))
     }
 

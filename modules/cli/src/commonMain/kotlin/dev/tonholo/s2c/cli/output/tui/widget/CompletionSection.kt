@@ -146,6 +146,7 @@ private fun StringBuilder.appendFailedEntry(entry: FailedFileEntry, stackTraceEn
 }
 
 private fun formatDuration(durationMs: Long): String {
+    if (durationMs < MILLIS_PER_SECOND) return "${durationMs}ms"
     val totalSeconds = durationMs / MILLIS_PER_SECOND
     val minutes = (totalSeconds / SECONDS_PER_MINUTE).toInt()
     val seconds = (totalSeconds % SECONDS_PER_MINUTE).toInt()
