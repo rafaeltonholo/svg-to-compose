@@ -47,8 +47,9 @@ private const val SIGINT_EXIT_CODE = 130
  *   plain-text and TUI-off runs.
  * - [LogPathOnly] only prints the log path suffix. Used by the TUI path, which
  *   already renders its own completion summary through the TUI renderer.
- * - [None] prints nothing structured but still surfaces log-write warnings. Used
- *   by JSON output where the renderer owns the protocol.
+ * - [None] suppresses finalizer output entirely, including log-write warnings.
+ *   Used by JSON output where the renderer owns the protocol and stray
+ *   terminal writes would corrupt it.
  */
 private enum class SummaryMode {
     Full,
