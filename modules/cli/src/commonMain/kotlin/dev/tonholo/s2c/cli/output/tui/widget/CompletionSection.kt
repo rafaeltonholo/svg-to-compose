@@ -46,7 +46,7 @@ internal fun buildCompletionSummary(state: CompletionState, stackTraceEnabled: B
         if (stats.failed > 0 && state.failedFiles.isNotEmpty()) {
             appendLine()
             appendLine(divider())
-            appendLine("Failed files (${stats.failed}):")
+            appendLine("Failed files (${state.failedFiles.size}):")
             appendLine()
             appendFailedGroups(
                 entries = state.failedFiles,
@@ -96,11 +96,9 @@ private fun progressLine(stats: RunStats): String {
 }
 
 private fun statsLine(stats: RunStats): String {
-    val duration = formatDuration(durationMs = stats.totalDuration.inWholeMilliseconds)
-    val throughput = computeThroughput(
-        succeeded = stats.succeeded,
-        durationMs = stats.totalDuration.inWholeMilliseconds,
-    )
+    val durationMs = stats.totalDuration.inWholeMilliseconds
+    val duration = formatDuration(durationMs = durationMs)
+    val throughput = computeThroughput(succeeded = stats.succeeded, durationMs = durationMs)
     return "Completed in $duration  Throughput: $throughput icons/sec"
 }
 

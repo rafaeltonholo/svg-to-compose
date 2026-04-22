@@ -236,9 +236,9 @@ class CompletionSectionTest {
 
         // Assert
         // The blank separator between groups (empty line) may legitimately appear,
-        // but we must never emit `"      "` (six spaces on their own line) from
-        // splitting a trace that ended in `\n`.
-        assertFalse(actual = summary.lines().any { it == "      " })
+        // but we must never emit a whitespace-only line (any mix of spaces or tabs)
+        // from splitting a trace that ended in `\n`.
+        assertFalse(actual = summary.lines().any { it.isNotEmpty() && it.isBlank() })
     }
 
     @Test
