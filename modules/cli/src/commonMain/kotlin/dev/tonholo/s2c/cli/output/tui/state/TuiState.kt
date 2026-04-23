@@ -8,6 +8,7 @@ internal data class TuiState(
     val recentFiles: RecentFilesState = RecentFilesState(),
     val updateNotification: UpdateNotificationState? = null,
     val singleFileCompletion: SingleFileCompletion? = null,
+    val completion: CompletionState = CompletionState(),
 ) {
     fun withMode(transform: (TuiMode) -> TuiMode): TuiState = copy(mode = transform(mode))
 
@@ -31,4 +32,7 @@ internal data class TuiState(
     fun withSingleFileCompletion(
         transform: (SingleFileCompletion?) -> SingleFileCompletion?,
     ): TuiState = copy(singleFileCompletion = transform(singleFileCompletion))
+
+    fun withCompletion(transform: (CompletionState) -> CompletionState): TuiState =
+        copy(completion = transform(completion))
 }
