@@ -206,7 +206,7 @@ private fun buildIconTemplateInsertValue(): String {
     val body = iconPlaceholder(TemplateConstants.IconVar.BODY)
     val builder = placeholder(
         TemplateConstants.Namespace.TEMPLATE,
-        "icon_builder",
+        TemplateConstants.Fragment.ICON_BUILDER,
     )
 
     // language=TOML
@@ -255,9 +255,9 @@ private fun buildFragmentKeys(): List<TomlKeyInfo> {
             insertValue = "${frag.GROUP_BUILDER} = \"group(rotate = $groupRotate)\"",
         ),
         TomlKeyInfo(
-            key = "icon_builder",
+            key = frag.ICON_BUILDER,
             description = $$"Icon builder fragment. Placeholders: ${$${ns.DEFINITIONS}:*}, ${$${ns.ICON}:*}.",
-            insertValue = "icon_builder = \"$defBuilder(name = \\\"$iconName\\\")\"",
+            insertValue = "${frag.ICON_BUILDER} = \"$defBuilder(name = \\\"$iconName\\\")\"",
         ),
         TomlKeyInfo(
             key = frag.CHUNK_FUNCTION_NAME,
