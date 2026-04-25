@@ -93,7 +93,7 @@ class TemplateEmitterTest {
                     $$"    ${template:icon_builder} {$\n        ${icon:body}$\n    }$\n}",
             ),
             fragments = mapOf(
-                "icon_builder" to $$"${def:builder}(name = ${icon:name})",
+                TemplateConstants.Fragment.ICON_BUILDER to $$"${def:builder}(name = ${icon:name})",
             ),
         )
         val fallback = ImageVectorEmitter(noOpLogger, formatConfig)

@@ -23,6 +23,7 @@ object TemplateConstants {
     object Fragment {
         const val PATH_BUILDER = "path_builder"
         const val GROUP_BUILDER = "group_builder"
+        const val ICON_BUILDER = "icon_builder"
         const val CHUNK_FUNCTION_NAME = "chunk_function_name"
         const val CHUNK_FUNCTION_DEFINITION = "chunk_function_definition"
     }
