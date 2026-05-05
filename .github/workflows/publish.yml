@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
 
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
 
