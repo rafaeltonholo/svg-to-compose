@@ -125,7 +125,7 @@ internal class IconParserConfigurationImpl(
 
     override fun validate(): List<String> {
         val errors = mutableListOf<String>()
-        val noPreview = noPreview.get()
+        val noPreview = noPreview.getOrElse(AppDefaults.NO_PREVIEW)
         if (noPreview.not() && theme.orNull.isNullOrBlank()) {
             errors.add("${configurationName()}: Theme name cannot be empty when Preview is enabled.")
         }
@@ -133,26 +133,26 @@ internal class IconParserConfigurationImpl(
         return errors
     }
 
-    internal fun merge(common: IconParserConfigurationImpl) {
+    internal fun merge(common: IconParserConfigurationImpl?) {
         iconVisibility
             .setIfNotPresent(
-                provider = common.iconVisibility,
+                provider = common?.iconVisibility,
                 defaultValue = if (AppDefaults.MAKE_INTERNAL) {
                     IconVisibility.Internal
                 } else {
                     IconVisibility.Public
                 },
             )
-        receiverType.setIfNotPresent(provider = common.receiverType)
+        receiverType.setIfNotPresent(provider = common?.receiverType)
         addToMaterialIcons.setIfNotPresent(
-            provider = common.addToMaterialIcons,
+            provider = common?.addToMaterialIcons,
             defaultValue = AppDefaults.ADD_TO_MATERIAL_ICONS,
         )
-        minified.setIfNotPresent(provider = common.minified, defaultValue = AppDefaults.MINIFIED)
-        noPreview.setIfNotPresent(provider = common.noPreview, defaultValue = AppDefaults.NO_PREVIEW)
-        theme.setIfNotPresent(provider = common.theme, defaultValue = "")
-        mapIconNameTo.setIfNotPresent(provider = common.mapIconNameTo)
-        exclude.setIfNotPresent(provider = common.exclude)
+        minified.setIfNotPresent(provider = common?.minified, defaultValue = AppDefaults.MINIFIED)
+        noPreview.setIfNotPresent(provider = common?.noPreview, defaultValue = AppDefaults.NO_PREVIEW)
+        theme.setIfNotPresent(provider = common?.theme, defaultValue = "")
+        mapIconNameTo.setIfNotPresent(provider = common?.mapIconNameTo)
+        exclude.setIfNotPresent(provider = common?.exclude)
     }
 
     override fun toString(): String = buildString {
