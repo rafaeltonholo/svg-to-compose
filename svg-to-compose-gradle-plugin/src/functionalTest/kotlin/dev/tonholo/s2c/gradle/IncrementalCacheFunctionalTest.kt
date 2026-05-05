@@ -347,10 +347,14 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
 
         // Act
         writeSvg("icons", "icon-b_fill.svg", SIMPLE_SVG_B)
-        val secondResult = runGradle(TASK_NAME)
+        val secondResult = runGradle(TASK_NAME, info = true)
 
         // Assert
         assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertFalse(
+            secondResult.output.contains("Non-incremental build for configuration"),
+            "Second run should be incremental so the bug path in resolveFileChanges is exercised",
+        )
         assertFalse(
             genDir.resolve("IconBFill.kt").exists(),
             "Excluded SVG should not produce output",
