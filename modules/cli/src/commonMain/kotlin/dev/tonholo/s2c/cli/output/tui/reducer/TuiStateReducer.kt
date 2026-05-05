@@ -25,6 +25,7 @@ internal fun reduceMode(state: TuiMode, event: ConversionEvent): TuiMode = when 
     is ConversionEvent.FileCompleted,
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
+    is ConversionEvent.ErrorReportGenerated,
     -> state
 }
 
@@ -56,6 +57,7 @@ internal fun reduceSingleFileCompletion(
     is ConversionEvent.FileStepChanged,
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
+    is ConversionEvent.ErrorReportGenerated,
     -> state
 }
 
@@ -71,6 +73,7 @@ internal fun reduceHeader(state: HeaderState, event: ConversionEvent): HeaderSta
     is ConversionEvent.FileCompleted,
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
+    is ConversionEvent.ErrorReportGenerated,
     -> state
 }
 
@@ -103,6 +106,7 @@ internal fun reduceProgress(state: ProgressState?, event: ConversionEvent): Prog
         is ConversionEvent.FileStepChanged,
         is ConversionEvent.RunCompleted,
         is ConversionEvent.UpdateAvailable,
+        is ConversionEvent.ErrorReportGenerated,
         -> state ?: ProgressState()
     }
 
@@ -154,6 +158,7 @@ internal fun reduceCurrentFiles(
     is ConversionEvent.RunStarted,
     is ConversionEvent.RunCompleted,
     is ConversionEvent.UpdateAvailable,
+    is ConversionEvent.ErrorReportGenerated,
     -> state
 }
 
@@ -172,6 +177,7 @@ internal fun reduceRecentFiles(state: RecentFilesState, event: ConversionEvent):
         is ConversionEvent.FileStepChanged,
         is ConversionEvent.RunCompleted,
         is ConversionEvent.UpdateAvailable,
+        is ConversionEvent.ErrorReportGenerated,
         -> state
     }
 
@@ -191,6 +197,7 @@ internal fun reduceUpdateNotification(
     is ConversionEvent.FileStepChanged,
     is ConversionEvent.FileCompleted,
     is ConversionEvent.RunCompleted,
+    is ConversionEvent.ErrorReportGenerated,
     -> state
 }
 
@@ -231,5 +238,6 @@ internal fun reduceCompletion(state: CompletionState, event: ConversionEvent): C
         is ConversionEvent.FileStarted,
         is ConversionEvent.FileStepChanged,
         is ConversionEvent.UpdateAvailable,
+        is ConversionEvent.ErrorReportGenerated,
         -> state
     }

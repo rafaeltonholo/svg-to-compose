@@ -63,6 +63,15 @@ internal sealed interface JsonEvent {
     @SerialName("update_available")
     data class UpdateAvailable(val current: String, val latest: String, val url: String) : JsonEvent
 
+    @Serializable
+    @SerialName("error_report")
+    data class ErrorReport(
+        @SerialName("report_file")
+        val reportFile: String,
+        @SerialName("bug_report_url")
+        val bugReportUrl: String,
+    ) : JsonEvent
+
     companion object {
         /**
          * Converts a [ConversionEvent] to its [JsonEvent] representation.
@@ -98,6 +107,11 @@ internal sealed interface JsonEvent {
                 current = event.current,
                 latest = event.latest,
                 url = event.releaseUrl,
+            )
+
+            is ConversionEvent.ErrorReportGenerated -> ErrorReport(
+                reportFile = event.reportPath,
+                bugReportUrl = event.bugReportUrl,
             )
         }
 

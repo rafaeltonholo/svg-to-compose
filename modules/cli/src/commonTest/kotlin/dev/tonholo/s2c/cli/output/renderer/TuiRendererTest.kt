@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.cli.output.renderer
 
+import com.github.ajalt.mordant.input.KeyboardEvent
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
 import com.github.ajalt.mordant.terminal.TerminalRecorder
@@ -9,6 +10,10 @@ import dev.tonholo.s2c.output.FileResult
 import dev.tonholo.s2c.output.RunConfig
 import dev.tonholo.s2c.output.RunStats
 import dev.tonholo.s2c.parser.ParserConfig
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -275,5 +280,209 @@ class TuiRendererTest {
         assertTrue(output.contains("a.svg"))
         assertTrue(output.contains("b.svg"))
         assertTrue(output.contains("c.svg"))
+    }
+
+    @Test
+    fun `given ErrorReportGenerated - when c key pressed - then clipboard receives saved report contents`() =
+        runTest {
+            // Arrange
+            val (terminal, recorder) = newTerminal()
+            val fileSystem = FakeFileSystem()
+            val reportPath = "/tmp/s2c-errors-1.log".toPath()
+            fileSystem.createDirectories(requireNotNull(reportPath.parent))
+            val savedReport = "svg-to-compose v2.2.0\n[ParseSvgError] icon.svg\n  Invalid path data\n"
+            fileSystem.write(reportPath) { writeUtf8(savedReport) }
+            val copiedText = mutableListOf<String>()
+            val renderer = TuiRenderer(
+                terminal = terminal,
+                stackTraceEnabled = false,
+                fileSystem = fileSystem,
+                clipboardWriter = { text ->
+                    copiedText += text
+                    true
+                },
+            )
+
+            // Act
+            renderer.onEvent(runStarted(totalFiles = 1))
+            renderer.onEvent(
+                ConversionEvent.FileCompleted(
+                    fileName = "icon.svg",
+                    duration = 5.milliseconds,
+                    result = FileResult.Failed(errorCode = ErrorCode.ParseSvgError, message = "bad"),
+                ),
+            )
+            renderer.onEvent(runCompleted(total = 1, succeeded = 0, failed = 1))
+            renderer.onEvent(
+                ConversionEvent.ErrorReportGenerated(
+                    reportPath = reportPath.toString(),
+                    bugReportUrl = "https://example.com",
+                ),
+            )
+            renderer.handleKeyEvent(event = KeyboardEvent(key = "c"))
+
+            // Assert
+            assertEquals(expected = listOf(savedReport), actual = copiedText)
+            assertTrue(
+                actual = recorder.output().contains("Error report copied to clipboard."),
+                message = recorder.output(),
+            )
+            // The exit signal completes after [c] so awaitUserExit must return.
+            renderer.awaitUserExit()
+        }
+
+    @Test
+    fun `given ErrorReportGenerated - when any non-c key pressed - then exit signal completes without copying`() =
+        runTest {
+            // Arrange
+            val (terminal, _) = newTerminal()
+            val fileSystem = FakeFileSystem()
+            val reportPath = "/tmp/s2c-errors-2.log".toPath()
+            fileSystem.createDirectories(requireNotNull(reportPath.parent))
+            fileSystem.write(reportPath) { writeUtf8("content") }
+            var copyCount = 0
+            val renderer = TuiRenderer(
+                terminal = terminal,
+                stackTraceEnabled = false,
+                fileSystem = fileSystem,
+                clipboardWriter = {
+                    copyCount++
+                    true
+                },
+            )
+
+            // Act
+            renderer.onEvent(runStarted(totalFiles = 1))
+            renderer.onEvent(runCompleted(total = 1, succeeded = 1, failed = 0, errorCounts = emptyMap()))
+            renderer.onEvent(
+                ConversionEvent.ErrorReportGenerated(
+                    reportPath = reportPath.toString(),
+                    bugReportUrl = "https://example.com",
+                ),
+            )
+            renderer.handleKeyEvent(event = KeyboardEvent(key = "q"))
+
+            // Assert
+            assertEquals(expected = 0, actual = copyCount)
+            renderer.awaitUserExit()
+        }
+
+    @Test
+    fun `given clipboard write fails - when c key pressed - then renderer prints fallback hint`() =
+        runTest {
+            // Arrange
+            val (terminal, recorder) = newTerminal()
+            val fileSystem = FakeFileSystem()
+            val reportPath = "/tmp/s2c-errors-3.log".toPath()
+            fileSystem.createDirectories(requireNotNull(reportPath.parent))
+            fileSystem.write(reportPath) { writeUtf8("content") }
+            val renderer = TuiRenderer(
+                terminal = terminal,
+                stackTraceEnabled = false,
+                fileSystem = fileSystem,
+                clipboardWriter = { false },
+            )
+
+            // Act
+            renderer.onEvent(runStarted(totalFiles = 1))
+            renderer.onEvent(runCompleted(total = 1, succeeded = 1, failed = 0, errorCounts = emptyMap()))
+            renderer.onEvent(
+                ConversionEvent.ErrorReportGenerated(
+                    reportPath = reportPath.toString(),
+                    bugReportUrl = "https://example.com",
+                ),
+            )
+            renderer.handleKeyEvent(event = KeyboardEvent(key = "c"))
+
+            // Assert
+            val output = recorder.output()
+            assertTrue(
+                actual = output.contains("Clipboard is unreachable"),
+                message = output,
+            )
+            assertTrue(actual = output.contains(reportPath.toString()), message = output)
+        }
+
+    @Test
+    fun `given no error report displayed - when awaitUserExit called - then returns immediately`() {
+        // Arrange
+        val (terminal, _) = newTerminal()
+        val renderer = TuiRenderer(
+            terminal = terminal,
+            stackTraceEnabled = false,
+            fileSystem = FakeFileSystem(),
+            clipboardWriter = { true },
+        )
+
+        // Act & Assert: runBlocking so we fail fast if this ever suspends.
+        runBlocking { renderer.awaitUserExit() }
+    }
+
+    @Test
+    fun `given ErrorReportGenerated displayed - when signalInputClosed called before keypress - then awaitUserExit returns`() =
+        runTest {
+            // Arrange: simulate the input flow terminating (stdin EOF, closed
+            // pipe) before the user presses [c] or any other key. Without the
+            // fix, awaitUserExit would suspend forever because userExitSignal
+            // is only completed via handleKeyEvent.
+            val (terminal, _) = newTerminal()
+            val fileSystem = FakeFileSystem()
+            val reportPath = "/tmp/s2c-errors-eof.log".toPath()
+            fileSystem.createDirectories(requireNotNull(reportPath.parent))
+            fileSystem.write(reportPath) { writeUtf8("content") }
+            val renderer = TuiRenderer(
+                terminal = terminal,
+                stackTraceEnabled = false,
+                fileSystem = fileSystem,
+                clipboardWriter = { true },
+            )
+            renderer.onEvent(runStarted(totalFiles = 1))
+            renderer.onEvent(runCompleted(total = 1, succeeded = 0, failed = 1))
+            renderer.onEvent(
+                ConversionEvent.ErrorReportGenerated(
+                    reportPath = reportPath.toString(),
+                    bugReportUrl = "https://example.com",
+                ),
+            )
+
+            // Act
+            renderer.signalInputClosed()
+
+            // Assert: returns instead of suspending forever.
+            renderer.awaitUserExit()
+        }
+
+    @Test
+    fun `given ErrorReportGenerated after RunCompleted - when dispatched - then terminal prints report path and url`() {
+        // Arrange
+        val (terminal, recorder) = newTerminal()
+        val renderer = TuiRenderer(terminal = terminal, stackTraceEnabled = false)
+
+        // Act
+        renderer.onEvent(runStarted(totalFiles = 1))
+        renderer.onEvent(
+            ConversionEvent.FileCompleted(
+                fileName = "broken.svg",
+                duration = 5.milliseconds,
+                result = FileResult.Failed(
+                    errorCode = ErrorCode.ParseSvgError,
+                    message = "bad",
+                ),
+            ),
+        )
+        renderer.onEvent(runCompleted(total = 1, succeeded = 0, failed = 1))
+        renderer.onEvent(
+            ConversionEvent.ErrorReportGenerated(
+                reportPath = "./s2c-errors-42.log",
+                bugReportUrl = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=bug",
+            ),
+        )
+
+        // Assert
+        val output = recorder.output()
+        assertTrue(output.contains("Error report saved to: ./s2c-errors-42.log"))
+        assertTrue(
+            output.contains("Report a bug: https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=bug"),
+        )
     }
 }

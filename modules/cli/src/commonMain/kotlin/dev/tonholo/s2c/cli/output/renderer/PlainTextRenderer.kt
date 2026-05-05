@@ -31,6 +31,7 @@ internal class PlainTextRenderer(private val writer: (String) -> Unit = ::printl
             is ConversionEvent.FileCompleted -> renderFileCompleted(event)
             is ConversionEvent.RunCompleted -> renderRunCompleted(event)
             is ConversionEvent.UpdateAvailable -> renderUpdateAvailable(event)
+            is ConversionEvent.ErrorReportGenerated -> renderErrorReport(event)
         }
     }
 
@@ -86,6 +87,11 @@ internal class PlainTextRenderer(private val writer: (String) -> Unit = ::printl
 
     private fun renderUpdateAvailable(event: ConversionEvent.UpdateAvailable) {
         writer("[UPDATE] v${event.latest} available - download from ${event.releaseUrl}")
+    }
+
+    private fun renderErrorReport(event: ConversionEvent.ErrorReportGenerated) {
+        writer("[REPORT] Error report saved to: ${event.reportPath}")
+        writer("[REPORT] Report a bug: ${event.bugReportUrl}")
     }
 
     private fun formatDuration(durationMs: Long): String {

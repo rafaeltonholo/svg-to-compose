@@ -301,6 +301,25 @@ class PlainTextRendererTest {
     }
 
     @Test
+    fun `given ErrorReportGenerated event - when onEvent called - then outputs REPORT lines`() {
+        // Arrange
+        val event = ConversionEvent.ErrorReportGenerated(
+            reportPath = "./s2c-errors-2026-04-03T14-30-00.log",
+            bugReportUrl = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=Bug",
+        )
+
+        // Act
+        val lines = collectOutput { it.onEvent(event) }
+
+        // Assert
+        assertEquals(expected = 2, actual = lines.size)
+        assertTrue(lines[0].startsWith("[REPORT]"))
+        assertTrue(lines[0].contains("./s2c-errors-2026-04-03T14-30-00.log"))
+        assertTrue(lines[1].startsWith("[REPORT]"))
+        assertTrue(lines[1].contains("https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=Bug"))
+    }
+
+    @Test
     fun `given RunCompleted - when throughput calculable - then shows icons per second`() {
         // Arrange
         val event = ConversionEvent.RunCompleted(
