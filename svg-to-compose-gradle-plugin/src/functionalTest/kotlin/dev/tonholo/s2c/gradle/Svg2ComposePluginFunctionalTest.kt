@@ -136,6 +136,42 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         assertAllOutputsMatchExpected(pkg, fileType = "xml", optimized = true)
     }
 
+    // --- No common block ---
+
+    @Test
+    fun `given configuration without common block, when task runs, then defaults are applied and outputs match optimized baseline`() {
+        val pkg = "dev.tonholo.s2c.integrity.icon.svg"
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories {
+                mavenCentral()
+            }
+            kotlin {
+                jvm()
+            }
+            svgToCompose {
+                processor {
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        icons { noPreview() }
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        copyResourcesToProject("icons", "svg")
+
+        val result = runGradle("parseSvgToComposeIcon")
+        assertTaskSuccess(result, "parseSvgToComposeIcon")
+        assertAllOutputsMatchExpected(pkg, fileType = "svg", optimized = true)
+    }
+
     // --- Configuration cache tests ---
 
     @Test
