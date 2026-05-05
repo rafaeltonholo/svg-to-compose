@@ -28,20 +28,17 @@ data object XmlPendingParentElement : XmlParentNode {
 
 private const val MAX_DEPTH = 5
 
-abstract class XmlChildNode(parent: XmlParentNode) : XmlNode {
-    var parent: XmlParentNode = parent
+abstract class XmlChildNode(initialParent: XmlParentNode) : XmlNode {
+    var parent: XmlParentNode = initialParent
         private set
 
     val rootParent: XmlParentNode by lazy {
-        var current: XmlChildNode
-        var currentParent = parent
-        do {
+        var current: XmlChildNode = this
+        var currentParent = current.parent
+        while (currentParent !is XmlRootNode) {
             current = currentParent as XmlChildNode
-            currentParent = when (currentParent) {
-                is XmlRootNode -> break
-                else -> current.parent
-            }
-        } while (currentParent !is XmlRootNode)
+            currentParent = current.parent
+        }
 
         // XmlRootNode is the Document itself and not an actual node.
         // Because of that, we return the direct child that we use to
