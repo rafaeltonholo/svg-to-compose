@@ -285,11 +285,13 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
             return allFiles to removedFromRegistry
         }
 
+        val exclude = configuration.iconConfiguration.get().exclude.orNull
         val added = mutableListOf<Path>()
         val removed = mutableListOf<Path>()
         inputChanges.getFileChanges(configuration.origin).forEach { change ->
             val ext = change.file.extension.lowercase()
             if (ext != "svg" && ext != "xml") return@forEach
+            if (exclude != null && change.file.name.matches(exclude)) return@forEach
             val path = change.file.toOkioPath()
             when (change.changeType) {
                 ChangeType.ADDED, ChangeType.MODIFIED -> added.add(path)
