@@ -5,6 +5,7 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
@@ -170,6 +171,58 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         val result = runGradle("parseSvgToComposeIcon")
         assertTaskSuccess(result, "parseSvgToComposeIcon")
         assertAllOutputsMatchExpected(pkg, fileType = "svg", optimized = true)
+    }
+
+    // --- Sub-directory package sanitization ---
+
+    @Test
+    fun `given recursive scan over folders with dashes, when task runs, then generated package is valid Kotlin`() {
+        val pkg = "dev.tonholo.s2c.test.dashes"
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories {
+                mavenCentral()
+            }
+            kotlin {
+                jvm()
+            }
+            svgToCompose {
+                processor {
+                    common {
+                        icons { noPreview() }
+                        recursive()
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        // language=svg
+        val svg = """
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <rect width="24" height="24" fill="#000"/>
+            </svg>
+        """.trimIndent()
+        writeSvg("icons/with-dashes/sub-folder", "icon.svg", svg)
+
+        val result = runGradle("parseSvgToComposeIcon")
+        assertTaskSuccess(result, "parseSvgToComposeIcon")
+
+        val expectedPackage = "$pkg.with_dashes.sub_folder"
+        val generatedRoot = projectDir.resolve("build/generated/svgToCompose")
+        val generated = generatedRoot.walkTopDown()
+            .firstOrNull { it.isFile && it.extension == "kt" && it.nameWithoutExtension == "Icon" }
+        assertNotNull(generated, "No generated Icon.kt under $generatedRoot. Tree: ${generatedRoot.walkTopDown().joinToString("\n")}")
+        val firstLine = generated.readText().lineSequence().first { it.isNotBlank() }
+        assertEquals("package $expectedPackage", firstLine)
     }
 
     // --- Configuration cache tests ---
