@@ -179,6 +179,8 @@ fun SvgNode.asNodes(
 
         is SvgPolylineNode -> listOf(asNode(minified = minified))
 
+        is SvgLineNode -> listOf(asNode(minified = minified))
+
         is SvgEllipseNode -> listOf(asNode(minified = minified))
 
         else -> null
