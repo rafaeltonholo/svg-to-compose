@@ -19,25 +19,32 @@ class SvgRadialGradientNode(
     SvgNode {
     override val constructor = ::SvgRadialGradientNode
 
-    /**
-     * Converts SVG radial gradient to Compose brush with transformed geometry
-     */
-    override fun toBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
+    override fun createGradientBrush(target: List<PathNodes>): ComposeBrush.Gradient.Radial {
         val (colors, stops) = colorStops
 
-        var cx = calculateGradientXCoordinate(cx, target)
-        var cy = calculateGradientYCoordinate(cy, target)
+        // Compose's radialGradient has a single center parameter with no separate
+        // focal point. SVG defines cx/cy as the end circle center (where 100%
+        // stops map) and fx/fy as the focal point (where 0% stops originate).
+        //
+        // We use cx/cy as Compose's center to preserve correct gradient circle
+        // boundaries. The focal point (fx/fy) is dropped because Compose has no
+        // equivalent parameter. This matches Android Studio's SVG-to-VectorDrawable
+        // conversion behavior. When fx/fy differs from cx/cy, the eccentric color
+        // origin is lost, but the circle boundary remains accurate, which produces
+        // fewer visual artifacts overall.
+        var centerX = calculateGradientXCoordinate(cx, target)
+        var centerY = calculateGradientYCoordinate(cy, target)
         var gradientRadius = calculateGradientXYCoordinate(radius, target, translateByBoundingBoxOrigin = false)
 
         val matrix = computeGradientTransformMatrix()
         if (matrix != null) {
-            val transformed = Point2D(cx, cy).transform(matrix)
-            cx = transformed.x
-            cy = transformed.y
+            val transformedCenter = Point2D(centerX, centerY).transform(matrix)
+            centerX = transformedCenter.x
+            centerY = transformedCenter.y
             gradientRadius = approximateCircleRadius(gradientRadius, matrix)
         }
-        val centerOffset = ComposeOffset(x = cx.toFloat(), y = cy.toFloat())
 
+        val centerOffset = ComposeOffset(x = centerX.toFloat(), y = centerY.toFloat())
         return ComposeBrush.Gradient.Radial(
             center = centerOffset,
             tileMode = spreadMethod.toCompose(),
@@ -56,8 +63,8 @@ class SvgRadialGradientNode(
      * This provides an average scale factor that represents how the transformation affects
      * the circle's size.
      *
-     * The calculation uses the formula: `sqrt((σ₁² + σ₂²) / 2)`, where `σ₁` and `σ₂` are the
-     * singular values, and `σ₁² + σ₂² = a² + b² + c² + d²`, with a, b, c, d being the
+     * The calculation uses the formula: `sqrt((s1^2 + s2^2) / 2)`, where `s1` and `s2` are the
+     * singular values, and `s1^2 + s2^2 = a^2 + b^2 + c^2 + d^2`, with a, b, c, d being the
      * elements of the 2x2 linear transformation matrix.
      *
      * @param gradientRadius the original radius of the circle before transformation

@@ -3,11 +3,8 @@ package dev.tonholo.s2c.domain.svg
 import dev.tonholo.s2c.domain.compose.ComposeBrush
 import dev.tonholo.s2c.domain.compose.ComposeOffset
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
-import kotlin.test.assertNotNull
 
 class SvgLinearGradientNodeTest : BaseSvgTest() {
 
@@ -332,8 +329,9 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
     }
 
     @Test
-    fun `given linearGradient href referencing a radialGradient - when toBrush is called - then throws IllegalStateException`() {
-        // Arrange
+    fun `given linearGradient href referencing a radialGradient - when toBrush is called - then produces linear brush with own stops`() {
+        // Arrange - per SVG spec, cross-type href inherits stops; but since this
+        // linearGradient has its own stops, it should use them and produce a linear brush.
         root.attributes["width"] = "100"
         root.attributes["height"] = "100"
         root.attributes["viewBox"] = "0 0 100 100"
@@ -347,16 +345,21 @@ class SvgLinearGradientNodeTest : BaseSvgTest() {
             attributes = mutableMapOf(
                 "id" to "linGradRef",
                 "xlink:href" to "#radGrad1",
+                "gradientUnits" to "userSpaceOnUse",
+                "x1" to "0",
+                "y1" to "0",
+                "x2" to "100",
+                "y2" to "100",
             ),
         )
+        root.gradients["linGradRef"] = linearGradient
 
-        // Act & Assert
-        val exception = assertFailsWith<IllegalStateException> {
-            linearGradient.toBrush(target = emptyList())
-        }
-        val message = exception.message
-        assertNotNull(message)
-        assertContains(message, "radGrad1")
-        assertContains(message, "SvgRadialGradientNode")
+        // Act
+        val brush = linearGradient.toBrush(target = emptyList())
+
+        // Assert - must be a LINEAR brush, not radial. Uses own 2 stops.
+        assertIs<ComposeBrush.Gradient.Linear>(brush)
+        assertEquals(expected = 2, actual = brush.colors.size)
+        assertEquals(expected = listOf(0f, 1f), actual = brush.stops)
     }
 }

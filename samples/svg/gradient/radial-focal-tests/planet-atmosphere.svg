@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <!-- Planet with atmospheric glow and sun-side illumination -->
+  <defs>
+    <radialGradient id="space" cx="150" cy="150" r="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0d1b2a"/>
+      <stop offset="100%" stop-color="#000005"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="150" cy="150" r="100" fx="120" fy="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5588bb"/>
+      <stop offset="20%" stop-color="#447799"/>
+      <stop offset="45%" stop-color="#336688"/>
+      <stop offset="70%" stop-color="#224466"/>
+      <stop offset="100%" stop-color="#112233"/>
+    </radialGradient>
+    <radialGradient id="atmosphere" cx="150" cy="150" r="115" fx="125" fy="125" gradientUnits="userSpaceOnUse">
+      <stop offset="70%" stop-color="#66aaff" stop-opacity="0"/>
+      <stop offset="85%" stop-color="#4488dd" stop-opacity="0.15"/>
+      <stop offset="95%" stop-color="#88ccff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#aaddff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="terminator" cx="170" cy="150" r="100" fx="200" fy="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.1"/>
+      <stop offset="80%" stop-color="#000000" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.85"/>
+    </radialGradient>
+    <radialGradient id="starLight" cx="50" cy="50" r="30" fx="48" fy="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#ffffee" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffffdd" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="300" height="300" fill="url(#space)"/>
+  <!-- Distant star -->
+  <circle cx="50" cy="50" r="30" fill="url(#starLight)"/>
+  <!-- Small stars -->
+  <circle cx="250" cy="40" r="1" fill="#ffffff" opacity="0.6"/>
+  <circle cx="220" cy="80" r="0.8" fill="#ffffff" opacity="0.4"/>
+  <circle cx="270" cy="200" r="1.2" fill="#ffffff" opacity="0.5"/>
+  <circle cx="40" cy="250" r="0.8" fill="#ffffff" opacity="0.3"/>
+  <circle cx="180" cy="30" r="0.6" fill="#ffffff" opacity="0.5"/>
+  <!-- Planet body -->
+  <circle cx="150" cy="150" r="100" fill="url(#planet)"/>
+  <circle cx="150" cy="150" r="100" fill="url(#terminator)"/>
+  <!-- Atmosphere -->
+  <circle cx="150" cy="150" r="115" fill="url(#atmosphere)"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Glass sphere with specular highlight offset from center -->
+  <defs>
+    <radialGradient id="sphere" cx="100" cy="110" r="80" fx="75" fy="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="15%" stop-color="#b3d9ff"/>
+      <stop offset="45%" stop-color="#3399ff"/>
+      <stop offset="75%" stop-color="#0055aa"/>
+      <stop offset="100%" stop-color="#001a33"/>
+    </radialGradient>
+    <radialGradient id="shadow" cx="100" cy="185" r="60" fx="100" fy="185" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="185" rx="60" ry="12" fill="url(#shadow)"/>
+  <circle cx="100" cy="100" r="80" fill="url(#sphere)"/>
+</svg>

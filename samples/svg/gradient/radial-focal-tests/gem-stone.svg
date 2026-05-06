@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="220" viewBox="0 0 200 220">
+  <!-- Cut gemstone with internal refraction highlight -->
+  <defs>
+    <radialGradient id="gemBody" cx="100" cy="120" r="75" fx="80" fy="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff1a6d"/>
+      <stop offset="25%" stop-color="#cc1166"/>
+      <stop offset="50%" stop-color="#990044"/>
+      <stop offset="75%" stop-color="#660033"/>
+      <stop offset="100%" stop-color="#330022"/>
+    </radialGradient>
+    <radialGradient id="gemHighlight" cx="85" cy="95" r="35" fx="78" fy="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#ffaacc" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ff1a6d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gemDeep" cx="110" cy="145" r="40" fx="115" fy="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff3388" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#1a0011" stop-opacity="0.8"/>
+    </radialGradient>
+  </defs>
+  <!-- Gem outline - hexagonal shape -->
+  <polygon points="100,30 160,70 160,160 100,200 40,160 40,70" fill="url(#gemBody)"/>
+  <polygon points="100,30 160,70 160,160 100,200 40,160 40,70" fill="url(#gemHighlight)"/>
+  <!-- Bottom facet darkening -->
+  <polygon points="100,130 160,160 100,200 40,160" fill="url(#gemDeep)"/>
+  <!-- Crown facet lines -->
+  <path d="M100,30 L70,70 M100,30 L130,70 M40,70 L160,70" stroke="#ffffff" stroke-opacity="0.15" stroke-width="0.5" fill="none"/>
+  <path d="M40,160 L100,130 L160,160" stroke="#ffffff" stroke-opacity="0.1" stroke-width="0.5" fill="none"/>
+</svg>

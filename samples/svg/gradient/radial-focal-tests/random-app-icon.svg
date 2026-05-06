@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- App icon with glossy finish - common mobile design pattern -->
+  <defs>
+    <radialGradient id="iconBg" cx="100" cy="120" r="120" fx="80" fy="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="40%" stop-color="#6d28d9"/>
+      <stop offset="70%" stop-color="#5b21b6"/>
+      <stop offset="100%" stop-color="#3b0764"/>
+    </radialGradient>
+    <radialGradient id="iconGlow" cx="100" cy="100" r="80" fx="85" fy="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#7c3aed" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#3b0764" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="iconShine" cx="100" cy="60" r="80" fx="90" fy="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Icon background -->
+  <rect x="15" y="15" width="170" height="170" rx="38" fill="url(#iconBg)"/>
+  <rect x="15" y="15" width="170" height="170" rx="38" fill="url(#iconGlow)"/>
+  <!-- Symbol (play triangle) -->
+  <polygon points="80,60 140,100 80,140" fill="#ffffff" opacity="0.9"/>
+  <!-- Top gloss -->
+  <rect x="15" y="15" width="170" height="85" rx="38" fill="url(#iconShine)"/>
+</svg>
