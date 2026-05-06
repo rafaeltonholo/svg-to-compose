@@ -65,6 +65,9 @@ private const val PROGRESS_PARSING = 50
 /** Progress percentage reported during the code-generation stage. */
 private const val PROGRESS_GENERATING = 80
 
+/** Maximum depth to walk when summarising a Throwable's cause chain. */
+private const val MAX_CAUSE_DEPTH = 5
+
 /** Maps a [ConversionStep] to a [ConversionOutput] for the UI. */
 private fun ConversionStep.toConversionOutput(json: Json): ConversionOutput = when (this) {
     is ConversionStep.Optimizing -> ConversionOutput.Progress(message, percent = PROGRESS_OPTIMIZING)
@@ -81,5 +84,31 @@ private fun ConversionStep.toConversionOutput(json: Json): ConversionOutput = wh
         ),
     )
 
-    is ConversionStep.Error -> ConversionOutput.Error(error.message ?: "Unknown error")
+    is ConversionStep.Error -> ConversionOutput.Error(error.toUserMessage())
+}
+
+/**
+ * Builds a UI-friendly error message that includes the exception type and the
+ * cause chain so users can self-diagnose conversion failures instead of seeing
+ * a bare "Unknown error".
+ */
+private fun Throwable.toUserMessage(): String = buildString {
+    append(this@toUserMessage::class.simpleName ?: "Error")
+    val rootMessage = this@toUserMessage.message?.takeIf { it.isNotBlank() }
+    if (rootMessage != null) {
+        append(": ")
+        append(rootMessage)
+    }
+    var current = cause
+    var depth = 0
+    while (current != null && depth < MAX_CAUSE_DEPTH) {
+        append("\nCaused by: ")
+        append(current::class.simpleName ?: "Error")
+        current.message?.takeIf { it.isNotBlank() }?.let {
+            append(": ")
+            append(it)
+        }
+        current = current.cause
+        depth++
+    }
 }
