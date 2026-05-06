@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.website.state.playground
 
+import dev.tonholo.s2c.extensions.toKotlinPackageSegment
 import dev.tonholo.s2c.website.worker.ConversionInput
 
 /**
@@ -33,8 +34,8 @@ internal object ConversionInputFactory {
     private fun computeFilePackage(relativePath: String, basePackage: String): String {
         if (relativePath.isEmpty() || basePackage.isEmpty()) return basePackage
         val subPkg = relativePath
-            .replace("/", ".")
-            .replace("-", "_")
+            .split("/")
+            .joinToString(".") { it.toKotlinPackageSegment() }
             .lowercase()
         return "$basePackage.$subPkg"
     }
