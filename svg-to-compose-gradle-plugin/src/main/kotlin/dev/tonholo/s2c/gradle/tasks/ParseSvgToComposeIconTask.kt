@@ -4,6 +4,7 @@ import com.android.build.api.variant.AndroidComponentsExtension
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
+import dev.tonholo.s2c.extensions.toKotlinPackageSegment
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
@@ -443,7 +444,11 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(private va
         parent: Path,
     ): String = configuration.destinationPackage.get().let { pkg ->
         pkg + if (recursive && path.parent != parent) {
-            ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
+            ".${
+                path.relativeTo(parent).parent?.segments?.joinToString(".") {
+                    it.toKotlinPackageSegment()
+                }
+            }"
         } else {
             ""
         }
