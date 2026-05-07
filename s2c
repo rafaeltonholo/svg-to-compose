@@ -47,7 +47,7 @@ fn_print_info() {
 }
 
 fn_fetch_latest_version() {
-  if [ "$VERSION" == "" ] || [ $MUST_UPGRADE == true ]; then
+  if [ "$VERSION" == "" ] || [ "$MUST_UPGRADE" == true ]; then
     fn_print_verbose "The app.properties file was not found. Fetching from Github."
     VERSION=$(curl -s https://api.github.com/repos/rafaeltonholo/svg-to-compose/releases/latest \
     | grep "tag_name" \
