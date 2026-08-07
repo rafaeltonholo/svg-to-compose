@@ -71,11 +71,10 @@ abstract class SvgToComposeExtension {
      * other configuration. The "common" configuration itself is not modified or removed.
      */
     internal fun applyCommonIfDefined() {
-        configurations.commonOrNull?.let { common ->
-            configurations.forEach {
-                if (it != common) {
-                    it.merge(common)
-                }
+        val common = configurations.commonOrNull
+        configurations.forEach {
+            if (it != common) {
+                it.merge(common)
             }
         }
     }
