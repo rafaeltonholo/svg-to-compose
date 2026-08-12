@@ -57,7 +57,7 @@ abstract class SvgToComposeExtension {
     }
 
     internal fun validate(): List<String> = configurations.flatMap { config ->
-        if (config == configurations.commonOrNull) {
+        if (config === configurations.commonOrNull) {
             emptyList()
         } else {
             config.validate()
@@ -65,17 +65,20 @@ abstract class SvgToComposeExtension {
     }
 
     /**
-     * Applies the "common" processor configuration to all other configurations, if present.
+     * Applies the "common" processor configuration and built-in defaults to all other
+     * configurations.
      *
-     * If a configuration named "common" exists in the container, its values are merged into every
-     * other configuration. The "common" configuration itself is not modified or removed.
+     * Defaults from [dev.tonholo.s2c.AppDefaults] are always applied to properties
+     * that have not been explicitly set, regardless of whether a "common" configuration
+     * exists. When a configuration named "common" is present, its values are merged
+     * into every other configuration before the defaults; the "common" configuration
+     * itself is not modified or removed.
      */
     internal fun applyCommonIfDefined() {
-        configurations.commonOrNull?.let { common ->
-            configurations.forEach {
-                if (it != common) {
-                    it.merge(common)
-                }
+        val common = configurations.commonOrNull
+        configurations.forEach { config ->
+            if (config !== common) {
+                config.merge(common)
             }
         }
     }

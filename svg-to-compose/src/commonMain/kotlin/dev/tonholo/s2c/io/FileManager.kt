@@ -103,7 +103,11 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
     /**
      * Checks whether any directory segment in [path] relative to [root] matches the [excludeDir] regex.
      */
-    private fun isDirExcluded(path: Path, root: Path, excludeDir: Regex): Boolean {
+    private fun isDirExcluded(
+        path: Path,
+        root: Path,
+        excludeDir: Regex,
+    ): Boolean {
         var current = path.parent
         while (current != null && current != root) {
             if (current.name.matches(excludeDir)) return true

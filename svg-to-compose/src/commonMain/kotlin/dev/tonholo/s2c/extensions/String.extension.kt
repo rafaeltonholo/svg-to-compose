@@ -98,3 +98,31 @@ fun String.toPercentage(): Float {
  * Removes trailing zeros from a string representing a number.
  */
 fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
+
+/**
+ * Sanitizes the receiver so it can be used as a single Kotlin package segment.
+ *
+ * Replaces every character that is not a valid Kotlin identifier part with `_`,
+ * and prefixes a leading `_` when the first character would otherwise only be
+ * valid as an identifier part (e.g. a digit). Empty input becomes `_`.
+ *
+ * Examples:
+ * - `"radial-focal-tests"` becomes `"radial_focal_tests"`
+ * - `"my folder.v2"` becomes `"my_folder_v2"`
+ * - `"123abc"` becomes `"_123abc"`
+ */
+fun String.toKotlinPackageSegment(): String {
+    if (isEmpty()) return "_"
+    val builder = StringBuilder(length + 1)
+    val first = this[0]
+    when {
+        first.isLetter() || first == '_' -> builder.append(first)
+        first.isDigit() -> builder.append('_').append(first)
+        else -> builder.append('_')
+    }
+    for (i in 1 until length) {
+        val ch = this[i]
+        builder.append(if (ch.isLetterOrDigit() || ch == '_') ch else '_')
+    }
+    return builder.toString()
+}

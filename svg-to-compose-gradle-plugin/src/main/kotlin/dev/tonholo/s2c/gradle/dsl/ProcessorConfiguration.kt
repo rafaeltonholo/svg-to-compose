@@ -122,17 +122,15 @@ abstract class ProcessorConfiguration @Inject constructor(
         return errors
     }
 
-    fun merge(common: ProcessorConfiguration) {
-        origin.setIfNotPresent(common.origin)
-        destinationPackage.setIfNotPresent(common.destinationPackage)
-        recursive.setIfNotPresent(common.recursive, defaultValue = AppDefaults.RECURSIVE)
-        maxDepth.setIfNotPresent(common.maxDepth, defaultValue = AppDefaults.MAX_RECURSIVE_DEPTH)
-        optimize.setIfNotPresent(common.optimize, defaultValue = AppDefaults.OPTIMIZE)
-        common.iconConfiguration.orNull?.let { commonIconConfig ->
-            iconConfiguration
-                .get()
-                .merge(commonIconConfig)
-        }
+    fun merge(common: ProcessorConfiguration?) {
+        origin.setIfNotPresent(common?.origin)
+        destinationPackage.setIfNotPresent(common?.destinationPackage)
+        recursive.setIfNotPresent(common?.recursive, defaultValue = AppDefaults.RECURSIVE)
+        maxDepth.setIfNotPresent(common?.maxDepth, defaultValue = AppDefaults.MAX_RECURSIVE_DEPTH)
+        optimize.setIfNotPresent(common?.optimize, defaultValue = AppDefaults.OPTIMIZE)
+        iconConfiguration
+            .get()
+            .merge(common?.iconConfiguration?.orNull)
     }
 
     override fun toString(): String = buildString {

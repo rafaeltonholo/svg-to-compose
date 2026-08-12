@@ -309,6 +309,59 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should be regenerated after clean + rebuild")
     }
 
+    @Test
+    fun `given exclude pattern, when incremental build adds excluded SVG, then build succeeds and excluded file is skipped`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.exclude"
+
+        // Arrange
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories { mavenCentral() }
+            kotlin { jvm() }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        icons {
+                            exclude(".*_fill\\.svg".toRegex())
+                        }
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should exist after first run")
+
+        // Act
+        writeSvg("icons", "icon-b_fill.svg", SIMPLE_SVG_B)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertFalse(
+            secondResult.output.contains("Non-incremental build for configuration"),
+            "Second run should be incremental so the bug path in resolveFileChanges is exercised",
+        )
+        assertFalse(
+            genDir.resolve("IconBFill.kt").exists(),
+            "Excluded SVG should not produce output",
+        )
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
     // endregion [ Single Configuration Tests ]
 
     // region [ Incrementality Verification Tests ]

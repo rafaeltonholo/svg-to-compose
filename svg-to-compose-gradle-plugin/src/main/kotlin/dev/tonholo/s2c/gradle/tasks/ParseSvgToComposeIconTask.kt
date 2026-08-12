@@ -5,6 +5,7 @@ import dev.tonholo.s2c.SvgToComposeContextProvider
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.extensions.pascalCase
+import dev.tonholo.s2c.extensions.toKotlinPackageSegment
 import dev.tonholo.s2c.gradle.dsl.IconVisibility
 import dev.tonholo.s2c.gradle.dsl.ProcessorConfiguration
 import dev.tonholo.s2c.gradle.dsl.SvgToComposeExtension
@@ -289,17 +290,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             return allFiles to removedFromRegistry
         }
 
-        val added = mutableListOf<Path>()
-        val removed = mutableListOf<Path>()
-        inputChanges.getFileChanges(configuration.origin).forEach { change ->
-            val ext = change.file.extension.lowercase()
-            if (ext != "svg" && ext != "xml") return@forEach
-            val path = change.file.toOkioPath()
-            when (change.changeType) {
-                ChangeType.ADDED, ChangeType.MODIFIED -> added.add(path)
-                ChangeType.REMOVED -> removed.add(path)
-            }
-        }
+        val (added, removed) = collectIncrementalChanges(configuration, inputChanges)
         // Check for persistent outputs that were manually deleted
         if (isPersistent) {
             added.addAll(findMissingPersistentOutputs(configuration, registry, fileManager))
@@ -463,7 +454,11 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
         parent: Path,
     ): String = configuration.destinationPackage.get().let { pkg ->
         pkg + if (recursive && path.parent != parent) {
-            ".${path.relativeTo(parent).parent?.segments?.joinToString(".")}"
+            ".${
+                path.relativeTo(parent).parent?.segments?.joinToString(".") {
+                    it.toKotlinPackageSegment()
+                }
+            }"
         } else {
             ""
         }
@@ -516,6 +511,37 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             }
             .map { (origin, _) -> origin.toPath() }
     }
+}
+
+/**
+ * Collects added/modified and removed paths from [inputChanges], filtering by
+ * supported extensions and the configured exclude pattern.
+ *
+ * Removals are intentionally not filtered by the exclude pattern: stale outputs
+ * from files that previously did not match the current exclude still need cleanup
+ * when their source is deleted.
+ */
+private fun collectIncrementalChanges(
+    configuration: ProcessorConfiguration,
+    inputChanges: InputChanges,
+): Pair<MutableList<Path>, MutableList<Path>> {
+    val exclude = configuration.iconConfiguration.get().exclude.orNull
+    val added = mutableListOf<Path>()
+    val removed = mutableListOf<Path>()
+    inputChanges.getFileChanges(configuration.origin).forEach { change ->
+        val ext = change.file.extension.lowercase()
+        if (ext != "svg" && ext != "xml") return@forEach
+        val path = change.file.toOkioPath()
+        when (change.changeType) {
+            ChangeType.ADDED, ChangeType.MODIFIED -> {
+                if (exclude != null && change.file.name.matches(exclude)) return@forEach
+                added.add(path)
+            }
+
+            ChangeType.REMOVED -> removed.add(path)
+        }
+    }
+    return added to removed
 }
 
 /**

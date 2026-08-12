@@ -72,4 +72,38 @@ class SvgContentParserTest {
         // Assert
         assertTrue(result.nodes.isNotEmpty(), "Expected non-empty node list for SVG with path")
     }
+
+    @Test
+    fun `given use element with forward reference to element defined later - when parse is called - then no exception is thrown`() {
+        // Arrange
+        // Regression test for https://github.com/rafaeltonholo/svg-to-compose/issues/315
+        // <use> referencing an element that is defined LATER in the document order
+        // forces SvgParser.findReplacementNode to create a placeholder element with
+        // parent=XmlPendingParentElement. Variable shadowing in XmlChildNode.rootParent
+        // captured the constructor parameter at construction time, so the lazy traversal
+        // still saw the pending sentinel after attachParentIfNeeded() updated the property.
+        val svgContent = """
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24">
+              <g>
+                <use href="#shape" xlink:href="#shape"/>
+              </g>
+              <defs>
+                <linearGradient id="grad1">
+                  <stop offset="0" stop-color="#ff0000"/>
+                  <stop offset="1" stop-color="#0000ff"/>
+                </linearGradient>
+                <path id="shape" d="M0 0L10 10" fill="url(#grad1)" stroke-width="1"/>
+              </defs>
+            </svg>
+        """.trimIndent()
+
+        // Act
+        val result = parser.parse(svgContent, iconName = "TestIcon", config = testConfig)
+
+        // Assert
+        assertTrue(
+            result.nodes.isNotEmpty(),
+            "Expected non-empty node list when <use> forward-references a later element",
+        )
+    }
 }
