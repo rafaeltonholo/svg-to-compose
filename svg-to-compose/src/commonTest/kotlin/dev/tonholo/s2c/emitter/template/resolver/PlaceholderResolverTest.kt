@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.emitter.template.resolver
 
+import app.cash.burst.Burst
 import dev.tonholo.s2c.emitter.template.TemplateConstants
 import dev.tonholo.s2c.emitter.template.TemplateContext
 import kotlin.test.Test
@@ -139,78 +140,16 @@ class PlaceholderResolverTest {
     // --- Inline null trimming tests ---
 
     @Test
-    fun `null at start of inline param list`() {
+    @Burst
+    fun `inline null-elision`(case: NullElisionCase) {
         val ctx = createContext()
-        val pathVars = mapOf("fill_alpha" to null, "stroke" to "Color.Red")
         val result = PlaceholderResolver.resolve(
-            $$"fn(fillAlpha = ${path:fill_alpha}, stroke = ${path:stroke})",
+            case.template,
             ctx,
-            nodeVariables = pathVars,
+            nodeVariables = case.pathVars,
             nodeNamespace = "path",
         )
-        assertEquals("fn(stroke = Color.Red)", result)
-    }
-
-    @Test
-    fun `null at end of inline param list`() {
-        val ctx = createContext()
-        val pathVars = mapOf("fill" to "Color.Red", "fill_alpha" to null)
-        val result = PlaceholderResolver.resolve(
-            $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha})",
-            ctx,
-            nodeVariables = pathVars,
-            nodeNamespace = "path",
-        )
-        assertEquals("fn(fill = Color.Red)", result)
-    }
-
-    @Test
-    fun `null in middle of inline param list`() {
-        val ctx = createContext()
-        val pathVars = mapOf(
-            "fill" to "Color.Red",
-            "fill_alpha" to null,
-            "stroke" to "Color.Blue",
-        )
-        val result = PlaceholderResolver.resolve(
-            $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, stroke = ${path:stroke})",
-            ctx,
-            nodeVariables = pathVars,
-            nodeNamespace = "path",
-        )
-        assertEquals("fn(fill = Color.Red, stroke = Color.Blue)", result)
-    }
-
-    @Test
-    fun `all params null on single line`() {
-        val ctx = createContext()
-        val pathVars = mapOf("fill" to null, "fill_alpha" to null)
-        val result = PlaceholderResolver.resolve(
-            $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha})",
-            ctx,
-            nodeVariables = pathVars,
-            nodeNamespace = "path",
-        )
-        assertEquals("fn()", result)
-    }
-
-    @Test
-    fun `multiple nulls in middle of inline param list`() {
-        val ctx = createContext()
-        val pathVars = mapOf(
-            "fill" to "Color.Red",
-            "fill_alpha" to null,
-            "stroke_alpha" to null,
-            "stroke" to "Color.Blue",
-        )
-        val result = PlaceholderResolver.resolve(
-            $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, " +
-                $$"strokeAlpha = ${path:stroke_alpha}, stroke = ${path:stroke})",
-            ctx,
-            nodeVariables = pathVars,
-            nodeNamespace = "path",
-        )
-        assertEquals("fn(fill = Color.Red, stroke = Color.Blue)", result)
+        assertEquals(case.expected, result)
     }
 
     @Test
@@ -237,5 +176,48 @@ class PlaceholderResolverTest {
         assertContains(result, "fill = SolidColor(Color.Black),")
         assertFalse(result.contains("fillAlpha"))
         assertContains(result, "pathFillType = EvenOdd,")
+    }
+
+    @Suppress("unused", "EnumEntryName")
+    enum class NullElisionCase(
+        val template: String,
+        val pathVars: Map<String, String?>,
+        val expected: String,
+    ) {
+        `null at start of inline param list`(
+            template = $$"fn(fillAlpha = ${path:fill_alpha}, stroke = ${path:stroke})",
+            pathVars = mapOf("fill_alpha" to null, "stroke" to "Color.Red"),
+            expected = "fn(stroke = Color.Red)",
+        ),
+        `null at end of inline param list`(
+            template = $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha})",
+            pathVars = mapOf("fill" to "Color.Red", "fill_alpha" to null),
+            expected = "fn(fill = Color.Red)",
+        ),
+        `null in middle of inline param list`(
+            template = $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, stroke = ${path:stroke})",
+            pathVars = mapOf(
+                "fill" to "Color.Red",
+                "fill_alpha" to null,
+                "stroke" to "Color.Blue",
+            ),
+            expected = "fn(fill = Color.Red, stroke = Color.Blue)",
+        ),
+        `all params null on single line`(
+            template = $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha})",
+            pathVars = mapOf("fill" to null, "fill_alpha" to null),
+            expected = "fn()",
+        ),
+        `multiple nulls in middle of inline param list`(
+            template = $$"fn(fill = ${path:fill}, fillAlpha = ${path:fill_alpha}, " +
+                $$"strokeAlpha = ${path:stroke_alpha}, stroke = ${path:stroke})",
+            pathVars = mapOf(
+                "fill" to "Color.Red",
+                "fill_alpha" to null,
+                "stroke_alpha" to null,
+                "stroke" to "Color.Blue",
+            ),
+            expected = "fn(fill = Color.Red, stroke = Color.Blue)",
+        ),
     }
 }
