@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.cli.output.report
 
 import dev.tonholo.s2c.error.ErrorCode
-import dev.tonholo.s2c.output.RunConfig
 
 /**
  * A single failed conversion included in a bug report.
@@ -27,13 +26,17 @@ internal data class BugReportFailure(
  *
  * The repository uses a YAML issue form (`.github/ISSUE_TEMPLATE/bug_report.yml`),
  * which ignores the classic `body` query parameter; each form field is
- * pre-filled through a query parameter named after its field id. The builder
- * fills `bug-description` with the failure summary, `environment` with the
- * version, platform, and run configuration, and `additional-context` with the
- * saved report location. To avoid exceeding browser / GitHub URL length
- * limits, the description is reduced to an error-code summary and the
- * `additional-context` field is dropped when the full URL would exceed
- * [maxUrlLength].
+ * pre-filled through a query parameter named after its field id, mapped by
+ * the field's intent:
+ * - `bug-description`: a short failure summary (counts and error codes).
+ * - `reproduction-steps`: the command line the user actually executed.
+ * - `environment`: OS and CLI version.
+ * - `input-output`: the per-file error output plus a request to attach a
+ *   reproducing input file.
+ *
+ * To avoid exceeding browser / GitHub URL length limits, the per-file output
+ * is dropped and the description points the reporter at the locally saved
+ * error report when the full URL would exceed [maxUrlLength].
  *
  * @param maxUrlLength the maximum allowed URL length before the truncated
  * variant is produced.
@@ -42,59 +45,57 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
     fun build(
         version: String,
         platform: String,
-        config: RunConfig,
+        commandLine: String,
         totalFiles: Int,
         succeeded: Int,
         failedFiles: List<BugReportFailure>,
-        reportPath: String,
     ): String {
         val title = buildTitle(failedFiles = failedFiles)
+        val reproductionSteps = buildReproductionSteps(commandLine = commandLine)
+        val environment = buildEnvironment(version = version, platform = platform)
         val full = assemble(
             title = title,
             description = buildDescription(
                 totalFiles = totalFiles,
                 succeeded = succeeded,
                 failedFiles = failedFiles,
+                fileListOmitted = false,
             ),
-            environment = buildEnvironment(
-                version = version,
-                platform = platform,
-                config = config,
-            ),
-            additionalContext = buildAdditionalContext(reportPath = reportPath),
+            reproductionSteps = reproductionSteps,
+            environment = environment,
+            inputOutput = buildInputOutput(failedFiles = failedFiles),
         )
         if (full.length <= maxUrlLength) return full
 
         return assemble(
             title = title,
-            description = buildTruncatedDescription(
+            description = buildDescription(
                 totalFiles = totalFiles,
                 succeeded = succeeded,
                 failedFiles = failedFiles,
-                reportPath = reportPath,
+                fileListOmitted = true,
             ),
-            environment = buildEnvironment(
-                version = version,
-                platform = platform,
-                config = null,
-            ),
-            additionalContext = null,
+            reproductionSteps = reproductionSteps,
+            environment = environment,
+            inputOutput = null,
         )
     }
 
     private fun assemble(
         title: String,
         description: String,
+        reproductionSteps: String,
         environment: String,
-        additionalContext: String?,
+        inputOutput: String?,
     ): String = buildString {
         append(BASE_URL)
         appendQueryParam(name = "template", value = ISSUE_FORM_FILE, first = true)
         appendQueryParam(name = "title", value = title)
         appendQueryParam(name = FIELD_BUG_DESCRIPTION, value = description)
+        appendQueryParam(name = FIELD_REPRODUCTION_STEPS, value = reproductionSteps)
         appendQueryParam(name = FIELD_ENVIRONMENT, value = environment)
-        if (additionalContext != null) {
-            appendQueryParam(name = FIELD_ADDITIONAL_CONTEXT, value = additionalContext)
+        if (inputOutput != null) {
+            appendQueryParam(name = FIELD_INPUT_OUTPUT, value = inputOutput)
         }
     }
 
@@ -106,8 +107,7 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
     }
 
     private fun buildTitle(failedFiles: List<BugReportFailure>): String {
-        val codes = failedFiles.map { it.errorCode.name }.distinct()
-        val joined = codes.joinToString(separator = ", ")
+        val joined = failedFiles.distinctCodes().joinToString(separator = ", ")
         return "$TITLE_PREFIX$joined"
     }
 
@@ -115,9 +115,39 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
         totalFiles: Int,
         succeeded: Int,
         failedFiles: List<BugReportFailure>,
+        fileListOmitted: Boolean,
     ): String = buildString {
-        appendFailureCount(totalFiles = totalFiles, succeeded = succeeded, failedCount = failedFiles.size)
-        appendLine()
+        append("The CLI failed to convert ")
+        append(failedFiles.size)
+        append(" of ")
+        append(totalFiles)
+        append(" files (")
+        append(succeeded)
+        appendLine(" succeeded).")
+        append("Error codes: ")
+        appendLine(failedFiles.distinctCodes().joinToString(separator = ", "))
+        if (fileListOmitted) {
+            appendLine()
+            appendLine("File list omitted for URL length; paste it here from the saved error report.")
+        }
+    }
+
+    private fun buildReproductionSteps(commandLine: String): String = buildString {
+        append("1. Run `")
+        append(commandLine)
+        appendLine("`")
+        appendLine("2. The conversion fails with the output in the Input and Output section.")
+    }
+
+    private fun buildEnvironment(version: String, platform: String): String = buildString {
+        append("- OS: ")
+        appendLine(platform)
+        append("- svg-to-compose version: ")
+        appendLine(version)
+    }
+
+    private fun buildInputOutput(failedFiles: List<BugReportFailure>): String = buildString {
+        appendLine("Error output:")
         for (entry in failedFiles) {
             append("- ")
             append(entry.errorCode.name)
@@ -130,57 +160,6 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
             }
             appendLine()
         }
-    }
-
-    private fun buildTruncatedDescription(
-        totalFiles: Int,
-        succeeded: Int,
-        failedFiles: List<BugReportFailure>,
-        reportPath: String,
-    ): String = buildString {
-        appendFailureCount(totalFiles = totalFiles, succeeded = succeeded, failedCount = failedFiles.size)
-        val codes = failedFiles.map { it.errorCode.name }.distinct()
-        append("Error codes: ")
-        appendLine(codes.joinToString(separator = ", "))
-        appendLine()
-        appendLine(
-            "File list truncated to fit the URL length limit. " +
-                "See the saved log file for full details:",
-        )
-        appendLine(reportPath)
-    }
-
-    private fun StringBuilder.appendFailureCount(totalFiles: Int, succeeded: Int, failedCount: Int) {
-        append("Batch conversion failed for ")
-        append(failedCount)
-        append(" of ")
-        append(totalFiles)
-        append(" files (")
-        append(succeeded)
-        appendLine(" succeeded).")
-    }
-
-    private fun buildEnvironment(
-        version: String,
-        platform: String,
-        config: RunConfig?,
-    ): String = buildString {
-        append("- OS: ")
-        appendLine(platform)
-        append("- svg-to-compose version: ")
-        appendLine(version)
-        if (config == null) return@buildString
-        append("- CLI command (if applicable): input=")
-        append(config.inputPath)
-        append(", output=")
-        append(config.outputPath)
-        append(", optimize=")
-        appendLine(if (config.optimizationEnabled) "on" else "off")
-    }
-
-    private fun buildAdditionalContext(reportPath: String): String = buildString {
-        appendLine("Full error details are saved locally in:")
-        appendLine(reportPath)
         appendLine()
         appendLine(
             "Please attach a minimal reproducing SVG if possible. " +
@@ -188,13 +167,17 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
         )
     }
 
+    private fun List<BugReportFailure>.distinctCodes(): List<String> =
+        map { it.errorCode.name }.distinct()
+
     companion object {
         private const val BASE_URL =
             "https://github.com/rafaeltonholo/svg-to-compose/issues/new"
         private const val ISSUE_FORM_FILE = "bug_report.yml"
         private const val FIELD_BUG_DESCRIPTION = "bug-description"
+        private const val FIELD_REPRODUCTION_STEPS = "reproduction-steps"
         private const val FIELD_ENVIRONMENT = "environment"
-        private const val FIELD_ADDITIONAL_CONTEXT = "additional-context"
+        private const val FIELD_INPUT_OUTPUT = "input-output"
         private const val TITLE_PREFIX = "[Bug]: Conversion failed: "
 
         /**

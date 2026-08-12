@@ -1,35 +1,11 @@
 package dev.tonholo.s2c.cli.output.report
 
 import dev.tonholo.s2c.error.ErrorCode
-import dev.tonholo.s2c.output.RunConfig
-import dev.tonholo.s2c.parser.ParserConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class BugReportUrlBuilderTest {
-
-    private val defaultParserConfig = ParserConfig(
-        pkg = "com.example.icons",
-        theme = "AppTheme",
-        optimize = true,
-        receiverType = null,
-        addToMaterial = false,
-        kmpPreview = false,
-        noPreview = false,
-        makeInternal = false,
-        minified = false,
-    )
-
-    private val defaultRunConfig = RunConfig(
-        inputPath = "./icons",
-        outputPath = "./generated",
-        parserConfig = defaultParserConfig,
-        packageName = "com.example.icons",
-        optimizationEnabled = true,
-        parallel = 0,
-        recursive = false,
-    )
 
     private fun failed(
         fileName: String,
@@ -37,21 +13,25 @@ class BugReportUrlBuilderTest {
         message: String = "bad",
     ) = BugReportFailure(fileName = fileName, errorCode = errorCode, message = message)
 
-    @Test
-    fun `given version and platform and failures - when build is called - then url starts with issues new endpoint`() {
-        // Arrange
-        val builder = BugReportUrlBuilder()
+    private fun build(
+        builder: BugReportUrlBuilder = BugReportUrlBuilder(),
+        commandLine: String = "s2c -p com.example.icons -o ./generated ./icons",
+        totalFiles: Int = 1,
+        succeeded: Int = 0,
+        failedFiles: List<BugReportFailure> = listOf(failed(fileName = "a.svg")),
+    ): String = builder.build(
+        version = "2.2.0",
+        platform = "macOS arm64",
+        commandLine = commandLine,
+        totalFiles = totalFiles,
+        succeeded = succeeded,
+        failedFiles = failedFiles,
+    )
 
-        // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 10,
-            succeeded = 9,
-            failedFiles = listOf(failed(fileName = "a.svg")),
-            reportPath = "./s2c-errors-1.log",
-        )
+    @Test
+    fun `given a failed run - when build is called - then url starts with issues new endpoint`() {
+        // Arrange & Act
+        val url = build()
 
         // Assert
         assertTrue(
@@ -61,9 +41,20 @@ class BugReportUrlBuilderTest {
     }
 
     @Test
+    fun `given builder - when build is called - then template targets the bug report issue form`() {
+        // Arrange & Act
+        val url = build()
+
+        // Assert
+        assertEquals(
+            expected = "bug_report.yml",
+            actual = decodeQueryParam(url = url, key = "template"),
+        )
+    }
+
+    @Test
     fun `given multiple error codes - when build is called - then title lists unique codes separated by commas`() {
         // Arrange
-        val builder = BugReportUrlBuilder()
         val failures = listOf(
             failed(fileName = "a.svg", errorCode = ErrorCode.ParseSvgError),
             failed(fileName = "b.svg", errorCode = ErrorCode.ParseSvgError),
@@ -71,84 +62,107 @@ class BugReportUrlBuilderTest {
         )
 
         // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 3,
-            succeeded = 0,
-            failedFiles = failures,
-            reportPath = "./s2c-errors-1.log",
-        )
+        val url = build(totalFiles = 3, failedFiles = failures)
 
         // Assert
-        val decodedTitle = decodeQueryParam(url = url, key = "title")
         assertEquals(
             expected = "[Bug]: Conversion failed: ParseSvgError, SvgoOptimizationError",
-            actual = decodedTitle,
+            actual = decodeQueryParam(url = url, key = "title"),
         )
     }
 
     @Test
-    fun `given a space in platform - when build is called - then the space is percent-encoded in the URL`() {
+    fun `given a failed run - when build is called - then description is a summary without per-file output`() {
         // Arrange
-        val builder = BugReportUrlBuilder()
-
-        // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 1,
-            succeeded = 0,
-            failedFiles = listOf(failed(fileName = "a.svg")),
-            reportPath = "./s2c-errors-1.log",
-        )
-
-        // Assert
-        assertTrue(
-            actual = url.contains("macOS%20arm64"),
-            message = "expected URL-encoded platform in: $url",
-        )
-    }
-
-    @Test
-    fun `given a failed conversion - when build is called - then issue form fields carry description environment and context`() {
-        // Arrange
-        val builder = BugReportUrlBuilder()
-
-        // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 1,
-            succeeded = 0,
-            failedFiles = listOf(
-                failed(
-                    fileName = "ic_broken_gradient.svg",
-                    errorCode = ErrorCode.ParseSvgError,
-                    message = "Unsupported gradient type: mesh-gradient",
-                ),
+        val failures = listOf(
+            failed(
+                fileName = "ic_broken_gradient.svg",
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Unsupported gradient type: mesh-gradient",
             ),
-            reportPath = "./s2c-errors-1.log",
         )
+
+        // Act
+        val url = build(failedFiles = failures)
 
         // Assert
         val description = decodeQueryParam(url = url, key = "bug-description")
+        assertTrue(actual = description.contains("failed to convert 1 of 1"), message = description)
         assertTrue(actual = description.contains("ParseSvgError"), message = description)
-        assertTrue(actual = description.contains("ic_broken_gradient.svg"), message = description)
-        val environment = decodeQueryParam(url = url, key = "environment")
-        assertTrue(actual = environment.contains("- OS: macOS arm64"), message = environment)
-        assertTrue(actual = environment.contains("- svg-to-compose version: 2.2.0"), message = environment)
-        val additionalContext = decodeQueryParam(url = url, key = "additional-context")
-        assertTrue(actual = additionalContext.contains("./s2c-errors-1.log"), message = additionalContext)
+        assertTrue(
+            actual = !description.contains("ic_broken_gradient.svg"),
+            message = "per-file output belongs in input-output, not the description: $description",
+        )
     }
 
     @Test
-    fun `given many failed files - when url would exceed limit - then description is truncated to codes and log pointer`() {
+    fun `given a command line - when build is called - then reproduction steps carry the executed command`() {
         // Arrange
-        val builder = BugReportUrlBuilder(maxUrlLength = 600)
+        val commandLine = "s2c --optimize false -p com.example.icons -r ./assets/icons.zip"
+
+        // Act
+        val url = build(commandLine = commandLine)
+
+        // Assert
+        val steps = decodeQueryParam(url = url, key = "reproduction-steps")
+        assertTrue(actual = steps.contains("`$commandLine`"), message = steps)
+    }
+
+    @Test
+    fun `given a failed run - when build is called - then environment lists os and version only`() {
+        // Arrange & Act
+        val url = build()
+
+        // Assert
+        val environment = decodeQueryParam(url = url, key = "environment")
+        assertTrue(actual = environment.contains("- OS: macOS arm64"), message = environment)
+        assertTrue(actual = environment.contains("- svg-to-compose version: 2.2.0"), message = environment)
+        assertTrue(
+            actual = !environment.contains("input="),
+            message = "environment must not carry reconstructed config: $environment",
+        )
+    }
+
+    @Test
+    fun `given failures - when build is called - then input-output carries the error output and attach request`() {
+        // Arrange
+        val failures = listOf(
+            failed(
+                fileName = "ic_broken_gradient.svg",
+                errorCode = ErrorCode.ParseSvgError,
+                message = "Unsupported gradient type: mesh-gradient",
+            ),
+        )
+
+        // Act
+        val url = build(failedFiles = failures)
+
+        // Assert
+        val inputOutput = decodeQueryParam(url = url, key = "input-output")
+        assertTrue(
+            actual = inputOutput.contains("- ParseSvgError: ic_broken_gradient.svg - Unsupported gradient type: mesh-gradient"),
+            message = inputOutput,
+        )
+        assertTrue(actual = inputOutput.contains("attach a minimal reproducing SVG"), message = inputOutput)
+    }
+
+    @Test
+    fun `given a failed run - when build is called - then no additional-context or local path is in the url`() {
+        // Arrange & Act
+        val url = build()
+
+        // Assert
+        assertTrue(
+            actual = !url.contains("additional-context="),
+            message = "local report paths are useless to issue readers: $url",
+        )
+        assertTrue(actual = !url.contains("s2c-errors"), message = url)
+    }
+
+    @Test
+    fun `given many failed files - when url would exceed limit - then file list is dropped and url stays within cap`() {
+        // Arrange
+        val builder = BugReportUrlBuilder(maxUrlLength = 700)
         val failures = List(size = 200) { index ->
             failed(
                 fileName = "ic_icon_$index.svg",
@@ -158,80 +172,35 @@ class BugReportUrlBuilderTest {
         }
 
         // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 200,
-            succeeded = 0,
-            failedFiles = failures,
-            reportPath = "./s2c-errors-1.log",
-        )
+        val url = build(builder = builder, totalFiles = 200, failedFiles = failures)
 
         // Assert
         assertTrue(
-            actual = url.length <= 600,
+            actual = url.length <= 700,
             message = "URL length ${url.length} exceeded the configured limit, url: $url",
         )
         val description = decodeQueryParam(url = url, key = "bug-description")
         assertTrue(actual = description.contains("Error codes: ParseSvgError"), message = description)
-        assertTrue(actual = description.contains("See the saved log file"), message = description)
-        assertTrue(actual = description.contains("./s2c-errors-1.log"), message = description)
-        val environment = decodeQueryParam(url = url, key = "environment")
-        assertTrue(actual = environment.contains("- svg-to-compose version: 2.2.0"), message = environment)
+        assertTrue(actual = description.contains("saved error report"), message = description)
         assertTrue(
-            actual = !url.contains("additional-context="),
-            message = "truncated url must drop additional-context to save length: $url",
+            actual = !url.contains("input-output="),
+            message = "truncated url must drop the file list: $url",
         )
+        val steps = decodeQueryParam(url = url, key = "reproduction-steps")
+        assertTrue(actual = steps.contains("s2c "), message = steps)
     }
 
     @Test
-    fun `given special characters in paths - when build is called - then they are properly percent-encoded`() {
-        // Arrange
-        val builder = BugReportUrlBuilder()
-        val config = defaultRunConfig.copy(inputPath = "./my icons & stuff")
-
-        // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = config,
-            totalFiles = 1,
-            succeeded = 0,
-            failedFiles = listOf(failed(fileName = "a.svg")),
-            reportPath = "./s2c-errors-1.log",
-        )
+    fun `given special characters in the command - when build is called - then they are percent-encoded`() {
+        // Arrange & Act
+        val url = build(commandLine = "s2c -o \"./my icons & stuff\" input.svg")
 
         // Assert
         assertTrue(
             actual = url.contains("%26"),
             message = "expected '&' to be percent-encoded as %26 in: $url",
         )
-        // Raw space must not appear inside the query string
         assertTrue(actual = !url.contains(" "), message = "raw space found in: $url")
-    }
-
-    @Test
-    fun `given builder - when build is called - then template targets the bug report issue form`() {
-        // Arrange
-        val builder = BugReportUrlBuilder()
-
-        // Act
-        val url = builder.build(
-            version = "2.2.0",
-            platform = "macOS arm64",
-            config = defaultRunConfig,
-            totalFiles = 1,
-            succeeded = 0,
-            failedFiles = listOf(failed(fileName = "a.svg")),
-            reportPath = "./s2c-errors-1.log",
-        )
-
-        // Assert
-        assertEquals(
-            expected = "bug_report.yml",
-            actual = decodeQueryParam(url = url, key = "template"),
-        )
     }
 
     /**
