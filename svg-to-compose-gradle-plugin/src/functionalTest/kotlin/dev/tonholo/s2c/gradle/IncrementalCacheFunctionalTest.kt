@@ -77,6 +77,49 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         )
     }
 
+    private fun setupExcludeDirBuildGradle(pkg: String) {
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories { mavenCentral() }
+            kotlin { jvm() }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        recursive()
+                        icons {
+                            excludeDir("drafts".toRegex())
+                        }
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+    }
+
+    private fun assertIncremental(result: BuildResult) {
+        assertFalse(
+            result.output.contains("Non-incremental build for configuration"),
+            "Run should be incremental so the incremental scan path is exercised",
+        )
+    }
+
+    private fun assertNoGeneratedFileNamed(fileName: String) {
+        val generatedRoot = projectDir.resolve("build/generated/svgToCompose")
+        val matches = generatedRoot.walkTopDown().filter { it.name == fileName }.toList()
+        assertTrue(matches.isEmpty(), "$fileName should not be generated, but found: $matches")
+    }
+
     private fun buildGradleContent(pkg: String, optimize: Boolean = false): String =
         // language=kotlin
         """
@@ -360,6 +403,79 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
             "Excluded SVG should not produce output",
         )
         assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
+    @Test
+    fun `given excludeDir pattern - when incremental build adds SVG in excluded dir - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.excludedir.add"
+
+        // Arrange
+        setupExcludeDirBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should exist after first run")
+
+        // Act
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_B)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
+    @Test
+    fun `given excludeDir pattern - when incremental build modifies SVG in excluded dir - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.excludedir.modify"
+
+        // Arrange
+        setupExcludeDirBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        assertNoGeneratedFileNamed("IconB.kt")
+
+        // Act
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+    }
+
+    @Test
+    fun `given SVG with uppercase extension - when full then incremental build - then file is skipped in both`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.uppercase"
+
+        // Arrange
+        setupBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertEquals(
+            expected = listOf("IconA.kt"),
+            actual = genDir.listFiles().orEmpty().map { it.name }.sorted(),
+            message = "Full build should skip the uppercase-extension file",
+        )
+
+        // Act
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertEquals(
+            expected = listOf("IconA.kt"),
+            actual = genDir.listFiles().orEmpty().map { it.name }.sorted(),
+            message = "Incremental build should skip the uppercase-extension file like the full build does",
+        )
     }
 
     // endregion [ Single Configuration Tests ]
