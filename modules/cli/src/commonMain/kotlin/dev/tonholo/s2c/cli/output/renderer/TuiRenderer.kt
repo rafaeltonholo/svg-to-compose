@@ -183,7 +183,7 @@ internal class TuiRenderer(
         if (event.key == "c") {
             performClipboardCopy(report = report)
         }
-        userExitSignal.complete(Unit)
+        userExitSignal.complete(value = Unit)
     }
 
     private fun performClipboardCopy(report: ConversionEvent.ErrorReportGenerated) {

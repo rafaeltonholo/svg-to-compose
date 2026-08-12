@@ -7,7 +7,7 @@ import okio.Path
 import kotlin.time.Instant
 
 /**
- * Writes a user-facing error report next to the working directory when one
+ * Writes a user-facing error report into the working directory when one
  * or more files failed to convert. The report is intended for pasting into
  * a GitHub issue and deliberately omits proprietary SVG content; it carries
  * version, platform, run configuration, and the per-file failure summary.
@@ -138,9 +138,6 @@ internal class ErrorReportWriter(
      */
     private fun formatTimestamp(epochMillis: Long): String {
         val iso = Instant.fromEpochMilliseconds(epochMillis).toString()
-        // `Instant.toString()` yields, e.g., "2026-04-03T14:30:00Z" or
-        // "2026-04-03T14:30:00.123Z"; strip fractional seconds + trailing Z
-        // and normalize colons for Windows compatibility.
         val withoutFraction = iso.substringBefore(delimiter = '.', missingDelimiterValue = iso)
         val withoutZone = withoutFraction.removeSuffix(suffix = "Z")
         return withoutZone.replace(oldChar = ':', newChar = '-')

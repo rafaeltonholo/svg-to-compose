@@ -175,9 +175,6 @@ internal class CliRunner(
                 suppressTerminalWarnings = false,
             )
             updateNotifier.notifyIfUpdateAvailable(renderer = renderer)
-            // Hold the TUI open while the user decides whether to press [c]
-            // and copy the error report. Returns immediately when no report
-            // was displayed, so clean runs are not gated on a keypress.
             renderer.awaitUserExit()
         } finally {
             scope.cancel()
@@ -224,10 +221,6 @@ internal class CliRunner(
                 true
             }
             .onCompletion {
-                // Release any awaitUserExit caller before cancelling the scope:
-                // if the input flow terminates (stdin EOF, closed pipe) before
-                // the user presses a key, the runner would otherwise suspend
-                // forever waiting on userExitSignal.
                 renderer.signalInputClosed()
                 parent.cancel()
             }
