@@ -25,9 +25,11 @@ fun Path.isEligibleForProcessing(
     root: Path,
     exclude: Regex?,
     excludeDir: Regex?,
-): Boolean = hasVectorFileExtension() &&
-    (exclude == null || !name.matches(exclude)) &&
-    (excludeDir == null || !isInExcludedDir(root = root, excludeDir = excludeDir))
+): Boolean {
+    val isNotExcluded = exclude == null || !name.matches(exclude)
+    val isNotInExcludedDir = excludeDir == null || !isInExcludedDir(root = root, excludeDir = excludeDir)
+    return hasVectorFileExtension() && isNotExcluded && isNotInExcludedDir
+}
 
 private fun Path.isInExcludedDir(root: Path, excludeDir: Regex): Boolean {
     var current = parent
