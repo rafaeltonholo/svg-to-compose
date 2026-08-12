@@ -3,9 +3,12 @@ package dev.tonholo.s2c.cli.output.report
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import platform.posix.SIGPIPE
+import platform.posix.SIG_IGN
 import platform.posix.fwrite
 import platform.posix.pclose
 import platform.posix.popen
+import platform.posix.signal
 
 /**
  * Linux clipboard write via a child process.
@@ -20,9 +23,14 @@ import platform.posix.popen
  * We write through `popen(..., "w")` so the command consumes stdin,
  * avoiding shell-escaping bugs that would appear if we embedded the
  * report body into the command string.
+ *
+ * SIGPIPE is ignored before writing: when the helper binary is missing,
+ * the shell exits before consuming stdin and the flush would otherwise
+ * kill the whole process instead of falling through to the next command.
  */
 @OptIn(ExperimentalForeignApi::class)
 internal actual fun copyToClipboard(text: String): Boolean {
+    signal(SIGPIPE, SIG_IGN)
     for (command in CLIPBOARD_COMMANDS) {
         if (runClipboardCommand(command = command, text = text)) return true
     }
