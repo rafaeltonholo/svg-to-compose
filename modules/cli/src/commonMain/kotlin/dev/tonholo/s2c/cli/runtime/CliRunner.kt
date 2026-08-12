@@ -15,6 +15,7 @@ import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.cli.output.report.BugReportFailure
 import dev.tonholo.s2c.cli.output.report.BugReportUrlBuilder
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.output.report.ErrorReportWriter
 import dev.tonholo.s2c.cli.output.report.platformInfo
 import dev.tonholo.s2c.cli.update.UpdateNotifier
@@ -72,6 +73,7 @@ internal class CliRunner(
     private val fileManager: FileManager,
     private val fileSystem: FileSystem,
     private val updateNotifier: UpdateNotifier,
+    private val invocationCommand: InvocationCommand,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
     @param:MainDispatcher
@@ -413,11 +415,10 @@ internal class CliRunner(
                 bugReportUrl = BugReportUrlBuilder().build(
                     version = version,
                     platform = platformInfo(),
-                    config = config,
+                    commandLine = invocationCommand.value,
                     totalFiles = runStats.totalFiles,
                     succeeded = runStats.succeeded,
                     failedFiles = failures,
-                    reportPath = reportPath.toString(),
                 ),
             ),
         )

@@ -2,6 +2,8 @@ package dev.tonholo.s2c.cli
 
 import com.github.ajalt.clikt.command.main
 import dev.tonholo.s2c.cli.inject.CliGraph
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
+import dev.tonholo.s2c.cli.output.report.formatCommandLine
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.runBlocking
@@ -17,6 +19,7 @@ import kotlinx.coroutines.runBlocking
 fun main(args: Array<String>) = runBlocking {
     val graph = createGraphFactory<CliGraph.Factory>().create(
         config = CliConfig(),
+        command = InvocationCommand(value = formatCommandLine(args = args.toList())),
     )
     graph.client.main(args)
 }
