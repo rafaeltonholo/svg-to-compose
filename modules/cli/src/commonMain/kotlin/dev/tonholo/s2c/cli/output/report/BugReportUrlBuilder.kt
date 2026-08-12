@@ -25,13 +25,18 @@ internal data class BugReportFailure(
  * Builds a pre-filled "New Issue" URL on the svg-to-compose GitHub repository
  * so users can report conversion failures without copying terminal output.
  *
- * The URL body includes the CLI version, host platform, run configuration,
- * and a summary of failed files. To avoid exceeding browser / GitHub URL
- * length limits, the body is truncated to a version + platform + error-code
- * summary when the full body would push the URL over [maxUrlLength].
+ * The repository uses a YAML issue form (`.github/ISSUE_TEMPLATE/bug_report.yml`),
+ * which ignores the classic `body` query parameter; each form field is
+ * pre-filled through a query parameter named after its field id. The builder
+ * fills `bug-description` with the failure summary, `environment` with the
+ * version, platform, and run configuration, and `additional-context` with the
+ * saved report location. To avoid exceeding browser / GitHub URL length
+ * limits, the description is reduced to an error-code summary and the
+ * `additional-context` field is dropped when the full URL would exceed
+ * [maxUrlLength].
  *
- * @param maxUrlLength the maximum allowed URL length; the builder truncates
- * the body section if the full URL would exceed this length.
+ * @param maxUrlLength the maximum allowed URL length before the truncated
+ * variant is produced.
  */
 internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_URL_LENGTH) {
     fun build(
@@ -44,38 +49,60 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
         reportPath: String,
     ): String {
         val title = buildTitle(failedFiles = failedFiles)
-        val fullBody = buildFullBody(
-            version = version,
-            platform = platform,
-            config = config,
-            totalFiles = totalFiles,
-            succeeded = succeeded,
-            failedFiles = failedFiles,
-            reportPath = reportPath,
+        val full = assemble(
+            title = title,
+            description = buildDescription(
+                totalFiles = totalFiles,
+                succeeded = succeeded,
+                failedFiles = failedFiles,
+            ),
+            environment = buildEnvironment(
+                version = version,
+                platform = platform,
+                config = config,
+            ),
+            additionalContext = buildAdditionalContext(reportPath = reportPath),
         )
-        val full = assemble(title = title, body = fullBody)
         if (full.length <= maxUrlLength) return full
 
-        val truncatedBody = buildTruncatedBody(
-            version = version,
-            platform = platform,
-            failedFiles = failedFiles,
-            reportPath = reportPath,
+        return assemble(
+            title = title,
+            description = buildTruncatedDescription(
+                totalFiles = totalFiles,
+                succeeded = succeeded,
+                failedFiles = failedFiles,
+                reportPath = reportPath,
+            ),
+            environment = buildEnvironment(
+                version = version,
+                platform = platform,
+                config = null,
+            ),
+            additionalContext = null,
         )
-        return assemble(title = title, body = truncatedBody)
     }
 
-    private fun assemble(title: String, body: String): String = buildString {
+    private fun assemble(
+        title: String,
+        description: String,
+        environment: String,
+        additionalContext: String?,
+    ): String = buildString {
         append(BASE_URL)
-        append('?')
-        append("template=")
-        append(percentEncode(value = DEFAULT_TEMPLATE))
-        append('&')
-        append("title=")
-        append(percentEncode(value = title))
-        append('&')
-        append("body=")
-        append(percentEncode(value = body))
+        appendQueryParam(name = "template", value = ISSUE_FORM_FILE, first = true)
+        appendQueryParam(name = "title", value = title)
+        appendQueryParam(name = FIELD_BUG_DESCRIPTION, value = description)
+        appendQueryParam(name = FIELD_ENVIRONMENT, value = environment)
+        if (additionalContext != null) {
+            appendQueryParam(name = FIELD_ADDITIONAL_CONTEXT, value = additionalContext)
+        }
+    }
+
+    private fun StringBuilder.appendQueryParam(name: String, value: String, first: Boolean = false) {
+        append(if (first) '?' else '&')
+        append(name)
+        append('=')
+        append(percentEncode(value = value))
     }
 
     private fun buildTitle(failedFiles: List<BugReportFailure>): String {
@@ -84,30 +111,13 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
         return "$TITLE_PREFIX$joined"
     }
 
-    private fun buildFullBody(
-        version: String,
-        platform: String,
-        config: RunConfig,
+    private fun buildDescription(
         totalFiles: Int,
         succeeded: Int,
         failedFiles: List<BugReportFailure>,
-        reportPath: String,
     ): String = buildString {
-        appendCommonHeader(version = version, platform = platform)
-        append("Input: ")
-        appendLine(config.inputPath)
-        append("Output: ")
-        appendLine(config.outputPath)
-        append("Optimize: ")
-        appendLine(if (config.optimizationEnabled) "on" else "off")
+        appendFailureCount(totalFiles = totalFiles, succeeded = succeeded, failedCount = failedFiles.size)
         appendLine()
-        append("Failed (")
-        append(failedFiles.size)
-        append('/')
-        append(totalFiles)
-        append(", succeeded=")
-        append(succeeded)
-        appendLine("):")
         for (entry in failedFiles) {
             append("- ")
             append(entry.errorCode.name)
@@ -120,7 +130,55 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
             }
             appendLine()
         }
+    }
+
+    private fun buildTruncatedDescription(
+        totalFiles: Int,
+        succeeded: Int,
+        failedFiles: List<BugReportFailure>,
+        reportPath: String,
+    ): String = buildString {
+        appendFailureCount(totalFiles = totalFiles, succeeded = succeeded, failedCount = failedFiles.size)
+        val codes = failedFiles.map { it.errorCode.name }.distinct()
+        append("Error codes: ")
+        appendLine(codes.joinToString(separator = ", "))
         appendLine()
+        appendLine(
+            "File list truncated to fit the URL length limit. " +
+                "See the saved log file for full details:",
+        )
+        appendLine(reportPath)
+    }
+
+    private fun StringBuilder.appendFailureCount(totalFiles: Int, succeeded: Int, failedCount: Int) {
+        append("Batch conversion failed for ")
+        append(failedCount)
+        append(" of ")
+        append(totalFiles)
+        append(" files (")
+        append(succeeded)
+        appendLine(" succeeded).")
+    }
+
+    private fun buildEnvironment(
+        version: String,
+        platform: String,
+        config: RunConfig?,
+    ): String = buildString {
+        append("- OS: ")
+        appendLine(platform)
+        append("- svg-to-compose version: ")
+        appendLine(version)
+        if (config == null) return@buildString
+        append("- CLI command (if applicable): input=")
+        append(config.inputPath)
+        append(", output=")
+        append(config.outputPath)
+        append(", optimize=")
+        appendLine(if (config.optimizationEnabled) "on" else "off")
+    }
+
+    private fun buildAdditionalContext(reportPath: String): String = buildString {
         appendLine("Full error details are saved locally in:")
         appendLine(reportPath)
         appendLine()
@@ -130,37 +188,14 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
         )
     }
 
-    private fun buildTruncatedBody(
-        version: String,
-        platform: String,
-        failedFiles: List<BugReportFailure>,
-        reportPath: String,
-    ): String = buildString {
-        appendCommonHeader(version = version, platform = platform)
-        val codes = failedFiles.map { it.errorCode.name }.distinct()
-        append("Error codes: ")
-        appendLine(codes.joinToString(separator = ", "))
-        appendLine()
-        appendLine(
-            "Body truncated to fit URL length limit. " +
-                "See the saved log file for full details:",
-        )
-        appendLine(reportPath)
-    }
-
-    private fun StringBuilder.appendCommonHeader(version: String, platform: String) {
-        append("svg-to-compose v")
-        appendLine(version)
-        append("Platform: ")
-        appendLine(platform)
-        appendLine()
-    }
-
     companion object {
         private const val BASE_URL =
             "https://github.com/rafaeltonholo/svg-to-compose/issues/new"
-        private const val DEFAULT_TEMPLATE = "bug_report.md"
-        private const val TITLE_PREFIX = "[Bug] Conversion failed: "
+        private const val ISSUE_FORM_FILE = "bug_report.yml"
+        private const val FIELD_BUG_DESCRIPTION = "bug-description"
+        private const val FIELD_ENVIRONMENT = "environment"
+        private const val FIELD_ADDITIONAL_CONTEXT = "additional-context"
+        private const val TITLE_PREFIX = "[Bug]: Conversion failed: "
 
         /**
          * GitHub accepts long URLs but browsers and shells vary; 2000 chars
@@ -175,8 +210,6 @@ internal class BugReportUrlBuilder(private val maxUrlLength: Int = DEFAULT_MAX_U
 /**
  * Percent-encodes [value] according to the RFC 3986 `pct-encoded` / `unreserved`
  * rules for use inside a query string. Space is encoded as `%20`, not `+`.
- *
- * Exposed at package level so tests and callers don't each reinvent it.
  */
 internal fun percentEncode(value: String): String {
     val bytes = value.encodeToByteArray()

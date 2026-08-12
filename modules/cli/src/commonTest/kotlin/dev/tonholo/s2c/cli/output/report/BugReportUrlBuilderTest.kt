@@ -84,7 +84,7 @@ class BugReportUrlBuilderTest {
         // Assert
         val decodedTitle = decodeQueryParam(url = url, key = "title")
         assertEquals(
-            expected = "[Bug] Conversion failed: ParseSvgError, SvgoOptimizationError",
+            expected = "[Bug]: Conversion failed: ParseSvgError, SvgoOptimizationError",
             actual = decodedTitle,
         )
     }
@@ -113,7 +113,7 @@ class BugReportUrlBuilderTest {
     }
 
     @Test
-    fun `given body content - when build is called - then body contains version platform and error summary`() {
+    fun `given a failed conversion - when build is called - then issue form fields carry description environment and context`() {
         // Arrange
         val builder = BugReportUrlBuilder()
 
@@ -135,16 +135,18 @@ class BugReportUrlBuilderTest {
         )
 
         // Assert
-        val body = decodeQueryParam(url = url, key = "body")
-        assertTrue(actual = body.contains("svg-to-compose v2.2.0"), message = body)
-        assertTrue(actual = body.contains("Platform: macOS arm64"), message = body)
-        assertTrue(actual = body.contains("ParseSvgError"), message = body)
-        assertTrue(actual = body.contains("ic_broken_gradient.svg"), message = body)
-        assertTrue(actual = body.contains("./s2c-errors-1.log"), message = body)
+        val description = decodeQueryParam(url = url, key = "bug-description")
+        assertTrue(actual = description.contains("ParseSvgError"), message = description)
+        assertTrue(actual = description.contains("ic_broken_gradient.svg"), message = description)
+        val environment = decodeQueryParam(url = url, key = "environment")
+        assertTrue(actual = environment.contains("- OS: macOS arm64"), message = environment)
+        assertTrue(actual = environment.contains("- svg-to-compose version: 2.2.0"), message = environment)
+        val additionalContext = decodeQueryParam(url = url, key = "additional-context")
+        assertTrue(actual = additionalContext.contains("./s2c-errors-1.log"), message = additionalContext)
     }
 
     @Test
-    fun `given many failed files - when body would exceed limit - then body is truncated to version platform and codes`() {
+    fun `given many failed files - when url would exceed limit - then description is truncated to codes and log pointer`() {
         // Arrange
         val builder = BugReportUrlBuilder(maxUrlLength = 600)
         val failures = List(size = 200) { index ->
@@ -171,12 +173,16 @@ class BugReportUrlBuilderTest {
             actual = url.length <= 600,
             message = "URL length ${url.length} exceeded the configured limit, url: $url",
         )
-        val body = decodeQueryParam(url = url, key = "body")
-        assertTrue(actual = body.contains("svg-to-compose v2.2.0"), message = body)
-        assertTrue(actual = body.contains("Platform: macOS arm64"), message = body)
-        assertTrue(actual = body.contains("ParseSvgError"), message = body)
-        // Truncation drops per-file listings and directs the user to the log file
-        assertTrue(actual = body.contains("See the saved log file"), message = body)
+        val description = decodeQueryParam(url = url, key = "bug-description")
+        assertTrue(actual = description.contains("Error codes: ParseSvgError"), message = description)
+        assertTrue(actual = description.contains("See the saved log file"), message = description)
+        assertTrue(actual = description.contains("./s2c-errors-1.log"), message = description)
+        val environment = decodeQueryParam(url = url, key = "environment")
+        assertTrue(actual = environment.contains("- svg-to-compose version: 2.2.0"), message = environment)
+        assertTrue(
+            actual = !url.contains("additional-context="),
+            message = "truncated url must drop additional-context to save length: $url",
+        )
     }
 
     @Test
@@ -206,7 +212,7 @@ class BugReportUrlBuilderTest {
     }
 
     @Test
-    fun `given builder - when build is called - then template=bug_report_md query param included`() {
+    fun `given builder - when build is called - then template targets the bug report issue form`() {
         // Arrange
         val builder = BugReportUrlBuilder()
 
@@ -223,7 +229,7 @@ class BugReportUrlBuilderTest {
 
         // Assert
         assertEquals(
-            expected = "bug_report.md",
+            expected = "bug_report.yml",
             actual = decodeQueryParam(url = url, key = "template"),
         )
     }
