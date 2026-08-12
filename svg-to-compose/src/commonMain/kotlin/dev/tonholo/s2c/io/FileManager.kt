@@ -91,7 +91,13 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
         return fileSystem
             .listRecursively(from, maxDepth = depth)
             .filter { path ->
-                path.isEligibleForProcessing(root = from, exclude = exclude, excludeDir = excludeDir)
+                path.isEligibleForProcessing(
+                    root = from,
+                    recursive = recursive,
+                    maxDepth = maxDepth,
+                    exclude = exclude,
+                    excludeDir = excludeDir,
+                )
             }
             .toList()
     }

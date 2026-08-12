@@ -518,10 +518,10 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 /**
  * Collects added/modified and removed paths from [inputChanges], applying the
  * same eligibility rules as the full scan in [FileManager.findFilesToProcess]:
- * supported extension, exclude pattern, and excludeDir pattern.
+ * supported extension, recursion depth, exclude pattern, and excludeDir pattern.
  *
- * Removals are intentionally not filtered by the exclude patterns: stale outputs
- * from files that previously did not match the current exclude still need cleanup
+ * Removals are intentionally only filtered by extension: stale outputs from
+ * files that previously did not match the current filters still need cleanup
  * when their source is deleted.
  */
 private fun collectIncrementalChanges(
@@ -532,6 +532,8 @@ private fun collectIncrementalChanges(
     val exclude = iconConfiguration.exclude.orNull
     val excludeDir = iconConfiguration.excludeDir.orNull
     val root = configuration.origin.get().asFile.toOkioPath()
+    val recursive = configuration.recursive.get()
+    val maxDepth = configuration.maxDepth.orNull
     val added = mutableListOf<Path>()
     val removed = mutableListOf<Path>()
     inputChanges.getFileChanges(configuration.origin).forEach { change ->
@@ -539,7 +541,14 @@ private fun collectIncrementalChanges(
         if (!path.hasVectorFileExtension()) return@forEach
         when (change.changeType) {
             ChangeType.ADDED, ChangeType.MODIFIED -> {
-                if (path.isEligibleForProcessing(root = root, exclude = exclude, excludeDir = excludeDir)) {
+                val isEligible = path.isEligibleForProcessing(
+                    root = root,
+                    recursive = recursive,
+                    maxDepth = maxDepth,
+                    exclude = exclude,
+                    excludeDir = excludeDir,
+                )
+                if (isEligible) {
                     added.add(path)
                 }
             }

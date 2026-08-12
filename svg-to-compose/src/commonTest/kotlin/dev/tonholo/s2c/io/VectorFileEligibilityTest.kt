@@ -1,12 +1,24 @@
 package dev.tonholo.s2c.io
 
+import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class VectorFileEligibilityTest {
-    private val root = "/icons".toPath()
+    private val iconsRoot = "/icons".toPath()
+
+    private fun Path.isEligibleUnlimited(
+        exclude: Regex? = null,
+        excludeDir: Regex? = null,
+    ): Boolean = isEligibleForProcessing(
+        root = iconsRoot,
+        recursive = true,
+        maxDepth = null,
+        exclude = exclude,
+        excludeDir = excludeDir,
+    )
 
     @Test
     fun `given svg file without filters - when isEligibleForProcessing - then returns true`() {
@@ -14,7 +26,7 @@ class VectorFileEligibilityTest {
         val path = "/icons/icon.svg".toPath()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = null)
+        val eligible = path.isEligibleUnlimited()
 
         // Assert
         assertTrue(eligible)
@@ -26,7 +38,7 @@ class VectorFileEligibilityTest {
         val path = "/icons/icon.xml".toPath()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = null)
+        val eligible = path.isEligibleUnlimited()
 
         // Assert
         assertTrue(eligible)
@@ -38,7 +50,7 @@ class VectorFileEligibilityTest {
         val path = "/icons/ICON.SVG".toPath()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = null)
+        val eligible = path.isEligibleUnlimited()
 
         // Assert
         assertFalse(eligible)
@@ -50,7 +62,7 @@ class VectorFileEligibilityTest {
         val path = "/icons/icon.png".toPath()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = null)
+        val eligible = path.isEligibleUnlimited()
 
         // Assert
         assertFalse(eligible)
@@ -63,7 +75,7 @@ class VectorFileEligibilityTest {
         val exclude = ".*_fill\\.svg".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = exclude, excludeDir = null)
+        val eligible = path.isEligibleUnlimited(exclude = exclude)
 
         // Assert
         assertFalse(eligible)
@@ -76,7 +88,7 @@ class VectorFileEligibilityTest {
         val exclude = ".*_fill\\.svg".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = exclude, excludeDir = null)
+        val eligible = path.isEligibleUnlimited(exclude = exclude)
 
         // Assert
         assertTrue(eligible)
@@ -89,7 +101,7 @@ class VectorFileEligibilityTest {
         val excludeDir = "drafts".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = excludeDir)
+        val eligible = path.isEligibleUnlimited(excludeDir = excludeDir)
 
         // Assert
         assertFalse(eligible)
@@ -102,7 +114,7 @@ class VectorFileEligibilityTest {
         val excludeDir = "drafts".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = excludeDir)
+        val eligible = path.isEligibleUnlimited(excludeDir = excludeDir)
 
         // Assert
         assertFalse(eligible)
@@ -115,7 +127,7 @@ class VectorFileEligibilityTest {
         val excludeDir = "drafts".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = excludeDir)
+        val eligible = path.isEligibleUnlimited(excludeDir = excludeDir)
 
         // Assert
         assertTrue(eligible)
@@ -128,7 +140,109 @@ class VectorFileEligibilityTest {
         val excludeDir = "icons".toRegex()
 
         // Act
-        val eligible = path.isEligibleForProcessing(root = root, exclude = null, excludeDir = excludeDir)
+        val eligible = path.isEligibleUnlimited(excludeDir = excludeDir)
+
+        // Assert
+        assertTrue(eligible)
+    }
+
+    @Test
+    fun `given recursive disabled - when file is directly in root - then returns true`() {
+        // Arrange
+        val path = "/icons/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleForProcessing(
+            root = iconsRoot,
+            recursive = false,
+            maxDepth = null,
+            exclude = null,
+            excludeDir = null,
+        )
+
+        // Assert
+        assertTrue(eligible)
+    }
+
+    @Test
+    fun `given recursive disabled - when file is in nested dir - then returns false`() {
+        // Arrange
+        val path = "/icons/nested/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleForProcessing(
+            root = iconsRoot,
+            recursive = false,
+            maxDepth = null,
+            exclude = null,
+            excludeDir = null,
+        )
+
+        // Assert
+        assertFalse(eligible)
+    }
+
+    @Test
+    fun `given recursive disabled with maxDepth set - when file is in nested dir - then returns false`() {
+        // Arrange
+        val path = "/icons/nested/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleForProcessing(
+            root = iconsRoot,
+            recursive = false,
+            maxDepth = 5,
+            exclude = null,
+            excludeDir = null,
+        )
+
+        // Assert
+        assertFalse(eligible)
+    }
+
+    @Test
+    fun `given maxDepth 1 - when file is at depth equal to limit - then returns true`() {
+        // Arrange
+        val path = "/icons/nested/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleForProcessing(
+            root = iconsRoot,
+            recursive = true,
+            maxDepth = 1,
+            exclude = null,
+            excludeDir = null,
+        )
+
+        // Assert
+        assertTrue(eligible)
+    }
+
+    @Test
+    fun `given maxDepth 1 - when file is beyond limit - then returns false`() {
+        // Arrange
+        val path = "/icons/nested/deep/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleForProcessing(
+            root = iconsRoot,
+            recursive = true,
+            maxDepth = 1,
+            exclude = null,
+            excludeDir = null,
+        )
+
+        // Assert
+        assertFalse(eligible)
+    }
+
+    @Test
+    fun `given recursive with null maxDepth - when file is deeply nested - then returns true`() {
+        // Arrange
+        val path = "/icons/a/b/c/d/icon.svg".toPath()
+
+        // Act
+        val eligible = path.isEligibleUnlimited()
 
         // Assert
         assertTrue(eligible)

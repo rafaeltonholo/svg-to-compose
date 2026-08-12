@@ -15,21 +15,39 @@ fun Path.hasVectorFileExtension(): Boolean =
  * directory scan and the Gradle plugin's incremental change scan apply this
  * same rule set so the two paths cannot drift.
  *
- * @param root The scan root. Directory segments between [root] and the file
- * are matched against [excludeDir]; [root] itself is never matched.
+ * @param root The scan root. Depth and [excludeDir] are evaluated against the
+ * file's path relative to [root]; [root] itself is never matched.
+ * @param recursive Whether nested directories are scanned. When false, only
+ * files directly inside [root] are eligible.
+ * @param maxDepth The maximum nesting depth when [recursive] is true. Files
+ * directly inside [root] are at depth 0. Null means unlimited.
  * @param exclude A regex excluding files by name. Null excludes nothing.
  * @param excludeDir A regex matched against each directory segment of the
  * file's path relative to [root]. Null excludes nothing.
  */
 fun Path.isEligibleForProcessing(
     root: Path,
+    recursive: Boolean,
+    maxDepth: Int?,
     exclude: Regex?,
     excludeDir: Regex?,
 ): Boolean {
+    val isWithinDepthLimit = isWithinDepthLimit(root = root, recursive = recursive, maxDepth = maxDepth)
     val isNotExcluded = exclude == null || !name.matches(exclude)
     val isNotInExcludedDir = excludeDir == null || !isInExcludedDir(root = root, excludeDir = excludeDir)
-    return hasVectorFileExtension() && isNotExcluded && isNotInExcludedDir
+    return hasVectorFileExtension() && isWithinDepthLimit && isNotExcluded && isNotInExcludedDir
 }
+
+private fun Path.isWithinDepthLimit(
+    root: Path,
+    recursive: Boolean,
+    maxDepth: Int?,
+): Boolean {
+    val depthLimit = if (recursive) maxDepth else 0
+    return depthLimit == null || depthRelativeTo(root) <= depthLimit
+}
+
+private fun Path.depthRelativeTo(root: Path): Int = segments.size - root.segments.size - 1
 
 private fun Path.isInExcludedDir(root: Path, excludeDir: Regex): Boolean {
     var current = parent
