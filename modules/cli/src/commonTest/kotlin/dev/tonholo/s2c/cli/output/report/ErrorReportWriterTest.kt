@@ -237,10 +237,37 @@ class ErrorReportWriterTest {
         assertFalse(actual = contents.contains("java.lang.RuntimeException"), message = contents)
     }
 
+    @Test
+    fun `given a fixed clock - when write is called - then filename replaces the timestamp colons with hyphens`() {
+        // Arrange
+        fileSystem.createDirectories(workingDir)
+        val reportWriter = writer()
+
+        // Act
+        val reportPath = reportWriter.write(
+            version = "2.2.0",
+            config = runConfig,
+            totalFiles = 1,
+            succeeded = 0,
+            failedFiles = listOf(
+                BugReportFailure(
+                    fileName = "ic_broken_gradient.svg",
+                    errorCode = ErrorCode.ParseSvgError,
+                    message = "Unsupported gradient type: mesh-gradient",
+                ),
+            ),
+            stackTraceEnabled = false,
+        )
+
+        // Assert
+        assertEquals(
+            expected = workingDir / "s2c-errors-2026-04-07T14-50-00.log",
+            actual = reportPath,
+        )
+    }
+
     companion object {
         private const val FIXED_PLATFORM = "macOS arm64"
-
-        // 2026-04-03T14:30:00Z in epoch milliseconds
-        private const val FIXED_EPOCH_MILLIS = 1775573400000L
+        private const val FIXED_EPOCH_MILLIS = 1_775_573_400_000L
     }
 }
