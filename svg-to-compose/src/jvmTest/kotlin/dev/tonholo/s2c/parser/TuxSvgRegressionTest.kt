@@ -3,7 +3,6 @@ package dev.tonholo.s2c.parser
 import dev.tonholo.s2c.ConversionStep
 import dev.tonholo.s2c.DefaultConverter
 import dev.tonholo.s2c.domain.FileType
-import dev.tonholo.s2c.emitter.CodeEmitterFactory
 import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.logger.NoOpLogger

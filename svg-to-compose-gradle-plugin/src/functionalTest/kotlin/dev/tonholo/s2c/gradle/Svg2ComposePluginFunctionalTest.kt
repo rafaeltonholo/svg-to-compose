@@ -312,7 +312,10 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         val generatedRoot = projectDir.resolve("build/generated/svgToCompose")
         val generated = generatedRoot.walkTopDown()
             .firstOrNull { it.isFile && it.extension == "kt" && it.nameWithoutExtension == "Icon" }
-        assertNotNull(generated, "No generated Icon.kt under $generatedRoot. Tree: ${generatedRoot.walkTopDown().joinToString("\n")}")
+        assertNotNull(
+            generated,
+            "No generated Icon.kt under $generatedRoot. Tree: ${generatedRoot.walkTopDown().joinToString("\n")}",
+        )
         val firstLine = generated.readText().lineSequence().first { it.isNotBlank() }
         assertEquals("package $expectedPackage", firstLine)
     }
