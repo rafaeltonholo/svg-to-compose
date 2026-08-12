@@ -107,6 +107,34 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         )
     }
 
+    private fun setupMaxDepthBuildGradle(pkg: String, maxDepth: Int) {
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories { mavenCentral() }
+            kotlin { jvm() }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        recursive()
+                        maxDepth($maxDepth)
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+    }
+
     private fun assertIncremental(result: BuildResult) {
         assertFalse(
             result.output.contains("Non-incremental build for configuration"),
@@ -440,6 +468,54 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
 
         // Act
         writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+    }
+
+    @Test
+    fun `given maxDepth 1 - when incremental build adds SVGs at and beyond depth limit - then only within-limit output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.maxdepth.add"
+
+        // Arrange
+        setupMaxDepthBuildGradle(pkg, maxDepth = 1)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should exist after first run")
+
+        // Act
+        writeSvg("icons/nested", "icon-c.svg", SIMPLE_SVG_A)
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_B)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertTrue(
+            genDir.resolve("nested/IconC.kt").exists(),
+            "SVG at depth 1 is within maxDepth and should produce output",
+        )
+        assertNoGeneratedFileNamed("IconB.kt")
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
+    @Test
+    fun `given maxDepth 1 - when incremental build modifies SVG beyond depth limit - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.maxdepth.modify"
+
+        // Arrange
+        setupMaxDepthBuildGradle(pkg, maxDepth = 1)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        assertNoGeneratedFileNamed("IconB.kt")
+
+        // Act
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_A_MODIFIED)
         val secondResult = runGradle(TASK_NAME, info = true)
 
         // Assert
