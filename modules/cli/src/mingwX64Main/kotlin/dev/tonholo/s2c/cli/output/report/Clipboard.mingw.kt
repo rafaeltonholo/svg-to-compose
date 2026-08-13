@@ -9,6 +9,7 @@ import platform.windows.CF_UNICODETEXT
 import platform.windows.CloseClipboard
 import platform.windows.EmptyClipboard
 import platform.windows.GMEM_MOVEABLE
+import platform.windows.GetConsoleWindow
 import platform.windows.GlobalAlloc
 import platform.windows.GlobalFree
 import platform.windows.GlobalLock
@@ -25,10 +26,14 @@ private const val WIDE_CHAR_BYTES = 2
  * The clipboard takes ownership of the `GlobalAlloc`-d buffer on a
  * successful `SetClipboardData` call, so we must only call `GlobalFree`
  * when that call fails; otherwise we would free memory the OS now owns.
+ *
+ * The clipboard is opened with the console window as owner because the
+ * `SetClipboardData` documentation warns the call can fail after
+ * `EmptyClipboard` when the clipboard was opened with a NULL owner.
  */
 @OptIn(ExperimentalForeignApi::class)
 internal actual fun copyToClipboard(text: String): Boolean {
-    if (OpenClipboard(hWndNewOwner = null) == 0) return false
+    if (OpenClipboard(hWndNewOwner = GetConsoleWindow()) == 0) return false
     return try {
         writeWithClipboardOpen(text = text)
     } finally {
