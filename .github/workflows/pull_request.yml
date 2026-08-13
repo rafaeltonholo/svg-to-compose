@@ -23,7 +23,7 @@ jobs:
 
         - name: Build Native Binary for macos
           if: matrix.os == 'macos-latest'
-          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
+          uses: burrunan/gradle-cache-action@4b67497abd37a511d6c1dc6299bdd84ff39f7bf5 # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
@@ -31,7 +31,7 @@ jobs:
 
         - name: Build Native Binary for Windows
           if: matrix.os == 'windows-latest'
-          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
+          uses: burrunan/gradle-cache-action@4b67497abd37a511d6c1dc6299bdd84ff39f7bf5 # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
@@ -39,7 +39,7 @@ jobs:
 
         - name: Build Native Binary for Linux
           if: matrix.os == 'ubuntu-latest'
-          uses: burrunan/gradle-cache-action@663fbad34e03c8f12b27f4999ac46e3d90f87eca # v3
+          uses: burrunan/gradle-cache-action@4b67497abd37a511d6c1dc6299bdd84ff39f7bf5 # v3
           with:
             gradle-version: wrapper
             job-id: ${{ matrix.os }}
