@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,6 +23,13 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class TuiRendererTest {
+
+    private val fileSystem = FakeFileSystem()
+
+    @AfterTest
+    fun tearDown() {
+        fileSystem.checkNoOpenFiles()
+    }
 
     private val defaultParserConfig = ParserConfig(
         pkg = "com.example.icons",
@@ -287,7 +295,6 @@ class TuiRendererTest {
         runTest {
             // Arrange
             val (terminal, recorder) = newTerminal()
-            val fileSystem = FakeFileSystem()
             val reportPath = "/tmp/s2c-errors-1.log".toPath()
             fileSystem.createDirectories(requireNotNull(reportPath.parent))
             val savedReport = "svg-to-compose v2.2.0\n[ParseSvgError] icon.svg\n  Invalid path data\n"
@@ -336,7 +343,6 @@ class TuiRendererTest {
         runTest {
             // Arrange
             val (terminal, _) = newTerminal()
-            val fileSystem = FakeFileSystem()
             val reportPath = "/tmp/s2c-errors-2.log".toPath()
             fileSystem.createDirectories(requireNotNull(reportPath.parent))
             fileSystem.write(reportPath) { writeUtf8("content") }
@@ -372,7 +378,6 @@ class TuiRendererTest {
         runTest {
             // Arrange
             val (terminal, recorder) = newTerminal()
-            val fileSystem = FakeFileSystem()
             val reportPath = "/tmp/s2c-errors-3.log".toPath()
             fileSystem.createDirectories(requireNotNull(reportPath.parent))
             fileSystem.write(reportPath) { writeUtf8("content") }
@@ -401,6 +406,7 @@ class TuiRendererTest {
                 message = output,
             )
             assertTrue(actual = output.contains(reportPath.toString()), message = output)
+            renderer.awaitUserExit()
         }
 
     @Test
@@ -410,7 +416,7 @@ class TuiRendererTest {
         val renderer = TuiRenderer(
             terminal = terminal,
             stackTraceEnabled = false,
-            fileSystem = FakeFileSystem(),
+            fileSystem = fileSystem,
             clipboardWriter = { true },
         )
 
@@ -426,7 +432,6 @@ class TuiRendererTest {
             // fix, awaitUserExit would suspend forever because userExitSignal
             // is only completed via handleKeyEvent.
             val (terminal, _) = newTerminal()
-            val fileSystem = FakeFileSystem()
             val reportPath = "/tmp/s2c-errors-eof.log".toPath()
             fileSystem.createDirectories(requireNotNull(reportPath.parent))
             fileSystem.write(reportPath) { writeUtf8("content") }
