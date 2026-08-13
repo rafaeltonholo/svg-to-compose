@@ -9,17 +9,26 @@ internal data class InvocationCommand(val value: String)
 
 /**
  * Joins [args] into a copy-pasteable `s2c` command. Arguments containing
- * whitespace or double quotes are wrapped in double quotes with embedded
- * quotes escaped.
+ * anything shell-sensitive are wrapped in double quotes with the characters
+ * that stay active inside POSIX double quotes (`\`, `"`, `$`, and backtick)
+ * escaped, so the command survives pasting into a shell unchanged.
  */
 internal fun formatCommandLine(args: List<String>): String =
     (listOf(BINARY_NAME) + args.map(::quoteIfNeeded)).joinToString(separator = " ")
 
 private fun quoteIfNeeded(arg: String): String {
-    val needsQuoting = arg.isEmpty() || arg.contains('"') || arg.any { it.isWhitespace() }
-    if (!needsQuoting) return arg
-    val escaped = arg.replace(oldValue = "\"", newValue = "\\\"")
+    if (arg.isNotEmpty() && arg.all(::isShellSafe)) return arg
+    val escaped = buildString(capacity = arg.length) {
+        for (char in arg) {
+            if (char in ESCAPED_IN_QUOTES) append('\\')
+            append(char)
+        }
+    }
     return "\"$escaped\""
 }
 
+private fun isShellSafe(char: Char): Boolean = char.isLetterOrDigit() || char in SAFE_PUNCTUATION
+
 private const val BINARY_NAME = "s2c"
+private const val SAFE_PUNCTUATION = "-_./=:@,+%"
+private val ESCAPED_IN_QUOTES = setOf('\\', '"', '$', '`')
