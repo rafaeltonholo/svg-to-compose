@@ -139,10 +139,8 @@ class BugReportUrlBuilderTest {
 
         // Assert
         val inputOutput = decodeQueryParam(url = url, key = "input-output")
-        assertTrue(
-            actual = inputOutput.contains("- ParseSvgError: ic_broken_gradient.svg - Unsupported gradient type: mesh-gradient"),
-            message = inputOutput,
-        )
+        val expectedErrorLine = "- ParseSvgError: ic_broken_gradient.svg - Unsupported gradient type: mesh-gradient"
+        assertTrue(actual = inputOutput.contains(expectedErrorLine), message = inputOutput)
         assertTrue(actual = inputOutput.contains("attach a minimal reproducing SVG"), message = inputOutput)
     }
 
@@ -188,6 +186,18 @@ class BugReportUrlBuilderTest {
         )
         val steps = decodeQueryParam(url = url, key = "reproduction-steps")
         assertTrue(actual = steps.contains("s2c "), message = steps)
+    }
+
+    @Test
+    fun `given a non-ascii value - when percentEncode is called - then utf8 bytes emit uppercase octets`() {
+        // Arrange
+        val value = "ícone č.svg"
+
+        // Act
+        val encoded = percentEncode(value = value)
+
+        // Assert
+        assertEquals(expected = "%C3%ADcone%20%C4%8D.svg", actual = encoded)
     }
 
     @Test
