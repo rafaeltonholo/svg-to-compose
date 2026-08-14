@@ -11,6 +11,10 @@ kotlin {
     useJs()
     useWasmJs()
 
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     sourceSets {
         commonMain.dependencies {
             api(projects.svgToCompose)
@@ -32,6 +36,7 @@ kotlin {
 
         jsMain.dependencies {
             implementation(libs.io.ktor.ktorClientCore)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(npm("jszip", libs.versions.jszip.get()))
         }
 
