@@ -12,12 +12,12 @@ private class JsZipExtractor(private val fileSystem: FileSystem) : ZipExtractor 
     override suspend fun extract(zipPath: Path, outputDir: Path): List<Path> {
         val bytes = fileSystem.read(zipPath) { readByteArray() }
         val archive = JsZip.loadAsync(bytes.toUint8Array()).await()
-        return archive.fileEntries().map { entry -> writeEntry(entry, outputDir) }
+        return archive.fileEntries().mapNotNull { entry -> writeEntry(entry, outputDir) }
     }
 
-    private suspend fun writeEntry(entry: JsZipEntry, outputDir: Path): Path {
+    private suspend fun writeEntry(entry: JsZipEntry, outputDir: Path): Path? {
+        val destination = containedDestination(outputDir = outputDir, entryName = entry.name) ?: return null
         val data = entry.async("uint8array").await()
-        val destination = outputDir / entry.name
         destination.parent?.let(fileSystem::createDirectories)
         fileSystem.write(destination) { write(data.toByteArray()) }
         return destination
