@@ -13,6 +13,11 @@ import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
 import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
+import dev.tonholo.s2c.cli.output.report.BugReportFailure
+import dev.tonholo.s2c.cli.output.report.BugReportUrlBuilder
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
+import dev.tonholo.s2c.cli.output.report.ErrorReportWriter
+import dev.tonholo.s2c.cli.output.report.platformInfo
 import dev.tonholo.s2c.cli.update.UpdateNotifier
 import dev.tonholo.s2c.error.ErrorCode
 import dev.tonholo.s2c.error.ExitProgramException
@@ -35,8 +40,11 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import okio.FileSystem
 import okio.IOException
 import okio.Path
+import okio.Path.Companion.toPath
+import kotlin.time.Clock
 
 private const val SIGINT_EXIT_CODE = 130
 
@@ -63,7 +71,9 @@ internal class CliRunner(
     private val terminal: Terminal,
     private val context: SvgToComposeContext,
     private val fileManager: FileManager,
+    private val fileSystem: FileSystem,
     private val updateNotifier: UpdateNotifier,
+    private val invocationCommand: InvocationCommand,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
     @param:MainDispatcher
@@ -114,8 +124,10 @@ internal class CliRunner(
         val renderer = TuiRenderer(
             terminal = terminal,
             stackTraceEnabled = context.configSnapshot.stackTrace,
+            fileSystem = fileSystem,
         )
         var stats: RunStats? = null
+        var version = ""
         val completedFiles = mutableListOf<FileCompletionEntry>()
         val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
 
@@ -136,6 +148,9 @@ internal class CliRunner(
                     .flowOn(ioDispatcher)
                     .collect { event ->
                         renderer.onEvent(event)
+                        if (event is ConversionEvent.RunStarted) {
+                            version = event.version
+                        }
                         if (event is ConversionEvent.FileCompleted) {
                             completedFiles.add(
                                 FileCompletionEntry(
@@ -152,7 +167,17 @@ internal class CliRunner(
             }
 
             processorDeferred.await()
+            emitErrorReportIfNeeded(
+                renderer = renderer,
+                version = version,
+                config = config,
+                stats = stats,
+                completedFiles = completedFiles,
+                stackTraceEnabled = context.configSnapshot.stackTrace,
+                suppressTerminalWarnings = false,
+            )
             updateNotifier.notifyIfUpdateAvailable(renderer = renderer)
+            renderer.awaitUserExit()
         } finally {
             scope.cancel()
             renderer.stop()
@@ -198,6 +223,7 @@ internal class CliRunner(
                 true
             }
             .onCompletion {
+                renderer.signalInputClosed()
                 parent.cancel()
             }
             .collect { event ->
@@ -223,6 +249,7 @@ internal class CliRunner(
         }
 
         var stats: RunStats? = null
+        var version = ""
         val completedFiles = mutableListOf<FileCompletionEntry>()
         val emitToRenderer = outputFormat == OutputFormat.Json || !isSilent
         val eventSink: OutputRenderer = if (emitToRenderer) renderer else OutputRenderer { }
@@ -237,6 +264,9 @@ internal class CliRunner(
             .flowOn(ioDispatcher)
             .collect { event ->
                 eventSink.onEvent(event)
+                if (event is ConversionEvent.RunStarted) {
+                    version = event.version
+                }
                 if (event is ConversionEvent.FileCompleted) {
                     completedFiles.add(
                         FileCompletionEntry(
@@ -250,6 +280,15 @@ internal class CliRunner(
                     stats = event.stats
                 }
             }
+        emitErrorReportIfNeeded(
+            renderer = eventSink,
+            version = version,
+            config = config,
+            stats = stats,
+            completedFiles = completedFiles,
+            stackTraceEnabled = context.configSnapshot.stackTrace,
+            suppressTerminalWarnings = outputFormat == OutputFormat.Json,
+        )
         updateNotifier.notifyIfUpdateAvailable(renderer = eventSink)
 
         val runStats = stats
@@ -333,6 +372,110 @@ internal class CliRunner(
         if (logPath != null) {
             terminal.println()
             terminal.println("Full log: $logPath")
+        }
+    }
+
+    /**
+     * Writes an auto-saved error report file and dispatches a
+     * [ConversionEvent.ErrorReportGenerated] through [renderer] so the TUI,
+     * plain-text, and JSON surfaces all display the report path and a
+     * pre-filled bug report URL.
+     *
+     * A no-op when the run had no failures, when the processor never emitted
+     * [ConversionEvent.RunCompleted], or when the file write fails; failures
+     * to write the report are surfaced as a terminal warning and intentionally
+     * do not crash the run.
+     */
+    private fun emitErrorReportIfNeeded(
+        renderer: OutputRenderer,
+        version: String,
+        config: RunConfig,
+        stats: RunStats?,
+        completedFiles: List<FileCompletionEntry>,
+        stackTraceEnabled: Boolean,
+        suppressTerminalWarnings: Boolean,
+    ) {
+        val runStats = stats ?: return
+        if (runStats.failed == 0) return
+        val failures = completedFiles.toBugReportFailures()
+        if (failures.isEmpty()) return
+
+        val reportPath = writeErrorReport(
+            version = version,
+            config = config,
+            stats = runStats,
+            failures = failures,
+            stackTraceEnabled = stackTraceEnabled,
+            suppressTerminalWarnings = suppressTerminalWarnings,
+        ) ?: return
+
+        renderer.onEvent(
+            ConversionEvent.ErrorReportGenerated(
+                reportPath = reportPath.toString(),
+                bugReportUrl = BugReportUrlBuilder().build(
+                    version = version,
+                    platform = platformInfo(),
+                    commandLine = invocationCommand.value,
+                    totalFiles = runStats.totalFiles,
+                    succeeded = runStats.succeeded,
+                    failedFiles = failures,
+                ),
+            ),
+        )
+    }
+
+    private fun List<FileCompletionEntry>.toBugReportFailures(): List<BugReportFailure> =
+        mapNotNull { entry ->
+            val result = entry.result as? FileResult.Failed ?: return@mapNotNull null
+            BugReportFailure(
+                fileName = entry.fileName,
+                errorCode = result.errorCode,
+                message = result.message,
+                stackTrace = result.stackTrace,
+            )
+        }
+
+    /**
+     * Writes the error report file via [ErrorReportWriter] and returns its
+     * path, or `null` if the write failed. I/O failures are reported to the
+     * terminal as a warning and swallowed: a broken report is not worth
+     * crashing the run over.
+     *
+     * @param suppressTerminalWarnings when `true`, the I/O-failure warning is
+     *  not printed to the terminal. JSON output mode passes `true` so the
+     *  JSONL stream stays parseable; mixing raw text into stdout would
+     *  corrupt the protocol the same way a stray run-log warning would.
+     */
+    private fun writeErrorReport(
+        version: String,
+        config: RunConfig,
+        stats: RunStats,
+        failures: List<BugReportFailure>,
+        stackTraceEnabled: Boolean,
+        suppressTerminalWarnings: Boolean,
+    ): Path? {
+        val workingDir = ".".toPath()
+        val writer = ErrorReportWriter(
+            fileSystem = fileSystem,
+            workingDir = workingDir,
+            nowEpochMillis = { Clock.System.now().toEpochMilliseconds() },
+            platformInfoProvider = ::platformInfo,
+        )
+        return try {
+            writer.write(
+                version = version,
+                config = config,
+                totalFiles = stats.totalFiles,
+                succeeded = stats.succeeded,
+                failedFiles = failures,
+                stackTraceEnabled = stackTraceEnabled,
+            )
+        } catch (e: IOException) {
+            if (!suppressTerminalWarnings) {
+                terminal.println()
+                terminal.println("Warning: could not write error report to $workingDir: ${e.message}")
+            }
+            null
         }
     }
 

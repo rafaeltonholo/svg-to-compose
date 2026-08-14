@@ -418,4 +418,40 @@ class ConversionEventTest {
         assertEquals(expected = true, actual = event.isWrapper)
     }
     // endregion
+
+    // region ConversionEvent.ErrorReportGenerated
+    @Test
+    fun `given ErrorReportGenerated event - when created - then it holds report path and bug url`() {
+        // Arrange & Act
+        val event = ConversionEvent.ErrorReportGenerated(
+            reportPath = "./s2c-errors-2026-04-03T14-30-00.log",
+            bugReportUrl = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=bug",
+        )
+        // Assert
+        assertIs<ConversionEvent>(event)
+        assertEquals(
+            expected = "./s2c-errors-2026-04-03T14-30-00.log",
+            actual = event.reportPath,
+        )
+        assertEquals(
+            expected = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=bug",
+            actual = event.bugReportUrl,
+        )
+    }
+
+    @Test
+    fun `given two ErrorReportGenerated events with same values - when compared - then they are equal`() {
+        // Arrange
+        val event1 = ConversionEvent.ErrorReportGenerated(
+            reportPath = "./s2c-errors-x.log",
+            bugReportUrl = "https://example.com",
+        )
+        val event2 = ConversionEvent.ErrorReportGenerated(
+            reportPath = "./s2c-errors-x.log",
+            bugReportUrl = "https://example.com",
+        )
+        // Act & Assert
+        assertEquals(expected = event1, actual = event2)
+    }
+    // endregion
 }

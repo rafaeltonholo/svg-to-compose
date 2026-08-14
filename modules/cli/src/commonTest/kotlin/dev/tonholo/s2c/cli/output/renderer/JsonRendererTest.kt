@@ -214,6 +214,31 @@ class JsonRendererTest {
     }
 
     @Test
+    fun `given ErrorReportGenerated - when onEvent called - then outputs error_report JSON`() {
+        // Arrange
+        val event = ConversionEvent.ErrorReportGenerated(
+            reportPath = "./s2c-errors-2026-04-03T14-30-00.log",
+            bugReportUrl = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=Bug",
+        )
+
+        // Act
+        val lines = collectOutput { it.onEvent(event) }
+
+        // Assert
+        assertEquals(expected = 1, actual = lines.size)
+        val obj = json.decodeFromString<JsonObject>(lines.first())
+        assertEquals(expected = "error_report", actual = obj["event"]?.jsonPrimitive?.content)
+        assertEquals(
+            expected = "./s2c-errors-2026-04-03T14-30-00.log",
+            actual = obj["report_file"]?.jsonPrimitive?.content,
+        )
+        assertEquals(
+            expected = "https://github.com/rafaeltonholo/svg-to-compose/issues/new?title=Bug",
+            actual = obj["bug_report_url"]?.jsonPrimitive?.content,
+        )
+    }
+
+    @Test
     fun `given multiple events - when onEvent called for each - then each line is independently parseable JSON`() {
         // Arrange
         val events = listOf(

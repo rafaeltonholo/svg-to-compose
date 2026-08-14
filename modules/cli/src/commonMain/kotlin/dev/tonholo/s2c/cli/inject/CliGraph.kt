@@ -7,6 +7,7 @@ import dev.tonholo.s2c.cli.config.BuildConfig
 import dev.tonholo.s2c.cli.dispatching.DeferredFileDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
 import dev.tonholo.s2c.cli.update.CacheDirResolver
@@ -157,8 +158,13 @@ internal interface CliGraph {
          *
          * @param config The mutable [CliConfig] instance that will be updated
          *  by [Client] once CLI flags are parsed.
+         * @param command The command line the user executed, captured from the
+         *  raw process arguments before Clikt parses them.
          */
-        fun create(@Provides config: CliConfig): CliGraph
+        fun create(
+            @Provides config: CliConfig,
+            @Provides command: InvocationCommand,
+        ): CliGraph
     }
 }
 

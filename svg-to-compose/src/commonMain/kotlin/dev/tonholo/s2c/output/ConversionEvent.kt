@@ -66,4 +66,18 @@ sealed interface ConversionEvent {
         val releaseUrl: String,
         val isWrapper: Boolean,
     ) : ConversionEvent
+
+    /**
+     * Emitted after [RunCompleted] when one or more files failed to convert.
+     *
+     * Carries the location of the auto-saved error report and a pre-filled GitHub
+     * issue URL users can follow to report the failure. Renderers surface these so
+     * users do not have to scrape them from terminal history.
+     *
+     * @property reportPath path to the saved error report file, relative to the
+     * working directory at the time of the run.
+     * @property bugReportUrl URL pointing at a pre-filled GitHub "New Issue" form.
+     */
+    data class ErrorReportGenerated(val reportPath: String, val bugReportUrl: String) :
+        ConversionEvent
 }
