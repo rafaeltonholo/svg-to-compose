@@ -99,17 +99,27 @@ fun String.toPercentage(): Float {
  */
 fun String.removeTrailingZero(): String = replace("\\.0\\b".toRegex(), "")
 
+private val kotlinHardKeywords = setOf(
+    "as", "break", "class", "continue", "do", "else", "false", "for", "fun",
+    "if", "in", "interface", "is", "null", "object", "package", "return",
+    "super", "this", "throw", "true", "try", "typealias", "typeof", "val",
+    "var", "when", "while",
+)
+
 /**
  * Sanitizes the receiver so it can be used as a single Kotlin package segment.
  *
  * Replaces every character that is not a valid Kotlin identifier part with `_`,
  * and prefixes a leading `_` when the first character would otherwise only be
- * valid as an identifier part (e.g. a digit). Empty input becomes `_`.
+ * valid as an identifier part (e.g. a digit). Empty input becomes `_`. When the
+ * sanitized result is a Kotlin hard keyword or literal, it is escaped with
+ * backticks.
  *
  * Examples:
  * - `"radial-focal-tests"` becomes `"radial_focal_tests"`
  * - `"my folder.v2"` becomes `"my_folder_v2"`
  * - `"123abc"` becomes `"_123abc"`
+ * - `"class"` becomes ``"`class`"``
  */
 fun String.toKotlinPackageSegment(): String {
     if (isEmpty()) return "_"
@@ -124,5 +134,6 @@ fun String.toKotlinPackageSegment(): String {
         val ch = this[i]
         builder.append(if (ch.isLetterOrDigit() || ch == '_') ch else '_')
     }
-    return builder.toString()
+    val sanitized = builder.toString()
+    return if (sanitized in kotlinHardKeywords) "`$sanitized`" else sanitized
 }
