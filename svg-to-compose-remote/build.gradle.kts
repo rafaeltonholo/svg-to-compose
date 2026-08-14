@@ -35,10 +35,6 @@ kotlin {
             implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(npm("jszip", libs.versions.jszip.get()))
         }
-
-        wasmJsMain.dependencies {
-            implementation(npm("jszip", libs.versions.jszip.get()))
-        }
     }
 }
 
