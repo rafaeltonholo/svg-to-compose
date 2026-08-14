@@ -1,6 +1,3 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
-import com.vanniktech.maven.publish.SourcesJar
 import dev.tonholo.s2c.conventions.kmp.targets.useJs
 import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
 
@@ -47,12 +44,6 @@ buildConfig {
 }
 
 mavenPublishing {
-    configure(
-        KotlinMultiplatform(
-            javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
-            sourcesJar = SourcesJar.Sources(),
-        ),
-    )
     pom {
         name.set("SVG/XML to Compose Remote Sources")
         description.set(

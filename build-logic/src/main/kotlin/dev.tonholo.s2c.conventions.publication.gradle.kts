@@ -1,5 +1,20 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+import com.vanniktech.maven.publish.SourcesJar
+
 plugins {
     com.vanniktech.maven.publish
+}
+
+plugins.withId("org.jetbrains.kotlin.multiplatform") {
+    mavenPublishing {
+        configure(
+            KotlinMultiplatform(
+                javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+                sourcesJar = SourcesJar.Sources(),
+            ),
+        )
+    }
 }
 
 publishing {
