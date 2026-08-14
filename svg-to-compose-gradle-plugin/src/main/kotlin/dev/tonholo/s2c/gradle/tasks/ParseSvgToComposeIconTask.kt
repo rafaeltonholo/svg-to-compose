@@ -520,9 +520,9 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
  * same eligibility rules as the full scan in [FileManager.findFilesToProcess]:
  * supported extension, recursion depth, exclude pattern, and excludeDir pattern.
  *
- * Removals are intentionally only filtered by extension: stale outputs from
- * files that previously did not match the current filters still need cleanup
- * when their source is deleted.
+ * Removals are intentionally only filtered by extension, ignoring case: stale
+ * outputs from files that previously did not match the current filters still
+ * need cleanup when their source is deleted.
  */
 private fun collectIncrementalChanges(
     configuration: ProcessorConfiguration,
@@ -538,7 +538,6 @@ private fun collectIncrementalChanges(
     val removed = mutableListOf<Path>()
     inputChanges.getFileChanges(configuration.origin).forEach { change ->
         val path = change.file.toOkioPath()
-        if (!path.hasVectorFileExtension()) return@forEach
         when (change.changeType) {
             ChangeType.ADDED, ChangeType.MODIFIED -> {
                 val isEligible = path.isEligibleForProcessing(
@@ -553,7 +552,11 @@ private fun collectIncrementalChanges(
                 }
             }
 
-            ChangeType.REMOVED -> removed.add(path)
+            ChangeType.REMOVED -> {
+                if (path.hasVectorFileExtension(ignoreCase = true)) {
+                    removed.add(path)
+                }
+            }
         }
     }
     return added to removed
