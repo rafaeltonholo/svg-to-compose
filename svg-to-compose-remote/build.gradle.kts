@@ -4,6 +4,7 @@ import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
 plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
+    alias(libs.plugins.app.cash.burst)
 }
 
 kotlin {
@@ -18,6 +19,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.test)
         }
 
         jvmMain.dependencies {
