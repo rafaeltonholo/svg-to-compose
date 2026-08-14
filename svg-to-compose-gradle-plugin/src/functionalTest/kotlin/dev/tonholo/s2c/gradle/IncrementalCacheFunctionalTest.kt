@@ -4,6 +4,7 @@ import dev.tonholo.s2c.gradle.common.GradleFunctionalTest
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.util.Properties
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -146,6 +147,19 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         val generatedRoot = projectDir.resolve("build/generated/svgToCompose")
         val matches = generatedRoot.walkTopDown().filter { it.name == fileName }.toList()
         assertTrue(matches.isEmpty(), "$fileName should not be generated, but found: $matches")
+    }
+
+    private fun registerLegacyPersistentOutput(sourceFileName: String, outputFileName: String) {
+        val registryFile = projectDir.resolve("build/generated/svgToCompose/persistent-output-registry.properties")
+        val props = Properties()
+        registryFile.inputStream().use(props::load)
+        val existingOrigin = props.stringPropertyNames().single()
+        val existingOutput = props.getProperty(existingOrigin)
+        props.setProperty(
+            existingOrigin.replaceAfterLast('/', sourceFileName),
+            existingOutput.replaceAfterLast('/', outputFileName),
+        )
+        registryFile.outputStream().use { props.store(it, null) }
     }
 
     private fun buildGradleContent(pkg: String, optimize: Boolean = false): String =
@@ -738,6 +752,34 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
         assertFalse(srcDir.resolve("IconA.kt").exists(), "IconA.kt should be removed from src/")
         assertTrue(srcDir.resolve("IconB.kt").exists(), "IconB.kt should still exist in src/")
+    }
+
+    @Test
+    fun `given legacy output for uppercase-extension SVG - when source is deleted - then incremental build removes the output`() {
+        val pkg = "dev.tonholo.s2c.test.persistent.uppercase.delete"
+
+        // Arrange
+        setupPersistentBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        val srcDir = generatedSrcDir(pkg)
+        val legacyOutput = srcDir.resolve("IconUpper.kt")
+        legacyOutput.writeText("package $pkg")
+        registerLegacyPersistentOutput(sourceFileName = "ICON-UPPER.SVG", outputFileName = "IconUpper.kt")
+
+        // Act
+        projectDir.resolve("icons/ICON-UPPER.SVG").delete()
+        val result = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(result, TaskOutcome.SUCCESS)
+        assertIncremental(result)
+        assertFalse(
+            legacyOutput.exists(),
+            "Legacy output should be deleted when its uppercase-extension source is removed",
+        )
+        assertTrue(srcDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
     }
 
     @Test
