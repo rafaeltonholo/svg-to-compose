@@ -14,7 +14,7 @@ JS, and WasmJS.
 
 ## Source Structure
 
-```
+```text
 src/
 ├── commonMain/    # Source abstraction, resolvers, shared logic
 ├── jvmMain/       # OkHttp transport, Okio openZip()
