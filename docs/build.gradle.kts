@@ -6,6 +6,7 @@ plugins {
 dependencies {
     dokka(projects.svgToCompose)
     dokka(projects.svgToComposeGradlePlugin)
+    dokka(projects.svgToComposeRemote)
 }
 
 dokka {

@@ -16,6 +16,7 @@
 | `svg-to-compose`               | Core KMP library - SVG/AVG parsing and Compose ImageVector code generation | [svg-to-compose/AGENTS.md](svg-to-compose/AGENTS.md)                             |
 | `modules/cli`                  | CLI entry point (Clikt), produces native executables (composite build)     | [modules/cli/AGENTS.md](modules/cli/AGENTS.md)                                   |
 | `svg-to-compose-gradle-plugin` | Gradle plugin for automated SVG/AVG to Compose conversion in builds        | [svg-to-compose-gradle-plugin/AGENTS.md](svg-to-compose-gradle-plugin/AGENTS.md) |
+| `svg-to-compose-remote`        | KMP library for remote icon sources (URL, ZIP, icon fonts)                 | [svg-to-compose-remote/AGENTS.md](svg-to-compose-remote/AGENTS.md)               |
 | `build-logic`                  | Convention plugins and shared build logic (included build)                 | [build-logic/AGENTS.md](build-logic/AGENTS.md)                                   |
 | `playground`                   | Android demo app                                                           | [playground/AGENTS.md](playground/AGENTS.md)                                     |
 | `playground-kmp`               | Kotlin Multiplatform demo app                                              | [playground-kmp/AGENTS.md](playground-kmp/AGENTS.md)                             |

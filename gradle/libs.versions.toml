@@ -6,10 +6,13 @@ compose-rules = "0.5.6"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
 ktoml = "0.7.1"
+ktor = "3.5.2"
+okhttp = "5.4.0"
 okio = "3.17.0"
 detekt = "2.0.0-alpha.2"
 fakt = "1.0.0-beta05"
 ksoup = "0.2.6"
+jszip = "3.10.1"
 jetbrains-annotation = "26.1.0"
 metro = "0.13.1"
 maven-publish = "0.36.0"
@@ -20,12 +23,14 @@ junit-jupiter = "6.0.3"
 shadow = "9.4.1"
 
 [libraries]
+com-squareup-okhttp3-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 com-squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 com-squareup-okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 detekt-rules-ktlint-wrapper = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
 com-akuleshov7-ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 com-fleeksoft-ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 com-rsicarelli-fakt-annotations = { module = "com.rsicarelli.fakt:annotations", version.ref = "fakt" }
+io-ktor-ktorClientCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 org-jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotation" }
 org-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 org-jetbrains-kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
