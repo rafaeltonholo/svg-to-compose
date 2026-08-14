@@ -5,10 +5,12 @@ import okio.Path
 
 /**
  * Returns true when this path ends with a supported vector file extension,
- * [FileType.Svg] or [FileType.Avg]. Matching is case-sensitive.
+ * [FileType.Svg] or [FileType.Avg]. Matching is case-sensitive unless
+ * [ignoreCase] is true.
  */
-fun Path.hasVectorFileExtension(): Boolean =
-    name.endsWith(FileType.Svg.extension) || name.endsWith(FileType.Avg.extension)
+fun Path.hasVectorFileExtension(ignoreCase: Boolean = false): Boolean =
+    name.endsWith(FileType.Svg.extension, ignoreCase = ignoreCase) ||
+        name.endsWith(FileType.Avg.extension, ignoreCase = ignoreCase)
 
 /**
  * Decides whether a vector file is eligible for conversion. Both the full

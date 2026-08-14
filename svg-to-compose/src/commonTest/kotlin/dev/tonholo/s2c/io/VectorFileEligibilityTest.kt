@@ -262,4 +262,17 @@ class VectorFileEligibilityTest {
         assertFalse(upperSvg.hasVectorFileExtension())
         assertFalse(png.hasVectorFileExtension())
     }
+
+    @Test
+    fun `given uppercase names - when hasVectorFileExtension ignoring case - then only supported extensions return true`() {
+        // Arrange
+        val upperSvg = "/icons/ICON.SVG".toPath()
+        val upperXml = "/icons/ICON.XML".toPath()
+        val upperPng = "/icons/ICON.PNG".toPath()
+
+        // Act & Assert
+        assertTrue(upperSvg.hasVectorFileExtension(ignoreCase = true))
+        assertTrue(upperXml.hasVectorFileExtension(ignoreCase = true))
+        assertFalse(upperPng.hasVectorFileExtension(ignoreCase = true))
+    }
 }
