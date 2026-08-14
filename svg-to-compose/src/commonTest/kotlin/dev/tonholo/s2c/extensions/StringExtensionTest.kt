@@ -31,4 +31,44 @@ class StringExtensionTest {
         // Assert
         assertEquals(expected, actual)
     }
+
+    @Test
+    @Burst
+    fun `given hard keyword segment when sanitizing then segment is wrapped in backticks`(
+        case: Pair<String, String> = burstValues(
+            "class" to "`class`",
+            "fun" to "`fun`",
+            "when" to "`when`",
+            "in" to "`in`",
+            "true" to "`true`",
+            "null" to "`null`",
+            "object" to "`object`",
+            "package" to "`package`",
+        ),
+    ) {
+        // Arrange
+        val (input, expected) = case
+        // Act
+        val actual = input.toKotlinPackageSegment()
+        // Assert
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    @Burst
+    fun `given soft or modifier keyword segment when sanitizing then segment stays unchanged`(
+        segment: String = burstValues(
+            "value",
+            "internal",
+            "import",
+            "data",
+        ),
+    ) {
+        // Arrange
+        val expected = segment
+        // Act
+        val actual = segment.toKotlinPackageSegment()
+        // Assert
+        assertEquals(expected, actual)
+    }
 }
