@@ -26,9 +26,6 @@ sealed interface RemoteSource {
         /**
          * Font file at [fontUrl] plus a separate mapping file at [mappingUrl].
          */
-        data class FileWithMapping(
-            val fontUrl: String,
-            val mappingUrl: String,
-        ) : Font
+        data class FileWithMapping(val fontUrl: String, val mappingUrl: String) : Font
     }
 }

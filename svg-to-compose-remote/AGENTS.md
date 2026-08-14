@@ -20,7 +20,7 @@ src/
 ├── jvmMain/       # OkHttp transport, Okio openZip()
 ├── nativeMain/    # Ktor transport, Okio openZip()
 ├── jsMain/        # Ktor JS transport, JSZip for ZIP extraction
-└── wasmJsMain/    # JSZip for ZIP extraction
+└── wasmJsMain/    # ZIP extraction not supported yet (throws)
 ```
 
 ## Dependency Rules
@@ -33,6 +33,9 @@ src/
   WasmJS.
 - **Core dependency**: this module depends on `svg-to-compose` (`api`), never
   the other way around. Core must stay free of networking dependencies.
+- **DI**: bindings live in `RemoteBindings`, contributed to `AppScope`. JS and
+  WasmJS graphs must include the container explicitly because Metro hint
+  generation is disabled for those platforms (KT-82395).
 
 ## Verification
 
