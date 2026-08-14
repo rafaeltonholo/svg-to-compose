@@ -35,7 +35,8 @@ ships as:
 │   ├── svg/
 │   └── avg/
 ├── svg-to-compose/                    # Core KMP library
-└── svg-to-compose-gradle-plugin/      # Gradle plugin
+├── svg-to-compose-gradle-plugin/      # Gradle plugin
+└── svg-to-compose-remote/             # Remote icon sources (URL, ZIP, fonts)
 ```
 
 ## Build Commands
@@ -163,6 +164,7 @@ Before modifying code in a module, read its `AGENTS.md`:
 | `svg-to-compose`               | [svg-to-compose/AGENTS.md](../svg-to-compose/AGENTS.md)                             |
 | `modules/cli`                  | [modules/cli/AGENTS.md](../modules/cli/AGENTS.md)                                   |
 | `svg-to-compose-gradle-plugin` | [svg-to-compose-gradle-plugin/AGENTS.md](../svg-to-compose-gradle-plugin/AGENTS.md) |
+| `svg-to-compose-remote`        | [svg-to-compose-remote/AGENTS.md](../svg-to-compose-remote/AGENTS.md)               |
 | `build-logic`                  | [build-logic/AGENTS.md](../build-logic/AGENTS.md)                                   |
 | `playground`                   | [playground/AGENTS.md](../playground/AGENTS.md)                                     |
 | `playground-kmp`               | [playground-kmp/AGENTS.md](../playground-kmp/AGENTS.md)                             |
