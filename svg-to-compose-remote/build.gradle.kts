@@ -11,10 +11,6 @@ kotlin {
     useJs()
     useWasmJs()
 
-    compilerOptions {
-        freeCompilerArgs.add("-Xexpect-actual-classes")
-    }
-
     sourceSets {
         commonMain.dependencies {
             api(projects.svgToCompose)

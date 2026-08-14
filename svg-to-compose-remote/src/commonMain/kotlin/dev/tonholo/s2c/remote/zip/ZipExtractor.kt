@@ -4,9 +4,9 @@ import okio.FileSystem
 import okio.Path
 
 /**
- * Extracts ZIP archives into a target directory on [fileSystem].
+ * Extracts ZIP archives into a target directory.
  */
-expect class ZipExtractor(fileSystem: FileSystem) {
+interface ZipExtractor {
     /**
      * Extracts the archive at [zipPath] into [outputDir], preserving the
      * archive's directory structure.
@@ -15,3 +15,8 @@ expect class ZipExtractor(fileSystem: FileSystem) {
      */
     suspend fun extract(zipPath: Path, outputDir: Path): List<Path>
 }
+
+/**
+ * Creates the platform [ZipExtractor] operating on [fileSystem].
+ */
+expect fun createZipExtractor(fileSystem: FileSystem): ZipExtractor

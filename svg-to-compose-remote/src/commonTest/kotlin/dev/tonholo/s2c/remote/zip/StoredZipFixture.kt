@@ -74,7 +74,11 @@ private class CentralRecord(
     }
 }
 
-private fun writeLocalEntry(buffer: Buffer, name: String, content: String): CentralRecord {
+private fun writeLocalEntry(
+    buffer: Buffer,
+    name: String,
+    content: String,
+): CentralRecord {
     val nameBytes = name.encodeToByteArray()
     val data = content.encodeToByteArray()
     val record = CentralRecord(

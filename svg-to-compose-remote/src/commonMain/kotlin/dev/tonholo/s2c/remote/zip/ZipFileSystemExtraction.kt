@@ -12,7 +12,12 @@ internal fun FileSystem.extractAllTo(target: FileSystem, outputDir: Path): List<
         .toList()
 }
 
-private fun FileSystem.copyEntryTo(entry: Path, root: Path, target: FileSystem, outputDir: Path): Path {
+private fun FileSystem.copyEntryTo(
+    entry: Path,
+    root: Path,
+    target: FileSystem,
+    outputDir: Path,
+): Path {
     val destination = outputDir / entry.relativeTo(root)
     destination.parent?.let(target::createDirectories)
     read(entry) {

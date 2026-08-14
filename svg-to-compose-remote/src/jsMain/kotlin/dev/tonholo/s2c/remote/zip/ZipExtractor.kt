@@ -6,10 +6,10 @@ import okio.Path
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
 
-actual class ZipExtractor actual constructor(
-    private val fileSystem: FileSystem,
-) {
-    actual suspend fun extract(zipPath: Path, outputDir: Path): List<Path> {
+actual fun createZipExtractor(fileSystem: FileSystem): ZipExtractor = JsZipExtractor(fileSystem)
+
+private class JsZipExtractor(private val fileSystem: FileSystem) : ZipExtractor {
+    override suspend fun extract(zipPath: Path, outputDir: Path): List<Path> {
         val bytes = fileSystem.read(zipPath) { readByteArray() }
         val archive = JsZip.loadAsync(bytes.toUint8Array()).await()
         return archive.fileEntries().map { entry -> writeEntry(entry, outputDir) }

@@ -26,7 +26,7 @@ class ZipExtractorTest {
                 )
             }
             val outputDir = "/out".toPath()
-            val extractor = ZipExtractor(fileSystem)
+            val extractor = createZipExtractor(fileSystem)
 
             // Act
             val extracted = extractor.extract(zipPath = zipPath, outputDir = outputDir)
