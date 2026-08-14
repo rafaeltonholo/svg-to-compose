@@ -19,6 +19,8 @@ import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
 import dev.tonholo.s2c.gradle.tasks.worker.toResult
 import dev.tonholo.s2c.io.FileManager
+import dev.tonholo.s2c.io.hasVectorFileExtension
+import dev.tonholo.s2c.io.isEligibleForProcessing
 import dev.tonholo.s2c.logger.Logger
 import dev.zacsweers.metro.HasMemberInjections
 import dev.zacsweers.metro.createGraphFactory
@@ -514,31 +516,47 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
 }
 
 /**
- * Collects added/modified and removed paths from [inputChanges], filtering by
- * supported extensions and the configured exclude pattern.
+ * Collects added/modified and removed paths from [inputChanges], applying the
+ * same eligibility rules as the full scan in [FileManager.findFilesToProcess]:
+ * supported extension, recursion depth, exclude pattern, and excludeDir pattern.
  *
- * Removals are intentionally not filtered by the exclude pattern: stale outputs
- * from files that previously did not match the current exclude still need cleanup
- * when their source is deleted.
+ * Removals are intentionally only filtered by extension, ignoring case: stale
+ * outputs from files that previously did not match the current filters still
+ * need cleanup when their source is deleted.
  */
 private fun collectIncrementalChanges(
     configuration: ProcessorConfiguration,
     inputChanges: InputChanges,
 ): Pair<MutableList<Path>, MutableList<Path>> {
-    val exclude = configuration.iconConfiguration.get().exclude.orNull
+    val iconConfiguration = configuration.iconConfiguration.get()
+    val exclude = iconConfiguration.exclude.orNull
+    val excludeDir = iconConfiguration.excludeDir.orNull
+    val root = configuration.origin.get().asFile.toOkioPath()
+    val recursive = configuration.recursive.get()
+    val maxDepth = configuration.maxDepth.orNull
     val added = mutableListOf<Path>()
     val removed = mutableListOf<Path>()
     inputChanges.getFileChanges(configuration.origin).forEach { change ->
-        val ext = change.file.extension.lowercase()
-        if (ext != "svg" && ext != "xml") return@forEach
         val path = change.file.toOkioPath()
         when (change.changeType) {
             ChangeType.ADDED, ChangeType.MODIFIED -> {
-                if (exclude != null && change.file.name.matches(exclude)) return@forEach
-                added.add(path)
+                val isEligible = path.isEligibleForProcessing(
+                    root = root,
+                    recursive = recursive,
+                    maxDepth = maxDepth,
+                    exclude = exclude,
+                    excludeDir = excludeDir,
+                )
+                if (isEligible) {
+                    added.add(path)
+                }
             }
 
-            ChangeType.REMOVED -> removed.add(path)
+            ChangeType.REMOVED -> {
+                if (path.hasVectorFileExtension(ignoreCase = true)) {
+                    removed.add(path)
+                }
+            }
         }
     }
     return added to removed

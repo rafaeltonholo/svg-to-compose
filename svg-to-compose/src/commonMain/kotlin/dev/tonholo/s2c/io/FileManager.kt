@@ -1,7 +1,6 @@
 package dev.tonholo.s2c.io
 
 import com.rsicarelli.fakt.Fake
-import dev.tonholo.s2c.domain.FileType
 import dev.tonholo.s2c.extensions.deleteRecursivelyCompat
 import dev.tonholo.s2c.extensions.listRecursively
 import dev.tonholo.s2c.logger.Logger
@@ -92,28 +91,15 @@ fun FileManager(fileSystem: FileSystem, logger: Logger): FileManager = object : 
         return fileSystem
             .listRecursively(from, maxDepth = depth)
             .filter { path ->
-                val isNotExcluded = exclude == null || !path.name.matches(exclude)
-                val isNotInExcludedDir = excludeDir == null || !isDirExcluded(path, from, excludeDir)
-                isNotExcluded && isNotInExcludedDir &&
-                    (path.name.endsWith(FileType.Svg.extension) || path.name.endsWith(FileType.Avg.extension))
+                path.isEligibleForProcessing(
+                    root = from,
+                    recursive = recursive,
+                    maxDepth = maxDepth,
+                    exclude = exclude,
+                    excludeDir = excludeDir,
+                )
             }
             .toList()
-    }
-
-    /**
-     * Checks whether any directory segment in [path] relative to [root] matches the [excludeDir] regex.
-     */
-    private fun isDirExcluded(
-        path: Path,
-        root: Path,
-        excludeDir: Regex,
-    ): Boolean {
-        var current = path.parent
-        while (current != null && current != root) {
-            if (current.name.matches(excludeDir)) return true
-            current = current.parent
-        }
-        return false
     }
 
     override fun readContent(file: Path): String = fileSystem.read(file) {

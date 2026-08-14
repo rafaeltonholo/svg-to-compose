@@ -4,6 +4,7 @@ import dev.tonholo.s2c.gradle.common.GradleFunctionalTest
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.util.Properties
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -75,6 +76,90 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         projectDir.resolve("build.gradle.kts").writeText(
             multiConfigBuildGradleContent(pkgA, pkgB, optimizeA, optimizeB, persistA, persistB),
         )
+    }
+
+    private fun setupExcludeDirBuildGradle(pkg: String) {
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories { mavenCentral() }
+            kotlin { jvm() }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        recursive()
+                        icons {
+                            excludeDir("drafts".toRegex())
+                        }
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+    }
+
+    private fun setupMaxDepthBuildGradle(pkg: String, maxDepth: Int) {
+        projectDir.resolve("build.gradle.kts").writeText(
+            // language=kotlin
+            """
+            plugins {
+                kotlin("multiplatform")
+                id("dev.tonholo.s2c")
+            }
+            repositories { mavenCentral() }
+            kotlin { jvm() }
+            svgToCompose {
+                processor {
+                    common {
+                        optimize(false)
+                        icons { noPreview() }
+                    }
+                    val icons by creating {
+                        from(layout.projectDirectory.dir("icons"))
+                        destinationPackage("$pkg")
+                        recursive()
+                        maxDepth($maxDepth)
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+    }
+
+    private fun assertIncremental(result: BuildResult) {
+        assertFalse(
+            result.output.contains("Non-incremental build for configuration"),
+            "Run should be incremental so the incremental scan path is exercised",
+        )
+    }
+
+    private fun assertNoGeneratedFileNamed(fileName: String) {
+        val generatedRoot = projectDir.resolve("build/generated/svgToCompose")
+        val matches = generatedRoot.walkTopDown().filter { it.name == fileName }.toList()
+        assertTrue(matches.isEmpty(), "$fileName should not be generated, but found: $matches")
+    }
+
+    private fun registerLegacyPersistentOutput(sourceFileName: String, outputFileName: String) {
+        val registryFile = projectDir.resolve("build/generated/svgToCompose/persistent-output-registry.properties")
+        val props = Properties()
+        registryFile.inputStream().use(props::load)
+        val existingOrigin = props.stringPropertyNames().single()
+        val existingOutput = props.getProperty(existingOrigin)
+        props.setProperty(
+            existingOrigin.replaceAfterLast('/', sourceFileName),
+            existingOutput.replaceAfterLast('/', outputFileName),
+        )
+        registryFile.outputStream().use { props.store(it, null) }
     }
 
     private fun buildGradleContent(pkg: String, optimize: Boolean = false): String =
@@ -362,6 +447,127 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
     }
 
+    @Test
+    fun `given excludeDir pattern - when incremental build adds SVG in excluded dir - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.excludedir.add"
+
+        // Arrange
+        setupExcludeDirBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should exist after first run")
+
+        // Act
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_B)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
+    @Test
+    fun `given excludeDir pattern - when incremental build modifies SVG in excluded dir - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.excludedir.modify"
+
+        // Arrange
+        setupExcludeDirBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        assertNoGeneratedFileNamed("IconB.kt")
+
+        // Act
+        writeSvg("icons/drafts", "icon-b.svg", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+    }
+
+    @Test
+    fun `given maxDepth 1 - when incremental build adds SVGs at and beyond depth limit - then only within-limit output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.maxdepth.add"
+
+        // Arrange
+        setupMaxDepthBuildGradle(pkg, maxDepth = 1)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should exist after first run")
+
+        // Act
+        writeSvg("icons/nested", "icon-c.svg", SIMPLE_SVG_A)
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_B)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertTrue(
+            genDir.resolve("nested/IconC.kt").exists(),
+            "SVG at depth 1 is within maxDepth and should produce output",
+        )
+        assertNoGeneratedFileNamed("IconB.kt")
+        assertTrue(genDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
+    }
+
+    @Test
+    fun `given maxDepth 1 - when incremental build modifies SVG beyond depth limit - then no output is produced`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.maxdepth.modify"
+
+        // Arrange
+        setupMaxDepthBuildGradle(pkg, maxDepth = 1)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        assertNoGeneratedFileNamed("IconB.kt")
+
+        // Act
+        writeSvg("icons/nested/deep", "icon-b.svg", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertNoGeneratedFileNamed("IconB.kt")
+    }
+
+    @Test
+    fun `given SVG with uppercase extension - when full then incremental build - then file is skipped in both`() {
+        val pkg = "dev.tonholo.s2c.test.incremental.uppercase"
+
+        // Arrange
+        setupBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        val genDir = generatedBuildDir(pkg)
+        assertEquals(
+            expected = listOf("IconA.kt"),
+            actual = genDir.listFiles().orEmpty().map { it.name }.sorted(),
+            message = "Full build should skip the uppercase-extension file",
+        )
+
+        // Act
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_A_MODIFIED)
+        val secondResult = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
+        assertIncremental(secondResult)
+        assertEquals(
+            expected = listOf("IconA.kt"),
+            actual = genDir.listFiles().orEmpty().map { it.name }.sorted(),
+            message = "Incremental build should skip the uppercase-extension file like the full build does",
+        )
+    }
+
     // endregion [ Single Configuration Tests ]
 
     // region [ Incrementality Verification Tests ]
@@ -546,6 +752,34 @@ class IncrementalCacheFunctionalTest : GradleFunctionalTest() {
         assertTaskOutcome(secondResult, TaskOutcome.SUCCESS)
         assertFalse(srcDir.resolve("IconA.kt").exists(), "IconA.kt should be removed from src/")
         assertTrue(srcDir.resolve("IconB.kt").exists(), "IconB.kt should still exist in src/")
+    }
+
+    @Test
+    fun `given legacy output for uppercase-extension SVG - when source is deleted - then incremental build removes the output`() {
+        val pkg = "dev.tonholo.s2c.test.persistent.uppercase.delete"
+
+        // Arrange
+        setupPersistentBuildGradle(pkg)
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG_A)
+        writeSvg("icons", "ICON-UPPER.SVG", SIMPLE_SVG_B)
+        runGradle(TASK_NAME)
+        val srcDir = generatedSrcDir(pkg)
+        val legacyOutput = srcDir.resolve("IconUpper.kt")
+        legacyOutput.writeText("package $pkg")
+        registerLegacyPersistentOutput(sourceFileName = "ICON-UPPER.SVG", outputFileName = "IconUpper.kt")
+
+        // Act
+        projectDir.resolve("icons/ICON-UPPER.SVG").delete()
+        val result = runGradle(TASK_NAME, info = true)
+
+        // Assert
+        assertTaskOutcome(result, TaskOutcome.SUCCESS)
+        assertIncremental(result)
+        assertFalse(
+            legacyOutput.exists(),
+            "Legacy output should be deleted when its uppercase-extension source is removed",
+        )
+        assertTrue(srcDir.resolve("IconA.kt").exists(), "IconA.kt should still exist")
     }
 
     @Test
