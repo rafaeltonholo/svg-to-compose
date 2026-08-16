@@ -157,13 +157,45 @@ abstract class GradleFunctionalTest {
     protected fun copyResourcesToProject(dirName: String, resourceType: String) {
         val targetDir = projectDir.resolve(dirName)
         targetDir.mkdirs()
-        val resourceDir = File(
-            requireNotNull(javaClass.classLoader.getResource(resourceType)) {
-                "Test resource directory not found: $resourceType"
-            }.toURI(),
-        )
-        resourceDir.listFiles().orEmpty().forEach { file ->
+        resourceFile(resourceType).listFiles().orEmpty().forEach { file ->
             file.copyTo(targetDir.resolve(file.name))
         }
     }
+
+    /**
+     * Copies the given classpath resources into a directory of the test project,
+     * keeping their file names.
+     *
+     * @param dirName Target directory name relative to [projectDir] (e.g. `"icons"`). Created if absent.
+     * @param resourcePaths Classpath resource paths (e.g. `"svg/gradient/linear-gradient01.svg"`).
+     * @throws IllegalArgumentException If a resource is not found on the classpath.
+     */
+    protected fun copyResourceFilesToProject(dirName: String, resourcePaths: List<String>) {
+        val targetDir = projectDir.resolve(dirName)
+        targetDir.mkdirs()
+        resourcePaths.forEach { resourcePath ->
+            val source = resourceFile(resourcePath)
+            source.copyTo(targetDir.resolve(source.name), overwrite = true)
+        }
+    }
+
+    /**
+     * Copies a classpath resource into the root of the test project.
+     *
+     * @param resourcePath Classpath resource path (e.g. `"s2c.template.toml"`).
+     * @param targetName File name to use inside [projectDir]. Defaults to the resource file name.
+     * @throws IllegalArgumentException If the resource is not found on the classpath.
+     */
+    protected fun copyResourceToProject(
+        resourcePath: String,
+        targetName: String = resourcePath.substringAfterLast('/'),
+    ) {
+        resourceFile(resourcePath).copyTo(projectDir.resolve(targetName), overwrite = true)
+    }
+
+    private fun resourceFile(resourcePath: String): File = File(
+        requireNotNull(javaClass.classLoader.getResource(resourcePath)) {
+            "Test resource not found on the classpath: $resourcePath"
+        }.toURI(),
+    )
 }
