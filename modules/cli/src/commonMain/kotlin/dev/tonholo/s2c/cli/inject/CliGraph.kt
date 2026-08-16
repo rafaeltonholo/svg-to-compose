@@ -7,6 +7,7 @@ import dev.tonholo.s2c.cli.config.BuildConfig
 import dev.tonholo.s2c.cli.dispatching.DeferredFileDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.logger.CliLogger
+import dev.tonholo.s2c.cli.output.LineWriter
 import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.runtime.CliConfig
 import dev.tonholo.s2c.cli.runtime.Client
@@ -63,6 +64,10 @@ internal interface CliGraph {
     /** Provides a [Terminal] instance for TUI rendering and raw input handling. */
     @Provides
     fun provideTerminal(): Terminal = Terminal()
+
+    /** Provides the stdout sink used by the logger and the line-based renderers. */
+    @Provides
+    fun provideLineWriter(): LineWriter = LineWriter { line -> println(line) }
 
     /**
      * Provides a [FileDispatcher] that defers strategy selection until dispatch

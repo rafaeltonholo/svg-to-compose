@@ -1,6 +1,7 @@
 package dev.tonholo.s2c.cli.logger
 
 import dev.tonholo.s2c.SvgToComposeContext
+import dev.tonholo.s2c.cli.output.LineWriter
 import dev.tonholo.s2c.logger.Logger
 import dev.tonholo.s2c.runtime.S2cConfig
 import dev.zacsweers.metro.Inject
@@ -12,7 +13,10 @@ import dev.zacsweers.metro.Inject
  * The underlying implementation is internal to the library.
  */
 @Inject
-internal class CliLogger(private val context: SvgToComposeContext) : Logger {
+internal class CliLogger(
+    private val context: SvgToComposeContext,
+    private val writer: LineWriter,
+) : Logger {
     private companion object {
         private const val SECTION_WIDTH = 50
         private const val SECTION_PADDING = SECTION_WIDTH / 2
@@ -22,7 +26,7 @@ internal class CliLogger(private val context: SvgToComposeContext) : Logger {
 
     override fun debug(message: Any) {
         if (!config.silent && config.debug) {
-            println("D: $message")
+            writer.write("D: $message")
         }
     }
 
@@ -43,28 +47,28 @@ internal class CliLogger(private val context: SvgToComposeContext) : Logger {
         }
 
     private fun startSection(message: String) {
-        println()
+        writer.write("")
         val section = "=".repeat(SECTION_PADDING - (message.length / 2))
-        println("$section $message $section")
-        println()
+        writer.write("$section $message $section")
+        writer.write("")
     }
 
     private fun endSection() {
-        println()
-        println("=".repeat(SECTION_WIDTH))
-        println()
+        writer.write("")
+        writer.write("=".repeat(SECTION_WIDTH))
+        writer.write("")
     }
 
     override fun verbose(message: String) {
         if (!config.silent && config.verbose) {
-            println("V: $message")
+            writer.write("V: $message")
         }
     }
 
     override fun warn(message: String, throwable: Throwable?) {
         if (!config.silent) {
             // TODO(https://github.com/rafaeltonholo/svg-to-compose/issues/85): add color to output.
-            println("WARNING ⚠️: $message")
+            writer.write("WARNING ⚠️: $message")
             if (config.stackTrace) {
                 throwable?.printStackTrace()
             }
@@ -73,19 +77,19 @@ internal class CliLogger(private val context: SvgToComposeContext) : Logger {
 
     override fun info(message: String) {
         if (!config.silent) {
-            println("I: $message")
+            writer.write("I: $message")
         }
     }
 
     override fun output(message: String) {
         if (!config.silent) {
-            println(message)
+            writer.write(message)
         }
     }
 
     override fun error(message: String, throwable: Throwable?) {
         if (!config.silent) {
-            println("E: $message")
+            writer.write("E: $message")
             if (config.stackTrace) {
                 throwable?.printStackTrace()
             }
@@ -94,7 +98,7 @@ internal class CliLogger(private val context: SvgToComposeContext) : Logger {
 
     override fun printEmpty() {
         if (!config.silent) {
-            println()
+            writer.write("")
         }
     }
 }

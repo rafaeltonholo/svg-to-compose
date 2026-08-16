@@ -8,6 +8,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.MainDispatcher
+import dev.tonholo.s2c.cli.output.LineWriter
 import dev.tonholo.s2c.cli.output.log.FileCompletionEntry
 import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
@@ -78,6 +79,7 @@ internal class CliRunner(
     private val ioDispatcher: CoroutineDispatcher,
     @param:MainDispatcher
     private val mainDispatcher: CoroutineDispatcher,
+    private val lineWriter: LineWriter,
 ) {
     suspend fun run(
         config: RunConfig,
@@ -240,8 +242,8 @@ internal class CliRunner(
     ) {
         val isSilent = context.configSnapshot.silent
         val renderer = when (outputFormat) {
-            OutputFormat.Json -> JsonRenderer()
-            OutputFormat.Text -> PlainTextRenderer()
+            OutputFormat.Json -> JsonRenderer(writer = lineWriter::write)
+            OutputFormat.Text -> PlainTextRenderer(writer = lineWriter::write)
         }
 
         if (outputFormat == OutputFormat.Json) {
