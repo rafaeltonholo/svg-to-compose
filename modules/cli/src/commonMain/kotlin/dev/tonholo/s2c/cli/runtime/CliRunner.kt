@@ -57,8 +57,9 @@ private const val SIGINT_EXIT_CODE = 130
  * - [LogPathOnly] only prints the log path suffix. Used by the TUI path, which
  *   already renders its own completion summary through the TUI renderer.
  * - [None] suppresses finalizer output entirely, including log-write warnings.
- *   Used by JSON output where the renderer owns the protocol and stray
- *   terminal writes would corrupt it.
+ *   Used by JSON output, where the renderer owns the protocol and stray
+ *   terminal writes would corrupt it, and by `--silent` runs, which must not
+ *   print anything at all.
  */
 private enum class SummaryMode {
     Full,
@@ -89,7 +90,9 @@ internal class CliRunner(
     ) {
         val processor = processorFactory.create(tempDirectory = null)
         try {
-            val useTui = terminal.terminalInfo.interactive && !config.noTui
+            val useTui = terminal.terminalInfo.interactive &&
+                !config.noTui &&
+                !context.configSnapshot.silent
 
             if (useTui) {
                 runWithTui(
@@ -223,6 +226,7 @@ internal class CliRunner(
         logDir: Path,
     ) {
         val isSilent = context.configSnapshot.silent
+        val quiet = isSilent || outputFormat == OutputFormat.Json
         val renderer = when (outputFormat) {
             OutputFormat.Json -> JsonRenderer(writer = lineWriter::write)
             OutputFormat.Text -> PlainTextRenderer(writer = lineWriter::write)
@@ -253,7 +257,7 @@ internal class CliRunner(
             record = record,
             config = config,
             stackTraceEnabled = context.configSnapshot.stackTrace,
-            suppressTerminalWarnings = outputFormat == OutputFormat.Json,
+            suppressTerminalWarnings = quiet,
         )
         updateNotifier.notifyIfUpdateAvailable(renderer = eventSink)
 
@@ -263,7 +267,7 @@ internal class CliRunner(
             stats = runStats,
             completedFiles = record.completedFiles,
             logDir = logDir,
-            summaryMode = if (outputFormat == OutputFormat.Json) SummaryMode.None else SummaryMode.Full,
+            summaryMode = if (quiet) SummaryMode.None else SummaryMode.Full,
         )
     }
 

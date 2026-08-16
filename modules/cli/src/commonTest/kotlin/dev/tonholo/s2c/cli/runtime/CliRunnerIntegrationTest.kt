@@ -209,4 +209,39 @@ class CliRunnerIntegrationTest {
             )
             assertTrue(actual = harness.terminalOutput.contains("Failed:"), message = harness.terminalOutput)
         }
+
+    @Test
+    fun `given a silent run with failures - when the terminal is not a tty - then nothing is printed`() =
+        runTest {
+            // Arrange
+            val harness = CliIntegrationHarness(silent = true)
+            harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
+            harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
+            harness.createDirectory(path = "/output")
+
+            // Act
+            runCatching { harness.run(input = "/icons", output = "/output") }
+
+            // Assert
+            assertEquals(expected = emptyList(), actual = harness.printedLines)
+            assertEquals(expected = "", actual = harness.terminalOutput)
+            assertTrue(actual = harness.exists(path = "/output/First.kt"))
+        }
+
+    @Test
+    fun `given a silent run in an interactive terminal - when files convert - then no dashboard is rendered`() =
+        runTest {
+            // Arrange
+            val harness = CliIntegrationHarness(interactive = true, silent = true)
+            harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
+            harness.createDirectory(path = "/output")
+
+            // Act
+            harness.run(input = "/icons", output = "/output")
+
+            // Assert
+            assertEquals(expected = emptyList(), actual = harness.printedLines)
+            assertEquals(expected = "", actual = harness.terminalOutput)
+            assertTrue(actual = harness.exists(path = "/output/First.kt"))
+        }
 }
