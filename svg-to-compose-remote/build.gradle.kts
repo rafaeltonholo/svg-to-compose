@@ -18,6 +18,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.test)
         }
 
         jvmMain.dependencies {
@@ -30,10 +31,7 @@ kotlin {
 
         jsMain.dependencies {
             implementation(libs.io.ktor.ktorClientCore)
-            implementation(npm("jszip", libs.versions.jszip.get()))
-        }
-
-        wasmJsMain.dependencies {
+            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(npm("jszip", libs.versions.jszip.get()))
         }
     }

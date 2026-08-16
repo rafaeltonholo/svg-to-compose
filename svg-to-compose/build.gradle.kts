@@ -4,7 +4,6 @@ import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
 plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
     alias(libs.plugins.dev.tonholo.s2c.conventions.testing)
-    alias(libs.plugins.app.cash.burst)
     alias(libs.plugins.com.rsicarelli.fakt)
     alias(libs.plugins.org.jetbrains.kotlin.serialization)
 }
