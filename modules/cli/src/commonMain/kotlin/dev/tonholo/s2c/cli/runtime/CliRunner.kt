@@ -16,8 +16,8 @@ import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.cli.output.report.BugReportFailure
 import dev.tonholo.s2c.cli.output.report.BugReportUrlBuilder
-import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.output.report.ErrorReportWriter
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.output.report.platformInfo
 import dev.tonholo.s2c.cli.update.UpdateNotifier
 import dev.tonholo.s2c.error.ErrorCode
@@ -128,9 +128,7 @@ internal class CliRunner(
             stackTraceEnabled = context.configSnapshot.stackTrace,
             fileSystem = fileSystem,
         )
-        var stats: RunStats? = null
-        var version = ""
-        val completedFiles = mutableListOf<FileCompletionEntry>()
+        val record = RunRecord()
         val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
 
         try {
@@ -150,31 +148,15 @@ internal class CliRunner(
                     .flowOn(ioDispatcher)
                     .collect { event ->
                         renderer.onEvent(event)
-                        if (event is ConversionEvent.RunStarted) {
-                            version = event.version
-                        }
-                        if (event is ConversionEvent.FileCompleted) {
-                            completedFiles.add(
-                                FileCompletionEntry(
-                                    fileName = event.fileName,
-                                    duration = event.duration,
-                                    result = event.result,
-                                ),
-                            )
-                        }
-                        if (event is ConversionEvent.RunCompleted) {
-                            stats = event.stats
-                        }
+                        record.record(event)
                     }
             }
 
             processorDeferred.await()
             emitErrorReportIfNeeded(
                 renderer = renderer,
-                version = version,
+                record = record,
                 config = config,
-                stats = stats,
-                completedFiles = completedFiles,
                 stackTraceEnabled = context.configSnapshot.stackTrace,
                 suppressTerminalWarnings = false,
             )
@@ -190,11 +172,11 @@ internal class CliRunner(
         // The only path that reaches here today is `Processor.run` returning
         // early when the single-file input matches `--exclude`. Treating it
         // as a no-op is correct: no files processed, no log to write.
-        val runStats = stats ?: return
+        val runStats = record.stats ?: return
         finalizeRun(
             config = config,
             stats = runStats,
-            completedFiles = completedFiles,
+            completedFiles = record.completedFiles,
             logDir = logDir,
             // The TUI completion section already renders the failure breakdown;
             // only the log path remains to be surfaced after it.
@@ -250,9 +232,7 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = true) }
         }
 
-        var stats: RunStats? = null
-        var version = ""
-        val completedFiles = mutableListOf<FileCompletionEntry>()
+        val record = RunRecord()
         val emitToRenderer = outputFormat == OutputFormat.Json || !isSilent
         val eventSink: OutputRenderer = if (emitToRenderer) renderer else OutputRenderer { }
         processor.runAsFlow(
@@ -266,43 +246,25 @@ internal class CliRunner(
             .flowOn(ioDispatcher)
             .collect { event ->
                 eventSink.onEvent(event)
-                if (event is ConversionEvent.RunStarted) {
-                    version = event.version
-                }
-                if (event is ConversionEvent.FileCompleted) {
-                    completedFiles.add(
-                        FileCompletionEntry(
-                            fileName = event.fileName,
-                            duration = event.duration,
-                            result = event.result,
-                        ),
-                    )
-                }
-                if (event is ConversionEvent.RunCompleted) {
-                    stats = event.stats
-                }
+                record.record(event)
             }
         emitErrorReportIfNeeded(
             renderer = eventSink,
-            version = version,
+            record = record,
             config = config,
-            stats = stats,
-            completedFiles = completedFiles,
             stackTraceEnabled = context.configSnapshot.stackTrace,
             suppressTerminalWarnings = outputFormat == OutputFormat.Json,
         )
         updateNotifier.notifyIfUpdateAvailable(renderer = eventSink)
 
-        val runStats = stats
-        if (runStats != null) {
-            finalizeRun(
-                config = config,
-                stats = runStats,
-                completedFiles = completedFiles,
-                logDir = logDir,
-                summaryMode = if (outputFormat == OutputFormat.Json) SummaryMode.None else SummaryMode.Full,
-            )
-        }
+        val runStats = record.stats ?: return
+        finalizeRun(
+            config = config,
+            stats = runStats,
+            completedFiles = record.completedFiles,
+            logDir = logDir,
+            summaryMode = if (outputFormat == OutputFormat.Json) SummaryMode.None else SummaryMode.Full,
+        )
     }
 
     /**
@@ -390,20 +352,18 @@ internal class CliRunner(
      */
     private fun emitErrorReportIfNeeded(
         renderer: OutputRenderer,
-        version: String,
+        record: RunRecord,
         config: RunConfig,
-        stats: RunStats?,
-        completedFiles: List<FileCompletionEntry>,
         stackTraceEnabled: Boolean,
         suppressTerminalWarnings: Boolean,
     ) {
-        val runStats = stats ?: return
+        val runStats = record.stats ?: return
         if (runStats.failed == 0) return
-        val failures = completedFiles.toBugReportFailures()
+        val failures = record.completedFiles.toBugReportFailures()
         if (failures.isEmpty()) return
 
         val reportPath = writeErrorReport(
-            version = version,
+            version = record.version,
             config = config,
             stats = runStats,
             failures = failures,
@@ -415,7 +375,7 @@ internal class CliRunner(
             ConversionEvent.ErrorReportGenerated(
                 reportPath = reportPath.toString(),
                 bugReportUrl = BugReportUrlBuilder().build(
-                    version = version,
+                    version = record.version,
                     platform = platformInfo(),
                     commandLine = invocationCommand.value,
                     totalFiles = runStats.totalFiles,
@@ -488,6 +448,40 @@ internal class CliRunner(
                 errorCode = ErrorCode.FailedToParseIconError,
                 message = "Failure to parse (${stats.failed}) file(s). $detail",
             )
+        }
+    }
+}
+
+/**
+ * Accumulates the parts of a run that the finalizer needs after the event
+ * stream ends: the tool version, the per-file outcomes, and the run
+ * statistics.
+ */
+private class RunRecord {
+    private val entries = mutableListOf<FileCompletionEntry>()
+
+    var version: String = ""
+        private set
+
+    var stats: RunStats? = null
+        private set
+
+    val completedFiles: List<FileCompletionEntry>
+        get() = entries
+
+    fun record(event: ConversionEvent) {
+        when (event) {
+            is ConversionEvent.RunStarted -> version = event.version
+
+            is ConversionEvent.FileCompleted -> entries += FileCompletionEntry(
+                fileName = event.fileName,
+                duration = event.duration,
+                result = event.result,
+            )
+
+            is ConversionEvent.RunCompleted -> stats = event.stats
+
+            else -> Unit
         }
     }
 }
