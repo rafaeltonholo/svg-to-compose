@@ -18,6 +18,7 @@ private val cliTocEntries = listOf(
     TocEntry(id = "installation", label = "Installation"),
     TocEntry(id = "external-dependencies", label = "External Dependencies"),
     TocEntry(id = "usage", label = "Usage Examples"),
+    TocEntry(id = "output-modes", label = "Output Modes"),
     TocEntry(id = "options", label = "All Options Reference"),
     TocEntry(id = "output-examples", label = "Output Examples"),
 )
