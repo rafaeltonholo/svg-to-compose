@@ -2,6 +2,7 @@ package dev.tonholo.s2c.gradle.tasks.worker
 
 import dev.tonholo.s2c.error.ExitProgramException
 import dev.tonholo.s2c.error.ParserException
+import dev.tonholo.s2c.gradle.internal.parser.TemplateMode
 import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.parser.ParserConfig
 import dev.tonholo.s2c.parser.config.TemplateConfig
@@ -81,7 +82,7 @@ internal abstract class IconParsingWorkAction : WorkAction<IconParsingParameters
         keepTempFolder = true,
         template = TemplateConfig(
             configPath = templateFilePath.orNull?.asFile?.toOkioPath(),
-            noDiscovery = !templateFilePath.isPresent,
+            noDiscovery = templateMode.getOrElse(TemplateMode.Auto) == TemplateMode.Disabled,
         ),
     )
 }

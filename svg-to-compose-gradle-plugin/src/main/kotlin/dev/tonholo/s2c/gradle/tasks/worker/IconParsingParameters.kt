@@ -1,5 +1,6 @@
 package dev.tonholo.s2c.gradle.tasks.worker
 
+import dev.tonholo.s2c.gradle.internal.parser.TemplateMode
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkParameters
@@ -27,6 +28,7 @@ internal interface IconParsingParameters : WorkParameters {
     val recursive: Property<Boolean>
     val maxDepth: Property<Int>
     val templateFilePath: RegularFileProperty
+    val templateMode: Property<TemplateMode>
     val resultFilePath: Property<String>
     val bridgeToken: Property<String>
 }

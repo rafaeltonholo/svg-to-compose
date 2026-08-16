@@ -10,6 +10,7 @@ import org.gradle.api.provider.Property
  * Configuration for parsing an icon. This interface provides
  * options to customize the generation process of icon resources.
  */
+@Suppress("TooManyFunctions")
 interface IconParserConfiguration {
     /**
      * The visibility modifier of the generated icon class.
@@ -166,6 +167,23 @@ interface IconParserConfiguration {
      *   via `layout.projectDirectory.file(...)`.
      */
     fun templateFile(path: RegularFile)
+
+    /**
+     * Generates the icons without any template, skipping the auto-discovery of
+     * `s2c.template.toml` files.
+     *
+     * When neither [templateFile] nor this function is called, the configuration
+     * inherits the template settings from the `common` configuration, or discovers
+     * an `s2c.template.toml` file by walking up from the output directory.
+     *
+     * Usage:
+     * ```kotlin
+     * icons {
+     *     noTemplate()
+     * }
+     * ```
+     */
+    fun noTemplate()
 
     /**
      * Persists all generated files inside the project's source set, using the given
