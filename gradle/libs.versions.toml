@@ -38,6 +38,7 @@ org-jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlin
 org-jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 # Plugins
+app-cash-burst-gradle-plugin = { module = "app.cash.burst:app.cash.burst.gradle.plugin", version.ref = "burst" }
 dev-detekt-gradle-plugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 dev-zacsweers-metro-gradle-plugin = { module = "dev.zacsweers.metro:dev.zacsweers.metro.gradle.plugin", version.ref = "metro" }
 org-jetbrains-dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
