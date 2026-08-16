@@ -22,6 +22,7 @@ subprojects {
         baseline = file("detekt-baseline.xml")
         source.setFrom(
             "src/jsMain/kotlin",
+            "src/jsTest/kotlin",
             "src/commonMain/kotlin",
             "src/wasmJsMain/kotlin",
         )
