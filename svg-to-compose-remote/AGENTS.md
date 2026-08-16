@@ -29,8 +29,8 @@ src/
   classpath, and Ktor's coroutine dependency conflicts with Gradle's bundled
   Kotlin runtime. OkHttp's synchronous API avoids that.
 - **Native/JS HTTP**: Ktor client.
-- **File I/O and ZIP**: Okio (`openZip()` on JVM and native); JSZip on JS and
-  WasmJS.
+- **File I/O and ZIP**: Okio (`openZip()` on JVM and native); JSZip on JS only.
+  WasmJS does not support ZIP extraction yet and throws instead.
 - **Core dependency**: this module depends on `svg-to-compose` (`api`), never
   the other way around. Core must stay free of networking dependencies.
 - **DI**: bindings live in `RemoteBindings`, contributed to `AppScope`. JS and
