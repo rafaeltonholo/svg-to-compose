@@ -1,6 +1,3 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
-import com.vanniktech.maven.publish.SourcesJar
 import dev.tonholo.s2c.conventions.kmp.targets.useJs
 import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
 
@@ -45,12 +42,6 @@ kotlin {
 }
 
 mavenPublishing {
-    configure(
-        KotlinMultiplatform(
-            javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
-            sourcesJar = SourcesJar.Sources(),
-        ),
-    )
     pom {
         name.set("SVG/XML to Compose Library")
         description.set("A KMP Library that converts SVG or an Android Vector Drawable (AVG) to Android Jetpack Compose Icons.")
