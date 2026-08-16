@@ -365,38 +365,16 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 queue.await()
             }
 
-        val expectedResultCount = filesToProcess.size
-        val actualResultFiles = resultsDir.listFiles()?.size ?: 0
-        if (actualResultFiles != expectedResultCount) {
-            logger.warn(
-                "Expected $expectedResultCount result files but found $actualResultFiles. " +
-                    "Some workers may have failed. Please see the logs for further investigation.",
+        try {
+            checkWorkerResults(
+                configurationName = configuration.name,
+                expectedResultCount = filesToProcess.size,
+                resultsDir = resultsDir,
             )
+            collectWorkerResults(resultsDir = resultsDir, errors = errors, outputFiles = outputFiles)
+        } finally {
+            resultsDir.deleteRecursively()
         }
-
-        // Collect results
-        resultsDir.listFiles()?.forEach { file ->
-            val props = Properties()
-            file.inputStream().use { props.load(it) }
-            val result = props.toResult()
-            val origin = result.origin.toPath()
-            when (result.status) {
-                Status.Ok -> {
-                    val output = result.output.toPath()
-                    outputFiles[origin] = output
-                }
-
-                Status.Error -> {
-                    val errorMessage = result.message
-                    errors[origin] = RuntimeException(errorMessage)
-                }
-
-                Status.Unknown -> {
-                    errors[origin] = RuntimeException("Unexpected error while processing $file")
-                }
-            }
-        }
-        resultsDir.deleteRecursively()
     }
 
     private fun WorkQueue.submit(
@@ -512,6 +490,56 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                     !fileManager.exists(origin.toPath())
             }
             .map { (origin, _) -> origin.toPath() }
+    }
+}
+
+/**
+ * Verifies that every submitted work item reported back before the results are collected.
+ *
+ * @param configurationName Name of the processor configuration being parsed.
+ * @param expectedResultCount Number of files submitted to the workers.
+ * @param resultsDir Directory where workers write their result files.
+ * @throws ExitProgramException When the amount of result files differs from
+ * [expectedResultCount], meaning at least one worker did not report its outcome.
+ */
+private fun checkWorkerResults(
+    configurationName: String,
+    expectedResultCount: Int,
+    resultsDir: File,
+) {
+    val actualResultCount = resultsDir.listFiles()?.size ?: 0
+    if (actualResultCount != expectedResultCount) {
+        throw ExitProgramException(
+            errorCode = ErrorCode.GradlePluginError,
+            message = "Icon parsing for configuration '$configurationName' is incomplete. " +
+                "Expected $expectedResultCount worker result file(s) but found $actualResultCount. " +
+                "Some workers may have failed silently. Run with --info or --debug for more details.",
+        )
+    }
+}
+
+/**
+ * Reads the worker result files and splits them into successful outputs and errors.
+ *
+ * @param resultsDir Directory where workers wrote their result files.
+ * @param errors Destination for the origin/error pairs found in the results.
+ * @param outputFiles Destination for the origin/generated file pairs found in the results.
+ */
+private fun collectWorkerResults(
+    resultsDir: File,
+    errors: MutableMap<Path, Throwable>,
+    outputFiles: MutableMap<Path, Path>,
+) {
+    resultsDir.listFiles()?.forEach { file ->
+        val props = Properties()
+        file.inputStream().use { props.load(it) }
+        val result = props.toResult()
+        val origin = result.origin.toPath()
+        when (result.status) {
+            Status.Ok -> outputFiles[origin] = result.output.toPath()
+            Status.Error -> errors[origin] = RuntimeException(result.message)
+            Status.Unknown -> errors[origin] = RuntimeException("Unexpected error while processing $file")
+        }
     }
 }
 
