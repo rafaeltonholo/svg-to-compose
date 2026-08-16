@@ -451,6 +451,8 @@ private fun normalizePath(path: String): String {
     return parsedPath.toString().trimStart()
 }
 
+private fun Char.isArcToCommand(): Boolean = equals(PathCommand.ArcTo.value, ignoreCase = true)
+
 private fun calculateArcCommandPosition(
     command: PathCommand,
     position: Int,
@@ -459,7 +461,7 @@ private fun calculateArcCommandPosition(
 ): Int = when {
     command != PathCommand.ArcTo -> -1
 
-    lastChar == PathCommand.ArcTo.value || current == PathCommand.ArcTo.value -> 0
+    lastChar.isArcToCommand() || current.isArcToCommand() -> 0
 
     position in PathCommand.ARC_TO_LARGE_ARC_POSITION..PathCommand.ARC_TO_SWEEP_FLAG_POSITION &&
         lastChar.isDigit() -> position + 1
