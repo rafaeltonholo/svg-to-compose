@@ -207,7 +207,33 @@ class CliRunnerIntegrationTest {
                 actual = harness.fileSystem.list(dir = "/".toPath()).any { it.name.startsWith("s2c-errors") },
                 message = harness.fileSystem.list(dir = "/".toPath()).toString(),
             )
-            assertTrue(actual = harness.terminalOutput.contains("Failed:"), message = harness.terminalOutput)
+            assertTrue(actual = harness.terminalOutput.contains("Full log: "), message = harness.terminalOutput)
+        }
+
+    @Test
+    fun `given a batch with one broken icon - when plain text is rendered - then the failure list is printed once`() =
+        runTest {
+            // Arrange
+            val harness = CliIntegrationHarness()
+            harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
+            harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
+            harness.createDirectory(path = "/output")
+
+            // Act
+            runCatching { harness.run(input = "/icons", output = "/output") }
+
+            // Assert
+            val console = harness.printedLines.joinToString(separator = "\n") + harness.terminalOutput
+            assertEquals(
+                expected = 1,
+                actual = console.split("Failed:").size - 1,
+                message = console,
+            )
+            assertEquals(
+                expected = 1,
+                actual = console.split("broken.svg: FailedToParseIconError").size - 1,
+                message = console,
+            )
         }
 
     @Test

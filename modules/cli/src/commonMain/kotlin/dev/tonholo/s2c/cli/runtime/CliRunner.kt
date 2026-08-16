@@ -49,24 +49,6 @@ import kotlin.time.Clock
 
 private const val SIGINT_EXIT_CODE = 130
 
-/**
- * Controls how much of the end-of-run summary the non-renderer finalizer prints.
- *
- * - [Full] prints the "Failed:" breakdown followed by the log path. Used by
- *   plain-text and TUI-off runs.
- * - [LogPathOnly] only prints the log path suffix. Used by the TUI path, which
- *   already renders its own completion summary through the TUI renderer.
- * - [None] suppresses finalizer output entirely, including log-write warnings.
- *   Used by JSON output, where the renderer owns the protocol and stray
- *   terminal writes would corrupt it, and by `--silent` runs, which must not
- *   print anything at all.
- */
-private enum class SummaryMode {
-    Full,
-    LogPathOnly,
-    None,
-}
-
 @Inject
 internal class CliRunner(
     private val processorFactory: Processor.Factory,
@@ -181,9 +163,7 @@ internal class CliRunner(
             stats = runStats,
             completedFiles = record.completedFiles,
             logDir = logDir,
-            // The TUI completion section already renders the failure breakdown;
-            // only the log path remains to be surfaced after it.
-            summaryMode = SummaryMode.LogPathOnly,
+            quiet = false,
         )
     }
 
@@ -267,30 +247,32 @@ internal class CliRunner(
             stats = runStats,
             completedFiles = record.completedFiles,
             logDir = logDir,
-            summaryMode = if (quiet) SummaryMode.None else SummaryMode.Full,
+            quiet = quiet,
         )
     }
 
     /**
-     * Writes the run log to [logDir] and, depending on [summaryMode], surfaces the
-     * failure summary and log path on the terminal.
+     * Writes the run log to [logDir] and points the user at it.
      *
-     * Log-write failures are intentionally non-fatal: they are reported to
-     * the terminal as a warning, but the failure summary and the
-     * [ExitProgramException] path still run so the user always sees why the
-     * run failed. This mirrors the TUI path's expectations.
+     * The renderers already print the failure breakdown, so the only thing
+     * left to surface here is the log path.
+     *
+     * Log-write failures are intentionally non-fatal: they are reported to the
+     * terminal as a warning, and the [ExitProgramException] path still runs so
+     * the user always sees why the run failed.
+     *
+     * @param quiet when `true`, nothing is written to the terminal. JSON output
+     *  owns stdout and would be corrupted by stray text, and `--silent` runs
+     *  must not print at all.
      */
     private fun finalizeRun(
         config: RunConfig,
         stats: RunStats,
         completedFiles: List<FileCompletionEntry>,
         logDir: Path,
-        summaryMode: SummaryMode,
+        quiet: Boolean,
     ) {
         if (completedFiles.isEmpty()) {
-            if (summaryMode == SummaryMode.Full) {
-                maybePrintFailureSummary(completedFiles = completedFiles, logPath = null)
-            }
             maybeThrowFailure(stats = stats, logPath = null)
             return
         }
@@ -299,41 +281,18 @@ internal class CliRunner(
         val logPath = try {
             logWriter.write(config = config, stats = stats, entries = completedFiles)
         } catch (e: IOException) {
-            if (summaryMode != SummaryMode.None) {
+            if (!quiet) {
                 terminal.println()
                 terminal.println("Warning: could not write run log to $logDir: ${e.message}")
             }
             null
         }
 
-        when (summaryMode) {
-            SummaryMode.Full -> maybePrintFailureSummary(
-                completedFiles = completedFiles,
-                logPath = logPath,
-            )
-
-            SummaryMode.LogPathOnly -> printLogPath(logPath = logPath)
-
-            SummaryMode.None -> Unit
+        if (!quiet) {
+            printLogPath(logPath = logPath)
         }
 
         maybeThrowFailure(stats = stats, logPath = logPath)
-    }
-
-    private fun maybePrintFailureSummary(
-        completedFiles: List<FileCompletionEntry>,
-        logPath: Path?,
-    ) {
-        val failedEntries = completedFiles.filter { it.result is FileResult.Failed }
-        if (failedEntries.isNotEmpty()) {
-            terminal.println()
-            terminal.println("Failed:")
-            for (entry in failedEntries) {
-                val result = entry.result as FileResult.Failed
-                terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
-            }
-        }
-        printLogPath(logPath = logPath)
     }
 
     private fun printLogPath(logPath: Path?) {
