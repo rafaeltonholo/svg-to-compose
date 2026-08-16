@@ -84,11 +84,13 @@ private fun trimNullParams(lineTokens: List<ResolvedToken>): String {
     }
 
     val result = StringBuilder()
+    val removals = mutableListOf<Int>()
     var i = 0
     while (i < segments.size) {
         val seg = segments[i]
         if (seg is Segment.NullMarker) {
             stripPrecedingParam(result)
+            removals.add(result.length)
             i = skipTrailingComma(segments, i + 1)
         } else {
             result.append((seg as Segment.Text).value)
@@ -96,7 +98,7 @@ private fun trimNullParams(lineTokens: List<ResolvedToken>): String {
         }
     }
 
-    return cleanupCommaArtifacts(result.toString())
+    return result.cleanupCommaArtifacts(removals)
 }
 
 /**
@@ -158,23 +160,58 @@ private fun skipTrailingComma(segments: MutableList<Segment>, nextIndex: Int): I
     return nextIndex
 }
 
-// Pre-compiled patterns for comma artifact cleanup.
-private val LEADING_COMMA = Regex("""\(\s*,\s*""")
-private val TRAILING_COMMA = Regex(""",\s*\)""")
-private val DOUBLE_COMMA = Regex(""",\s*,""")
+/**
+ * Cleans up the comma artifacts left behind at each of the [removals]
+ * positions, from the last to the first so the positions still to be
+ * cleaned stay valid.
+ */
+private fun StringBuilder.cleanupCommaArtifacts(removals: List<Int>): String {
+    for (removal in removals.asReversed()) {
+        cleanupCommaArtifactAt(removal.coerceAtMost(length))
+    }
+    return toString()
+}
 
 /**
- * Cleans up comma artifacts after null parameter stripping.
+ * Removes the comma left dangling by a parameter stripped at [removal].
+ *
+ * Only the characters adjacent to [removal] are inspected, so commas anywhere
+ * else on the line, string literals included, are kept as they are.
  */
-private fun cleanupCommaArtifacts(text: String): String {
-    var result = text
-    // "(," → "("
-    result = result.replace(LEADING_COMMA, "(")
-    // ",)" → ")"
-    result = result.replace(TRAILING_COMMA, ")")
-    // ",," → ","
-    result = result.replace(DOUBLE_COMMA, ",")
-    return result
+private fun StringBuilder.cleanupCommaArtifactAt(removal: Int) {
+    val before = lastNonWhitespaceIndexBefore(removal)
+    val after = firstNonWhitespaceIndexFrom(removal)
+    val opensArguments = before >= 0 && this[before] == '('
+    val closesArguments = after < length && this[after] == ')'
+    val commaBefore = before >= 0 && this[before] == ','
+    val commaAfter = after < length && this[after] == ','
+
+    when {
+        opensArguments && commaAfter -> deleteRange(
+            startIndex = before + 1,
+            endIndex = firstNonWhitespaceIndexFrom(after + 1),
+        )
+
+        commaBefore && commaAfter -> deleteRange(startIndex = before + 1, endIndex = after + 1)
+
+        commaBefore && closesArguments -> deleteRange(startIndex = before, endIndex = after)
+    }
+}
+
+private fun StringBuilder.lastNonWhitespaceIndexBefore(index: Int): Int {
+    var position = index - 1
+    while (position >= 0 && this[position].isWhitespace()) {
+        position--
+    }
+    return position
+}
+
+private fun StringBuilder.firstNonWhitespaceIndexFrom(index: Int): Int {
+    var position = index
+    while (position < length && this[position].isWhitespace()) {
+        position++
+    }
+    return position
 }
 
 private sealed interface Segment {
