@@ -1,5 +1,6 @@
 import dev.tonholo.s2c.conventions.kmp.targets.useJs
 import dev.tonholo.s2c.conventions.kmp.targets.useWasmJs
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.dev.tonholo.s2c.conventions.kmp)
@@ -9,6 +10,16 @@ plugins {
 kotlin {
     useJs()
     useWasmJs()
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("jvmAndNative") {
+                withJvm()
+                withNative()
+            }
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {

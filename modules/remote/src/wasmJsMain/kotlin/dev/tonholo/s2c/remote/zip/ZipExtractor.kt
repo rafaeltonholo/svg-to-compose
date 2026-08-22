@@ -7,5 +7,5 @@ actual fun createZipExtractor(fileSystem: FileSystem): ZipExtractor = Unsupporte
 
 private object UnsupportedZipExtractor : ZipExtractor {
     override suspend fun extract(zipPath: Path, outputDir: Path): List<Path> =
-        throw UnsupportedOperationException("ZIP extraction is not supported on the WasmJS target yet.")
+        throw UnsupportedOperationException("ZIP extraction is not implemented on the WasmJS target yet.")
 }
