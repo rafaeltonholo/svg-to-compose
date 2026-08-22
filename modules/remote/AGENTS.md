@@ -5,7 +5,7 @@ SVG-to-Compose: direct URLs, ZIP archives, and icon fonts. It exists so that
 networking code stays out of the core `svg-to-compose` module and out of the
 JVM-only Gradle plugin.
 
-Read [.ai/guidelines.md](../.ai/guidelines.md) first.
+Read [.ai/guidelines.md](../../.ai/guidelines.md) first.
 
 ## Platform Targets
 
