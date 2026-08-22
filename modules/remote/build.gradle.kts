@@ -25,24 +25,33 @@ kotlin {
         commonMain.dependencies {
             api(projects.svgToCompose)
             implementation(libs.com.squareup.okio)
+            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
+            implementation(libs.io.ktor.ktorClientCore)
         }
 
         commonTest.dependencies {
             implementation(libs.com.squareup.okio.fakefilesystem)
             implementation(libs.org.jetbrains.kotlinx.coroutines.test)
+            implementation(libs.io.ktor.ktorClientMock)
         }
 
         jvmMain.dependencies {
-            implementation(libs.com.squareup.okhttp3.okhttp)
+            implementation(libs.io.ktor.ktorClientOkhttp)
         }
 
-        nativeMain.dependencies {
-            implementation(libs.io.ktor.ktorClientCore)
+        appleMain.dependencies {
+            implementation(libs.io.ktor.ktorClientCio)
+        }
+
+        linuxMain.dependencies {
+            implementation(libs.io.ktor.ktorClientCio)
+        }
+
+        mingwMain.dependencies {
+            implementation(libs.io.ktor.ktorClientWinhttp)
         }
 
         jsMain.dependencies {
-            implementation(libs.io.ktor.ktorClientCore)
-            implementation(libs.org.jetbrains.kotlinx.coroutines.core)
             implementation(npm("jszip", libs.versions.jszip.get()))
         }
     }
