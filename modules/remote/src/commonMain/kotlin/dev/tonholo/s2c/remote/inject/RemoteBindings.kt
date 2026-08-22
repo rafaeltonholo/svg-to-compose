@@ -1,5 +1,8 @@
 package dev.tonholo.s2c.remote.inject
 
+import dev.tonholo.s2c.remote.http.HttpTransport
+import dev.tonholo.s2c.remote.http.RetryingHttpTransport
+import dev.tonholo.s2c.remote.http.createHttpTransport
 import dev.tonholo.s2c.remote.source.DefaultSourceResolver
 import dev.tonholo.s2c.remote.source.SourceResolver
 import dev.tonholo.s2c.remote.zip.ZipExtractor
@@ -34,5 +37,9 @@ interface RemoteBindings {
         @SingleIn(AppScope::class)
         fun provideZipExtractor(fileSystem: FileSystem): ZipExtractor =
             createZipExtractor(fileSystem)
+
+        @Provides
+        @SingleIn(AppScope::class)
+        fun provideHttpTransport(): HttpTransport = RetryingHttpTransport(createHttpTransport())
     }
 }

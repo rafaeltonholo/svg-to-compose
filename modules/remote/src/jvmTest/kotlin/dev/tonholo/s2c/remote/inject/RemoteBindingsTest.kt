@@ -2,6 +2,8 @@ package dev.tonholo.s2c.remote.inject
 
 import dev.tonholo.s2c.inject.FileDispatcherBindings
 import dev.tonholo.s2c.inject.SvgToComposeBindings
+import dev.tonholo.s2c.remote.http.HttpTransport
+import dev.tonholo.s2c.remote.http.RetryingHttpTransport
 import dev.tonholo.s2c.remote.source.DefaultSourceResolver
 import dev.tonholo.s2c.remote.source.SourceResolver
 import dev.tonholo.s2c.remote.zip.ZipExtractor
@@ -22,6 +24,7 @@ import kotlin.test.assertNotNull
 internal interface RemoteBindingsTestGraph {
     val sourceResolver: SourceResolver
     val zipExtractor: ZipExtractor
+    val httpTransport: HttpTransport
 
     @Provides
     fun provideFileSystem(): FileSystem = FakeFileSystem()
@@ -37,5 +40,6 @@ class RemoteBindingsTest {
         // Assert
         assertIs<DefaultSourceResolver>(graph.sourceResolver)
         assertNotNull(graph.zipExtractor)
+        assertIs<RetryingHttpTransport>(graph.httpTransport)
     }
 }
