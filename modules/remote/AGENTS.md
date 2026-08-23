@@ -38,7 +38,11 @@ a library.
   boundary so the common retry layer works on every target. Ktor on JS and
   WasmJS throws a bare `kotlin.Error` instead of an `IOException`, which is the
   only reason `translateEngineFailure` is expect/actual; JVM and native already
-  throw `kotlinx.io.IOException`, so their actual returns `null`.
+  throw `kotlinx.io.IOException`, so their actual returns `null`. Known gap: the
+  WasmJS *browser* fetch path throws `JsError`, which extends `Throwable` and so
+  escapes translation. It is unreachable from Node and from every consumer we
+  ship, and `JsError` is not visible from `webMain`, so fixing it would mean
+  splitting the actual back per target.
 - **Large downloads**: use `HttpTransport.download` (streams to an okio
   `Sink`); `get` buffers the whole body and is only for small responses.
 - **File I/O and ZIP**: Okio (`openZip()` on JVM and native); JSZip on JS only.

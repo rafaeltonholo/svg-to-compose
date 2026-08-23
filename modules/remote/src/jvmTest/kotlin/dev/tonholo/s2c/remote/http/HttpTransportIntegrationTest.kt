@@ -6,6 +6,7 @@ import okio.Buffer
 import java.net.InetSocketAddress
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class HttpTransportIntegrationTest {
 
@@ -75,6 +76,33 @@ class HttpTransportIntegrationTest {
                 assertEquals(200, response.status)
                 assertEquals(0, response.body.size)
                 assertEquals("zip-bytes", buffer.readUtf8())
+            } finally {
+                server.stop(0)
+            }
+        }
+
+    @Test
+    fun `given server that truncates the body - when get is called - then throws HttpTransportException`() =
+        runTest {
+            // Arrange
+            val promisedLength = 1_024L
+            val server = HttpServer.create(InetSocketAddress(0), 0)
+            server.createContext("/icon.svg") { exchange ->
+                exchange.sendResponseHeaders(200, promisedLength)
+                exchange.responseBody.write("<svg".encodeToByteArray())
+                exchange.responseBody.flush()
+                exchange.close()
+            }
+            server.start()
+
+            try {
+                val transport = createHttpTransport()
+                val url = "http://localhost:${server.address.port}/icon.svg"
+
+                // Act / Assert
+                assertFailsWith<HttpTransportException> {
+                    transport.get(url)
+                }
             } finally {
                 server.stop(0)
             }

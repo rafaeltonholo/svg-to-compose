@@ -6,16 +6,30 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteChannel
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.IOException
 import okio.Buffer
+import okio.Sink
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class KtorHttpTransportTest {
 
     private class RecordedCall {
         val methods = mutableListOf<HttpMethod>()
         val headers = mutableListOf<String?>()
+    }
+
+    private class ClosingSink(private val delegate: Sink) : Sink by delegate {
+        var closed = false
+
+        override fun close() {
+            closed = true
+            delegate.close()
+        }
     }
 
     private fun transportReturning(body: String, recorded: RecordedCall): KtorHttpTransport {
@@ -75,5 +89,35 @@ class KtorHttpTransportTest {
             assertEquals(0, response.body.size)
             assertEquals("zip-bytes", buffer.readUtf8())
             assertEquals(listOf(HttpMethod.Get), recorded.methods)
+        }
+
+    @Test
+    fun `given mock engine - when download completes - then the sink is closed`() = runTest {
+        // Arrange
+        val transport = transportReturning(body = "zip-bytes", recorded = RecordedCall())
+        val sink = ClosingSink(Buffer())
+
+        // Act
+        transport.download("https://example.com/icons.zip") { sink }
+
+        // Assert
+        assertTrue(sink.closed)
+    }
+
+    @Test
+    fun `given body that fails while reading - when get is called - then throws HttpTransportException`() =
+        runTest {
+            // Arrange
+            val engine = MockEngine {
+                val channel = ByteChannel(autoFlush = true)
+                channel.cancel(IOException("connection reset"))
+                respond(content = channel, status = HttpStatusCode.OK)
+            }
+            val transport = KtorHttpTransport(HttpClient(engine))
+
+            // Act / Assert
+            assertFailsWith<HttpTransportException> {
+                transport.get("https://example.com/icon.svg")
+            }
         }
 }
