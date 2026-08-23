@@ -28,6 +28,7 @@ include(
     ":svg-to-compose-gradle-plugin",
     ":svg-to-compose-remote",
 )
+project(":svg-to-compose-remote").projectDir = file("modules/remote")
 
 includeBuild("website")
 includeBuild("modules/cli")

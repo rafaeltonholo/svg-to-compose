@@ -34,7 +34,7 @@ console-reports:
 
 comments:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   AbsentOrWrongFileLicense:
     active: false
     licenseTemplate: ''
@@ -71,7 +71,7 @@ comments:
 
 complexity:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   CognitiveComplexMethod:
     active: true
     allowedComplexity: 15
@@ -145,7 +145,7 @@ complexity:
     ignoreStringsRegex: '$^'
   TooManyFunctions:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
     allowedFunctionsPerFile: 11
     allowedFunctionsPerClass: 11
     allowedFunctionsPerInterface: 11
@@ -213,7 +213,7 @@ empty-blocks:
 
 exceptions:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   ExceptionRaisedInUnexpectedLocation:
     active: true
     methodNames:
@@ -282,7 +282,7 @@ exceptions:
 
 naming:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   BooleanPropertyNaming:
     active: false
     allowedPattern: '^(is|has|are)'
@@ -361,7 +361,7 @@ naming:
 
 performance:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   ArrayPrimitive:
     active: true
   CouldBeSequence:
@@ -378,7 +378,7 @@ performance:
 
 potential-bugs:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/commonTest/**', '**/functionalTest/**']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/commonTest/**', '**/functionalTest/**']
   AvoidReferentialEquality:
     active: true
     forbiddenTypePatterns:
@@ -481,7 +481,7 @@ potential-bugs:
 
 style:
   active: true
-  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
+  excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/nativeTest/**', '**/wasmJsTest/**', '**/jvmAndNativeTest/**', '**/*.kts']
   AlsoCouldBeApply:
     active: false
   BracesOnIfStatements:
@@ -617,6 +617,9 @@ style:
       - '**/androidInstrumentedTest/**'
       - '**/jsTest/**'
       - '**/iosTest/**'
+      - '**/nativeTest/**'
+      - '**/wasmJsTest/**'
+      - '**/jvmAndNativeTest/**'
       - '**/functionalTest/**'
     maxLineLength: 120
     excludePackageStatements: true

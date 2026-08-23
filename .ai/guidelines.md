@@ -28,15 +28,16 @@ ships as:
 ├── gradle/
 │   ├── libs.versions.toml            # Shared dependency version catalog
 │   └── libs.cli.versions.toml       # CLI-specific dependency catalog
-├── modules/cli/                       # CLI entry point (composite build)
+├── modules/
+│   ├── cli/                           # CLI entry point (composite build)
+│   └── remote/                        # Remote icon sources (URL, ZIP, fonts)
 ├── playground/                        # Android demo app
 ├── playground-kmp/                    # KMP demo app
 ├── samples/                           # Example SVG/AVG input files
 │   ├── svg/
 │   └── avg/
 ├── svg-to-compose/                    # Core KMP library
-├── svg-to-compose-gradle-plugin/      # Gradle plugin
-└── svg-to-compose-remote/             # Remote icon sources (URL, ZIP, fonts)
+└── svg-to-compose-gradle-plugin/      # Gradle plugin
 ```
 
 ## Build Commands
@@ -164,7 +165,7 @@ Before modifying code in a module, read its `AGENTS.md`:
 | `svg-to-compose`               | [svg-to-compose/AGENTS.md](../svg-to-compose/AGENTS.md)                             |
 | `modules/cli`                  | [modules/cli/AGENTS.md](../modules/cli/AGENTS.md)                                   |
 | `svg-to-compose-gradle-plugin` | [svg-to-compose-gradle-plugin/AGENTS.md](../svg-to-compose-gradle-plugin/AGENTS.md) |
-| `svg-to-compose-remote`        | [svg-to-compose-remote/AGENTS.md](../svg-to-compose-remote/AGENTS.md)               |
+| `svg-to-compose-remote`        | [modules/remote/AGENTS.md](../modules/remote/AGENTS.md)               |
 | `build-logic`                  | [build-logic/AGENTS.md](../build-logic/AGENTS.md)                                   |
 | `playground`                   | [playground/AGENTS.md](../playground/AGENTS.md)                                     |
 | `playground-kmp`               | [playground-kmp/AGENTS.md](../playground-kmp/AGENTS.md)                             |
