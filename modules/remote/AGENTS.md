@@ -16,15 +16,13 @@ JS, and WasmJS.
 ```text
 src/
 ├── commonMain/        # Sources, resolvers, and the single Ktor HttpTransport
-├── jvmAndNativeMain/  # Okio openZip(), no-op engine failure translation
-├── webMain/           # JS/WasmJS engine failure translation
+├── jvmAndNativeMain/  # Okio openZip()
 ├── jsMain/            # JSZip for ZIP extraction
 └── wasmJsMain/        # ZIP not implemented yet (throws)
 ```
 
-Only platform groups are declared. `jvmAndNative` is the one custom group;
-`web` comes from the default hierarchy template. Never add a group named after
-a library.
+`jvmAndNative` is the only custom group and it is named after platforms. Never
+add a group named after a library.
 
 ## Dependency Rules
 
@@ -34,15 +32,14 @@ a library.
   ships inside `ktor-client-core` for JS and WasmJS. The client is built with
   the no-arg `HttpClient { }` so the engine comes from discovery. There is no
   `expect fun createHttpTransport`.
-- **Engine failures**: translated to `HttpTransportException` at the transport
-  boundary so the common retry layer works on every target. Ktor on JS and
-  WasmJS throws a bare `kotlin.Error` instead of an `IOException`, which is the
-  only reason `translateEngineFailure` is expect/actual; JVM and native already
-  throw `kotlinx.io.IOException`, so their actual returns `null`. Known gap: the
-  WasmJS *browser* fetch path throws `JsError`, which extends `Throwable` and so
-  escapes translation. It is unreachable from Node and from every consumer we
-  ship, and `JsError` is not visible from `webMain`, so fixing it would mean
-  splitting the actual back per target.
+- **Engine failures**: never match them by type. Each engine reports a failed
+  connection differently: `IOException` on CIO and OkHttp,
+  `IllegalStateException` on WinHttp, a bare `kotlin.Error` on the JS engines,
+  and `JsError` on the WasmJS browser path. `KtorHttpTransport` wraps anything
+  that escapes a request call (except `CancellationException`) in
+  `HttpTransportException`, so the common retry layer sees every failure on
+  every target. An earlier type-matching version passed on macOS and Linux and
+  failed on Windows.
 - **Large downloads**: use `HttpTransport.download` (streams to an okio
   `Sink`); `get` buffers the whole body and is only for small responses.
 - **File I/O and ZIP**: Okio (`openZip()` on JVM and native); JSZip on JS only.

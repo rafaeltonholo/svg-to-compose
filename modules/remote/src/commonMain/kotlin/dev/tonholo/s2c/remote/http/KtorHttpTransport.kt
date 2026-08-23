@@ -13,7 +13,6 @@ import io.ktor.util.toMap
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.CancellationException
-import kotlinx.io.IOException
 import kotlinx.io.readByteArray
 import okio.Sink
 import okio.buffer
@@ -32,12 +31,6 @@ fun createHttpTransport(): HttpTransport = KtorHttpTransport(
         }
     },
 )
-
-/**
- * Maps an engine-specific network failure to an [IOException], or returns
- * `null` when the failure is not a network error and must propagate as-is.
- */
-internal expect fun translateEngineFailure(failure: Throwable): IOException?
 
 internal class KtorHttpTransport(private val client: HttpClient) : HttpTransport {
     override suspend fun get(url: String, headers: Map<String, String>): HttpResponse =
@@ -98,8 +91,13 @@ private suspend fun ByteReadChannel.writeTo(sink: Sink) {
     }
 }
 
+/**
+ * Every Ktor engine reports connection failures with its own exception type:
+ * `IOException` on CIO and OkHttp, `IllegalStateException` on WinHttp, and a
+ * bare `kotlin.Error` on the JS engines. Anything escaping a request call is a
+ * failed request, so it is wrapped rather than matched by type.
+ */
 private fun Throwable.asTransportFailure(url: String): Throwable {
     if (this is CancellationException) return this
-    val ioFailure = this as? IOException ?: translateEngineFailure(this) ?: return this
-    return HttpTransportException(message = "Request to $url failed", cause = ioFailure)
+    return HttpTransportException(message = "Request to $url failed", cause = this)
 }

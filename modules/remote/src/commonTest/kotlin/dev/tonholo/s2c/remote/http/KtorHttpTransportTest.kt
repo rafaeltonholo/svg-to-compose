@@ -105,6 +105,19 @@ class KtorHttpTransportTest {
     }
 
     @Test
+    fun `given engine that fails with a non-io error - when get is called - then throws HttpTransportException`() =
+        runTest {
+            // Arrange: WinHttp reports connection failures as IllegalStateException, not IOException.
+            val engine = MockEngine { error("Failed to send request: A connection could not be established") }
+            val transport = KtorHttpTransport(HttpClient(engine))
+
+            // Act / Assert
+            assertFailsWith<HttpTransportException> {
+                transport.get("https://example.com/icon.svg")
+            }
+        }
+
+    @Test
     fun `given body that fails while reading - when get is called - then throws HttpTransportException`() =
         runTest {
             // Arrange
