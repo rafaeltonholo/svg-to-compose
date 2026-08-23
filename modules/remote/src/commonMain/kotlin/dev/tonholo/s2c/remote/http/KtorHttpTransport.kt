@@ -8,6 +8,8 @@ import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpMethod
+import io.ktor.http.IllegalHeaderNameException
+import io.ktor.http.IllegalHeaderValueException
 import io.ktor.http.isSuccess
 import io.ktor.util.toMap
 import io.ktor.utils.io.ByteReadChannel
@@ -96,8 +98,15 @@ private suspend fun ByteReadChannel.writeTo(sink: Sink) {
  * `IOException` on CIO and OkHttp, `IllegalStateException` on WinHttp, and a
  * bare `kotlin.Error` on the JS engines. Anything escaping a request call is a
  * failed request, so it is wrapped rather than matched by type.
+ *
+ * Rejected headers are the exception: the request never left, and retrying
+ * re-sends the same invalid value, so they propagate unwrapped.
  */
-private fun Throwable.asTransportFailure(url: String): Throwable {
-    if (this is CancellationException) return this
-    return HttpTransportException(message = "Request to $url failed", cause = this)
+private fun Throwable.asTransportFailure(url: String): Throwable = when (this) {
+    is CancellationException,
+    is IllegalHeaderNameException,
+    is IllegalHeaderValueException,
+    -> this
+
+    else -> HttpTransportException(message = "Request to $url failed", cause = this)
 }

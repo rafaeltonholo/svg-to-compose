@@ -4,6 +4,13 @@ import okio.Sink
 
 /**
  * Minimal HTTP client abstraction for downloading remote sources.
+ *
+ * Every method fails with [HttpTransportException] when the request cannot be
+ * completed, or with [IllegalArgumentException] when a header name or value is
+ * rejected before the request is sent. Only the former is retried, because a
+ * rejected header fails identically on every attempt. Header values taken from
+ * a previous response, such as an `ETag` echoed back as `If-None-Match`, are
+ * the realistic source of the latter.
  */
 interface HttpTransport {
     /**

@@ -105,6 +105,23 @@ class KtorHttpTransportTest {
     }
 
     @Test
+    fun `given header value with a control character - when get is called - then fails without sending a request`() =
+        runTest {
+            // Arrange: an ETag echoed back as If-None-Match carries whatever the server sent.
+            val recorded = RecordedCall()
+            val transport = transportReturning(body = "payload", recorded = recorded)
+
+            // Act / Assert
+            assertFailsWith<IllegalArgumentException> {
+                transport.get(
+                    url = "https://example.com/icon.svg",
+                    headers = mapOf("If-None-Match" to "\"v1\"\r\nX-Injected: 1"),
+                )
+            }
+            assertEquals(emptyList(), recorded.methods)
+        }
+
+    @Test
     fun `given engine that fails with a non-io error - when get is called - then throws HttpTransportException`() =
         runTest {
             // Arrange: WinHttp reports connection failures as IllegalStateException, not IOException.
