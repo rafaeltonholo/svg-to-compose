@@ -16,8 +16,6 @@ import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
 import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
-import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
-import dev.tonholo.s2c.gradle.tasks.worker.toResult
 import dev.tonholo.s2c.io.FileManager
 import dev.tonholo.s2c.io.hasVectorFileExtension
 import dev.tonholo.s2c.io.isEligibleForProcessing
@@ -55,7 +53,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 import java.io.File
-import java.util.Properties
 import java.util.UUID
 import javax.inject.Inject
 import dev.tonholo.s2c.gradle.internal.logger.Logger as createGradleLogger
@@ -338,7 +335,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             .dir("$WORKER_RESULTS_FOLDER/${configuration.name}")
             .get()
             .asFile
-        if (!resultsDir.exists()) resultsDir.mkdirs()
+        resultsDir.deleteRecursively()
+        resultsDir.mkdirs()
 
         // Concurrency is controlled by chunking based on maxParallelExecutions and Gradle's max workers.
         val chunkSize = if (maxParallelExecutions.get() > 1) maxParallelExecutions.get() else 1
@@ -365,38 +363,17 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
                 queue.await()
             }
 
-        val expectedResultCount = filesToProcess.size
-        val actualResultFiles = resultsDir.listFiles()?.size ?: 0
-        if (actualResultFiles != expectedResultCount) {
-            logger.warn(
-                "Expected $expectedResultCount result files but found $actualResultFiles. " +
-                    "Some workers may have failed. Please see the logs for further investigation.",
+        try {
+            processWorkerResults(
+                configurationName = configuration.name,
+                expectedResultCount = filesToProcess.size,
+                resultsDir = resultsDir,
+                errors = errors,
+                outputFiles = outputFiles,
             )
+        } finally {
+            resultsDir.deleteRecursively()
         }
-
-        // Collect results
-        resultsDir.listFiles()?.forEach { file ->
-            val props = Properties()
-            file.inputStream().use { props.load(it) }
-            val result = props.toResult()
-            val origin = result.origin.toPath()
-            when (result.status) {
-                Status.Ok -> {
-                    val output = result.output.toPath()
-                    outputFiles[origin] = output
-                }
-
-                Status.Error -> {
-                    val errorMessage = result.message
-                    errors[origin] = RuntimeException(errorMessage)
-                }
-
-                Status.Unknown -> {
-                    errors[origin] = RuntimeException("Unexpected error while processing $file")
-                }
-            }
-        }
-        resultsDir.deleteRecursively()
     }
 
     private fun WorkQueue.submit(

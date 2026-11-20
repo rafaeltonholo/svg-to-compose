@@ -89,6 +89,24 @@ abstract class GradleFunctionalTest {
             .build()
 
     /**
+     * Runs a Gradle build in the [projectDir] expecting it to fail.
+     *
+     * @param args Gradle arguments (task names, flags, etc.).
+     * @return The [BuildResult] of the failed build.
+     */
+    protected fun runGradleAndFail(vararg args: String): BuildResult = GradleRunner.create()
+        .withProjectDir(projectDir)
+        .withPluginClasspath()
+        .withArguments(
+            buildList {
+                addAll(args)
+                add("--stacktrace")
+            },
+        )
+        .forwardOutput()
+        .buildAndFail()
+
+    /**
      * Asserts that a task in the build result has the [expected] outcome.
      *
      * @param result The build result to inspect.
