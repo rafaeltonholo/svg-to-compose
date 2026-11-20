@@ -17,11 +17,6 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     configAsKobwebWorker("s2c-converter")
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xcontext-parameters",
-        )
-    }
     sourceSets {
         jsMain.dependencies {
             api(libs.org.jetbrains.kotlinx.serialization.json)
