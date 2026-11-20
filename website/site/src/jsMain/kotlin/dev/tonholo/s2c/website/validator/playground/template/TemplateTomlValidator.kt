@@ -37,6 +37,10 @@ object TemplateTomlValidator {
     )
 
     private const val TRIPLE_QUOTE = "\"\"\""
+    private const val COMMENT_MARKER = '#'
+    private const val BASIC_STRING_QUOTE = '"'
+    private const val LITERAL_STRING_QUOTE = '\''
+    private const val ESCAPE = '\\'
 
     fun validate(toml: String): List<TemplateValidationError> {
         val lines = toml.lines()
@@ -156,14 +160,35 @@ object TemplateTomlValidator {
      * and returns the section name, or null if the format is invalid.
      */
     private fun parseSectionHeader(line: String): String? {
-        val isArray = line.startsWith("[[")
+        val header = stripTrailingComment(line)
+        val isArray = header.startsWith("[[")
         val openBrackets = if (isArray) 2 else 1
         val closeBrackets = if (isArray) "]]" else "]"
 
-        if (!line.endsWith(closeBrackets)) return null
+        if (!header.endsWith(closeBrackets)) return null
 
-        val inner = line.substring(openBrackets, line.length - openBrackets).trim()
+        val inner = header.substring(openBrackets, header.length - openBrackets).trim()
         return inner.ifEmpty { null }
+    }
+
+    /**
+     * Removes a `#` comment from the end of [line], ignoring any `#` that sits
+     * inside a basic (`"`) or literal (`'`) TOML string.
+     */
+    private fun stripTrailingComment(line: String): String {
+        var index = 0
+        var openQuote: Char? = null
+        while (index < line.length) {
+            val char = line[index]
+            when {
+                openQuote == BASIC_STRING_QUOTE && char == ESCAPE -> index++
+                openQuote != null -> if (char == openQuote) openQuote = null
+                char == BASIC_STRING_QUOTE || char == LITERAL_STRING_QUOTE -> openQuote = char
+                char == COMMENT_MARKER -> return line.substring(0, index).trimEnd()
+            }
+            index++
+        }
+        return line
     }
 
     /**
