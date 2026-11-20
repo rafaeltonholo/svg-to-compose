@@ -153,10 +153,6 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = previousSilent) }
         }
 
-        // `stats == null` means the processor never emitted `RunCompleted`.
-        // The only path that reaches here today is `Processor.run` returning
-        // early when the single-file input matches `--exclude`. Treating it
-        // as a no-op is correct: no files processed, no log to write.
         val runStats = record.stats ?: return
         finalizeRun(
             config = config,
@@ -217,8 +213,7 @@ internal class CliRunner(
         }
 
         val record = RunRecord()
-        val emitToRenderer = outputFormat == OutputFormat.Json || !isSilent
-        val eventSink: OutputRenderer = if (emitToRenderer) renderer else OutputRenderer { }
+        val eventSink: OutputRenderer = if (isSilent) OutputRenderer { } else renderer
         processor.runAsFlow(
             path = config.inputPath,
             output = config.outputPath,
@@ -426,6 +421,12 @@ private class RunRecord {
     var version: String = ""
         private set
 
+    /**
+     * Statistics of the finished run, or `null` when the processor never
+     * emitted [ConversionEvent.RunCompleted]. That happens when the processor
+     * returns early, for example when the only input file matches `--exclude`:
+     * no files were processed, so there is nothing to log.
+     */
     var stats: RunStats? = null
         private set
 
