@@ -10,49 +10,27 @@ class PathCommandTest {
     @Test
     @Burst
     fun `given lowercase command char - when toPathCommand is called - then matching command is returned`(
-        expected: PathCommand = burstValues(
-            PathCommand.ArcTo,
-            PathCommand.CurveTo,
-            PathCommand.HorizontalLineTo,
-            PathCommand.LineTo,
-            PathCommand.MoveTo,
-            PathCommand.QuadTo,
-            PathCommand.ReflectiveCurveTo,
-            PathCommand.ReflectiveQuadTo,
-            PathCommand.VerticalLineTo,
-            PathCommand.Close,
-        ),
+        letter: SvgCommandLetter,
     ) {
         // Arrange
-        val char = expected.value
+        val char = letter.lowercase
         // Act
         val actual = char.toPathCommand()
         // Assert
-        assertEquals(expected, actual)
+        assertEquals(letter.command, actual)
     }
 
     @Test
     @Burst
     fun `given uppercase command char - when toPathCommand is called - then matching command is returned`(
-        expected: PathCommand = burstValues(
-            PathCommand.ArcTo,
-            PathCommand.CurveTo,
-            PathCommand.HorizontalLineTo,
-            PathCommand.LineTo,
-            PathCommand.MoveTo,
-            PathCommand.QuadTo,
-            PathCommand.ReflectiveCurveTo,
-            PathCommand.ReflectiveQuadTo,
-            PathCommand.VerticalLineTo,
-            PathCommand.Close,
-        ),
+        letter: SvgCommandLetter,
     ) {
         // Arrange
-        val char = expected.uppercaseChar()
+        val char = letter.uppercase
         // Act
         val actual = char.toPathCommand()
         // Assert
-        assertEquals(expected, actual)
+        assertEquals(letter.command, actual)
     }
 
     @Test
@@ -65,4 +43,17 @@ class PathCommandTest {
         // Assert
         assertNull(actual)
     }
+}
+
+enum class SvgCommandLetter(val lowercase: Char, val uppercase: Char, val command: PathCommand) {
+    Arc('a', 'A', PathCommand.ArcTo),
+    Curve('c', 'C', PathCommand.CurveTo),
+    Horizontal('h', 'H', PathCommand.HorizontalLineTo),
+    Line('l', 'L', PathCommand.LineTo),
+    Move('m', 'M', PathCommand.MoveTo),
+    Quad('q', 'Q', PathCommand.QuadTo),
+    ReflectiveCurve('s', 'S', PathCommand.ReflectiveCurveTo),
+    ReflectiveQuad('t', 'T', PathCommand.ReflectiveQuadTo),
+    Vertical('v', 'V', PathCommand.VerticalLineTo),
+    Close('z', 'Z', PathCommand.Close),
 }
