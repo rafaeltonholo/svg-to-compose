@@ -66,6 +66,27 @@ internal data class CliOption(val flag: String, val type: String, val descriptio
                 description = "Disable template auto-discovery. By default, `s2c` walks up from the output " +
                     "directory looking for `s2c.template.toml`.",
             ),
+            CliOption(
+                flag = "--no-tui",
+                type = "Boolean",
+                description = "Disable the dashboard and print plain text instead",
+            ),
+            CliOption(
+                flag = "--json",
+                type = "Boolean",
+                description = "Print one JSON object per line (JSONL). Implies `--no-tui`. " +
+                    "Cannot be used with `--silent`",
+            ),
+            CliOption(
+                flag = "--silent",
+                type = "Boolean",
+                description = "Suppress all output, including the dashboard. Cannot be used with `--json`",
+            ),
+            CliOption(
+                flag = "--log-dir",
+                type = "String",
+                description = "Directory for run log files (default: `.s2c/logs`)",
+            ),
         )
     }
 }

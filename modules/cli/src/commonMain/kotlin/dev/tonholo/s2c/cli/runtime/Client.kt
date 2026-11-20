@@ -2,6 +2,7 @@ package dev.tonholo.s2c.cli.runtime
 
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
+import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -158,7 +159,8 @@ internal class Client(
 
     private val silent by option(
         names = arrayOf("--silent"),
-        help = "Enable silent run mode. This will suppress all the output logs this CLI provides.",
+        help = "Enable silent run mode. This will suppress all the output logs this CLI provides. " +
+            "Cannot be combined with --json.",
     ).flag()
 
     private val exclude by option(
@@ -219,7 +221,8 @@ internal class Client(
 
     private val json by option(
         names = arrayOf("--json"),
-        help = "Output conversion progress as JSONL (one JSON object per line). Implies --no-tui.",
+        help = "Output conversion progress as JSONL (one JSON object per line). Implies --no-tui. " +
+            "Cannot be combined with --silent.",
     ).flag(default = false)
 
     private val logDir by option(
@@ -275,6 +278,8 @@ internal class Client(
     private val config get() = context.configSnapshot
 
     override suspend fun run() {
+        rejectSilentWithJson()
+
         context.updateConfig<CliConfig> { config ->
             config.copy(
                 debug = effectiveDebug,
@@ -322,6 +327,10 @@ internal class Client(
         } finally {
             SvgToComposeContextProvider.reset()
         }
+    }
+
+    private fun rejectSilentWithJson() {
+        if (silent && json) throw UsageError(message = "--silent cannot be combined with --json")
     }
 
     private fun logArgs() {

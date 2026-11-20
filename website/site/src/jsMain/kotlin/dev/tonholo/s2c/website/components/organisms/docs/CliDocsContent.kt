@@ -98,6 +98,28 @@ private const val S2C_DISABLE_OPTIMIZATION = """
 |  icon.svg
 """
 
+private const val PLAIN_TEXT_OUTPUT = """
+|[INFO] svg-to-compose v3.0.0
+|[INFO] Input: ./icons | Output: ./output | Files: 3 | Optimize: on
+|[OK]   first.svg (12ms)
+|[OK]   second.svg (9ms)
+|[FAIL] broken.svg - FailedToParseIconError: not-a-number is not a Number
+|[DONE] 2 succeeded, 1 failed (0s, 12.8 icons/sec)
+"""
+
+// language=sh
+private const val S2C_JSON_OUTPUT = """
+|s2c --json \
+|  -o ./output \
+|  -p com.app.icons \
+|  -t com.app.theme.AppTheme \
+|  ./icons \
+|  | jq -r 'select(.event == "file_complete" and .status == "failed") | .file'
+"""
+
+private const val JSON_SCHEMA_URL =
+    "https://github.com/rafaeltonholo/svg-to-compose/blob/main/docs/JSON_OUTPUT.md"
+
 private const val OUTPUT_EXAMPLE = """
 |package com.app.icons
 |
@@ -145,6 +167,7 @@ fun CliDocsContent(modifier: Modifier = Modifier) {
         InstallationSection()
         ExternalDependenciesSection()
         UsageSection()
+        OutputModesSection()
         OptionsReferenceSection()
         TemplateSystemCallout()
         OutputExamplesSection()
@@ -377,6 +400,80 @@ private fun UsageSection() {
             language = "shell",
             filename = "Terminal",
         )
+    }
+}
+
+@Composable
+private fun OutputModesSection() {
+    DocSection(id = "output-modes", title = "Output Modes") {
+        SpanText(
+            text = "The CLI reports a run in one of four ways. It picks the mode from where its " +
+                "output goes, and you can override that choice with flags.",
+            modifier = DocsBodyTextStyle.toModifier(),
+        )
+        Ul(attrs = DocsBulletListStyle.toModifier().toAttrs()) {
+            Li {
+                CodeAwareSpanText(
+                    text = "Dashboard: the default in an interactive terminal. Shows a live " +
+                        "progress bar, ETA, throughput, the current file, and the files that " +
+                        "finished recently.",
+                )
+            }
+            Li {
+                CodeAwareSpanText(
+                    text = "Plain text: used when the output is piped or redirected, and with " +
+                        "`--no-tui`. One line per event, prefixed with `[INFO]`, `[OK]`, " +
+                        "`[FAIL]`, or `[DONE]`.",
+                )
+            }
+            Li {
+                CodeAwareSpanText(
+                    text = "JSON: turned on with `--json`. One JSON object per line, and nothing " +
+                        "else on standard output. Implies `--no-tui`.",
+                )
+            }
+            Li {
+                CodeAwareSpanText(
+                    text = "Silent: turned on with `--silent`. No output at all. You cannot use it together " +
+                        "with `--json`; the CLI stops with a usage error.",
+                )
+            }
+        }
+        SpanText(
+            text = "Plain text output:",
+            modifier = DocsBodyTextStyle.toModifier()
+                .fontWeight(FontWeight.SemiBold),
+        )
+        CodeBlock(
+            code = PLAIN_TEXT_OUTPUT.trimMargin(),
+            language = "shell",
+            filename = "Terminal",
+        )
+        SpanText(
+            text = "List the files that failed in a CI job:",
+            modifier = DocsBodyTextStyle.toModifier()
+                .fontWeight(FontWeight.SemiBold),
+        )
+        CodeBlock(
+            code = S2C_JSON_OUTPUT.trimMargin(),
+            language = "shell",
+            filename = "Terminal",
+        )
+        DocCallout(variant = CalloutVariant.TIP) {
+            CodeAwareSpanText(
+                text = "A run that processes files writes a log file under `.s2c/logs`, and " +
+                    "`--log-dir` moves it elsewhere. A failed run also saves an error report in " +
+                    "the current directory and shows a pre-filled GitHub issue link. The exit " +
+                    "status is non-zero when any file fails, in every mode.",
+                modifier = DocsBodyTextStyle.toModifier(),
+                variant = TipCalloutCodeAwareVariant,
+            )
+        }
+        Span(attrs = DocsBodyTextStyle.toAttrs()) {
+            Text("See the ")
+            Link(path = JSON_SCHEMA_URL, text = "JSON output event schema")
+            Text(" for every event and field.")
+        }
     }
 }
 

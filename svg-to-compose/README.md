@@ -14,6 +14,7 @@ Android Jetpack Compose Icons.
 - [Installation](#installation)
 - [External dependencies](#external-dependencies)
 - [Using the command-line tool](#using-the-command-line-tool)
+- [Output modes](#output-modes)
 - [Result Examples](#result-examples)
 
 ## Why?
@@ -137,7 +138,8 @@ Options:
                                                           maximum depth of 10
   --recursive-depth, --depth=<int>                        The depth level for recursive file search within directory. The default value is 10. (default:
                                                           10)
-  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides.
+  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides. Cannot be
+                                                          combined with --json.
   --exclude=<text>                                        A regex used to exclude some icons from the parsing.
   --indent-size=<int>                                     Number of indent characters per level in generated code. Overrides .editorconfig if specified.
   --indent-style=(space|tab)                              Indentation style for generated code: 'space' or 'tab'. Overrides .editorconfig if specified.
@@ -210,6 +212,91 @@ s2c -o OutputIconFile.kt \
 > [!IMPORTANT]
 > If you don't specify the full qualifier of the Theme, you'll need to add the
 > import it later.
+
+## Output modes
+
+The CLI reports a run in one of four ways. It picks the mode from where its
+output goes, and you can override that with flags.
+
+| Mode       | When it is used                                            | What you get                                                           |
+|------------|------------------------------------------------------------|------------------------------------------------------------------------|
+| Dashboard  | Default, when the output is an interactive terminal         | Live progress bar, ETA, throughput, current file, recent files          |
+| Plain text | When the output is piped or redirected, or with `--no-tui`  | One line per event, prefixed with `[INFO]`, `[OK]`, `[FAIL]`, `[DONE]`  |
+| JSON       | With `--json`                                               | One JSON object per line (JSONL), nothing else on stdout                |
+| Silent     | With `--silent`                                             | No output at all                                                        |
+
+### Dashboard
+
+When `s2c` writes to an interactive terminal, it shows a live dashboard with
+the overall progress, the elapsed time, an ETA, the throughput, the file being
+converted, and the files that finished recently. In a batch run, press `h` to
+collapse or expand the header. Press `Ctrl+C` to stop the run.
+
+A single file gets a shorter view: the header, the conversion steps, and one
+completion line. There is no progress bar and no recent files list.
+
+When the run ends, the dashboard prints a summary with the counters and, if
+anything failed, the failures grouped by error code.
+
+### Plain text
+
+`s2c` switches to plain text when its output is not a terminal, which is what
+happens in CI or when you pipe it into another command. Add `--no-tui` to force
+plain text in an interactive terminal.
+
+```console
+[INFO] svg-to-compose v3.0.0
+[INFO] Input: ./icons | Output: ./output | Files: 3 | Optimize: on
+[OK]   first.svg (12ms)
+[OK]   second.svg (9ms)
+[FAIL] broken.svg - FailedToParseIconError: not-a-number is not a Number
+[DONE] 2 succeeded, 1 failed (0s, 12.8 icons/sec)
+```
+
+Only failed files start with `[FAIL]`, so you can filter them:
+
+```console
+s2c <args> ./icons | grep '^\[FAIL\]'
+```
+
+### JSON
+
+`--json` prints one JSON object per line and implies `--no-tui`. Nothing else
+is written to standard output, so the stream stays parseable.
+
+```console
+s2c --json \
+  -o ./output \
+  -p your.app.package.icon \
+  -t your.app.package.theme.YourAppComposeTheme \
+  ./icons \
+  | jq -r 'select(.event == "file_complete" and .status == "failed") | .file'
+```
+
+See the [JSON output event schema](../docs/JSON_OUTPUT.md) for every event and
+field.
+
+### Silent
+
+`--silent` suppresses all output, including the dashboard. Files are still
+converted, the run log is still written, and the exit status still tells you
+whether the run worked.
+
+You cannot use `--silent` together with `--json`. The CLI stops with a usage
+error, because silent means no output and JSON means output.
+
+### Logs and error reports
+
+A run that processes at least one file writes a log file under `.s2c/logs`.
+Use `--log-dir <directory>` to put it somewhere else.
+
+When a file fails, the CLI also saves an error report named
+`s2c-errors-<timestamp>.log` in the current directory and shows a pre-filled
+GitHub issue URL. The report contains the run configuration and the failure
+messages, not your SVG content. In the dashboard you can press `c` to copy the
+report to the clipboard.
+
+The exit status is non-zero when any file fails, in every mode.
 
 ## Result Examples
 

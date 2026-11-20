@@ -8,6 +8,7 @@ import dev.tonholo.s2c.Processor
 import dev.tonholo.s2c.SvgToComposeContext
 import dev.tonholo.s2c.cli.inject.coroutine.IoDispatcher
 import dev.tonholo.s2c.cli.inject.coroutine.MainDispatcher
+import dev.tonholo.s2c.cli.output.LineWriter
 import dev.tonholo.s2c.cli.output.log.FileCompletionEntry
 import dev.tonholo.s2c.cli.output.log.RunLogWriter
 import dev.tonholo.s2c.cli.output.renderer.JsonRenderer
@@ -15,8 +16,8 @@ import dev.tonholo.s2c.cli.output.renderer.PlainTextRenderer
 import dev.tonholo.s2c.cli.output.renderer.TuiRenderer
 import dev.tonholo.s2c.cli.output.report.BugReportFailure
 import dev.tonholo.s2c.cli.output.report.BugReportUrlBuilder
-import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.output.report.ErrorReportWriter
+import dev.tonholo.s2c.cli.output.report.InvocationCommand
 import dev.tonholo.s2c.cli.output.report.platformInfo
 import dev.tonholo.s2c.cli.update.UpdateNotifier
 import dev.tonholo.s2c.error.ErrorCode
@@ -48,23 +49,6 @@ import kotlin.time.Clock
 
 private const val SIGINT_EXIT_CODE = 130
 
-/**
- * Controls how much of the end-of-run summary the non-renderer finalizer prints.
- *
- * - [Full] prints the "Failed:" breakdown followed by the log path. Used by
- *   plain-text and TUI-off runs.
- * - [LogPathOnly] only prints the log path suffix. Used by the TUI path, which
- *   already renders its own completion summary through the TUI renderer.
- * - [None] suppresses finalizer output entirely, including log-write warnings.
- *   Used by JSON output where the renderer owns the protocol and stray
- *   terminal writes would corrupt it.
- */
-private enum class SummaryMode {
-    Full,
-    LogPathOnly,
-    None,
-}
-
 @Inject
 internal class CliRunner(
     private val processorFactory: Processor.Factory,
@@ -78,6 +62,7 @@ internal class CliRunner(
     private val ioDispatcher: CoroutineDispatcher,
     @param:MainDispatcher
     private val mainDispatcher: CoroutineDispatcher,
+    private val lineWriter: LineWriter,
 ) {
     suspend fun run(
         config: RunConfig,
@@ -87,7 +72,9 @@ internal class CliRunner(
     ) {
         val processor = processorFactory.create(tempDirectory = null)
         try {
-            val useTui = terminal.terminalInfo.interactive && !config.noTui
+            val useTui = terminal.terminalInfo.interactive &&
+                !config.noTui &&
+                !context.configSnapshot.silent
 
             if (useTui) {
                 runWithTui(
@@ -126,9 +113,7 @@ internal class CliRunner(
             stackTraceEnabled = context.configSnapshot.stackTrace,
             fileSystem = fileSystem,
         )
-        var stats: RunStats? = null
-        var version = ""
-        val completedFiles = mutableListOf<FileCompletionEntry>()
+        val record = RunRecord()
         val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
 
         try {
@@ -148,31 +133,15 @@ internal class CliRunner(
                     .flowOn(ioDispatcher)
                     .collect { event ->
                         renderer.onEvent(event)
-                        if (event is ConversionEvent.RunStarted) {
-                            version = event.version
-                        }
-                        if (event is ConversionEvent.FileCompleted) {
-                            completedFiles.add(
-                                FileCompletionEntry(
-                                    fileName = event.fileName,
-                                    duration = event.duration,
-                                    result = event.result,
-                                ),
-                            )
-                        }
-                        if (event is ConversionEvent.RunCompleted) {
-                            stats = event.stats
-                        }
+                        record.record(event)
                     }
             }
 
             processorDeferred.await()
             emitErrorReportIfNeeded(
                 renderer = renderer,
-                version = version,
+                record = record,
                 config = config,
-                stats = stats,
-                completedFiles = completedFiles,
                 stackTraceEnabled = context.configSnapshot.stackTrace,
                 suppressTerminalWarnings = false,
             )
@@ -184,19 +153,13 @@ internal class CliRunner(
             context.updateConfig<CliConfig> { it.copy(silent = previousSilent) }
         }
 
-        // `stats == null` means the processor never emitted `RunCompleted`.
-        // The only path that reaches here today is `Processor.run` returning
-        // early when the single-file input matches `--exclude`. Treating it
-        // as a no-op is correct: no files processed, no log to write.
-        val runStats = stats ?: return
+        val runStats = record.stats ?: return
         finalizeRun(
             config = config,
             stats = runStats,
-            completedFiles = completedFiles,
+            completedFiles = record.completedFiles,
             logDir = logDir,
-            // The TUI completion section already renders the failure breakdown;
-            // only the log path remains to be surfaced after it.
-            summaryMode = SummaryMode.LogPathOnly,
+            quiet = false,
         )
     }
 
@@ -239,20 +202,18 @@ internal class CliRunner(
         logDir: Path,
     ) {
         val isSilent = context.configSnapshot.silent
+        val quiet = isSilent || outputFormat == OutputFormat.Json
         val renderer = when (outputFormat) {
-            OutputFormat.Json -> JsonRenderer()
-            OutputFormat.Text -> PlainTextRenderer()
+            OutputFormat.Json -> JsonRenderer(writer = lineWriter::write)
+            OutputFormat.Text -> PlainTextRenderer(writer = lineWriter::write)
         }
 
         if (outputFormat == OutputFormat.Json) {
             context.updateConfig<CliConfig> { it.copy(silent = true) }
         }
 
-        var stats: RunStats? = null
-        var version = ""
-        val completedFiles = mutableListOf<FileCompletionEntry>()
-        val emitToRenderer = outputFormat == OutputFormat.Json || !isSilent
-        val eventSink: OutputRenderer = if (emitToRenderer) renderer else OutputRenderer { }
+        val record = RunRecord()
+        val eventSink: OutputRenderer = if (isSilent) OutputRenderer { } else renderer
         processor.runAsFlow(
             path = config.inputPath,
             output = config.outputPath,
@@ -264,65 +225,49 @@ internal class CliRunner(
             .flowOn(ioDispatcher)
             .collect { event ->
                 eventSink.onEvent(event)
-                if (event is ConversionEvent.RunStarted) {
-                    version = event.version
-                }
-                if (event is ConversionEvent.FileCompleted) {
-                    completedFiles.add(
-                        FileCompletionEntry(
-                            fileName = event.fileName,
-                            duration = event.duration,
-                            result = event.result,
-                        ),
-                    )
-                }
-                if (event is ConversionEvent.RunCompleted) {
-                    stats = event.stats
-                }
+                record.record(event)
             }
         emitErrorReportIfNeeded(
             renderer = eventSink,
-            version = version,
+            record = record,
             config = config,
-            stats = stats,
-            completedFiles = completedFiles,
             stackTraceEnabled = context.configSnapshot.stackTrace,
-            suppressTerminalWarnings = outputFormat == OutputFormat.Json,
+            suppressTerminalWarnings = quiet,
         )
         updateNotifier.notifyIfUpdateAvailable(renderer = eventSink)
 
-        val runStats = stats
-        if (runStats != null) {
-            finalizeRun(
-                config = config,
-                stats = runStats,
-                completedFiles = completedFiles,
-                logDir = logDir,
-                summaryMode = if (outputFormat == OutputFormat.Json) SummaryMode.None else SummaryMode.Full,
-            )
-        }
+        val runStats = record.stats ?: return
+        finalizeRun(
+            config = config,
+            stats = runStats,
+            completedFiles = record.completedFiles,
+            logDir = logDir,
+            quiet = quiet,
+        )
     }
 
     /**
-     * Writes the run log to [logDir] and, depending on [summaryMode], surfaces the
-     * failure summary and log path on the terminal.
+     * Writes the run log to [logDir] and points the user at it.
      *
-     * Log-write failures are intentionally non-fatal: they are reported to
-     * the terminal as a warning, but the failure summary and the
-     * [ExitProgramException] path still run so the user always sees why the
-     * run failed. This mirrors the TUI path's expectations.
+     * The renderers already print the failure breakdown, so the only thing
+     * left to surface here is the log path.
+     *
+     * Log-write failures are intentionally non-fatal: they are reported to the
+     * terminal as a warning, and the [ExitProgramException] path still runs so
+     * the user always sees why the run failed.
+     *
+     * @param quiet when `true`, nothing is written to the terminal. JSON output
+     *  owns stdout and would be corrupted by stray text, and `--silent` runs
+     *  must not print at all.
      */
     private fun finalizeRun(
         config: RunConfig,
         stats: RunStats,
         completedFiles: List<FileCompletionEntry>,
         logDir: Path,
-        summaryMode: SummaryMode,
+        quiet: Boolean,
     ) {
         if (completedFiles.isEmpty()) {
-            if (summaryMode == SummaryMode.Full) {
-                maybePrintFailureSummary(completedFiles = completedFiles, logPath = null)
-            }
             maybeThrowFailure(stats = stats, logPath = null)
             return
         }
@@ -331,41 +276,18 @@ internal class CliRunner(
         val logPath = try {
             logWriter.write(config = config, stats = stats, entries = completedFiles)
         } catch (e: IOException) {
-            if (summaryMode != SummaryMode.None) {
+            if (!quiet) {
                 terminal.println()
                 terminal.println("Warning: could not write run log to $logDir: ${e.message}")
             }
             null
         }
 
-        when (summaryMode) {
-            SummaryMode.Full -> maybePrintFailureSummary(
-                completedFiles = completedFiles,
-                logPath = logPath,
-            )
-
-            SummaryMode.LogPathOnly -> printLogPath(logPath = logPath)
-
-            SummaryMode.None -> Unit
+        if (!quiet) {
+            printLogPath(logPath = logPath)
         }
 
         maybeThrowFailure(stats = stats, logPath = logPath)
-    }
-
-    private fun maybePrintFailureSummary(
-        completedFiles: List<FileCompletionEntry>,
-        logPath: Path?,
-    ) {
-        val failedEntries = completedFiles.filter { it.result is FileResult.Failed }
-        if (failedEntries.isNotEmpty()) {
-            terminal.println()
-            terminal.println("Failed:")
-            for (entry in failedEntries) {
-                val result = entry.result as FileResult.Failed
-                terminal.println("  ${entry.fileName}: ${result.errorCode.name} - ${result.message}")
-            }
-        }
-        printLogPath(logPath = logPath)
     }
 
     private fun printLogPath(logPath: Path?) {
@@ -388,20 +310,18 @@ internal class CliRunner(
      */
     private fun emitErrorReportIfNeeded(
         renderer: OutputRenderer,
-        version: String,
+        record: RunRecord,
         config: RunConfig,
-        stats: RunStats?,
-        completedFiles: List<FileCompletionEntry>,
         stackTraceEnabled: Boolean,
         suppressTerminalWarnings: Boolean,
     ) {
-        val runStats = stats ?: return
+        val runStats = record.stats ?: return
         if (runStats.failed == 0) return
-        val failures = completedFiles.toBugReportFailures()
+        val failures = record.completedFiles.toBugReportFailures()
         if (failures.isEmpty()) return
 
         val reportPath = writeErrorReport(
-            version = version,
+            version = record.version,
             config = config,
             stats = runStats,
             failures = failures,
@@ -413,7 +333,7 @@ internal class CliRunner(
             ConversionEvent.ErrorReportGenerated(
                 reportPath = reportPath.toString(),
                 bugReportUrl = BugReportUrlBuilder().build(
-                    version = version,
+                    version = record.version,
                     platform = platformInfo(),
                     commandLine = invocationCommand.value,
                     totalFiles = runStats.totalFiles,
@@ -486,6 +406,46 @@ internal class CliRunner(
                 errorCode = ErrorCode.FailedToParseIconError,
                 message = "Failure to parse (${stats.failed}) file(s). $detail",
             )
+        }
+    }
+}
+
+/**
+ * Accumulates the parts of a run that the finalizer needs after the event
+ * stream ends: the tool version, the per-file outcomes, and the run
+ * statistics.
+ */
+private class RunRecord {
+    private val entries = mutableListOf<FileCompletionEntry>()
+
+    var version: String = ""
+        private set
+
+    /**
+     * Statistics of the finished run, or `null` when the processor never
+     * emitted [ConversionEvent.RunCompleted]. That happens when the processor
+     * returns early, for example when the only input file matches `--exclude`:
+     * no files were processed, so there is nothing to log.
+     */
+    var stats: RunStats? = null
+        private set
+
+    val completedFiles: List<FileCompletionEntry>
+        get() = entries
+
+    fun record(event: ConversionEvent) {
+        when (event) {
+            is ConversionEvent.RunStarted -> version = event.version
+
+            is ConversionEvent.FileCompleted -> entries += FileCompletionEntry(
+                fileName = event.fileName,
+                duration = event.duration,
+                result = event.result,
+            )
+
+            is ConversionEvent.RunCompleted -> stats = event.stats
+
+            else -> Unit
         }
     }
 }

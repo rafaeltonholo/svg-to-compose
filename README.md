@@ -273,6 +273,62 @@ s2c --help
         /my/svg/or/xml/directory
     ```
 
+#### Output Modes
+
+The CLI picks how to report a run based on where its output goes. You can
+override that choice with flags.
+
+| Mode       | When it is used                                             | What you get                                                   |
+|------------|-------------------------------------------------------------|----------------------------------------------------------------|
+| Dashboard  | Default, when the output is an interactive terminal          | Live progress bar, ETA, throughput, current file, recent files  |
+| Plain text | When the output is piped or redirected, or with `--no-tui`   | One line per event, prefixed with `[INFO]`, `[OK]`, `[FAIL]`, `[DONE]` |
+| JSON       | With `--json`                                                | One JSON object per line (JSONL), nothing else on stdout        |
+| Silent     | With `--silent`                                              | No output at all                                                |
+
+- `--no-tui` turns the dashboard off and prints plain text, even in an
+  interactive terminal. Use it when the dashboard gets in the way, for example
+  in a build log.
+- `--json` prints machine-readable output and implies `--no-tui`. See the
+  [JSON output event schema](./docs/JSON_OUTPUT.md) for the full list of events
+  and fields.
+- `--silent` suppresses every message, including the dashboard. You cannot use
+  it together with `--json`; the CLI stops with a usage error.
+
+Whatever the mode, a run that processes files writes a log file under
+`.s2c/logs` (change the directory with `--log-dir`), and a failed run also
+saves an error report named
+`s2c-errors-<timestamp>.log` in the current directory. The CLI exits with a
+non-zero status when any file fails.
+
+**Plain text output**
+
+```console
+[INFO] svg-to-compose v3.0.0
+[INFO] Input: ./icons | Output: ./output | Files: 3 | Optimize: on
+[OK]   first.svg (12ms)
+[OK]   second.svg (9ms)
+[FAIL] broken.svg - FailedToParseIconError: not-a-number is not a Number
+[DONE] 2 succeeded, 1 failed (0s, 12.8 icons/sec)
+```
+
+Only failed files start with `[FAIL]`, so a pipeline can filter them:
+
+```console
+s2c <args> ./icons | grep '^\[FAIL\]'
+```
+
+**JSON output in CI**
+
+```console
+s2c --json \
+    -o ./output \
+    -p your.app.package.icon \
+    -t your.app.package.theme.YourAppComposeTheme \
+    ./icons \
+  | tee conversion.jsonl \
+  | jq -r 'select(.event == "file_complete" and .status == "failed") | .file'
+```
+
 ### Using the Gradle Plugin
 
 > [!NOTE]
