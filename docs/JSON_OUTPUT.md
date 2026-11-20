@@ -206,5 +206,8 @@ the JSON stream only for the details.
 
 ## Other output modes
 
+`--json` cannot be used together with `--silent`. The CLI stops with a usage
+error when both are set.
+
 See the [command-line tool documentation](../svg-to-compose/README.md) for the
 dashboard, the plain text mode, and `--silent`.

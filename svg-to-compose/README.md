@@ -138,7 +138,8 @@ Options:
                                                           maximum depth of 10
   --recursive-depth, --depth=<int>                        The depth level for recursive file search within directory. The default value is 10. (default:
                                                           10)
-  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides.
+  --silent                                                Enable silent run mode. This will suppress all the output logs this CLI provides. Cannot be
+                                                          combined with --json.
   --exclude=<text>                                        A regex used to exclude some icons from the parsing.
   --indent-size=<int>                                     Number of indent characters per level in generated code. Overrides .editorconfig if specified.
   --indent-style=(space|tab)                              Indentation style for generated code: 'space' or 'tab'. Overrides .editorconfig if specified.
@@ -280,6 +281,9 @@ field.
 `--silent` suppresses all output, including the dashboard. Files are still
 converted, the run log is still written, and the exit status still tells you
 whether the run worked.
+
+You cannot use `--silent` together with `--json`. The CLI stops with a usage
+error, because silent means no output and JSON means output.
 
 ### Logs and error reports
 

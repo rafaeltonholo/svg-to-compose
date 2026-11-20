@@ -291,7 +291,8 @@ override that choice with flags.
 - `--json` prints machine-readable output and implies `--no-tui`. See the
   [JSON output event schema](./docs/JSON_OUTPUT.md) for the full list of events
   and fields.
-- `--silent` suppresses every message, including the dashboard.
+- `--silent` suppresses every message, including the dashboard. You cannot use
+  it together with `--json`; the CLI stops with a usage error.
 
 Whatever the mode, a run that processes files writes a log file under
 `.s2c/logs` (change the directory with `--log-dir`), and a failed run also
