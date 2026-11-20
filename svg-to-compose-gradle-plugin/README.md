@@ -212,6 +212,8 @@ Within the `icons` block, you can customize how icons are processed:
   customization. The file can have any name; when omitted, auto-discovers a file
   named `s2c.template.toml` by walking up from the output directory. See
   [Template System](../docs/TEMPLATES.md) for the full schema reference.
+- **noTemplate()**: Generates the icons without any template and skips the
+  auto-discovery of `s2c.template.toml` files.
 - **persist()**: Persists generated files in the source set (use with caution).
 
 ### Parallel Processing

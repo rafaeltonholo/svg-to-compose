@@ -54,6 +54,7 @@ svgToCompose {
             optimize(enabled = false)
             icons {
                 theme("dev.tonholo.svgtocompose.playground.ui.theme.SampleAppTheme")
+                noTemplate()
             }
         }
         val basePackage = "dev.tonholo.svgtocompose.playground.ui.icon"

@@ -14,6 +14,8 @@ import dev.tonholo.s2c.gradle.internal.cache.PersistentOutputRegistry
 import dev.tonholo.s2c.gradle.internal.inject.GradlePluginGraph
 import dev.tonholo.s2c.gradle.internal.logger.setLogLevel
 import dev.tonholo.s2c.gradle.internal.parser.IconParserConfigurationImpl
+import dev.tonholo.s2c.gradle.internal.parser.TemplateMode
+import dev.tonholo.s2c.gradle.internal.parser.findDiscoveredTemplate
 import dev.tonholo.s2c.gradle.internal.service.S2cWorkerBridge
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkAction
 import dev.tonholo.s2c.gradle.tasks.worker.IconParsingWorkActionResult.Status
@@ -38,10 +40,13 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.LocalState
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.options.Option
@@ -98,6 +103,14 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
     @get:Input
     internal val configurationNames: List<String>
         get() = configurations.map { it.name }.sorted()
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    internal val discoveredTemplateFiles: List<File>
+        get() = activeConfigurations
+            .filter { it.iconConfiguration.get().templateMode.getOrElse(TemplateMode.Auto) == TemplateMode.Auto }
+            .mapNotNull { outputDirectories[it.name]?.let(::findDiscoveredTemplate) }
+            .distinct()
 
     @get:Input
     internal abstract val maxParallelExecutions: Property<Int>
@@ -428,6 +441,7 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             excludeDirPattern.set(iconConfiguration.excludeDir.orNull?.pattern)
             kmpPreview.set(kmp.get())
             templateFilePath.set(iconConfiguration.templateFile.orNull?.asFile)
+            templateMode.set(iconConfiguration.templateMode)
             resultFilePath.set(resultFile.absolutePath)
             this.bridgeToken.set(bridgeToken)
             tempDirPath.set(temporaryDir.resolve("worker-${path.name.hashCode()}").absolutePath)

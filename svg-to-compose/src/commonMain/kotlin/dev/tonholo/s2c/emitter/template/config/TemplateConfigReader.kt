@@ -6,7 +6,8 @@ import dev.tonholo.s2c.io.FileManager
 import dev.zacsweers.metro.Inject
 import okio.Path
 
-private const val TEMPLATE_FILENAME = "s2c.template.toml"
+/** Name of the file the template auto-discovery looks for. */
+const val TEMPLATE_FILENAME = "s2c.template.toml"
 
 /**
  * Reads `s2c.template.toml` files by explicit path or auto-discovery.

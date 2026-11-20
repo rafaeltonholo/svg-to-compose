@@ -85,6 +85,10 @@ internal class IconParserConfigurationImpl(
     @get:Optional
     internal val templateFile: RegularFileProperty = objectFactory.fileProperty()
 
+    @get:Input
+    @get:Optional
+    internal val templateMode: Property<TemplateMode> = objectFactory.property<TemplateMode>()
+
     internal val isCodeGenerationPersistent: Property<Boolean> = objectFactory.property<Boolean>()
 
     @get:Input
@@ -149,6 +153,12 @@ internal class IconParserConfigurationImpl(
 
     override fun templateFile(path: RegularFile) {
         templateFile.set(path)
+        templateMode.set(TemplateMode.ExplicitFile)
+    }
+
+    override fun noTemplate() {
+        templateFile.set(null as RegularFile?)
+        templateMode.set(TemplateMode.Disabled)
     }
 
     @DelicateSvg2ComposeApi
@@ -187,7 +197,15 @@ internal class IconParserConfigurationImpl(
         mapIconNameTo.setIfNotPresent(provider = common?.mapIconNameTo)
         exclude.setIfNotPresent(provider = common?.exclude)
         excludeDir.setIfNotPresent(provider = common?.excludeDir)
-        if (common != null && !templateFile.isPresent && common.templateFile.isPresent) {
+        mergeTemplate(common)
+    }
+
+    private fun mergeTemplate(common: IconParserConfigurationImpl?) {
+        if (templateMode.isPresent) return
+
+        val commonMode = common?.templateMode?.orNull
+        templateMode.set(commonMode ?: TemplateMode.Auto)
+        if (common != null && commonMode == TemplateMode.ExplicitFile) {
             templateFile.set(common.templateFile)
         }
     }
@@ -205,6 +223,7 @@ internal class IconParserConfigurationImpl(
         appendLine("  exclude=${exclude.orNull}, ")
         appendLine("  excludeDir=${excludeDir.orNull}, ")
         appendLine("  templateFile=${templateFile.orNull?.asFile?.absolutePath}, ")
+        appendLine("  templateMode=${templateMode.orNull}, ")
         append(")")
     }
 }
