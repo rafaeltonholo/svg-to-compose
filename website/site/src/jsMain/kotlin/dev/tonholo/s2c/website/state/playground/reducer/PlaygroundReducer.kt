@@ -28,8 +28,10 @@ internal class PlaygroundReducer(
             is PlaygroundAction.ChangePreviewExpanded,
             -> uiReducer.reduce(state, action)
 
-            is PlaygroundAction.LoadContent, is PlaygroundAction.SingleFileLoaded, is PlaygroundAction.StartConversion ->
-                singleFileReducer.reduce(state, action)
+            is PlaygroundAction.LoadContent,
+            is PlaygroundAction.SingleFileLoaded,
+            is PlaygroundAction.StartConversion,
+            -> singleFileReducer.reduce(state, action)
 
             is PlaygroundAction.StartBatch,
             is PlaygroundAction.StartBatchConversion,
