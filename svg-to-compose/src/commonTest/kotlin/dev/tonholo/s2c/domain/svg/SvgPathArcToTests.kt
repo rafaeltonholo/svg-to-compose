@@ -1,5 +1,7 @@
 package dev.tonholo.s2c.domain.svg
 
+import app.cash.burst.Burst
+import app.cash.burst.burstValues
 import dev.tonholo.s2c.domain.ImageVectorNode
 import dev.tonholo.s2c.domain.PathNodes
 import dev.tonholo.s2c.domain.emit
@@ -96,6 +98,84 @@ class SvgPathArcToTests : BaseSvgTest() {
             assertIs<PathNodes.ArcTo>(this)
             assertFalse(isRelative)
         }
+    }
+
+    @Test
+    @Burst
+    fun `given absolute arc with concatenated flags - when parsed - then flags are separated`(
+        flags: String = burstValues("00", "01", "10", "11"),
+    ) {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M10 80 A25 25 0 $flags 50 50",
+            ),
+        )
+        // Act
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
+        val nodes = node.wrapper.nodes
+        // Assert
+        assertEquals(expected = 2, actual = nodes.size)
+        val arcTo = nodes[1]
+        assertIs<PathNodes.ArcTo>(arcTo)
+        assertFalse(arcTo.isRelative)
+        assertEquals(expected = 25.0, actual = arcTo.a)
+        assertEquals(expected = 25.0, actual = arcTo.b)
+        assertEquals(expected = 0.0, actual = arcTo.theta)
+        assertEquals(expected = flags[0] == '1', actual = arcTo.isMoreThanHalf)
+        assertEquals(expected = flags[1] == '1', actual = arcTo.isPositiveArc)
+        assertEquals(expected = 50.0, actual = arcTo.x)
+        assertEquals(expected = 50.0, actual = arcTo.y)
+    }
+
+    @Test
+    @Burst
+    fun `given arc with leading dot radii - when parsed - then the endpoint keeps its digits`(
+        command: Char = burstValues('A', 'a'),
+    ) {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M0 0 ${command}5 .5 .5 0 1 20 20",
+            ),
+        )
+        // Act
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
+        val arcTo = node.wrapper.nodes[1]
+        // Assert
+        assertIs<PathNodes.ArcTo>(arcTo)
+        assertEquals(expected = 20.0, actual = arcTo.x)
+        assertEquals(expected = 20.0, actual = arcTo.y)
+    }
+
+    @Test
+    fun `given absolute arcs with no space after flags - when parsed - then every arc keeps all parameters`() {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "A20 60 45 0130 20 " +
+                    "A20 60 45 01-30 20 " +
+                    "A20 60 45 01-.30 20 " +
+                    "A20 60 45 10-.30 20 " +
+                    "A20 60 45 11-.30 20 " +
+                    "A20 60 45 01.3 20 " +
+                    "A20 60 45 01.0 20 " +
+                    "A20 60 45 11.0 20 " +
+                    "A20 60 45 0 1 30 20",
+            ),
+        )
+        // Act
+        val node = with(logger) { path.asNode(minified = true) } as ImageVectorNode.Path
+        val nodes = node.wrapper.nodes
+        // Assert
+        assertEquals(expected = 9, actual = nodes.size)
+        assertEquals(expected = 9, actual = nodes.filterIsInstance<PathNodes.ArcTo>().size)
+
+        val parameterCount = nodes.map { it.buildParameters().size }.toSet()
+        assertEquals(expected = 1, actual = parameterCount.size)
     }
 
     @Test

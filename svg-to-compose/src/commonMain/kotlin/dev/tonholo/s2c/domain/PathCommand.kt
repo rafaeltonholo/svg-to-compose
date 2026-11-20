@@ -55,14 +55,15 @@ internal fun String.removeSuffix(pathCommand: PathCommand): String =
 /**
  * Converts a Char to its corresponding PathCommand enum value.
  *
- * This extension function maps lowercase path command characters to their
- * corresponding PathCommand enum values. The mapping includes all standard
- * SVG path commands such as move, line, curve, arc, and close operations.
+ * The match ignores case, so both the absolute (uppercase) and the relative
+ * (lowercase) form of a path command map to the same enum value. The mapping
+ * includes all standard SVG path commands such as move, line, curve, arc and
+ * close operations.
  *
  * @return The PathCommand enum value corresponding to this character, or null
  * if the character does not match any known path command value.
  */
-internal fun Char.toPathCommand(): PathCommand? = when (this) {
+internal fun Char.toPathCommand(): PathCommand? = when (lowercaseChar()) {
     PathCommand.ArcTo.value -> PathCommand.ArcTo
     PathCommand.CurveTo.value -> PathCommand.CurveTo
     PathCommand.HorizontalLineTo.value -> PathCommand.HorizontalLineTo
