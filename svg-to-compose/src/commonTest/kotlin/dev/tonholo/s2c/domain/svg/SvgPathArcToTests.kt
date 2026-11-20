@@ -130,6 +130,27 @@ class SvgPathArcToTests : BaseSvgTest() {
     }
 
     @Test
+    @Burst
+    fun `given arc with leading dot radii - when parsed - then the endpoint keeps its digits`(
+        command: Char = burstValues('A', 'a'),
+    ) {
+        // Arrange
+        val path = SvgPathNode(
+            parent = root,
+            attributes = mutableMapOf(
+                "d" to "M0 0 ${command}5 .5 .5 0 1 20 20",
+            ),
+        )
+        // Act
+        val node = with(logger) { path.asNode(minified = false) } as ImageVectorNode.Path
+        val arcTo = node.wrapper.nodes[1]
+        // Assert
+        assertIs<PathNodes.ArcTo>(arcTo)
+        assertEquals(expected = 20.0, actual = arcTo.x)
+        assertEquals(expected = 20.0, actual = arcTo.y)
+    }
+
+    @Test
     fun `given absolute arcs with no space after flags - when parsed - then every arc keeps all parameters`() {
         // Arrange
         val path = SvgPathNode(
