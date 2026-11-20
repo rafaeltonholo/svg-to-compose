@@ -17,11 +17,6 @@ plugins {
 kotlin {
     useNative()
     useJvm()
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-Xcontext-parameters",
-        )
-    }
 }
 
 buildConfig {
