@@ -85,7 +85,10 @@ internal fun applyHighlightToBackdrop(
     return true
 }
 
-private fun attachErrorTitles(backdrop: HTMLElement, errorsByLine: Map<Int, TemplateValidationError>) {
+private fun attachErrorTitles(
+    backdrop: HTMLElement,
+    errorsByLine: Map<Int, TemplateValidationError>,
+) {
     val allLines = backdrop.querySelectorAll(".line")
     for (i in 0 until allLines.length) {
         val lineEl = allLines.item(i) as? HTMLElement ?: continue
@@ -121,7 +124,11 @@ private fun resolveTooltipForText(lineText: String): TooltipInfo? {
     return null
 }
 
-private fun wireInfoIconHandlers(backdrop: HTMLElement, tooltipState: TomlTooltipState, wrapperElement: HTMLElement?) {
+private fun wireInfoIconHandlers(
+    backdrop: HTMLElement,
+    tooltipState: TomlTooltipState,
+    wrapperElement: HTMLElement?,
+) {
     val icons = backdrop.querySelectorAll(".$INFO_ICON_CLASS")
     for (i in 0 until icons.length) {
         val icon = icons.item(i) as? HTMLElement ?: continue

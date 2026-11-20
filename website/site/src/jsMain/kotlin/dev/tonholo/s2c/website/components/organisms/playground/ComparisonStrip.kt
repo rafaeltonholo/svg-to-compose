@@ -224,7 +224,12 @@ private fun SourceLabel(extension: String, palette: SitePalette) {
 }
 
 @Composable
-private fun ConvertedPreviewColumn(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float) {
+private fun ConvertedPreviewColumn(
+    iconFileContentsJson: String?,
+    zoomLevel: Float,
+    panX: Float,
+    panY: Float,
+) {
     val palette = ColorMode.current.toSitePalette()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -284,7 +289,10 @@ private fun computeNativeScale(svgCode: String, containerSizePx: Int): Float? {
 }
 
 @Composable
-private fun SourcePreviewContent(state: SourcePreviewContent, onPan: (dx: Float, dy: Float) -> Unit) {
+private fun SourcePreviewContent(
+    state: SourcePreviewContent,
+    onPan: (dx: Float, dy: Float) -> Unit,
+) {
     if (state.extension == "avg") {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -388,7 +396,12 @@ private fun org.jetbrains.compose.web.attributes.AttrsScope<*>.attachDragHandler
 }
 
 @Composable
-private fun ComparisonIframe(iconFileContentsJson: String?, zoomLevel: Float, panX: Float, panY: Float) {
+private fun ComparisonIframe(
+    iconFileContentsJson: String?,
+    zoomLevel: Float,
+    panX: Float,
+    panY: Float,
+) {
     var iframeLoaded by remember { mutableStateOf(false) }
     val iframeRef = remember { mutableStateOf<HTMLIFrameElement?>(null) }
 

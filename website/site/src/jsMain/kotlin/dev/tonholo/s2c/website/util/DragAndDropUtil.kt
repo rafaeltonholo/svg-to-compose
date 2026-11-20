@@ -12,7 +12,11 @@ import kotlin.coroutines.resume
  * synchronously (before DataTransfer is cleared), then reading directory
  * contents asynchronously.
  */
-fun handleDrop(event: Event, scope: CoroutineScope, onSelectFiles: (List<File>, Map<String, String>) -> Unit) {
+fun handleDrop(
+    event: Event,
+    scope: CoroutineScope,
+    onSelectFiles: (List<File>, Map<String, String>) -> Unit,
+) {
     val (entries, files) = collectDroppedItems(event)
     dispatchDroppedItems(entries, files, scope, onSelectFiles)
 }
@@ -32,7 +36,11 @@ private fun collectDroppedItems(event: Event): DroppedItems {
     return DroppedItems(entries, files)
 }
 
-private fun collectFromItems(items: dynamic, entries: MutableList<dynamic>, files: MutableList<File>) {
+private fun collectFromItems(
+    items: dynamic,
+    entries: MutableList<dynamic>,
+    files: MutableList<File>,
+) {
     for (i in 0 until (items.length as Int)) {
         val item = items[i]
         val entry: dynamic = try {
@@ -83,7 +91,12 @@ private fun dispatchDroppedItems(
  * Recursively reads a FileSystemEntry, collecting files and their
  * relative paths from the drop root.
  */
-suspend fun readEntry(entry: dynamic, files: MutableList<File>, paths: MutableMap<String, String>, rootPath: String) {
+suspend fun readEntry(
+    entry: dynamic,
+    files: MutableList<File>,
+    paths: MutableMap<String, String>,
+    rootPath: String,
+) {
     if (entry.isFile as Boolean) {
         val file = suspendCancellableCoroutine<File?> { cont ->
             entry.file({ f: File -> cont.resume(f) })

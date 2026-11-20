@@ -151,7 +151,11 @@ private fun OutputPanelHeader(fileName: String, kotlinCode: String) {
 }
 
 @Composable
-private fun CopyButton(code: String, copied: Boolean, onCopy: () -> Unit) {
+private fun CopyButton(
+    code: String,
+    copied: Boolean,
+    onCopy: () -> Unit,
+) {
     val palette = ColorMode.current.toSitePalette()
     Div(
         attrs = Modifier

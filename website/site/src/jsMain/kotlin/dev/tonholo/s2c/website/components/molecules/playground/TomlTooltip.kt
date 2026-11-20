@@ -126,7 +126,12 @@ class TomlTooltipState {
     var maxWidthPx by mutableDoubleStateOf(0.0)
         private set
 
-    fun show(tooltipInfo: TooltipInfo, top: Double, left: Double, maxWidth: Double = 0.0) {
+    fun show(
+        tooltipInfo: TooltipInfo,
+        top: Double,
+        left: Double,
+        maxWidth: Double = 0.0,
+    ) {
         this.info = tooltipInfo
         this.topPx = top
         this.leftPx = left

@@ -114,7 +114,13 @@ fun OptionsHeaderRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun OptionRow(flag: String, type: String, description: String, index: Int, modifier: Modifier = Modifier) {
+fun OptionRow(
+    flag: String,
+    type: String,
+    description: String,
+    index: Int,
+    modifier: Modifier = Modifier,
+) {
     val palette = ColorMode.current.toSitePalette()
     val variant = if (index % 2 != 0) OddRowVariant else null
     Div(

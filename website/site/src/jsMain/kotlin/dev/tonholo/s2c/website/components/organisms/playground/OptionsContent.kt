@@ -145,7 +145,11 @@ fun OptionsContent(
 
 /** Labeled toggle switch for a single boolean option. */
 @Composable
-internal fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+internal fun OptionToggle(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     val palette = ColorMode.current.toSitePalette()
     Div(
         attrs = Modifier
@@ -170,7 +174,12 @@ internal fun OptionToggle(label: String, checked: Boolean, onCheckedChange: (Boo
 
 /** Labeled text input for a single string option. */
 @Composable
-internal fun OptionInput(label: String, value: String, placeholderText: String, onValueChange: (String) -> Unit) {
+internal fun OptionInput(
+    label: String,
+    value: String,
+    placeholderText: String,
+    onValueChange: (String) -> Unit,
+) {
     val palette = ColorMode.current.toSitePalette()
     Div {
         SpanText(

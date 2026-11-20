@@ -58,7 +58,11 @@ val DocCalloutStyle = CssStyle.base {
 }
 
 @Composable
-fun DocCallout(variant: CalloutVariant, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun DocCallout(
+    variant: CalloutVariant,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     val palette = ColorMode.current.toSitePalette()
     val (borderColor, containerColor) = variant.resolveColors(palette)
 

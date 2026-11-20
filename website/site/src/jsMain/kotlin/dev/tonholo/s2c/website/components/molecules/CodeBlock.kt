@@ -246,7 +246,11 @@ private fun PlainCodeBlock(code: String) {
 }
 
 @Composable
-private fun CopyButton(code: String, copied: Boolean, onCopy: () -> Unit) {
+private fun CopyButton(
+    code: String,
+    copied: Boolean,
+    onCopy: () -> Unit,
+) {
     Div(
         attrs = CopyButtonStyle.toModifier()
             .onClick {

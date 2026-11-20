@@ -87,7 +87,11 @@ val InactiveChipStyle = CssStyle {
 }
 
 @Composable
-fun PlatformChipSelector(selectedPlatform: Platform, onSelect: (Platform) -> Unit, modifier: Modifier = Modifier) {
+fun PlatformChipSelector(
+    selectedPlatform: Platform,
+    onSelect: (Platform) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = ChipContainerStyle.toModifier()
             .role("tablist")

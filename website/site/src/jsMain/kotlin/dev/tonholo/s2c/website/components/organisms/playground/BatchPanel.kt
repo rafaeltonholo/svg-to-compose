@@ -299,7 +299,11 @@ private fun ExpandedFolderFiles(
 }
 
 @Composable
-private fun LoadMoreTrigger(visibleCount: Int, totalCount: Int, onLoadMore: () -> Unit) {
+private fun LoadMoreTrigger(
+    visibleCount: Int,
+    totalCount: Int,
+    onLoadMore: () -> Unit,
+) {
     IntersectionObserverTrigger(onVisible = onLoadMore)
     SpanText(
         "Show more ($visibleCount/$totalCount)",

@@ -203,7 +203,12 @@ private fun TabItem(
     }
 }
 
-private fun handleTabKeyDown(event: SyntheticKeyboardEvent, index: Int, tabs: List<String>, onSelect: (Int) -> Unit) {
+private fun handleTabKeyDown(
+    event: SyntheticKeyboardEvent,
+    index: Int,
+    tabs: List<String>,
+    onSelect: (Int) -> Unit,
+) {
     when (event.key) {
         "ArrowLeft" -> {
             event.preventDefault()

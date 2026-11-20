@@ -65,4 +65,5 @@ fun GithubSvg(color: Color = Color.rgb(value = 0x78716C)) {
     }
 }
 
-class SVGClipPathAttrsScope(attrs: AttrsScope<SVGGElement>) : SVGContainerElementAttrsScope<SVGGElement>(attrs)
+class SVGClipPathAttrsScope(attrs: AttrsScope<SVGGElement>) :
+    SVGContainerElementAttrsScope<SVGGElement>(attrs)

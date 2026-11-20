@@ -816,7 +816,11 @@ private fun ExamplesSection() {
 }
 
 @Composable
-private fun TableHeader(text: String, palette: SitePalette, align: TextAlign) {
+private fun TableHeader(
+    text: String,
+    palette: SitePalette,
+    align: TextAlign,
+) {
     Th(
         attrs = TemplateTableHeaderStyle
             .toModifier()
@@ -830,7 +834,13 @@ private fun TableHeader(text: String, palette: SitePalette, align: TextAlign) {
 }
 
 @Composable
-private fun NamespaceRow(namespace: String, syntax: String, resolves: String, scope: String, index: Int) {
+private fun NamespaceRow(
+    namespace: String,
+    syntax: String,
+    resolves: String,
+    scope: String,
+    index: Int,
+) {
     val palette = ColorMode.current.toSitePalette()
     Tr(attrs = alternatingRowModifier(palette, index).toAttrs()) {
         Td(
@@ -872,7 +882,11 @@ private fun VariableTable(palette: SitePalette, variables: List<Pair<String, Str
 }
 
 @Composable
-private fun VariableRow(variable: String, description: String, index: Int) {
+private fun VariableRow(
+    variable: String,
+    description: String,
+    index: Int,
+) {
     val palette = ColorMode.current.toSitePalette()
     Tr(attrs = alternatingRowModifier(palette, index).toAttrs()) {
         Td(
@@ -910,7 +924,11 @@ private fun FieldTable(headers: List<String>, rows: List<List<String>>) {
 }
 
 @Composable
-private fun FieldTableRow(palette: SitePalette, row: List<String>, index: Int) {
+private fun FieldTableRow(
+    palette: SitePalette,
+    row: List<String>,
+    index: Int,
+) {
     Tr(attrs = alternatingRowModifier(palette, index).toAttrs()) {
         row.forEachIndexed { cellIndex, cell ->
             FieldTableCell(palette = palette, cell = cell, isFirstColumn = cellIndex == 0)
@@ -919,7 +937,11 @@ private fun FieldTableRow(palette: SitePalette, row: List<String>, index: Int) {
 }
 
 @Composable
-private fun FieldTableCell(palette: SitePalette, cell: String, isFirstColumn: Boolean) {
+private fun FieldTableCell(
+    palette: SitePalette,
+    cell: String,
+    isFirstColumn: Boolean,
+) {
     Td(
         attrs = TemplateTableCellStyle
             .toModifier()
@@ -935,8 +957,9 @@ private fun FieldTableCell(palette: SitePalette, cell: String, isFirstColumn: Bo
     }
 }
 
-private fun alternatingRowModifier(palette: SitePalette, index: Int): Modifier = if (index % 2 != 0) {
-    Modifier.backgroundColor(palette.onBackground.toRgb().copyf(alpha = ALTERNATING_ROW_ALPHA))
-} else {
-    Modifier
-}
+private fun alternatingRowModifier(palette: SitePalette, index: Int): Modifier =
+    if (index % 2 != 0) {
+        Modifier.backgroundColor(palette.onBackground.toRgb().copyf(alpha = ALTERNATING_ROW_ALPHA))
+    } else {
+        Modifier
+    }

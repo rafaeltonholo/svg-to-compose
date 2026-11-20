@@ -88,7 +88,11 @@ val UploadButtonStyle = CssStyle.base {
  * Contains a drop zone and buttons to pick files or folders.
  */
 @Composable
-fun UploadPanel(onFilePickerClick: () -> Unit, onFolderPickerClick: () -> Unit, modifier: Modifier = Modifier) {
+fun UploadPanel(
+    onFilePickerClick: () -> Unit,
+    onFolderPickerClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = UploadPanelStyle.toModifier().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,

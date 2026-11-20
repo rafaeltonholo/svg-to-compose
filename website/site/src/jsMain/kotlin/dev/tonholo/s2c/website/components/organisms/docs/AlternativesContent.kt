@@ -227,7 +227,11 @@ private fun ComparisonTableSection() {
 }
 
 @Composable
-private fun ComparisonTableRow(row: ComparisonRow, index: Int, palette: SitePalette) {
+private fun ComparisonTableRow(
+    row: ComparisonRow,
+    index: Int,
+    palette: SitePalette,
+) {
     val backgroundModifier = if (index % 2 != 0) {
         Modifier.backgroundColor(palette.onBackground.toRgb().copyf(alpha = 0.06f))
     } else {

@@ -262,7 +262,10 @@ private fun FileRowConvertingPhase(
 }
 
 @Composable
-private fun ConvertingStatusText(conversionResult: BatchConversionResult?, isCurrentlyConverting: Boolean) {
+private fun ConvertingStatusText(
+    conversionResult: BatchConversionResult?,
+    isCurrentlyConverting: Boolean,
+) {
     val palette = ColorMode.current.toSitePalette()
     val statusText = when {
         isCurrentlyConverting -> "Converting..."

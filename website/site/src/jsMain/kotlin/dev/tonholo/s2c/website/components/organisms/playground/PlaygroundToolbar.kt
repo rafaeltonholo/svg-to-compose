@@ -203,7 +203,11 @@ fun PlaygroundToolbar(
 }
 
 @Composable
-private fun SampleButtons(sampleNames: List<String>, selectedSample: Int, onSampleSelect: (Int) -> Unit) {
+private fun SampleButtons(
+    sampleNames: List<String>,
+    selectedSample: Int,
+    onSampleSelect: (Int) -> Unit,
+) {
     Div(
         attrs = Modifier
             .display(DisplayStyle.Flex)
@@ -257,7 +261,11 @@ private fun InputModeButtons(inputMode: String, onInputModeChange: (String) -> U
 }
 
 @Composable
-private fun ConvertButton(isConverting: Boolean, isDisabled: Boolean, onConvert: () -> Unit) {
+private fun ConvertButton(
+    isConverting: Boolean,
+    isDisabled: Boolean,
+    onConvert: () -> Unit,
+) {
     val inactive = isConverting || isDisabled
     Button(
         attrs = ConvertButtonStyle.toModifier()

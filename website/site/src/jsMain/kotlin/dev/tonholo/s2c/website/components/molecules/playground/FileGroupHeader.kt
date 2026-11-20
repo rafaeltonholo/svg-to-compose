@@ -169,7 +169,11 @@ internal fun FileGroupHeader(
 }
 
 @Composable
-private fun TrailingContent(state: FileGroupHeaderState, fileGroup: FileGroup, palette: SitePalette) {
+private fun TrailingContent(
+    state: FileGroupHeaderState,
+    fileGroup: FileGroup,
+    palette: SitePalette,
+) {
     when (state.groupState.phase) {
         is BatchPhase.Select -> {
             SpanText(
@@ -198,7 +202,11 @@ private fun TrailingContent(state: FileGroupHeaderState, fileGroup: FileGroup, p
 }
 
 @Composable
-private fun FileGroupCheckbox(selectedCount: Int, totalCount: Int, onToggleSelection: (shiftKey: Boolean) -> Unit) {
+private fun FileGroupCheckbox(
+    selectedCount: Int,
+    totalCount: Int,
+    onToggleSelection: (shiftKey: Boolean) -> Unit,
+) {
     val palette = SiteTheme.palette
     val allSelected = selectedCount == totalCount
     Div(
@@ -254,7 +262,11 @@ private fun FileGroupConvertingTrailing(completedCount: Int, totalCount: Int) {
 }
 
 @Composable
-private fun FileGroupResultsTrailing(completedCount: Int, selectedCount: Int, palette: SitePalette) {
+private fun FileGroupResultsTrailing(
+    completedCount: Int,
+    selectedCount: Int,
+    palette: SitePalette,
+) {
     if (selectedCount == 0) return
     val errorCount = selectedCount - completedCount
 

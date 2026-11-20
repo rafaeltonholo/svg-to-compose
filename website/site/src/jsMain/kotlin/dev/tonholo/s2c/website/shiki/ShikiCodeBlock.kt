@@ -80,7 +80,11 @@ val ShikiCodeBlockStyle = CssStyle {
 }
 
 @Composable
-fun ShikiCodeBlock(language: String, code: String, modifier: Modifier = Modifier) {
+fun ShikiCodeBlock(
+    language: String,
+    code: String,
+    modifier: Modifier = Modifier,
+) {
     val colorMode = ColorMode.current
     var parsedCode by remember { mutableStateOf("") }
 
