@@ -48,40 +48,40 @@ class WorkerResultsFunctionalTest : GradleFunctionalTest() {
     """.trimIndent()
 
     /**
-     * Adds a build script snippet that writes an unexpected result file into the
-     * worker results directory before the task action runs, simulating a results
-     * directory whose content no longer matches the submitted work items.
+     * Adds a build script snippet that writes a result file into the worker
+     * results directory before the task action runs, simulating a file left
+     * behind by an earlier build that was killed.
      */
     // language=kotlin
-    private fun seedUnexpectedWorkerResultContent(fileName: String) = """
-        val unexpectedResultFile = layout.buildDirectory
+    private fun seedStaleWorkerResult(fileName: String) = """
+        val staleResultFile = layout.buildDirectory
             .file("generated/svgToCompose/worker-results/$CONFIGURATION_NAME/$fileName")
             .get()
             .asFile
         tasks.named("$TASK_NAME") {
             doFirst {
-                unexpectedResultFile.parentFile.mkdirs()
-                unexpectedResultFile.writeText("origin=unknown\noutput=\nstatus=Ok\nmessage=\n")
+                staleResultFile.parentFile.mkdirs()
+                staleResultFile.writeText("origin=unknown\noutput=\nstatus=Ok\nmessage=\n")
             }
         }
     """.trimIndent()
 
     @Test
-    fun `given worker results do not match the submitted files - when task runs - then build fails`() {
+    fun `given a stale worker result from a killed build - when task runs - then build succeeds`() {
         // Arrange
         val script = buildGradleContent(pkg = "dev.tonholo.s2c.test.workerresults") +
             "\n" +
-            seedUnexpectedWorkerResultContent(fileName = "result-42.properties")
+            seedStaleWorkerResult(fileName = "result-42.properties")
         projectDir.resolve("build.gradle.kts").writeText(script)
         writeSvg("icons", "icon-a.svg", SIMPLE_SVG)
 
         // Act
-        val result = runGradleAndFail(TASK_NAME)
+        val result = runGradle(TASK_NAME)
 
         // Assert
         assertTrue(
-            result.output.contains("Expected 1 worker result file(s) but found 2"),
-            "Expected the build to fail on a worker result mismatch. Output:\n${result.output}",
+            result.output.contains("BUILD SUCCESSFUL"),
+            "Expected a stale worker result not to fail the build. Output:\n${result.output}",
         )
     }
 
