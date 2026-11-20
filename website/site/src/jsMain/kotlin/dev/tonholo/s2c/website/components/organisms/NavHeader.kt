@@ -375,7 +375,11 @@ enum class SideMenuState {
 }
 
 @Composable
-private fun SideMenu(menuState: SideMenuState, close: () -> Unit, onAnimationEnd: () -> Unit) {
+private fun SideMenu(
+    menuState: SideMenuState,
+    close: () -> Unit,
+    onAnimationEnd: () -> Unit,
+) {
     Overlay(
         Modifier
             .setVariable(OverlayVars.BackgroundColor, Colors.Transparent)

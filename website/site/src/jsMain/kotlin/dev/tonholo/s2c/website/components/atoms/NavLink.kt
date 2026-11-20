@@ -34,7 +34,11 @@ val NavLinkStyle = CssStyle {
 }
 
 @Composable
-fun NavLink(href: String, text: String, modifier: Modifier = Modifier) {
+fun NavLink(
+    href: String,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
     Link(
         href,
         text,

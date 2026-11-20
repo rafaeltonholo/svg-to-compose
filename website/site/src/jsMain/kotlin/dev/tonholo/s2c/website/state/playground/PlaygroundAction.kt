@@ -12,7 +12,8 @@ import dev.tonholo.s2c.website.worker.ConversionOutput
 internal sealed interface PlaygroundAction {
     // Editor actions
     data class SelectSample(val index: Int) : PlaygroundAction
-    data class SampleLoaded(val svgCode: String, val samplePath: String, val iconName: String) : PlaygroundAction
+    data class SampleLoaded(val svgCode: String, val samplePath: String, val iconName: String) :
+        PlaygroundAction
     data class ChangeInputMode(val mode: String) : PlaygroundAction
     data class UpdateInputCode(val code: String) : PlaygroundAction
     data class LoadContent(val content: String) : PlaygroundAction
@@ -39,7 +40,8 @@ internal sealed interface PlaygroundAction {
     // File selection (only effective during BatchPhase.Select)
     data class ToggleFileSelection(val fileKey: String) : PlaygroundAction
     data class ToggleFolderSelection(val folderPath: String) : PlaygroundAction
-    data class SetFoldersSelection(val folderPaths: List<String>, val selected: Boolean) : PlaygroundAction
+    data class SetFoldersSelection(val folderPaths: List<String>, val selected: Boolean) :
+        PlaygroundAction
     data object ToggleSelectAll : PlaygroundAction
     data class ToggleFolderExpanded(val folderPath: String) : PlaygroundAction
 

@@ -72,6 +72,10 @@ fun GradleSvg(
 }
 
 @Composable
-fun GradleSvg(modifier: Modifier = Modifier, color: Color = Color.rgb(value = 0x02303A), size: Int = 512) {
+fun GradleSvg(
+    modifier: Modifier = Modifier,
+    color: Color = Color.rgb(value = 0x02303A),
+    size: Int = 512,
+) {
     GradleSvg(color = color, width = size, height = size, modifier = modifier)
 }

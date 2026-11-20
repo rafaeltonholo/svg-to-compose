@@ -111,7 +111,11 @@ fun rememberActiveTocSection(entries: List<TocEntry>): String? {
 }
 
 @Composable
-fun TableOfContents(entries: List<TocEntry>, activeId: String?, modifier: Modifier = Modifier) {
+fun TableOfContents(
+    entries: List<TocEntry>,
+    activeId: String?,
+    modifier: Modifier = Modifier,
+) {
     Nav(
         attrs = TocContainerStyle.toModifier()
             .then(modifier)

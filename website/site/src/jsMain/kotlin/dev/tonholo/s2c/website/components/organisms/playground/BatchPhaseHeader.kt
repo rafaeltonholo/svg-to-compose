@@ -209,7 +209,11 @@ private fun SelectPhaseContent(
 }
 
 @Composable
-private fun SelectAllCheckbox(allSelected: Boolean, palette: SitePalette, onToggleSelectAll: () -> Unit) {
+private fun SelectAllCheckbox(
+    allSelected: Boolean,
+    palette: SitePalette,
+    onToggleSelectAll: () -> Unit,
+) {
     Div(
         attrs = Modifier
             .cursor(Cursor.Pointer)

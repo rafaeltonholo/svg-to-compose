@@ -39,7 +39,11 @@ val InstallContentStyle = CssStyle.base {
 }
 
 @Composable
-fun InstallSection(selectedToolTab: Int, onToolTabSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun InstallSection(
+    selectedToolTab: Int,
+    onToolTabSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val palette = ColorMode.current.toSitePalette()
     SectionContainer(id = "install", modifier = modifier, altBackground = true) {
         H2(

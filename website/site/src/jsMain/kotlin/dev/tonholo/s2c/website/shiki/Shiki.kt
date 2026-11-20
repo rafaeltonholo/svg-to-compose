@@ -11,7 +11,8 @@ import kotlin.coroutines.resume
 @OptIn(ExperimentalJsExport::class)
 class Shiki internal constructor(api: ShikiApi) : ShikiApi by api {
     @JsExport.Ignore
-    suspend fun codeToHtml(code: String, options: dynamic): String = codeToHtmlPromise(code, options).await()
+    suspend fun codeToHtml(code: String, options: dynamic): String =
+        codeToHtmlPromise(code, options).await()
 
     companion object {
         private const val SHIKI_VERSION = "4.0.2"

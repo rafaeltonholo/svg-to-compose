@@ -119,7 +119,11 @@ class AutocompleteState {
     /**
      * Show autocomplete at the given position with the given suggestions.
      */
-    fun show(suggestions: List<TomlKeyInfo>, top: Double, left: Double) {
+    fun show(
+        suggestions: List<TomlKeyInfo>,
+        top: Double,
+        left: Double,
+    ) {
         this.suggestions = suggestions
         this.topPx = top
         this.leftPx = left
@@ -232,7 +236,11 @@ fun computeCursorPosition(textarea: HTMLTextAreaElement): Pair<Double, Double> {
  * Positioned absolutely relative to the editor wrapper.
  */
 @Composable
-fun AutocompleteDropdown(state: AutocompleteState, onSelect: (TomlKeyInfo) -> Unit, modifier: Modifier = Modifier) {
+fun AutocompleteDropdown(
+    state: AutocompleteState,
+    onSelect: (TomlKeyInfo) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     if (!state.visible || state.suggestions.isEmpty()) return
 
     var hoveredIndex by remember(state.suggestions) { mutableStateOf(-1) }

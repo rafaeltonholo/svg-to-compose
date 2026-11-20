@@ -198,7 +198,8 @@ object TemplateEditorSchema {
 
 private fun placeholder(namespace: String, variable: String): String = $$"${$$namespace:$$variable}"
 
-private fun iconPlaceholder(variable: String): String = placeholder(TemplateConstants.Namespace.ICON, variable)
+private fun iconPlaceholder(variable: String): String =
+    placeholder(TemplateConstants.Namespace.ICON, variable)
 
 private fun buildIconTemplateInsertValue(): String {
     val visibility = iconPlaceholder(TemplateConstants.IconVar.VISIBILITY)
@@ -274,7 +275,8 @@ private fun buildFragmentKeys(): List<TomlKeyInfo> {
     )
 }
 
-private fun buildTopLevelSections(): List<TomlKeyInfo> = buildDefinitionSections() + buildTemplateSections()
+private fun buildTopLevelSections(): List<TomlKeyInfo> =
+    buildDefinitionSections() + buildTemplateSections()
 
 private fun buildDefinitionSections(): List<TomlKeyInfo> = listOf(
     TomlKeyInfo(

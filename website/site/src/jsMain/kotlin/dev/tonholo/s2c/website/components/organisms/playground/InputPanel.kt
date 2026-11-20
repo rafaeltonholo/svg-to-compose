@@ -362,7 +362,11 @@ private fun computeOutdent(value: String, start: Int): EditorEdit? {
     return EditorEdit(newValue, newPos)
 }
 
-private fun computeIndent(value: String, start: Int, end: Int): EditorEdit {
+private fun computeIndent(
+    value: String,
+    start: Int,
+    end: Int,
+): EditorEdit {
     val newValue = value.substring(0, start) + TAB_INDENT + value.substring(end)
     return EditorEdit(newValue, start + TAB_INDENT.length)
 }

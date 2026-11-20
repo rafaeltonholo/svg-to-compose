@@ -254,7 +254,12 @@ fun DocsPage() {
 }
 
 @Composable
-private fun DocsCard(title: String, description: String, href: String, icon: @Composable () -> Unit) {
+private fun DocsCard(
+    title: String,
+    description: String,
+    href: String,
+    icon: @Composable () -> Unit,
+) {
     val palette = SiteTheme.palette
     Link(
         path = href,

@@ -32,7 +32,11 @@ val UsageTabContentStyle = CssStyle.base {
 }
 
 @Composable
-fun HowToUseSection(selectedToolTab: Int, onToolTabSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun HowToUseSection(
+    selectedToolTab: Int,
+    onToolTabSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val palette = ColorMode.current.toSitePalette()
     SectionContainer(id = "usage", modifier = modifier) {
         H2(

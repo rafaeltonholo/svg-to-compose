@@ -82,7 +82,11 @@ val MobileTabStyle = CssStyle {
  * (ArrowLeft/Right, Home/End, Space/Enter).
  */
 @Composable
-fun MobileTabBar(tabs: List<String>, activePanel: Int, onPanelSelect: (Int) -> Unit) {
+fun MobileTabBar(
+    tabs: List<String>,
+    activePanel: Int,
+    onPanelSelect: (Int) -> Unit,
+) {
     Div(
         attrs = MobileTabBarStyle.toModifier()
             .role("tablist")

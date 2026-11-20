@@ -7,7 +7,11 @@ package dev.tonholo.s2c.website.navigation
  * @property label The display label shown in navigation links.
  * @property subRoutes Child routes nested under this route.
  */
-data class WebRoute(val path: String, val label: String, val subRoutes: Set<WebRoute> = emptySet()) {
+data class WebRoute(
+    val path: String,
+    val label: String,
+    val subRoutes: Set<WebRoute> = emptySet(),
+) {
     /**
      * All routes in this hierarchy, including this route and its [subRoutes].
      */

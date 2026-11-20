@@ -9,101 +9,104 @@ import dev.tonholo.s2c.website.state.playground.batch.toFileGroups
 import kotlin.js.Date
 
 internal class BatchReducer : Reducer<PlaygroundAction, PlaygroundState> {
-    override fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState = when (action) {
-        is PlaygroundAction.StartBatch,
-        is PlaygroundAction.StartBatchConversion,
-        is PlaygroundAction.BatchFileProgress,
-        is PlaygroundAction.BatchFileCompleted,
-        is PlaygroundAction.BatchCompleted,
-        is PlaygroundAction.CancelBatch,
-        is PlaygroundAction.BatchCancelled,
-        is PlaygroundAction.RestartBatch,
-        is PlaygroundAction.ClearBatchResults,
-        -> reduceBatchLifecycle(state, action)
-
-        is PlaygroundAction.ToggleFileSelection,
-        is PlaygroundAction.ToggleFolderSelection,
-        is PlaygroundAction.SetFoldersSelection,
-        is PlaygroundAction.ToggleSelectAll,
-        is PlaygroundAction.ToggleFolderExpanded,
-        -> reduceBatchSelection(state, action)
-
-        is PlaygroundAction.InspectBatchResult,
-        is PlaygroundAction.NavigatePrev,
-        is PlaygroundAction.NavigateNext,
-        is PlaygroundAction.BackToBatchList,
-        -> reduceBatchNavigation(state, action)
-
-        else -> state
-    }
-
-    private fun reduceBatchLifecycle(state: PlaygroundState, action: PlaygroundAction): PlaygroundState =
+    override fun reduce(state: PlaygroundState, action: PlaygroundAction): PlaygroundState =
         when (action) {
-            is PlaygroundAction.StartBatch -> {
-                val groups = action.files.toFileGroups()
-                val allKeys = action.files.map { it.fileKey() }.toSet()
-                state.copy(
-                    uploadedFiles = action.files,
-                    fileGroups = groups,
-                    selectedFiles = allKeys,
-                    batchPhase = BatchPhase.Select,
-                    inputMode = "upload",
-                    selectedSample = -1,
-                    previewExpanded = false,
-                )
-            }
+            is PlaygroundAction.StartBatch,
+            is PlaygroundAction.StartBatchConversion,
+            is PlaygroundAction.BatchFileProgress,
+            is PlaygroundAction.BatchFileCompleted,
+            is PlaygroundAction.BatchCompleted,
+            is PlaygroundAction.CancelBatch,
+            is PlaygroundAction.BatchCancelled,
+            is PlaygroundAction.RestartBatch,
+            is PlaygroundAction.ClearBatchResults,
+            -> reduceBatchLifecycle(state, action)
 
-            is PlaygroundAction.StartBatchConversion -> state.copy(
-                batchPhase = BatchPhase.Converting(
-                    total = state.selectedFiles.size,
-                    startTimeMs = Date.now(),
-                ),
-            )
+            is PlaygroundAction.ToggleFileSelection,
+            is PlaygroundAction.ToggleFolderSelection,
+            is PlaygroundAction.SetFoldersSelection,
+            is PlaygroundAction.ToggleSelectAll,
+            is PlaygroundAction.ToggleFolderExpanded,
+            -> reduceBatchSelection(state, action)
 
-            is PlaygroundAction.BatchFileProgress -> state
-
-            is PlaygroundAction.BatchFileCompleted -> {
-                val phase = state.batchPhase
-                if (phase is BatchPhase.Converting) {
-                    state.copy(
-                        batchPhase = phase.copy(
-                            completedCount = phase.completedCount + 1,
-                        ),
-                    )
-                } else {
-                    state
-                }
-            }
-
-            is PlaygroundAction.BatchCompleted ->
-                transitionToResults(state, cancelled = false, results = action.results)
-
-            is PlaygroundAction.CancelBatch -> {
-                val phase = state.batchPhase
-                if (phase is BatchPhase.Converting) {
-                    state.copy(batchPhase = phase.copy(cancelling = true))
-                } else {
-                    state
-                }
-            }
-
-            is PlaygroundAction.BatchCancelled ->
-                transitionToResults(state, cancelled = true, results = action.results)
-
-            is PlaygroundAction.RestartBatch -> state.copy(batchPhase = BatchPhase.Select)
-
-            is PlaygroundAction.ClearBatchResults -> state.copy(
-                batchPhase = null,
-                uploadedFiles = emptyList(),
-                fileGroups = emptyList(),
-                selectedFiles = emptySet(),
-                expandedFolders = emptySet(),
-                viewingBatchResult = false,
-                viewingBatchIndex = -1,
-            )
+            is PlaygroundAction.InspectBatchResult,
+            is PlaygroundAction.NavigatePrev,
+            is PlaygroundAction.NavigateNext,
+            is PlaygroundAction.BackToBatchList,
+            -> reduceBatchNavigation(state, action)
 
             else -> state
         }
+
+    private fun reduceBatchLifecycle(
+        state: PlaygroundState,
+        action: PlaygroundAction,
+    ): PlaygroundState = when (action) {
+        is PlaygroundAction.StartBatch -> {
+            val groups = action.files.toFileGroups()
+            val allKeys = action.files.map { it.fileKey() }.toSet()
+            state.copy(
+                uploadedFiles = action.files,
+                fileGroups = groups,
+                selectedFiles = allKeys,
+                batchPhase = BatchPhase.Select,
+                inputMode = "upload",
+                selectedSample = -1,
+                previewExpanded = false,
+            )
+        }
+
+        is PlaygroundAction.StartBatchConversion -> state.copy(
+            batchPhase = BatchPhase.Converting(
+                total = state.selectedFiles.size,
+                startTimeMs = Date.now(),
+            ),
+        )
+
+        is PlaygroundAction.BatchFileProgress -> state
+
+        is PlaygroundAction.BatchFileCompleted -> {
+            val phase = state.batchPhase
+            if (phase is BatchPhase.Converting) {
+                state.copy(
+                    batchPhase = phase.copy(
+                        completedCount = phase.completedCount + 1,
+                    ),
+                )
+            } else {
+                state
+            }
+        }
+
+        is PlaygroundAction.BatchCompleted ->
+            transitionToResults(state, cancelled = false, results = action.results)
+
+        is PlaygroundAction.CancelBatch -> {
+            val phase = state.batchPhase
+            if (phase is BatchPhase.Converting) {
+                state.copy(batchPhase = phase.copy(cancelling = true))
+            } else {
+                state
+            }
+        }
+
+        is PlaygroundAction.BatchCancelled ->
+            transitionToResults(state, cancelled = true, results = action.results)
+
+        is PlaygroundAction.RestartBatch -> state.copy(batchPhase = BatchPhase.Select)
+
+        is PlaygroundAction.ClearBatchResults -> state.copy(
+            batchPhase = null,
+            uploadedFiles = emptyList(),
+            fileGroups = emptyList(),
+            selectedFiles = emptySet(),
+            expandedFolders = emptySet(),
+            viewingBatchResult = false,
+            viewingBatchIndex = -1,
+        )
+
+        else -> state
+    }
 
     private fun transitionToResults(
         state: PlaygroundState,
@@ -125,15 +128,17 @@ internal class BatchReducer : Reducer<PlaygroundAction, PlaygroundState> {
         }
     }
 
-    private fun reduceBatchSelection(state: PlaygroundState, action: PlaygroundAction): PlaygroundState =
-        when (action) {
-            is PlaygroundAction.ToggleFileSelection -> toggleFileSelection(state, action.fileKey)
-            is PlaygroundAction.ToggleFolderSelection -> toggleFolderSelection(state, action.folderPath)
-            is PlaygroundAction.SetFoldersSelection -> setFoldersSelection(state, action.folderPaths, action.selected)
-            is PlaygroundAction.ToggleSelectAll -> toggleSelectAll(state)
-            is PlaygroundAction.ToggleFolderExpanded -> toggleFolderExpanded(state, action.folderPath)
-            else -> state
-        }
+    private fun reduceBatchSelection(
+        state: PlaygroundState,
+        action: PlaygroundAction,
+    ): PlaygroundState = when (action) {
+        is PlaygroundAction.ToggleFileSelection -> toggleFileSelection(state, action.fileKey)
+        is PlaygroundAction.ToggleFolderSelection -> toggleFolderSelection(state, action.folderPath)
+        is PlaygroundAction.SetFoldersSelection -> setFoldersSelection(state, action.folderPaths, action.selected)
+        is PlaygroundAction.ToggleSelectAll -> toggleSelectAll(state)
+        is PlaygroundAction.ToggleFolderExpanded -> toggleFolderExpanded(state, action.folderPath)
+        else -> state
+    }
 
     private fun toggleFileSelection(state: PlaygroundState, fileKey: String): PlaygroundState {
         if (state.batchPhase !is BatchPhase.Select) return state
@@ -194,53 +199,59 @@ internal class BatchReducer : Reducer<PlaygroundAction, PlaygroundState> {
         return state.copy(expandedFolders = updated)
     }
 
-    private fun reduceBatchNavigation(state: PlaygroundState, action: PlaygroundAction): PlaygroundState =
-        when (action) {
-            is PlaygroundAction.InspectBatchResult -> {
-                val results = (state.batchPhase as? BatchPhase.Results)?.completed
-                val index = results?.indexOf(action.result) ?: -1
-                if (results != null && index >= 0) {
-                    applyInspection(state, action.result, index)
-                } else {
-                    state
-                }
+    private fun reduceBatchNavigation(
+        state: PlaygroundState,
+        action: PlaygroundAction,
+    ): PlaygroundState = when (action) {
+        is PlaygroundAction.InspectBatchResult -> {
+            val results = (state.batchPhase as? BatchPhase.Results)?.completed
+            val index = results?.indexOf(action.result) ?: -1
+            if (results != null && index >= 0) {
+                applyInspection(state, action.result, index)
+            } else {
+                state
             }
-
-            is PlaygroundAction.NavigatePrev -> {
-                val results = (state.batchPhase as? BatchPhase.Results)?.completed
-                val idx = state.viewingBatchIndex
-                if (results != null && idx > 0) {
-                    applyInspection(state, results[idx - 1], idx - 1)
-                } else {
-                    state
-                }
-            }
-
-            is PlaygroundAction.NavigateNext -> {
-                val results = (state.batchPhase as? BatchPhase.Results)?.completed
-                val idx = state.viewingBatchIndex
-                if (results != null && idx < results.lastIndex) {
-                    applyInspection(state, results[idx + 1], idx + 1)
-                } else {
-                    state
-                }
-            }
-
-            is PlaygroundAction.BackToBatchList -> state.copy(
-                viewingBatchResult = false,
-                viewingBatchIndex = -1,
-            )
-
-            is PlaygroundAction.ZipUploadError -> state.copy(
-                conversionError = action.message,
-                isConverting = false,
-                batchPhase = null,
-            )
-
-            else -> state
         }
 
-    private fun applyInspection(state: PlaygroundState, result: BatchConversionResult, index: Int): PlaygroundState {
+        is PlaygroundAction.NavigatePrev -> {
+            val results = (state.batchPhase as? BatchPhase.Results)?.completed
+            val idx = state.viewingBatchIndex
+            if (results != null && idx > 0) {
+                applyInspection(state, results[idx - 1], idx - 1)
+            } else {
+                state
+            }
+        }
+
+        is PlaygroundAction.NavigateNext -> {
+            val results = (state.batchPhase as? BatchPhase.Results)?.completed
+            val idx = state.viewingBatchIndex
+            if (results != null && idx < results.lastIndex) {
+                applyInspection(state, results[idx + 1], idx + 1)
+            } else {
+                state
+            }
+        }
+
+        is PlaygroundAction.BackToBatchList -> state.copy(
+            viewingBatchResult = false,
+            viewingBatchIndex = -1,
+        )
+
+        is PlaygroundAction.ZipUploadError -> state.copy(
+            conversionError = action.message,
+            isConverting = false,
+            batchPhase = null,
+        )
+
+        else -> state
+    }
+
+    private fun applyInspection(
+        state: PlaygroundState,
+        result: BatchConversionResult,
+        index: Int,
+    ): PlaygroundState {
         val iconName = result.fileName.substringBeforeLast(".")
             .replaceFirstChar { it.uppercase() }
         return state.copy(

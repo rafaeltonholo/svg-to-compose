@@ -84,7 +84,11 @@ private fun buildBreadcrumbs(path: String): BreadcrumbListStructuredData? {
     return BreadcrumbListStructuredData(items)
 }
 
-private fun upsertMeta(attributeName: String, attributeValue: String, content: String) {
+private fun upsertMeta(
+    attributeName: String,
+    attributeValue: String,
+    content: String,
+) {
     val head = document.head ?: return
     val escapedValue = attributeValue.replace("'", "\\'")
     val selector = "meta[$attributeName='$escapedValue']"

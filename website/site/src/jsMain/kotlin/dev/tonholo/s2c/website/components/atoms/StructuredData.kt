@@ -111,8 +111,11 @@ data class FAQPageStructuredData(val questions: List<QuestionAnswer>) : Structur
     }
 }
 
-data class HowToStructuredData(val name: String, val description: String, val steps: List<HowToStep>) :
-    StructuredDataType {
+data class HowToStructuredData(
+    val name: String,
+    val description: String,
+    val steps: List<HowToStep>,
+) : StructuredDataType {
     data class HowToStep(val name: String, val text: String)
 
     override fun toJsonLd(): String {

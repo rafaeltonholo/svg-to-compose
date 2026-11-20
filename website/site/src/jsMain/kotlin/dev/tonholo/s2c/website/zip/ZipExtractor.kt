@@ -27,18 +27,23 @@ internal sealed interface ZipLimitCheck {
 /**
  * Checks whether the zip [file] exceeds the size soft limit.
  */
-internal fun checkZipSizeLimit(file: File): ZipLimitCheck = if (file.size.toDouble() > MAX_ZIP_SIZE_BYTES) {
-    ZipLimitCheck.SizeWarning(sizeBytes = file.size.toDouble())
-} else {
-    ZipLimitCheck.Ok
-}
+internal fun checkZipSizeLimit(file: File): ZipLimitCheck =
+    if (file.size.toDouble() > MAX_ZIP_SIZE_BYTES) {
+        ZipLimitCheck.SizeWarning(sizeBytes = file.size.toDouble())
+    } else {
+        ZipLimitCheck.Ok
+    }
 
 /**
  * Holds a parsed zip with its matching entries, ready for the
  * file-count check before full content extraction.
  */
 internal class ParsedZip(val matchingEntries: List<ZipEntry>) {
-    internal class ZipEntry(val relativePath: String, val extension: String, val zipObject: JSZipObject)
+    internal class ZipEntry(
+        val relativePath: String,
+        val extension: String,
+        val zipObject: JSZipObject,
+    )
 }
 
 /**
@@ -95,7 +100,10 @@ internal fun checkZipFileCountLimit(parsedZip: ParsedZip): ZipLimitCheck =
  * Successfully parsed files plus error entries for files that
  * failed to read from the zip.
  */
-internal class ZipExtractionResult(val files: List<UploadedFileInfo>, val errors: List<BatchConversionResult>)
+internal class ZipExtractionResult(
+    val files: List<UploadedFileInfo>,
+    val errors: List<BatchConversionResult>,
+)
 
 /**
  * Reads matching entries from a [parsedZip] and produces
