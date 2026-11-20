@@ -434,7 +434,8 @@ private fun OutputModesSection() {
             }
             Li {
                 CodeAwareSpanText(
-                    text = "Silent: turned on with `--silent`. No output at all.",
+                    text = "Silent: turned on with `--silent`. No output at all. You cannot use it together " +
+                        "with `--json`; the CLI stops with a usage error.",
                 )
             }
         }
