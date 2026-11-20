@@ -239,5 +239,8 @@ kotlin {
             implementation(websiteLibs.org.jetbrains.kotlinx.kotlinxSerializationJson)
             implementation(npm("jszip", websiteLibs.versions.jszip.get()))
         }
+        jsTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }

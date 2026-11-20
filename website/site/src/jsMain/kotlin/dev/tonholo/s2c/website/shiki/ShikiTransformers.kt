@@ -1,6 +1,15 @@
 package dev.tonholo.s2c.website.shiki
 
 /**
+ * Returns `true` when [value] is either `null` or `undefined`.
+ *
+ * Properties read from HAST nodes may be absent (`undefined`) or explicitly
+ * empty (`null`). On a `dynamic` value Kotlin/JS compiles `== null` to a loose
+ * comparison, which matches both.
+ */
+internal fun isNullOrUndefined(value: dynamic): Boolean = value == null
+
+/**
  * Kotlin/JS wrappers for `@shikijs/transformers`.
  *
  * These functions call into the transformers module loaded at runtime
@@ -32,7 +41,7 @@ object ShikiTransformers {
     // Adds a CSS class to a HAST node's properties.
     // HAST stores classes as a string in `properties.class`.
     private fun addClassToNode(node: dynamic, className: String) {
-        if (node.properties == null || node.properties == js("undefined")) {
+        if (isNullOrUndefined(node.properties)) {
             node.properties = js("({})")
         }
         val existing: String? = node.properties["class"]?.toString()
@@ -85,7 +94,7 @@ object ShikiTransformers {
                 iconNode.children = arrayOf(textNode)
 
                 val children = node.children
-                if (children != js("undefined")) {
+                if (!isNullOrUndefined(children)) {
                     node.children = children.concat(arrayOf(iconNode))
                 }
             }
