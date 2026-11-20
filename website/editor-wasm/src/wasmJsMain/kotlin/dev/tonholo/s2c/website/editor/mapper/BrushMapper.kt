@@ -103,7 +103,9 @@ private fun ComposeBrush.Gradient.Sweep.toSweepBrush(): Brush? {
  * pairs survive parsing, signalling the caller to fall back to the colors-only
  * overload.
  */
-private fun List<Float>?.toUsableColorStops(rawColors: List<ComposeColor>): Array<Pair<Float, Color>>? {
+private fun List<Float>?.toUsableColorStops(
+    rawColors: List<ComposeColor>,
+): Array<Pair<Float, Color>>? {
     if (this.isNullOrEmpty()) return null
     val pairs = zip(rawColors)
         .mapNotNull { (stop, rawColor) -> parseColor(rawColor)?.let { stop to it } }
