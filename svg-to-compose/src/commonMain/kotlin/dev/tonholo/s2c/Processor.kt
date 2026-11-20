@@ -48,7 +48,7 @@ class Processor(
     private val logger: Logger,
     private val fileManager: FileManager,
     private val iconWriter: IconWriter,
-    @Assisted @param:TempDirectory private val tempDirectory: Path?,
+    @Assisted @param:TempDirectory tempDirectory: Path?,
     private val optimizers: OptimizerFactory,
     private val parser: ImageParser,
     private val codeEmitterFactory: CodeEmitterFactory,
