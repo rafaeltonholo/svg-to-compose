@@ -26,12 +26,15 @@ internal fun processWorkerResults(
     errors: MutableMap<Path, Throwable>,
     outputFiles: MutableMap<Path, Path>,
 ) {
+    val collectedErrors = mutableMapOf<Path, Throwable>()
+    collectWorkerResults(resultsDir = resultsDir, errors = collectedErrors, outputFiles = outputFiles)
+    errors.putAll(collectedErrors)
     checkWorkerResults(
         configurationName = configurationName,
         expectedResultCount = expectedResultCount,
         resultsDir = resultsDir,
+        errors = collectedErrors,
     )
-    collectWorkerResults(resultsDir = resultsDir, errors = errors, outputFiles = outputFiles)
 }
 
 /**
@@ -40,6 +43,7 @@ internal fun processWorkerResults(
  * @param configurationName Name of the processor configuration being parsed.
  * @param expectedResultCount Number of files submitted to the workers.
  * @param resultsDir Directory where workers write their result files.
+ * @param errors Per-file errors already read from the results, reported together with the count.
  * @throws ExitProgramException When the amount of result files differs from
  * [expectedResultCount], meaning at least one worker did not report its outcome.
  */
@@ -47,6 +51,7 @@ private fun checkWorkerResults(
     configurationName: String,
     expectedResultCount: Int,
     resultsDir: File,
+    errors: Map<Path, Throwable>,
 ) {
     val actualResultCount = resultsDir.listFiles()?.size ?: 0
     if (actualResultCount != expectedResultCount) {
@@ -54,7 +59,8 @@ private fun checkWorkerResults(
             errorCode = ErrorCode.GradlePluginError,
             message = "Icon parsing for configuration '$configurationName' is incomplete. " +
                 "Expected $expectedResultCount worker result file(s) but found $actualResultCount. " +
-                "Some workers may have failed silently. Run with --info or --debug for more details.",
+                "Some workers may have failed silently. Run with --info or --debug for more details." +
+                errors.asReport(),
         )
     }
 }
@@ -83,3 +89,8 @@ private fun collectWorkerResults(
         }
     }
 }
+
+private fun Map<Path, Throwable>.asReport(): String =
+    entries.joinToString(separator = "") { (origin, error) ->
+        "\n\t- $origin: ${error.message}"
+    }

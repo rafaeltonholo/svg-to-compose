@@ -23,21 +23,26 @@ class WorkerResultsTest {
         resultsDir.deleteRecursively()
     }
 
-    private fun writeErrorResult(fileName: String, origin: String, message: String) {
+    private fun writeErrorResult(
+        fileName: String,
+        origin: String,
+        message: String,
+    ) {
         resultsDir.resolve(fileName).writeText(
             "origin=$origin\noutput=\nstatus=Error\nmessage=$message\n",
         )
     }
 
-    private fun process(expectedResultCount: Int): ExitProgramException = assertFailsWith<ExitProgramException> {
-        processWorkerResults(
-            configurationName = "icons",
-            expectedResultCount = expectedResultCount,
-            resultsDir = resultsDir,
-            errors = mutableMapOf<Path, Throwable>(),
-            outputFiles = mutableMapOf<Path, Path>(),
-        )
-    }
+    private fun process(expectedResultCount: Int): ExitProgramException =
+        assertFailsWith<ExitProgramException> {
+            processWorkerResults(
+                configurationName = "icons",
+                expectedResultCount = expectedResultCount,
+                resultsDir = resultsDir,
+                errors = mutableMapOf<Path, Throwable>(),
+                outputFiles = mutableMapOf<Path, Path>(),
+            )
+        }
 
     @Test
     fun `given fewer results than submitted files - when results are processed - then failure reports the counts`() {
