@@ -34,7 +34,7 @@ class TuiRendererPipelineTest {
     fun `given a batch of real icons - when the run drives the tui - then the dashboard summarises the run`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness(interactive = true)
+            val harness = CliIntegrationHarness(scheduler = testScheduler, interactive = true)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/second.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
@@ -67,7 +67,7 @@ class TuiRendererPipelineTest {
     fun `given a single real icon - when the run drives the tui - then the single file view is used`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness(interactive = true)
+            val harness = CliIntegrationHarness(scheduler = testScheduler, interactive = true)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.createDirectory(path = "/output")
             val (terminal, recorder) = newTerminal()

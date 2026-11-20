@@ -22,7 +22,7 @@ class CliRunnerIntegrationTest {
     fun `given a batch with one broken icon - when the terminal is not a tty - then only failed files are tagged FAIL`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/second.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
@@ -56,7 +56,7 @@ class CliRunnerIntegrationTest {
     fun `given a batch run - when json output is selected - then every line is a json object tagged with an event`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/second.svg", content = CliIntegrationHarness.validSvg)
             harness.createDirectory(path = "/output")
@@ -94,7 +94,7 @@ class CliRunnerIntegrationTest {
     fun `given an interactive terminal - when no-tui is set - then plain text is rendered instead of the dashboard`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness(interactive = true)
+            val harness = CliIntegrationHarness(scheduler = testScheduler, interactive = true)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.createDirectory(path = "/output")
 
@@ -121,7 +121,7 @@ class CliRunnerIntegrationTest {
     fun `given a single svg file - when converted - then the run reports exactly one file`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.createDirectory(path = "/output")
 
@@ -151,7 +151,7 @@ class CliRunnerIntegrationTest {
     fun `given a directory with no icons - when run - then it fails with a file not found error`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.createDirectory(path = "/icons")
             harness.createDirectory(path = "/output")
 
@@ -176,7 +176,7 @@ class CliRunnerIntegrationTest {
     fun `given every icon fails - when run - then all files are reported and an error report is written`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.brokenSvg)
             harness.writeFile(path = "/icons/second.svg", content = CliIntegrationHarness.brokenSvg)
             harness.createDirectory(path = "/output")
@@ -214,7 +214,7 @@ class CliRunnerIntegrationTest {
     fun `given a batch with one broken icon - when plain text is rendered - then the failure list is printed once`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness()
+            val harness = CliIntegrationHarness(scheduler = testScheduler)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
             harness.createDirectory(path = "/output")
@@ -240,7 +240,7 @@ class CliRunnerIntegrationTest {
     fun `given a silent run with failures - when the terminal is not a tty - then nothing is printed`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness(silent = true)
+            val harness = CliIntegrationHarness(scheduler = testScheduler, silent = true)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.writeFile(path = "/icons/broken.svg", content = CliIntegrationHarness.brokenSvg)
             harness.createDirectory(path = "/output")
@@ -258,7 +258,7 @@ class CliRunnerIntegrationTest {
     fun `given a silent run in an interactive terminal - when files convert - then no dashboard is rendered`() =
         runTest {
             // Arrange
-            val harness = CliIntegrationHarness(interactive = true, silent = true)
+            val harness = CliIntegrationHarness(scheduler = testScheduler, interactive = true, silent = true)
             harness.writeFile(path = "/icons/first.svg", content = CliIntegrationHarness.validSvg)
             harness.createDirectory(path = "/output")
 

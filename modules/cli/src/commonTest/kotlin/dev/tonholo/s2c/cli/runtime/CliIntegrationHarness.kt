@@ -3,34 +3,16 @@ package dev.tonholo.s2c.cli.runtime
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
 import com.github.ajalt.mordant.terminal.TerminalRecorder
-import dev.tonholo.s2c.Processor
-import dev.tonholo.s2c.SvgToComposeContextImpl
-import dev.tonholo.s2c.cli.logger.CliLogger
-import dev.tonholo.s2c.cli.output.LineWriter
+import dev.tonholo.s2c.cli.inject.CliTestGraph
 import dev.tonholo.s2c.cli.output.report.InvocationCommand
-import dev.tonholo.s2c.cli.update.GitHubReleaseFetcher
-import dev.tonholo.s2c.cli.update.UpdateCache
-import dev.tonholo.s2c.cli.update.UpdateNotifier
-import dev.tonholo.s2c.cli.update.VersionChecker
-import dev.tonholo.s2c.cli.update.WrapperDetector
-import dev.tonholo.s2c.dispatching.SequentialFileDispatcher
-import dev.tonholo.s2c.domain.FileType
-import dev.tonholo.s2c.emitter.DefaultCodeEmitterFactory
-import dev.tonholo.s2c.emitter.editorconfig.DefaultEditorConfigReader
-import dev.tonholo.s2c.emitter.template.config.DefaultTemplateConfigReader
-import dev.tonholo.s2c.io.DefaultIconWriter
-import dev.tonholo.s2c.io.FileManager
-import dev.tonholo.s2c.optimizer.Optimizer
 import dev.tonholo.s2c.output.ConversionEvent
 import dev.tonholo.s2c.output.RunConfig
-import dev.tonholo.s2c.parser.AvgContentParser
-import dev.tonholo.s2c.parser.DefaultImageParser
 import dev.tonholo.s2c.parser.ParserConfig
-import dev.tonholo.s2c.parser.SvgContentParser
-import kotlinx.coroutines.Dispatchers
+import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -41,17 +23,25 @@ private const val TERMINAL_WIDTH = 120
  * Wires the real conversion pipeline to the real CLI runtime over an
  * in-memory file system and a recording terminal.
  *
- * The core [Processor] is built from the same implementations the
- * production dependency graph provides, so a run exercises parsing, code
- * generation, file writing, run-log writing, and error reporting for real.
- * Only the file system and the output sinks are swapped for test doubles.
+ * The whole object graph comes from [CliTestGraph], which shares its bindings
+ * with the production graph through [dev.tonholo.s2c.cli.inject.CliBindings].
+ * Only the file system, the terminal, the output sink and the dispatchers are
+ * swapped for test doubles, so a run exercises parsing, code generation, file
+ * writing, run-log writing, and error reporting for real.
+ *
+ * @param scheduler the scheduler of the surrounding `runTest`, shared with
+ *  the injected dispatchers so the run is deterministic.
  *
  * @param interactive whether the terminal reports itself as a TTY, which is
  *  what [CliRunner] uses to pick between the dashboard and the line-based
  *  renderers.
  * @param silent the value of the `--silent` flag for the run.
  */
-internal class CliIntegrationHarness(interactive: Boolean = false, silent: Boolean = false) {
+internal class CliIntegrationHarness(
+    scheduler: TestCoroutineScheduler,
+    interactive: Boolean = false,
+    silent: Boolean = false,
+) {
     val fileSystem: FakeFileSystem = FakeFileSystem()
 
     /** Every line the CLI wrote to stdout, in order. */
@@ -63,64 +53,20 @@ internal class CliIntegrationHarness(interactive: Boolean = false, silent: Boole
         outputInteractive = interactive,
         inputInteractive = interactive,
     )
-    private val terminal = Terminal(terminalInterface = recorder)
-    private val context = SvgToComposeContextImpl(initial = CliConfig(silent = silent))
-    private val lineWriter = LineWriter { line -> printedLines += line }
-    private val logger = CliLogger(context = context, writer = lineWriter)
-    private val fileManager = FileManager(fileSystem = fileSystem, logger = logger)
+    private val dispatcher = StandardTestDispatcher(scheduler = scheduler)
 
-    private val processorFactory = object : Processor.Factory {
-        override fun create(tempDirectory: Path?): Processor = Processor(
-            config = context.configSnapshot,
-            logger = logger,
-            fileManager = fileManager,
-            iconWriter = DefaultIconWriter(logger = logger, fileManager = fileManager),
-            tempDirectory = tempDirectory,
-            optimizers = Optimizer.Factory(
-                logger = logger,
-                fileManager = fileManager,
-                context = context,
-            ),
-            parser = DefaultImageParser(
-                fileManager = fileManager,
-                contentParsers = mapOf(
-                    FileType.Svg to SvgContentParser(logger = logger),
-                    FileType.Avg to AvgContentParser(logger = logger),
-                ),
-            ),
-            codeEmitterFactory = DefaultCodeEmitterFactory(logger = logger),
-            editorConfigReader = DefaultEditorConfigReader(fileManager = fileManager),
-            templateConfigReader = DefaultTemplateConfigReader(fileManager = fileManager),
-            fileDispatcher = SequentialFileDispatcher,
-        )
-    }
-
-    private val runner = CliRunner(
-        processorFactory = processorFactory,
-        terminal = terminal,
-        context = context,
-        fileManager = fileManager,
+    private val graph = createGraphFactory<CliTestGraph.Factory>().create(
+        config = CliConfig(silent = silent, parallel = CliConfig.PARALLEL_DISABLED),
+        command = InvocationCommand(value = "s2c"),
         fileSystem = fileSystem,
-        updateNotifier = UpdateNotifier(
-            versionChecker = VersionChecker(
-                currentVersion = "3.0.0",
-                cache = UpdateCache(
-                    fileSystem = fileSystem,
-                    cacheDir = "/cache".toPath(),
-                    json = Json,
-                    ioDispatcher = Dispatchers.Default,
-                ),
-                fetcher = GitHubReleaseFetcher { null },
-                nowEpochMillis = { 0L },
-            ),
-            wrapperDetector = WrapperDetector(envReader = { null }),
-            logger = logger,
-        ),
-        invocationCommand = InvocationCommand(value = "s2c"),
-        ioDispatcher = Dispatchers.Default,
-        mainDispatcher = Dispatchers.Default,
-        lineWriter = lineWriter,
+        terminal = Terminal(terminalInterface = recorder),
+        lineWriter = { line -> printedLines += line },
+        ioDispatcher = dispatcher,
+        mainDispatcher = dispatcher,
     )
+
+    /** The production command, wired by the test graph. */
+    val client: Client = graph.client
 
     /** Everything [CliRunner] wrote straight to the terminal. */
     val terminalOutput: String
@@ -147,7 +93,7 @@ internal class CliIntegrationHarness(interactive: Boolean = false, silent: Boole
         noTui: Boolean = false,
         recursive: Boolean = false,
     ) {
-        runner.run(
+        graph.runner.run(
             config = runConfig(input = input, output = output, noTui = noTui, recursive = recursive),
             mapIconNameTo = { iconName -> iconName },
             outputFormat = outputFormat,
@@ -160,14 +106,14 @@ internal class CliIntegrationHarness(interactive: Boolean = false, silent: Boole
      * the events it emitted, so renderer-level tests can replay a real run.
      */
     suspend fun collectEvents(input: String, output: String): List<ConversionEvent> =
-        processorFactory.create(tempDirectory = null)
+        graph.processorFactory.create(tempDirectory = null)
             .runAsFlow(
                 path = input,
                 output = output,
                 config = parserConfig,
                 recursive = false,
             )
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatcher)
             .toList()
 
     private fun runConfig(
