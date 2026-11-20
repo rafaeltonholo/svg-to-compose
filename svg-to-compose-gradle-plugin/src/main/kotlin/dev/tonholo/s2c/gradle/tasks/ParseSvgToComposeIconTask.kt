@@ -338,7 +338,8 @@ internal abstract class ParseSvgToComposeIconTask @Inject constructor(
             .dir("$WORKER_RESULTS_FOLDER/${configuration.name}")
             .get()
             .asFile
-        if (!resultsDir.exists()) resultsDir.mkdirs()
+        resultsDir.deleteRecursively()
+        resultsDir.mkdirs()
 
         // Concurrency is controlled by chunking based on maxParallelExecutions and Gradle's max workers.
         val chunkSize = if (maxParallelExecutions.get() > 1) maxParallelExecutions.get() else 1
