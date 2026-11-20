@@ -21,6 +21,7 @@ class TemplateModeFunctionalTest : GradleFunctionalTest() {
         private const val TASK_PATH = ":$TASK_NAME"
         private const val PACKAGE = "dev.tonholo.s2c.test.template"
         private const val TEMPLATE_MARKER = "TemplateDiscoveryMarker"
+        private const val EDITED_TEMPLATE_MARKER = "EditedTemplateDiscoveryMarker"
 
         // language=svg
         private val SIMPLE_SVG = """
@@ -93,6 +94,23 @@ class TemplateModeFunctionalTest : GradleFunctionalTest() {
             readGeneratedIcon().contains(TEMPLATE_MARKER),
             "Expected the discovered template to shape the generated icon",
         )
+    }
+
+    @Test
+    fun `given a discovered template - when the template is edited - then the task runs again`() {
+        // Arrange
+        setupBuildGradle()
+        writeSvg("icons", "icon-a.svg", SIMPLE_SVG)
+        writeDiscoverableTemplate()
+        runGradle(TASK_NAME)
+
+        // Act
+        val editedTemplate = TEMPLATE_TOML.replace(TEMPLATE_MARKER, EDITED_TEMPLATE_MARKER)
+        projectDir.resolve("s2c.template.toml").writeText(editedTemplate)
+        val result = runGradle(TASK_NAME)
+
+        // Assert
+        assertTaskOutcome(result, TASK_PATH, TaskOutcome.SUCCESS)
     }
 
     @Test
