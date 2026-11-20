@@ -74,32 +74,28 @@ class Svg2ComposePluginFunctionalTest : GradleFunctionalTest() {
         """.trimIndent()
 
     private val templateSvgFiles = listOf(
-        "samples/svg/attention-filled.svg",
-        "samples/svg/android.svg",
-        "samples/svg/brasil.svg",
-        "samples/svg/gradient/linear-gradient01.svg",
-        "samples/svg/mask/mask-with-group.svg",
+        "svg/attention-filled.svg",
+        "svg/android.svg",
+        "svg/brasil.svg",
+        "svg/gradient/linear-gradient01.svg",
+        "svg/mask/mask-with-group.svg",
     )
 
     private val templateAvgFiles = listOf(
-        "samples/avg/shield-halved-solid.xml",
-        "samples/avg/android.xml",
-        "samples/avg/gradient/stroke_gradient.xml",
+        "avg/shield-halved-solid.xml",
+        "avg/android.xml",
+        "avg/gradient/stroke_gradient.xml",
     )
 
     private fun copyTemplateIconsToProject(type: String) {
-        val iconsDir = projectDir.resolve("icons")
-        iconsDir.mkdirs()
-        val files = if (type == "svg") templateSvgFiles else templateAvgFiles
-        for (relativePath in files) {
-            val source = repoRoot.resolve(relativePath)
-            source.copyTo(iconsDir.resolve(source.name))
-        }
+        copyResourceFilesToProject(
+            dirName = "icons",
+            resourcePaths = if (type == "svg") templateSvgFiles else templateAvgFiles,
+        )
     }
 
     private fun copyTemplateConfigToProject() {
-        val templateSource = repoRoot.resolve("playground/s2c.template.toml")
-        templateSource.copyTo(projectDir.resolve("s2c.template.toml"))
+        copyResourceToProject(resourcePath = "s2c.template.toml")
     }
 
     /**
